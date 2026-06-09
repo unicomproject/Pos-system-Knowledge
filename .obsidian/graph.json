@@ -8,7 +8,7 @@
   "collapse-color-groups": false,
   "colorGroups": [
     {
-      "query": "file:Developer",
+      "query": "path:04_MODULE_KNOWLEDGE  ",
       "color": {
         "a": 1,
         "rgb": 14048348
@@ -18,14 +18,7 @@
       "query": "path:03_USER_JOURNEYS  ",
       "color": {
         "a": 1,
-        "rgb": 4314431
-      }
-    },
-    {
-      "query": "path:(Tables)",
-      "color": {
-        "a": 1,
-        "rgb": 11392604
+        "rgb": 6084190
       }
     }
   ],
@@ -39,6 +32,6 @@
   "repelStrength": 10,
   "linkStrength": 1,
   "linkDistance": 250,
-  "scale": 0.535979599622588,
+  "scale": 0.38230109687699154,
   "close": false
 }
