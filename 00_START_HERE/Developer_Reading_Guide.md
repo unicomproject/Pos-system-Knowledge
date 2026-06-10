@@ -107,19 +107,18 @@ Always read scope and access-control rules first.
 
 ## Recommended Reading By Work Item
 
-| Work Item         | Required Files                                                                |
-| ----------------- | ----------------------------------------------------------------------------- |
-| Tenant creation   | [[Create_Tenant_Flow]], [[Tenant]], [[Subscription]], [[Feature_Entitlement]] |
-| User setup        | [[01_Setup_Link_And_Password_Flow]], [[Auth]], [[Users]]                      |
-| Role permissions  | [[Role_Permission]], [[Permission_Code_List]], [[API_Authorization_Rules]]    |
-| Till setup        | [[Till]], [[Devices]], [[Tills]]                                              |
-| Device activation | [[Device_Activation_Flow]], [[Device]], [[POS_Hardware_Integration]]          |
-| POS sale          | [[Start_Sale_Flow]], [[Sales]], [[Sale_Lines]], [[Payments]]                  |
-| Discount          | [[Discount_Flow]], [[Discount]], [[Discounts]]                                |
-| Return/refund     | [[08_Return_Refund_Flow]], [[Returns]], [[RefundsReturn_Refund_Flow]]         |
-| Exchange          | [[Exchange_Flow]], [[Exchange]]                                               |
-| Reports           | [[Reports]], [[Reports.md]]                                                   |
-
+| Work Item | Required Files |
+|---|---|
+| Tenant creation | [[03_USER_JOURNEYS/Platform_Admin/02_Create_Tenant_Flow|Create tenant flow]], [[04_MODULE_KNOWLEDGE/Tenant/01_Module_Overview|Tenant module]], [[04_MODULE_KNOWLEDGE/Subscription/01_Module_Overview|Subscription module]], [[04_MODULE_KNOWLEDGE/Feature_Entitlement/01_Module_Overview|Feature entitlement module]], [[06_DATABASE_KNOWLEDGE/Tables/03_Tenant_Foundation|Tenant foundation tables]], [[06_DATABASE_KNOWLEDGE/Tables/05_Subscription_Plans_Feature_Catalog|Subscription plan and feature catalog tables]] |
+| User setup | [[03_USER_JOURNEYS/Tenant_Admin/01_Setup_Link_And_Password_Flow|Setup link and password flow]], [[04_MODULE_KNOWLEDGE/Auth/01_Module_Overview|Auth module]], [[06_DATABASE_KNOWLEDGE/Tables/08_Tenant_Identity_Roles|Tenant identity and role tables]], [[06_DATABASE_KNOWLEDGE/Tables/09_User_Tokens_And_Sessions|User token and session tables]] |
+| Role permissions | [[03_USER_JOURNEYS/Tenant_Admin/06_Role_Permission_Flow|Role permission flow]], [[04_MODULE_KNOWLEDGE/Role_Permission/01_Module_Overview|Role permission module]], [[02_ACCESS_CONTROL/Permission_Code_List|Permission code list]], [[02_ACCESS_CONTROL/API_Authorization_Rules|API authorization rules]], [[06_DATABASE_KNOWLEDGE/Tables/08_Tenant_Identity_Roles|Tenant identity and role tables]] |
+| Till setup | [[03_USER_JOURNEYS/Platform_Admin/06_Till_Setup_Flow|Till setup flow]], [[03_USER_JOURNEYS/Tenant_Admin/04_Till_Management_Flow|Till management flow]], [[04_MODULE_KNOWLEDGE/Till/01_Module_Overview|Till module]], [[04_MODULE_KNOWLEDGE/Device/01_Module_Overview|Device module]], [[06_DATABASE_KNOWLEDGE/Tables/10_Till_Device_Session|Till device session tables]] |
+| Device activation | [[03_USER_JOURNEYS/Cashier/02_Device_Activation_Flow|Device activation flow]], [[04_MODULE_KNOWLEDGE/Device/01_Module_Overview|Device module]], [[06_DATABASE_KNOWLEDGE/Tables/10_Till_Device_Session|Till device session tables]], [[12_INTEGRATIONS/POS_Hardware_Integration|POS hardware integration]] |
+| POS sale | [[03_USER_JOURNEYS/Cashier/04_Start_Sale_Flow|Start sale flow]], [[03_USER_JOURNEYS/Cashier/07_Payment_Flow|Payment flow]], [[04_MODULE_KNOWLEDGE/Sales/01_Module_Overview|Sales module]], [[04_MODULE_KNOWLEDGE/Payment/01_Module_Overview|Payment module]], [[06_DATABASE_KNOWLEDGE/Tables/19_Sales_Core|Sales core tables]], [[06_DATABASE_KNOWLEDGE/Tables/20_Payment_Core|Payment core tables]] |
+| Discount | [[03_USER_JOURNEYS/Cashier/05_Discount_Flow|Discount flow]], [[03_USER_JOURNEYS/Tenant_Admin/10_Discount_Setup_Flow|Discount setup flow]], [[04_MODULE_KNOWLEDGE/Discount/01_Module_Overview|Discount module]], [[06_DATABASE_KNOWLEDGE/Tables/22_Discount_Core|Discount core tables]], [[06_DATABASE_KNOWLEDGE/Tables/23_Expiry_Discount|Expiry discount tables]] |
+| Return/refund | [[03_USER_JOURNEYS/Cashier/08_Return_Refund_Flow|Return refund flow]], [[04_MODULE_KNOWLEDGE/Return_Refund/01_Module_Overview|Return refund module]], [[06_DATABASE_KNOWLEDGE/Tables/21_Receipts_And_Refunds|Receipt and refund tables]], [[06_DATABASE_KNOWLEDGE/Tables/25_Returns|Returns tables]] |
+| Exchange | [[03_USER_JOURNEYS/Cashier/09_Exchange_Flow|Exchange flow]], [[04_MODULE_KNOWLEDGE/Exchange/01_Module_Overview|Exchange module]], [[06_DATABASE_KNOWLEDGE/Tables/26_Exchanges_Customer_Credit|Exchange and customer credit tables]] |
+| Reports | [[03_USER_JOURNEYS/Tenant_Admin/11_Tenant_Reports_Flow|Tenant reports flow]], [[04_MODULE_KNOWLEDGE/Reports/01_Module_Overview|Reports module]], [[06_DATABASE_KNOWLEDGE/Tables/27_Reports_Exports|Reports export tables]] |
 ## Implementation Sequence Rule
 
 Do not build screens before the backend contract is understood.

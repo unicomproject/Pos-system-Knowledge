@@ -60,11 +60,13 @@ This layer decides the use-case workflow without EF Core implementation details.
 The Domain layer contains business concepts independent from technical
 frameworks.
 
-It contains entities, value objects, stable business enums, domain rules,
-module-wise permission code constants, and business invariants.
+It contains entities, value objects, domain rules, module-wise permission code
+constants, and business invariants.
 
-Examples include sale status, payment status, till session status, Money,
-Product, Sale, Payment, Refund, and Exchange.
+Database status/type fields such as sale status, payment status, and till session
+status must remain string properties in Domain models. Allowed values are enforced
+through Application validation and Infrastructure EF Core database CHECK
+constraints, not C# enum classes.
 
 ## Infrastructure Layer
 

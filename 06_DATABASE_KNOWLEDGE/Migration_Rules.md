@@ -32,6 +32,11 @@ Use constraints for status values, payment method codes, discount type/scope
 codes, movement direction, positive quantities, non-negative monetary totals,
 tenant-aware uniqueness, and one open till session per tenant/till.
 
+Status/type/check-value columns must be implemented as varchar/text columns with
+database CHECK constraints. Do not require matching C# enum classes in the
+Domain layer for these values; Domain models keep string properties and
+Infrastructure owns the CHECK constraint mapping.
+
 ## Hash Storage Rule
 
 Never store raw tokens/codes.

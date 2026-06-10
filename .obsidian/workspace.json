@@ -13,12 +13,22 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "00_START_HERE/Developer_Reading_Guide.md",
+                "file": "15_IMPLEMENTATION_TRACKING/Full_Feature_Status_Index.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Developer_Reading_Guide"
+              "title": "Full_Feature_Status_Index"
+            }
+          },
+          {
+            "id": "e4b581fe8ebd8db2",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
             }
           }
         ]
@@ -94,7 +104,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
+                "file": "15_IMPLEMENTATION_TRACKING/Full_Feature_Status_Index.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +114,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for 10_Cash_In_Out_Flow"
+              "title": "Backlinks for Full_Feature_Status_Index"
             }
           },
           {
@@ -185,41 +195,41 @@
   },
   "active": "56806a201bd68d51",
   "lastOpenFiles": [
-    "Reports.md",
-    "12_INTEGRATIONS/AWS_S3_File_Storage.md",
-    "04_MODULE_KNOWLEDGE/Feature_Entitlement/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/Feature_Entitlement/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Feature_Entitlement/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/Discount/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/Discount/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/Discount/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Device/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Auth/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Auth/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/_MODULE_TEMPLATE/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/_MODULE_TEMPLATE/01_Module_Overview.md",
-    "00_START_HERE/Project_Glossary.md",
+    "15_IMPLEMENTATION_TRACKING/_TEMPLATES/Implementation_Status_Template.md",
+    "14_AI_DEVELOPER_PROMPTS/Angular/angular feature implement prompt.md",
+    "14_AI_DEVELOPER_PROMPTS/Backend/Backend feature prompt.md",
     "04_MODULE_KNOWLEDGE/Exchange/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/Exchange/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/Exchange/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Exchange",
-    "04_MODULE_KNOWLEDGE/Return_Refund/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/Return_Refund/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/Return_Refund/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Return_Refund",
-    "04_MODULE_KNOWLEDGE/Loyalty/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/Loyalty/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/Loyalty/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Loyalty",
-    "04_MODULE_KNOWLEDGE/Discount",
-    "04_MODULE_KNOWLEDGE/Payment/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/Payment/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/Payment/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Payment",
-    "04_MODULE_KNOWLEDGE/Sales",
-    "04_MODULE_KNOWLEDGE/Inventory",
-    "04_MODULE_KNOWLEDGE/Product",
-    "04_MODULE_KNOWLEDGE/Device",
-    "04_MODULE_KNOWLEDGE/Till"
+    "15_IMPLEMENTATION_TRACKING/Flutter/Sales/Start_Sale_UI_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Sales/Create_Sale_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Angular/Tenant/Tenant_List_Page_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Flutter/README.md",
+    "15_IMPLEMENTATION_TRACKING/Flutter/Sales",
+    "15_IMPLEMENTATION_TRACKING/Backend/Sales",
+    "15_IMPLEMENTATION_TRACKING/Backend/README.md",
+    "15_IMPLEMENTATION_TRACKING/Angular/README.md",
+    "15_IMPLEMENTATION_TRACKING/Angular/Tenant",
+    "15_IMPLEMENTATION_TRACKING/_TEMPLATES",
+    "15_IMPLEMENTATION_TRACKING/Full_Feature_Status_Index.md",
+    "15_IMPLEMENTATION_TRACKING/Flutter",
+    "15_IMPLEMENTATION_TRACKING/Backend",
+    "15_IMPLEMENTATION_TRACKING/Angular",
+    "15_IMPLEMENTATION_TRACKING",
+    "13_IMPLEMENTATION_TRACKING/Flutter/Sales/Start_Sale_UI_Implementation_Status.md",
+    "13_IMPLEMENTATION_TRACKING/Backend/Sales/Create_Sale_Implementation_Status.md",
+    "13_IMPLEMENTATION_TRACKING/Angular/Tenant/Tenant_List_Page_Implementation_Status.md",
+    "13_IMPLEMENTATION_TRACKING/_TEMPLATES/Implementation_Status_Template.md",
+    "13_IMPLEMENTATION_TRACKING/Flutter/Sales",
+    "13_IMPLEMENTATION_TRACKING/Flutter/README.md",
+    "13_IMPLEMENTATION_TRACKING/Backend/Sales",
+    "13_IMPLEMENTATION_TRACKING/Backend/README.md",
+    "13_IMPLEMENTATION_TRACKING/Angular/README.md",
+    "13_IMPLEMENTATION_TRACKING/Full_Feature_Status_Index.md",
+    "12_IMPLEMENTATION_TRACKING/Flutter/Sales/Start_Sale_UI_Implementation_Status.md",
+    "12_IMPLEMENTATION_TRACKING/Flutter/README.md",
+    "12_IMPLEMENTATION_TRACKING/Angular/Tenant/Tenant_List_Page_Implementation_Status.md",
+    "12_IMPLEMENTATION_TRACKING/Angular/README.md",
+    "12_IMPLEMENTATION_TRACKING/Backend/Sales/Create_Sale_Implementation_Status.md",
+    "12_IMPLEMENTATION_TRACKING/Backend/README.md",
+    "12_IMPLEMENTATION_TRACKING/_TEMPLATES/Implementation_Status_Template.md"
   ]
 }

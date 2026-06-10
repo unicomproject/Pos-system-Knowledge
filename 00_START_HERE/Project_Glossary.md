@@ -123,7 +123,7 @@ Do not introduce alternate names unless a later architecture decision approves t
 | Clean Architecture | Layered backend approach separating API, Application, Domain, and Infrastructure |
 | API Layer | Controllers, middleware, filters, versioned HTTP endpoints |
 | Application Layer | Use cases, services, DTOs, validators, repository interfaces |
-| Domain Layer | Entities, stable enums, value objects, domain rules, permission constants |
+| Domain Layer | Entities, value objects, string status/type fields, domain rules, permission constants |
 | Infrastructure Layer | EF Core, repositories, PostgreSQL, S3, JWT, adapters |
 | Audit Log | Immutable record of sensitive platform or tenant action |
 

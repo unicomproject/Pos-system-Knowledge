@@ -20,6 +20,48 @@
         "a": 1,
         "rgb": 6084190
       }
+    },
+    {
+      "query": "path:06_DATABASE_KNOWLEDGE  ",
+      "color": {
+        "a": 1,
+        "rgb": 14404378
+      }
+    },
+    {
+      "query": "path:05_BACKEND_ARCHITECTURE  ",
+      "color": {
+        "a": 1,
+        "rgb": 2409101
+      }
+    },
+    {
+      "query": "path:09_ANGULAR_ADMIN_KNOWLEDGE  ",
+      "color": {
+        "a": 1,
+        "rgb": 1325256
+      }
+    },
+    {
+      "query": "path:01_RELEASE_SCOPE  ",
+      "color": {
+        "a": 1,
+        "rgb": 5243334
+      }
+    },
+    {
+      "query": "path:00_START_HERE  ",
+      "color": {
+        "a": 1,
+        "rgb": 5263494
+      }
+    },
+    {
+      "query": "path:02_ACCESS_CONTROL path:",
+      "color": {
+        "a": 1,
+        "rgb": 11361494
+      }
     }
   ],
   "collapse-display": true,
@@ -32,6 +74,6 @@
   "repelStrength": 10,
   "linkStrength": 1,
   "linkDistance": 250,
-  "scale": 0.38230109687699154,
-  "close": false
+  "scale": 0.20323414060548142,
+  "close": true
 }
