@@ -1,4 +1,4 @@
-<!-- title: Developer Reading Guide -->
+git commit <!-- title: Developer Reading Guide -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
 <!-- last_updated: 2026-06-08 -->

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "00_START_HERE/Developer_Reading_Guide.md",
+                "file": "08_FLUTTER_POS_KNOWLEDGE/Permission_Based_UI_Rendering.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Developer_Reading_Guide"
+              "title": "Permission_Based_UI_Rendering"
             }
           }
         ]
@@ -185,6 +185,10 @@
   },
   "active": "56806a201bd68d51",
   "lastOpenFiles": [
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter_Module_Implementation_Guide.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter_App_Architecture.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Dio_API_Client.md",
+    "00_START_HERE/Developer_Reading_Guide.md",
     "Reports.md",
     "12_INTEGRATIONS/AWS_S3_File_Storage.md",
     "04_MODULE_KNOWLEDGE/Feature_Entitlement/02_Functional_Rules.md",
@@ -209,12 +213,8 @@
     "04_MODULE_KNOWLEDGE/Return_Refund",
     "04_MODULE_KNOWLEDGE/Loyalty/03_Technical_Contract.md",
     "04_MODULE_KNOWLEDGE/Loyalty/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/Loyalty/01_Module_Overview.md",
     "04_MODULE_KNOWLEDGE/Loyalty",
     "04_MODULE_KNOWLEDGE/Discount",
-    "04_MODULE_KNOWLEDGE/Payment/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/Payment/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/Payment/01_Module_Overview.md",
     "04_MODULE_KNOWLEDGE/Payment",
     "04_MODULE_KNOWLEDGE/Sales",
     "04_MODULE_KNOWLEDGE/Inventory",
