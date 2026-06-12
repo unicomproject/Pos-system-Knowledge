@@ -85,6 +85,11 @@ tenant.
 
 Mixed-tenant records must never be accepted in one transaction.
 
+All records committed in one Unit of Work or database transaction must belong to
+the same tenant.
+
+Mixed-tenant writes must be rejected before commit.
+
 ## Related Files
 
 - [[Database_Overview]]

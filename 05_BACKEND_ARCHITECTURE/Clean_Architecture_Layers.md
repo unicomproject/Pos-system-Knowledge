@@ -55,6 +55,17 @@ workflow orchestration.
 
 This layer decides the use-case workflow without EF Core implementation details.
 
+## Unit Of Work Rule
+
+Application services may depend on an `IUnitOfWork` abstraction when a use case
+needs to commit changes across multiple repositories.
+
+Application must not depend on EF Core `DbContext` directly.
+
+Infrastructure implements Unit of Work using `AppDbContext`.
+
+EF Core `DbContext` remains the concrete persistence unit of work.
+
 ## Domain Layer
 
 The Domain layer contains business concepts independent from technical

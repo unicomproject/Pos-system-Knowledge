@@ -31,7 +31,7 @@ Do not place a heading before metadata.
 <!-- title: File Title -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: Cuurent Date -->
 ```
 
 ## Allowed Status Values

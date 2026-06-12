@@ -78,6 +78,7 @@ Use this status after tests pass:
 | Module | [MODULE_NAME] |
 | Platform | Backend |
 | Status | Completed |
+| Name | Developer Name |
 | Completed Date | [YYYY-MM-DD] |
 | Tests | Passed |
 | PR / Commit | [value or -] |
