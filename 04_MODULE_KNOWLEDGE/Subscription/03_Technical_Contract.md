@@ -105,6 +105,19 @@ Test cases should cover:
 
 No full accounting; no direct gateway UI in Angular.
 
+## Platform Admin Subscription Plans List API (Implemented 2026-06-17)
+
+| Item | Contract |
+|---|---|
+| Endpoint | `GET /api/v1/platform/subscription-plans` |
+| Auth | Platform JWT (`PlatformBearer`) |
+| Permission | `platform.subscription_plans.view` |
+| Data source | `subscription_plans`, `subscription_plan_features`, `tenant_subscriptions` |
+| Status mapping | DB `active` → API `published`, DB `retired` → API `archived`, DB `draft` → API `draft` |
+| Billing mapping | DB `yearly` → API `annual`, DB `custom` → API `both` |
+| Active tenant count | `tenant_subscriptions` where status in (`trial`, `active`) |
+| Add-ons count | Returns `0` until add-on pricing table is confirmed in Release 1 database design |
+
 ## Related Files
 
 - [[01_Module_Overview]]

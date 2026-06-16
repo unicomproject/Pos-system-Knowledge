@@ -166,6 +166,17 @@ rules from the updated database design.
 - No explicit design note was provided.
 
 
+## Platform Admin List API Notes (Implemented 2026-06-17)
+
+The Super Admin subscription plans list page uses:
+
+- `GET /api/v1/platform/subscription-plans`
+- Permission: `platform.subscription_plans.view`
+- Existing Release 1 tables only; no new plan/module/add-on tables were added for this task.
+- API status values exposed to frontend: `draft`, `published`, `archived`.
+- Database status values remain: `draft`, `active`, `retired`.
+
+
 ## Related Files
 
 - [[../Database_Overview]]

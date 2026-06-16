@@ -103,6 +103,12 @@ Test cases should cover:
 
 No role-only access without entitlement.
 
+## Subscription Plan Feature Entitlement (Implemented 2026-06-17)
+
+- Included module count is derived from enabled rows in `subscription_plan_features` joined to `platform_features.module_id`.
+- Backend remains final authority for plan entitlements.
+- Frontend must not hardcode module or feature catalog values for the subscription plans list page.
+
 ## Related Files
 
 - [[01_Module_Overview]]
