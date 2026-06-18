@@ -107,6 +107,25 @@ Do not create random values that break repeatable migrations or tests.
 
 Document any seed dependency between modules.
 
+## Development POS Activation Seed Dependency (Verified 2026-06-17)
+
+`DevelopmentPosActivationSeedData` depends on:
+
+| Dependency | Source |
+|---|---|
+| TENANT001 tenant | `DevelopmentAuthSeedData.EnsureTenantAndUsersSql` |
+| tenantadmin001@gmail.com | Tenant admin user |
+| manager001@gmail.com | Manager user |
+| cashier001@gmail.com | Cashier user |
+| cashier002@gmail.com | Second cashier user |
+| pos_operator_dev role | Created in same POS activation seed |
+
+Rules:
+
+- Bootstrap tenant/users at the start of POS activation seed when auth migration was skipped.
+- Use `INSERT ... SELECT ... JOIN` for role/outlet/till rows; never insert NULL foreign keys.
+- Match partial unique indexes in `ON CONFLICT`, e.g. `WHERE revoked_at IS NULL`.
+
 ## Related Files
 
 - [[Backend_Coding_Principles]]
