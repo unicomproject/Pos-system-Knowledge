@@ -79,6 +79,8 @@ Tenant Admin routes appear only when backend context allows them.
 
 ## Redirect Rules
 
+### Target Release 1 rules
+
 | Condition | Redirect |
 |---|---|
 | No session | `/sign-in` |
@@ -88,6 +90,17 @@ Tenant Admin routes appear only when backend context allows them.
 | No till for POS | `/till-selection` |
 | Till not opened for checkout | `/till-open` |
 | Missing permission | `/permission-denied` |
+
+### Implemented redirect behavior (current code)
+
+| Condition | Redirect |
+|---|---|
+| No session on protected routes | `/tenant-login` (not `/sign-in`) |
+| Bootstrap not ready | `/pos/boot` |
+| Bootstrap ready on boot route | `postLoginRouteProvider.path` |
+| Wrong POS route for user context | Locked to post-login route |
+
+Full guard table: [[Flutter_Cashier_New_Sale_Implementation#Router Guards (Implemented)]].
 
 ## Guard Flow
 

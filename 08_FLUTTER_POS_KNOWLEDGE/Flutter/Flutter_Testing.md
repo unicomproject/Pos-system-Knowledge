@@ -85,8 +85,10 @@ approved, declined, and timeout states.
 
 | Area | File | Coverage |
 |---|---|---|
-| POS home | `test/widget_test.dart` | Dashboard, Start Sale hero, disabled start sale |
-| New Sale | `test/widget_test.dart` | Route guard, grid, search, categories, cart |
+| POS home | `test/widget_test.dart` | Hero, cards, loading/error, disabled start sale |
+| Sidebar | `test/widget_test.dart` | Permissions, scroll, destinations |
+| New Sale | `test/widget_test.dart` | Route, search, categories, cart, scroll bounds |
+| Shell top bar | `test/widget_test.dart` | Hidden on phone home; shown on New Sale |
 | Post-login | `test/features/auth/post_login_navigation_test.dart` | Bootstrap, navigation resolver |
 | Device activation | `test/features/device_activation/*` | Form + use case |
 | Till open | `test/features/till/*` | Form + use case + screen |

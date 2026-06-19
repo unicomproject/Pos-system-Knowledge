@@ -149,6 +149,7 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `notifications.view` | Notification bell |
 | `pos.till.open` | Till open flow (`canOpenPosTill`) |
 | `tenant.till.manage` | Device activation gate (`canActivatePosDevice`) |
+| `till.session.view` | Home header till status chip |
 
 Implementation map: [[../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]].
 

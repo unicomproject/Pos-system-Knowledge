@@ -83,7 +83,7 @@ lib/features/cart/               # catalog datasource, cart provider, cart panel
 lib/features/device_activation/  # device context (bootstrap dependency)
 lib/features/till/               # till session (bootstrap dependency)
 lib/core/access/pos_access_codes.dart
-lib/shared/pos_session/          # bootstrap provider + boot screen
+lib/shared/pos_session/          # bootstrap, boot screen, posSessionContextProvider
 lib/app/router/app_router.dart   # guards + route merge
 ```
 
@@ -97,9 +97,61 @@ lib/app/router/app_router.dart   # guards + route merge
 | `PosProductVariantSheet` | Variants + cart line edit |
 | `PosEmptyCartPanel` | Cart, totals, proceed button |
 | `PosNewSaleActionBar` | Customer / discount / park (disabled) |
+| `PosPlaceholderScreen` | Stub screens (customers, returns, etc.) |
 
 Home cards: returns, customer, parked sales, cash drawer use summary card widgets
 with API-driven counts when home payload loads.
+
+Additional home widgets: `PosOnlineOrdersSummaryCard`, `PosStatusChip`,
+`PosHomeActionCard`, `PosMetricTile`, `PosDashboardCardContainer`.
+`PosHomeHeader` shows greeting, optional notification bell (`onPressed: null`),
+till status chip (`till.session.view`), and live date/time.
+
+`PosNewSaleHeader` exists but renders `SizedBox.shrink()` (unused stub).
+
+## Shell Layout Behavior
+
+| Rule | Implementation |
+|---|---|
+| Sidebar vs mobile | Sidebar when width ≥ 700px; mobile `AppBar` otherwise |
+| Top bar on home | Hidden on `/pos/home` (`shouldShowPosTopBar`) |
+| Desktop search | `PosDesktopTopBar` — only on `/pos/new-sale`, needs `products.search` |
+| Mobile search | Not on `PosMobileTopBar`; search is desktop top-bar only today |
+| Mobile top bar actions | Notification and menu icons present; `onPressed: empty` |
+| Sidebar logout | User menu → `/tenant-login` after `authSessionProvider.clear()` |
+
+## New Sale Layout Behavior
+
+| Breakpoint | Layout |
+|---|---|
+| Width &lt; tablet | Product area expanded (flex 6) + fixed-height cart panel (360px or 390px) |
+| Width ≥ tablet | Row: expanded product area + cart column (330px or 360px width) |
+| Product grid columns | 2 (&lt;500px), 3 (&lt;700px), 4 (otherwise); tile height 152px |
+| Category chips | Static list in `posNewSaleCategories` (not API-driven) |
+| Section header | Dynamic title with filter count; **Sort by: Popular** is display-only |
+| Action bar | Below product grid on New Sale only |
+
+## Product and Variant Behavior
+
+- Grid tap without variants: direct `addToCart` with qty 1.
+- Grid tap with variants: `PosProductVariantSheet` loads `posProductDetailProvider`.
+- Variant sheet: option chips disable combinations that only match out-of-stock SKUs.
+- Submit label: **Add to Cart** or **Update Cart** when editing a cart line.
+- Cart row tap reopens variant sheet with `existingCartItem`.
+- `ApiEndpoints.posProductVariants` is defined but **not called**; detail endpoint
+  returns variant groups and variants.
+
+## Cart Panel Layout and Behavior
+
+`PosEmptyCartPanel` uses a fixed three-part column:
+
+1. **Header** (`_CartHeader`) — cart title + optional clear (`sales.cart.clear`).
+2. **Body** (`Expanded` + `ListView`) — scrollable line items only.
+3. **Footer** (`_CartSummaryFooter`) — subtotal/discount/tax/total + Proceed button.
+
+Footer totals stay fixed while items scroll. Discount and tax always show `LKR 0.00`.
+Cart lines stored in `Map<String, PosNewSaleCartItem>`; new lines append at end
+(recent additions appear at bottom of list). Line tap opens edit sheet.
 
 ## State and Models
 
@@ -113,6 +165,8 @@ with API-driven counts when home payload loads.
 | `posNewSaleCartProvider` | Local cart (`PosNewSaleCartState`) |
 | `posNewSaleSearchQueryProvider` | Search (needs `products.search`) |
 | `posShellGrantedPermissionsProvider` | Sidebar visibility |
+| `posSessionContextProvider` | Device/till/outlet display for activation/open-till screens |
+| `posCatalogRemoteDatasourceProvider` | Catalog HTTP client |
 | `PosCatalogProductSummary`, `toCartProduct()` | Catalog → cart mapping |
 
 Discount/tax hard-coded `0`. Cart is in-memory only.
@@ -152,6 +206,7 @@ Flutter constants in `pos_access_codes.dart`. Dev seed:
 | Proceed to Payment | `sales.checkout` + `payments.*.accept` |
 | Start Sale on home | + trusted device + open till session |
 | Notifications icon | `notifications.view` |
+| Home till status chip | `till.session.view` |
 
 Router forbidden screen when route permission missing.
 
@@ -172,11 +227,32 @@ Router forbidden screen when route permission missing.
 | Empty filter | "No products found" |
 | Empty cart | "No items added" |
 | Disabled Start Sale | Button disabled + message from home access rules |
+| Variant invalid / OOS | Red message in variant sheet |
+| Notification taps | No action (stub handlers) |
+
+## Router Guards (Implemented)
+
+From `app_router.dart` redirect (not all target routes exist yet):
+
+| Condition | Redirect |
+|---|---|
+| Unauthenticated on POS/till/device routes | `/tenant-login` |
+| Authenticated, bootstrap not ready | `/pos/boot` |
+| Bootstrap ready on boot route | `postLoginRouteProvider.path` |
+| Authenticated on login | boot route or post-login route |
+| POS route ≠ post-login route for restricted users | post-login route |
+| Tenant admin while POS user | post-login POS route |
+
+Forbidden route builders use `TenantAdminForbiddenScreen` when session lacks
+route permission (e.g. missing `pos.new_sale.view`).
 
 ## Tests (Present)
 
-`test/widget_test.dart`: home, sidebar permissions, New Sale navigation, search,
-category filter, cart totals, variant flow, disabled start sale.
+`test/widget_test.dart`: home hero, reference cards, online orders omission,
+sidebar visibility/permissions, home loading/error shells, New Sale navigation,
+search, categories, cart totals, variant flow, disabled start sale, phone top bar
+(hidden on home / shown on New Sale), sidebar scroll on short desktop, scroll
+constraints for grid and cart list, auth header before home API.
 
 `test/features/auth/post_login_navigation_test.dart`: post-login routes,
 bootstrap failure.
