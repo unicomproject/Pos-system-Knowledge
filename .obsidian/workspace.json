@@ -1,24 +1,24 @@
 {
   "main": {
-    "id": "1cb734fccc6c8439",
+    "id": "8f5d5d49e5642147",
     "type": "split",
     "children": [
       {
-        "id": "f2503a97c3c43573",
+        "id": "9c561de49426fa6e",
         "type": "tabs",
         "children": [
           {
-            "id": "56806a201bd68d51",
+            "id": "252da568f5b36f62",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "08_FLUTTER_POS_KNOWLEDGE/Permission_Based_UI_Rendering.md",
+                "file": "14_AI_DEVELOPER_PROMPTS/Testing/01_API_Test_Case_Generation_Prompt.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Permission_Based_UI_Rendering"
+              "title": "01_API_Test_Case_Generation_Prompt"
             }
           }
         ]
@@ -27,15 +27,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "d3f87169598919b0",
+    "id": "100a414e7e6e9a27",
     "type": "split",
     "children": [
       {
-        "id": "f6617836dfe14690",
+        "id": "2f3445539d2105c9",
         "type": "tabs",
         "children": [
           {
-            "id": "27fe543d610a8aae",
+            "id": "0ce7c63c0b4a42a2",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -48,7 +48,7 @@
             }
           },
           {
-            "id": "b71489dff0c11785",
+            "id": "69ed34ff6ab04669",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -65,7 +65,7 @@
             }
           },
           {
-            "id": "1fe9824e1901cf53",
+            "id": "b65a787c066ee299",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -78,23 +78,23 @@
       }
     ],
     "direction": "horizontal",
-    "width": 403.5
+    "width": 379.5
   },
   "right": {
-    "id": "bb1db1e68db4824b",
+    "id": "17789eb71a72b01a",
     "type": "split",
     "children": [
       {
-        "id": "5fdd4342edd2c68d",
+        "id": "aab57a02e7c60ffd",
         "type": "tabs",
         "children": [
           {
-            "id": "0fd941b3d7486c35",
+            "id": "abbe590cbfdba91c",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
+                "file": "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Error_Handling.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,25 +104,25 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for 10_Cash_In_Out_Flow"
+              "title": "Backlinks for Flutter_Error_Handling"
             }
           },
           {
-            "id": "5266211a06e2aa0b",
+            "id": "af059d3d41945e6b",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
+                "file": "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Error_Handling.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from 10_Cash_In_Out_Flow"
+              "title": "Outgoing links from Flutter_Error_Handling"
             }
           },
           {
-            "id": "c8dd2289d8f917e9",
+            "id": "ec48fe3c3d29f83f",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -137,7 +137,7 @@
             }
           },
           {
-            "id": "c85a86c08b5b9863",
+            "id": "473c3bdf1b54bcfe",
             "type": "leaf",
             "state": {
               "type": "all-properties",
@@ -151,18 +151,18 @@
             }
           },
           {
-            "id": "82ef659ed078ee6d",
+            "id": "7476b1878251f222",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
+                "file": "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Error_Handling.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 10_Cash_In_Out_Flow"
+              "title": "Outline of Flutter_Error_Handling"
             }
           }
         ]
@@ -183,43 +183,35 @@
       "bases:Create new base": false
     }
   },
-  "active": "56806a201bd68d51",
+  "active": "252da568f5b36f62",
   "lastOpenFiles": [
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter_Module_Implementation_Guide.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter_App_Architecture.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Dio_API_Client.md",
-    "00_START_HERE/Developer_Reading_Guide.md",
-    "Reports.md",
-    "12_INTEGRATIONS/AWS_S3_File_Storage.md",
-    "04_MODULE_KNOWLEDGE/Feature_Entitlement/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/Feature_Entitlement/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Feature_Entitlement/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/Discount/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/Discount/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/Discount/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Device/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Auth/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Auth/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/_MODULE_TEMPLATE/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/_MODULE_TEMPLATE/01_Module_Overview.md",
-    "00_START_HERE/Project_Glossary.md",
-    "04_MODULE_KNOWLEDGE/Exchange/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/Exchange/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/Exchange/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Exchange",
-    "04_MODULE_KNOWLEDGE/Return_Refund/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/Return_Refund/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/Return_Refund/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/Return_Refund",
-    "04_MODULE_KNOWLEDGE/Loyalty/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/Loyalty/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/Loyalty",
-    "04_MODULE_KNOWLEDGE/Discount",
-    "04_MODULE_KNOWLEDGE/Payment",
-    "04_MODULE_KNOWLEDGE/Sales",
-    "04_MODULE_KNOWLEDGE/Inventory",
-    "04_MODULE_KNOWLEDGE/Product",
-    "04_MODULE_KNOWLEDGE/Device",
-    "04_MODULE_KNOWLEDGE/Till"
+    "14_AI_DEVELOPER_PROMPTS/Testing/05_Regression_Checklist_Prompt.md",
+    "14_AI_DEVELOPER_PROMPTS/Testing/04_Tenant_Isolation_Test_Prompt.md",
+    "14_AI_DEVELOPER_PROMPTS/Testing/03_POS_Flow_Test_Case_Prompt.md",
+    "14_AI_DEVELOPER_PROMPTS/Testing/02_Permission_Test_Case_Prompt.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Tenant/Outlet_Create_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin/Tenant_Admin_Test_Cases.md",
+    "14_AI_DEVELOPER_PROMPTS/Backend/Backend feature prompt.md",
+    "15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin/Tenant_Admin_Full_Codebase_Report.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Tenant",
+    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_Admin_Login_Implementation_Status.md",
+    "10_TESTING_QA/Test_Case/Auth_Test_Cases.md",
+    "10_TESTING_QA/API_Test_Cases.md",
+    "15_IMPLEMENTATION_TRACKING/Flutter/Sales/Start_Sale_UI_Implementation_Status.md",
+    "06_DATABASE_KNOWLEDGE/Tables/20_Payment_Core.md",
+    "03_USER_JOURNEYS/Cross_Role_Flows/03_Tenant_Suspended_Flow.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Error_Handling.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_App_Architecture.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_API_Network.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_API_Integration.md",
+    "06_DATABASE_KNOWLEDGE/Tables/03_Tenant_Foundation.md",
+    "06_DATABASE_KNOWLEDGE/Tables/01_Platform_Identity.md",
+    "05_BACKEND_ARCHITECTURE/Seed_Data_Standards.md",
+    "05_BACKEND_ARCHITECTURE/Multi_Tenant_Handling.md",
+    "05_BACKEND_ARCHITECTURE/Module_Based_Folder_Structure.md",
+    "05_BACKEND_ARCHITECTURE/Error_Response_Standards.md",
+    "05_BACKEND_ARCHITECTURE/DTO_And_Mapping_Rules.md",
+    "05_BACKEND_ARCHITECTURE/Clean_Architecture_Layers.md",
+    "15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin"
   ]
 }

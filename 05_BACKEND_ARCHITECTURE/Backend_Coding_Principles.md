@@ -82,6 +82,15 @@ Application services must:
   till close operations.
 - Write audit records for sensitive actions.
 
+## Unit Of Work Rules
+
+- Application service owns the transaction boundary.
+- Use Unit of Work for checkout, payment, refund, exchange, stock, and till
+  close workflows.
+- Repositories should not call `SaveChangesAsync` per method unless the use case
+  is intentionally single-step.
+- Use one commit per use case where possible.
+
 ## Repository Rules
 
 Repositories must:

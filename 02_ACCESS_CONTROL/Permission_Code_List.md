@@ -21,10 +21,13 @@ Do not create one large `PermissionCode` enum.
 
 Do not place permission codes inside generic `Domain/Enums`.
 
-Use module-wise static constants inside the Domain module folder.
+Use module-wise static constants inside the Domain module folder for permission
+code references.
 
-Stable business statuses may be enums. Permission catalog values must be seeded
-and stored in the database.
+Do not generate C# enum classes for database status/type/check-value columns.
+Those Domain properties remain strings, while allowed values are enforced through
+Application validation and database CHECK constraints. Permission catalog values
+must be seeded and stored in the database.
 
 ## Code Ownership Pattern
 
