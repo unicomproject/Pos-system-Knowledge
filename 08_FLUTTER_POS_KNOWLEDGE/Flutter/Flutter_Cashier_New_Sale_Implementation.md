@@ -8,228 +8,199 @@
 
 ## Purpose
 
-This file documents the **implemented** cashier POS shell, home dashboard, and New
-Sale UI in the Flutter app as of branch `pos-home-dashboard`.
+Documents **implemented** cashier POS session, shell, home, and New Sale UI on
+`Nytroz-POS-App` branch `pos-home-dashboard`.
 
-It separates what works today from planned Release 1 scope in journey files.
-
-Use [[04_Start_Sale_Flow]] for target business rules.
-
-Use this file for current code behavior.
+Target journeys: [[04_Start_Sale_Flow]], [[02_Device_Activation_Flow]],
+[[03_Till_Open_Flow]]. This file reflects **current code**, not planned scope.
 
 ## Feature Overview
 
-| Area | Current state |
+| Area | State |
 |---|---|
+| Login → bootstrap → device/till gate | Implemented |
 | POS shell (sidebar, top bar, guards) | Implemented |
 | POS home dashboard | Implemented (API + shell fallback) |
-| New Sale screen (catalog + local cart) | Partially implemented |
-| Backend sale checkout / payment | Not wired in Flutter |
-| Barcode scan | Not implemented in Flutter |
-| Park / recall sale | Placeholder routes only |
-| Customer attach on New Sale | UI stub only |
+| New Sale catalog + local cart | Partial |
+| Sale checkout / payment / receipt | Not wired in Flutter |
+| Barcode scan | UI hint only; no lookup API call |
+| Park / customer / discount on New Sale | Buttons visible; `onPressed: null` |
+| Returns / parked / cash drawer screens | Placeholder routes |
 
-Cashier work lives under `lib/features/pos_shell`, `lib/features/sale`, and
-`lib/features/cart`. Session bootstrap (`lib/shared/pos_session`) runs before POS
-routes when the user has device/till permissions.
+## End-to-End Flow (Implemented)
 
-## User Flow (Implemented Steps)
-
-| Step | Action | Result today |
+| Step | Route / action | Result |
 |---:|---|---|
-| 1 | Staff signs in at `/tenant-login` | Session restored; bootstrap at `/pos/boot` when POS permissions require device/till |
-| 2 | Redirect to `/pos/home` for cashier users | Home loads API dashboard or shell fallback while loading |
-| 3 | Tap **Start New Sale** (if enabled) | Navigates to `/pos/new-sale` |
-| 4 | Filter products (category chips, top-bar search on New Sale) | Client-side filter on loaded catalog |
-| 5 | Tap product tile | Adds to local cart, or opens variant bottom sheet |
-| 6 | Adjust qty / remove in cart panel | Local `posNewSaleCartProvider` updates |
-| 7 | Tap **Proceed to Payment** | Bottom sheet lists allowed payment methods; closes sheet only (no API) |
+| 1 | `/tenant-login` | JWT session; permissions on `AuthSession` |
+| 2 | `/pos/boot` | Bootstrap when `requiresPosDeviceBootstrap` |
+| 3 | `/pos/device-activation` or `/pos/open-till` | Post-login resolver when device untrusted or till closed |
+| 4 | `/pos/home` | Dashboard; `GET /api/v1/pos/home` after bootstrap |
+| 5 | Start New Sale → `/pos/new-sale` | Catalog + cart when permitted and till open |
+| 6 | Search / chips / product tap | Client filter; add to `posNewSaleCartProvider` |
+| 7 | Proceed to Payment | Payment-method sheet only; no backend call |
 
-Steps requiring backend sale creation, payment capture, receipt, park, or customer
-attach are **not completed** in the current UI.
+`postLoginRouteProvider` picks device activation, open till, POS home, or tenant
+admin dashboard. `canActivatePosDevice` checks `tenant.till.manage` (not a POS-only
+code). `canOpenPosTill` checks `pos.till.open`.
 
-## Screens and Routes
+## Routes
 
-| Route | Screen | Notes |
+| Route | Screen | State |
 |---|---|---|
-| `/pos/boot` | `PosSessionBootScreen` | Device/till hydration gate |
-| `/pos/home` | `PosHomeScreen` | Dashboard |
-| `/pos/new-sale` | `PosNewSaleScreen` | Catalog + cart |
-| `/pos/customers` | `PosPlaceholderScreen` | Placeholder |
-| `/pos/returns-refunds` | `PosPlaceholderScreen` | Placeholder |
-| `/pos/parked-sales` | `PosPlaceholderScreen` | Placeholder |
-| `/pos/cash-drawer` | `PosPlaceholderScreen` | Placeholder |
-| `/pos/profile` | `PosPlaceholderScreen` | Placeholder (no sidebar entry) |
+| `/pos/boot` | `PosSessionBootScreen` | Implemented |
+| `/device-activation`, `/pos/device-activation` | `DeviceActivationScreen` | Implemented |
+| `/open-till`, `/till-open`, `/pos/open-till` | `TillOpenScreen` | Implemented |
+| `/pos/home` | `PosHomeScreen` | Implemented |
+| `/pos/new-sale` | `PosNewSaleScreen` | Implemented |
+| `/pos/customers` | Placeholder | Stub |
+| `/pos/returns-refunds` | Placeholder | Stub |
+| `/pos/parked-sales` | Placeholder | Stub |
+| `/pos/cash-drawer` | Placeholder | Stub |
+| `/pos/profile` | Placeholder | Menu only |
 
-### Doc conflict: planned vs actual routes
+**Conflict:** [[Flutter_Routing_Guards]] target names (`/pos-home`, `/checkout`)
+differ from implemented `/pos/*` paths. Use this file for cashier routes today.
 
-[[Flutter_Routing_Guards]] lists `/pos-home`, `/checkout`, `/held-sales`, etc.
-**Current code uses `/pos/home`, `/pos/new-sale`, `/pos/parked-sales`.** Treat
-this file as the route source for implemented cashier work until guards doc is
-reconciled.
+## Sidebar Navigation
 
-## Folder Structure
+From `pos_shell_nav_destinations.dart`. Visibility = permission on session.
+
+| Label | Route | Permission gate |
+|---|---|---|
+| Home | `/pos/home` | `pos.home.view` |
+| New Sale | `/pos/new-sale` | `pos.new_sale.view` |
+| Orders | — | `orders.view` (no route; snackbar) |
+| Customers | `/pos/customers` | `customers.view` or `customers.create` |
+| Return & Refund | `/pos/returns-refunds` | `returns.view` or `refunds.view` |
+| Cash Drawer | `/pos/cash-drawer` | `cash_drawer.view` |
+
+## Folder Structure (Cashier)
 
 ```text
-lib/features/pos_shell/
-  pos_shell_router.dart
-  data/datasources/pos_home_remote_datasource.dart
-  presentation/screens/pos_home_screen.dart
-  presentation/providers/pos_home_dashboard_provider.dart
-  presentation/widgets/home/*
-  presentation/widgets/common/pos_shell_scaffold.dart
-lib/features/sale/presentation/
-  screens/pos_new_sale_screen.dart
-  widgets/new_sale/*
-lib/features/cart/
-  data/datasources/pos_catalog_remote_datasource.dart
-  data/datasources/pos_catalog_fallback_data.dart
-  domain/entities/pos_catalog_models.dart
-  presentation/providers/pos_new_sale_cart_provider.dart
-  presentation/providers/pos_catalog_provider.dart
-  presentation/widgets/pos_empty_cart_panel.dart
+lib/features/pos_shell/          # router, home API, shell widgets
+lib/features/sale/presentation/  # New Sale screen + catalog widgets
+lib/features/cart/               # catalog datasource, cart provider, cart panel
+lib/features/device_activation/  # device context (bootstrap dependency)
+lib/features/till/               # till session (bootstrap dependency)
 lib/core/access/pos_access_codes.dart
-lib/shared/pos_session/pos_session_bootstrap_provider.dart
+lib/shared/pos_session/          # bootstrap provider + boot screen
+lib/app/router/app_router.dart   # guards + route merge
 ```
 
-## Components and Widgets
+## Key Widgets
 
 | Widget | Role |
 |---|---|
-| `PosShellScaffold`, `PosSidebar`, top bars | Shell layout |
-| `PosHomeHeader`, `PosHomeTopGrid`, `PosStartSaleHeroCard` | Home dashboard |
-| `PosNewSaleScreen`, `PosProductGrid`, `PosProductCategoryChips` | Catalog |
-| `PosProductVariantSheet` | Variant pick / cart line edit |
-| `PosEmptyCartPanel` | Cart list, totals, proceed button |
-| `PosNewSaleActionBar` | Add customer / discount / park buttons (disabled) |
+| `PosShellScaffold`, `PosSidebar`, top bars | Layout; search on New Sale only |
+| `PosHomeHeader`, top/bottom grids, hero card | Home dashboard |
+| `PosProductGrid`, `PosProductCategoryChips` | Catalog |
+| `PosProductVariantSheet` | Variants + cart line edit |
+| `PosEmptyCartPanel` | Cart, totals, proceed button |
+| `PosNewSaleActionBar` | Customer / discount / park (disabled) |
 
-## State Management
+Home cards: returns, customer, parked sales, cash drawer use summary card widgets
+with API-driven counts when home payload loads.
 
-| Provider | Responsibility |
+## State and Models
+
+| Provider / type | Role |
 |---|---|
-| `posSessionBootstrapProvider` | Device + till hydration gate |
-| `posHomeDashboardProvider` | Home API payload → dashboard state |
-| `posNewSaleCatalogProvider` | Product list (`GET /api/v1/pos/products`) |
-| `posProductDetailProvider` | Variant detail (`GET /api/v1/pos/products/{id}`) |
-| `posNewSaleCartProvider` | Local cart lines and totals |
-| `posNewSaleSearchQueryProvider` | Shared search (top bar + grid) |
-| `posNewSaleSelectedCategoryProvider` | Category chip filter |
-| `deviceActivationProvider`, `tillProvider` | POS context for home/catalog |
+| `posSessionBootstrapProvider` | Device + till hydration |
+| `postLoginRouteProvider` | Post-login destination |
+| `posHomeDashboardProvider` | Home API → `PosHomeDashboardState` |
+| `posNewSaleCatalogProvider` | Product list |
+| `posProductDetailProvider` | Variant detail |
+| `posNewSaleCartProvider` | Local cart (`PosNewSaleCartState`) |
+| `posNewSaleSearchQueryProvider` | Search (needs `products.search`) |
+| `posShellGrantedPermissionsProvider` | Sidebar visibility |
+| `PosCatalogProductSummary`, `toCartProduct()` | Catalog → cart mapping |
 
-Cart discount and tax are hard-coded to `0` in `PosNewSaleCartState`. No
-`cartProvider` from [[Flutter_State_Management_Riverpod]] exists yet; use
-`posNewSaleCartProvider` instead.
+Discount/tax hard-coded `0`. Cart is in-memory only.
 
-## API Integration (Flutter)
+## API Usage (Flutter)
 
-| Endpoint | Used by cashier UI? |
+| Endpoint | Wired? |
 |---|---|
-| `GET /api/v1/pos/home` | Yes (`posHomeDashboardProvider`) |
-| `GET /api/v1/pos/products` | Yes (`posNewSaleCatalogProvider`) |
-| `GET /api/v1/pos/products/{id}` | Yes (variant sheet) |
-| `GET /api/v1/pos/catalog/categories` | Datasource exists; chips use static list |
-| `GET /api/v1/devices/current` | Bootstrap / catalog context |
-| `GET /api/v1/tills/current-session` | Bootstrap / home enablement |
+| `GET /api/v1/pos/home` | Yes |
+| `GET /api/v1/pos/products` | Yes (`deviceId` query) |
+| `GET /api/v1/pos/products/{id}` | Yes |
+| `GET /api/v1/devices/current` | Bootstrap |
+| `GET /api/v1/tills/current-session` | Bootstrap |
+| `POST /api/v1/tills/open` | Till open screen |
+| `POST /api/v1/devices/activate` | Device activation |
+| `GET /api/v1/pos/catalog/categories` | Datasource only; chips static |
+| `GET /api/v1/pos/catalog/products/lookup` | No (barcode) |
 | `POST /api/v1/pos/cart/*` | No |
 | `POST /api/v1/pos/sales` | No |
 | `POST /api/v1/pos/payments` | No |
-| `GET /api/v1/pos/catalog/products/lookup` (barcode) | No |
 
-Catalog falls back to `pos_catalog_fallback_data.dart` when session/device is
-missing or the products API fails.
+API failure → `pos_catalog_fallback_data.dart` seed products.
 
-## Backend Dependencies
+## Permissions (New Sale UI)
 
-Backend modules used indirectly today:
+Flutter constants in `pos_access_codes.dart`. Dev seed:
+`DevelopmentPosNewSalePermissionsSeedData.cs`.
 
-- `PosHomeController` — dashboard card enablement and metrics
-- `PosProductsController` — product summaries and detail
-- Device and till APIs — session bootstrap
-
-Backend sale/cart/payment controllers exist but are **not called** from the
-current New Sale UI.
-
-## Permissions and Session Rules
-
-Permission codes are in `lib/core/access/pos_access_codes.dart`.
-
-| UI area | Permission codes (examples) |
+| UI | Permission |
 |---|---|
-| View home | `pos.home.view` |
-| Open New Sale route | `pos.new_sale.view` |
-| View / add products | `products.view`, `sales.cart.add_item` |
-| Cart update/remove/clear | `sales.cart.update_item`, `sales.cart.remove_item`, `sales.cart.clear` |
-| Checkout button | `sales.checkout` + payment accept permissions |
-| Action bar stubs | `customers.create`, `sales.discount.apply`, `sales.park.create` |
+| Home | `pos.home.view` |
+| New Sale route | `pos.new_sale.view` |
+| Product grid | `products.view` |
+| Top-bar search | `products.search` |
+| Add to cart | `sales.cart.add_item` |
+| Qty / remove / clear | `sales.cart.update_item`, `remove_item`, `clear` |
+| Proceed to Payment | `sales.checkout` + `payments.*.accept` |
+| Start Sale on home | + trusted device + open till session |
+| Notifications icon | `notifications.view` |
 
-Home **Start New Sale** also requires trusted device and open till session
-(`PosHomeDashboardState.accessFor`). Router shows `TenantAdminForbiddenScreen`
-when `pos.new_sale.view` is missing.
+Router forbidden screen when route permission missing.
 
-## Cart Behavior
+## Cart and Payment Behavior
 
-- Cart is **in-memory only** (Riverpod notifier).
-- Line key: `variantId ?? productId`.
-- Totals: subtotal sum of line prices; discount/tax always zero.
-- Max quantity enforced when variant `stockQty` is known.
-- Clearing cart requires `sales.cart.clear` permission.
+- Line key: `variantId ?? productId`; max qty from variant `stockQty`.
+- Proceed opens bottom sheet; tap method closes sheet only.
+- No sale record, payment capture, or receipt.
 
-## Payment / Proceed Behavior
+## Error / Loading / Empty States
 
-- Button enabled when cart has items, user has `sales.checkout`, and at least one
-  payment permission (`payments.cash.accept`, `payments.card.accept`, etc.).
-- Opens modal bottom sheet; selecting a method only closes the sheet.
-- No sale creation, payment API, or receipt flow runs.
-
-## Error, Loading, and Empty States
-
-| State | Behavior |
+| Case | UI |
 |---|---|
-| Home loading | Shell dashboard + inline loading banner |
-| Home API error | Shell dashboard + retry banner |
-| Catalog loading | Grid `CircularProgressIndicator` |
-| Catalog API failure | Silent fallback to seed products |
-| No product permission | Locked grid message |
-| Empty search/filter | "No products found" |
-| Empty cart | "No items added" illustration |
+| Home loading / error | Shell fallback + banner + retry |
+| Catalog loading | Spinner |
+| Catalog error | Fallback products (silent) |
+| No `products.view` | Locked grid |
+| Empty filter | "No products found" |
+| Empty cart | "No items added" |
+| Disabled Start Sale | Button disabled + message from home access rules |
 
-## Implemented Now
+## Tests (Present)
 
-- POS shell navigation and permission-gated routes
-- POS home with backend-driven card enablement
-- New Sale layout (responsive product grid + cart panel)
-- Product search (client-side) and static category chips
-- Variant selection sheet with stock checks
-- Local cart add/update/remove/clear with permission gates
-- Payment method picker UI (non-functional)
-- Widget tests in `test/widget_test.dart` for home, New Sale, cart, permissions
+`test/widget_test.dart`: home, sidebar permissions, New Sale navigation, search,
+category filter, cart totals, variant flow, disabled start sale.
 
-## Not Implemented Yet
+`test/features/auth/post_login_navigation_test.dart`: post-login routes,
+bootstrap failure.
 
-- Barcode / SKU scan flow
-- API-backed category chips
-- Backend cart calculate / validate / discount APIs
-- Customer attach, discount apply, park sale actions
-- Sale checkout, payment capture, receipt
-- Parked sales, returns, cash drawer screens (placeholders)
-- Orders sidebar destination (no route)
-- Offline sale queue
+`test/features/till/*`, `test/features/device_activation/*`: till open and device
+activation forms/use cases.
+
+## Not Implemented
+
+Backend cart calculate/checkout, payment, receipt, park/recall, barcode lookup,
+API category chips, offline queue, real customer/returns/cash-drawer screens.
 
 ## Developer Notes
 
-1. Wire catalog search to `GET /api/v1/pos/products?search=` before adding more
-   client-only filters.
-2. Replace static `posNewSaleCategories` with `GET /api/v1/pos/catalog/categories`.
-3. Integrate `POST /api/v1/pos/cart/calculate` before showing tax/discount totals.
-4. Checkout must call `POST /api/v1/pos/sales` then payment endpoints; do not
-   treat local cart totals as authoritative.
-5. Reconcile [[Flutter_Routing_Guards]] route table with `/pos/*` paths.
-6. Branch reference: `Nytroz-POS-App` `pos-home-dashboard`.
+1. Wire search to `GET /api/v1/pos/products?search=` and barcode to catalog lookup.
+2. Call `POST /api/v1/pos/cart/calculate` before showing tax/discount.
+3. Checkout: `POST /api/v1/pos/sales` then payments; never trust local totals.
+4. Reconcile [[Flutter_Routing_Guards]] with `/pos/*` paths.
+5. Align [[Permission_Code_List]] POS examples with seeded `sales.*` / `products.*` codes.
 
 ## Related Files
 
 - [[Flutter_Routing_Guards]]
 - [[Flutter_State_Management_Riverpod]]
 - [[Flutter_API_Integration]]
-- [[04_Start_Sale_Flow]]
+- [[Permission_Code_List]]
 - [[../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Start_Sale_UI_Implementation_Status]]

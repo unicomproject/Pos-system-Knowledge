@@ -58,7 +58,8 @@ PR/commit reference is recorded.
 | Platform | Module | Feature | Status | Completed Date | PR / Commit | Notes |
 |---|---|---|---|---|---|---|
 | Backend | Sales | Create Sale API | In Progress | - | `pos-home-dashboard` | API exists; Flutter not wired |
-| Flutter | Sales | Start Sale UI | In Progress | - | `pos-home-dashboard` | Home + New Sale partial |
+| Flutter | POS Shell | POS Home Dashboard | In Progress | - | `pos-home-dashboard` | API dashboard + placeholders |
+| Flutter | Sales | Start Sale UI | In Progress | - | `pos-home-dashboard` | Catalog + local cart partial |
 | Angular | Tenant | Tenant List Page | Not Started | - | - | Example row |
 
 ## Update Process

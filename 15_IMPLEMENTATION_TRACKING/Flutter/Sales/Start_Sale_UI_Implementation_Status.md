@@ -68,7 +68,8 @@ flutter test
 
 | File Updated | Update Summary |
 |---|---|
-| [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]] | Added implementation map |
+| [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]] | Expanded implementation map |
+| [[../../15_IMPLEMENTATION_TRACKING/Flutter/Pos_Shell/Pos_Home_Dashboard_Implementation_Status]] | Added POS home status |
 | [[../Full_Feature_Status_Index]] | Updated status row |
 | This file | Status In Progress |
 

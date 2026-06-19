@@ -1,7 +1,7 @@
 <!-- title: Flutter Folder Structure -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Flutter Folder Structure
@@ -108,6 +108,22 @@ features/<feature_name>/
 - No business rules inside UI.
 - No hardcoded role checks.
 - No secrets in flavors.
+
+## Implemented Cashier Subtree (Current Code)
+
+Not all listed feature folders exist yet. Cashier work today is concentrated in:
+
+```text
+lib/features/pos_shell/
+lib/features/sale/presentation/
+lib/features/cart/
+lib/features/device_activation/
+lib/features/till/
+lib/shared/pos_session/
+lib/core/access/pos_access_codes.dart
+```
+
+See [[Flutter_Cashier_New_Sale_Implementation]] for file-level map.
 
 ## Related Files
 

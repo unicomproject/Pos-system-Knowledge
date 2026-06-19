@@ -1,7 +1,7 @@
 <!-- title: Flutter Testing -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Flutter Testing
@@ -80,6 +80,18 @@ approved, declined, and timeout states.
 - Logout clears tokens and selected outlet/till.
 - Missing permission shows denied state.
 - Missing till blocks billing.
+
+## Implemented Cashier Tests (2026-06-18)
+
+| Area | File | Coverage |
+|---|---|---|
+| POS home | `test/widget_test.dart` | Dashboard, Start Sale hero, disabled start sale |
+| New Sale | `test/widget_test.dart` | Route guard, grid, search, categories, cart |
+| Post-login | `test/features/auth/post_login_navigation_test.dart` | Bootstrap, navigation resolver |
+| Device activation | `test/features/device_activation/*` | Form + use case |
+| Till open | `test/features/till/*` | Form + use case + screen |
+
+Map: [[Flutter_Cashier_New_Sale_Implementation]].
 
 ## Related Files
 
