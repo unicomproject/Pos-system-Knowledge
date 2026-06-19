@@ -1,9 +1,7 @@
 <!-- title: Platform Admin Subscription UI -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-17 -->
-
-# Platform Admin Subscription UI
+<!-- last_updated: 2026-06-19 -->
 
 ## Scope
 
@@ -18,111 +16,222 @@ purchase or payment checkout flow.
 | `/admin/subscriptions/create` | Create Subscription Plan wizard |
 
 Sidebar item **Subscriptions** stays active for all routes under
-`/admin/subscriptions/*`. No hardcoded notification badge on sidebar items.
+`/admin/subscriptions/*`.
 
-## List Page
+Do not show sidebar collapse button on subscription screens.
 
-### Header
+## Create Plan Wizard — Step 1 Basics (Latest UI)
 
-- Breadcrumb: `Subscriptions / Plans`
-- Title: **Subscription Plans**
-- Subtitle: Create and manage plan templates for tenants.
-- Primary action: **Create Plan** → `/admin/subscriptions/create` (plus icon)
+Layout:
 
-Search input appears only on the list page, not on create/edit pages.
+- Page breadcrumb: `Subscriptions / Create Plan`
+- Title: **Create Subscription Plan**
+- Subtitle: Build a subscription package for your tenants.
+- Six-step stepper: Basics → Modules → Features → Pricing → Limits → Review & Publish
+- Left card: Plan Basics
+- Right sticky card: Draft Summary
+- Top-right action buttons: Back, Save Draft, Next
+- Bottom sticky action bar:
+  - Left: **Back** (step 1 returns to list)
+  - Right: **Save Draft** and **Next**
 
-### Status Tabs
+### Allowed Step 1 fields (Release 1 DB-backed)
 
-Tabs with counts from API `statusCounts` (never hardcoded):
-
-| Tab | Filter |
+| UI field | DB column |
 |---|---|
-| All | No status filter |
-| Draft | `status=draft` |
-| Published | `status=published` |
-| Archived | `status=archived` |
+| Plan Name | `subscription_plans.name` |
+| Plan Code | `subscription_plans.plan_code` |
+| Description | `subscription_plans.description` |
+| Billing Cycle | `subscription_plans.billing_cycle` |
+| Currency | `subscription_plans.base_currency` |
+| Status (read-only Draft) | `subscription_plans.status = draft` |
 
-### Filters (combined with tabs and search)
+Billing cycle options:
 
-- Plan Type: All, Free, Trial, Paid, Custom
-- Status: All, Draft, Published, Archived
-- Billing Cycle: All, Monthly, Annual, Both
-- Currency: All, LKR, USD, GBP, EUR
-- Search: debounced (300ms), matches plan name and plan code
+- `monthly`
+- `yearly`
+- `custom`
+- `trial`
+- `demo`
 
-### Table Columns
+### Removed non-R1 fields
 
-Plan Name, Plan Code, Plan Type, Tenant Monthly Price, Tenant Annual Price,
-Included Modules, Add-ons, Active Tenants, Status, Last Updated, Actions.
+Do not render in Create Plan UI:
 
-### Status Badges
+- `taxMode`
+- `visibility`
+- `setupFee`
+- `effectiveFrom`
+- `planType`
 
-| Status | Style |
-|---|---|
-| Published | Green pill |
-| Draft | Amber/orange pill |
-| Archived | Gray pill |
+### Draft Summary rules
 
-### Actions
+Shows live values for:
 
-Icon buttons: View, Edit, Duplicate, More menu.
+- Plan Name
+- Plan Code
+- Billing Cycle
+- Currency
+- Status: Draft
 
-More menu respects API flags: Publish (draft only), Archive, Delete.
-Delete disabled when `canDelete=false`; tooltip shows `deleteBlockedReason`.
+Progress placeholders until later steps are configured:
 
-### States
+- Modules: Not selected
+- Features: Not selected
+- Limits: Not configured
+- Pricing: Not configured
 
-- Loading: skeleton table rows
-- Empty: centered empty state with Create Plan CTA
-- Error: message + Try again button
+Do not show tenant monthly price in Step 1 summary.
 
-### Pagination
+### Status wording
 
-Uses API metadata: `pageNumber`, `pageSize`, `totalItems`, `totalPages`,
-`hasPreviousPage`, `hasNextPage`. Range label example:
-`Showing 1 to 10 of 25 plans`.
+UI label may say **Publish**, but database status uses existing DB values:
 
-## Create Plan Wizard
+- draft → `draft`
+- publish → `active`
+- archive → `retired`
 
-Six steps: Basics → Modules → Features → Pricing → Limits → Review & Publish.
+Status info box text:
 
-Layout: step content left, sticky **Draft Summary** panel right.
+> Plan is in draft until you publish it. Only active plans can be assigned to tenants.
 
-Wording uses **Tenant monthly price** and **Tenant annual price**. No payment
-checkout wording (no "You will be charged").
+### Save Draft behavior
 
-Modules and features load from API service methods. Empty catalog states shown
-when backend catalog endpoints are not yet available. No hardcoded module or
-feature names in templates.
+Minimum required fields:
 
-Publish opens confirmation modal explaining post-publish edit restrictions.
+- planName
+- planCode
+- billingCycle
+- baseCurrency
+
+Calls `POST /api/v1/platform/subscription-plans`.
+
+Success toast only after backend success:
+
+> Subscription plan saved as draft
+
+## Create Plan Wizard — Step 4 Pricing (Latest UI)
+
+Layout matches Step 1 shell:
+
+- Step 4 **Pricing** active in stepper
+- Left card: **Base Pricing**
+- Right sticky card: **Draft Summary**
+- Top-right and bottom action bars: Back, Save Draft, Next
+
+### Allowed Pricing fields (Release 1 DB-backed)
+
+| UI field | DB column | Editable |
+|---|---|---|
+| Billing Cycle | `subscription_plans.billing_cycle` | Read-only (from Basics) |
+| Currency | `subscription_plans.base_currency` | Read-only (from Basics) |
+| Base Price | `subscription_plans.base_price` | Yes |
+
+Helper text:
+
+- Billing Cycle / Currency: Selected in Basics step.
+- Base Price: This is the base subscription price for the selected billing cycle.
+
+Blue info box:
+
+> This base price will be used for tenant subscription billing based on the selected billing cycle.
+
+### Removed non-R1 pricing fields
+
+Do not render:
+
+- Monthly Price
+- Annual Price
+- Trial Days
+- Setup Fee
+- Add-on Pricing
+- Revenue Preview
+- Annual discount / Save percentage
+- Tax fields
+- Payment checkout wording
+
+### Draft Summary on Pricing step
+
+Top rows:
+
+- Plan Name
+- Plan Code
+- Billing Cycle
+- Currency
+- Base Price (when on Pricing step or value entered)
+- Status: Draft
+
+Progress order (must follow wizard order):
+
+1. Modules — e.g. `5 selected`
+2. Features — e.g. `12 enabled`
+3. Pricing — `Not configured` | `In progress` | `Configured`
+4. Limits — `Not configured` until Limits step completed
+
+Pricing status rules:
+
+- **Not configured** — base price empty
+- **In progress** — value entered but invalid
+- **Configured** — valid base price `>= 0`
+
+Limits must not show **Configured** on Pricing step unless user completed Limits and navigated back.
+
+### Save Draft on Pricing step
+
+1. Validate Basics minimum fields
+2. Validate base price when on Pricing step
+3. If no draft id → `POST /api/v1/platform/subscription-plans`
+4. Then `PATCH /api/v1/platform/subscription-plans/{id}/pricing` with `{ basePrice }`
+5. Success toast only after backend success
+
+### Save Draft on Limits step
+
+1. Validate basics + limits (maxOutlets, maxTills, maxUsers)
+2. Create draft if no `savedPlanId`
+3. `PATCH .../limits`
+4. Toast only on backend success; Draft Summary Limits = Configured after save
+
+### Publish
+
+1. PATCH pricing + PATCH limits (if not already saved)
+2. `POST .../publish` → response `status: active`
+3. Navigate to `/admin/subscriptions` with success toast; list reloads from backend
+
+## Verified end-to-end (2026-06-19)
+
+API + DB flow on `nytroz_pos_dev`:
+
+- POST create → `status: draft`
+- PATCH pricing → `base_price: 12900`
+- PATCH limits → `5/10/25`
+- POST publish → `status: active`
+- GET list → item `status: active`, UI label Published
 
 ## API
 
-List: `GET /api/v1/platform/subscription-plans`
-
-Create/publish/catalog endpoints are stubbed in frontend service with TODO until
-backend endpoints are available.
-
-## Permission and Error State Rules (Verified 2026-06-17)
-
-| State | When shown |
+| Endpoint | Purpose |
 |---|---|
-| Loading | API request in progress; tab counts show `—`, table shows skeleton rows |
-| Empty | API returns `200` with zero items |
-| Error + Retry | Real API/network failure (non-permission) |
-| Permission denied | API returns `403` with backend message such as missing `platform.subscription_plans.view` |
+| `GET /api/v1/platform/subscription-plans` | List plans |
+| `POST /api/v1/platform/subscription-plans` | Create draft plan |
+| `PATCH /api/v1/platform/subscription-plans/{id}/pricing` | Update draft base price |
+| `PATCH /api/v1/platform/subscription-plans/{id}/limits` | Update draft limits |
+| `POST /api/v1/platform/subscription-plans/{id}/publish` | Publish draft to active |
 
-Do not show permission denied before the API responds. Frontend does not bypass
-backend permission checks.
+## Status display contract
 
-### Create Plan Button Visibility
+| Backend/API status | UI label | Badge color |
+|---|---|---|
+| `draft` | Draft | Amber/orange |
+| `active` | Published | Green |
+| `retired` | Archived | Gray |
 
-Show only when auth session includes `platform.subscription_plans.create`, or
-legacy `platform.subscription.manage` if present in session permissions.
+- Backend returns `draft`, `active`, `retired` only
+- Frontend must not expect `published` or `archived` in API row status
+- List tabs: Published → filter `active`; Archived → filter `retired`
+- `statusCounts.published` / `statusCounts.archived` are count bucket keys only
 
 ## Related Files
 
-- [[../03_USER_JOURNEYS/Platform_Admin/Subscription_Plan_Management_Flow]]
 - [[../09_ANGULAR_ADMIN_KNOWLEDGE/Subscription_UI_Implementation]]
 - [[../04_MODULE_KNOWLEDGE/Subscription/03_Technical_Contract]]
+- [[../14_AI_DEVELOPER_PROMPTS/Frontend_Subscription_UI]]
