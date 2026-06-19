@@ -74,6 +74,19 @@ data, or real AWS/payment credentials.
 - Sensitive data is stored as hash/reference only.
 - Table and column names match updated database design.
 
+## Development Seed SQL Rules (Verified 2026-06-17)
+
+For development-only data migrations such as `20260613120000_SeedDevelopmentPosActivationData`:
+
+1. Guard with `ASPNETCORE_ENVIRONMENT=Development` only.
+2. Bootstrap prerequisite tenant/users before role assignment inserts.
+3. Prefer `INSERT ... SELECT ... JOIN` over scalar subqueries in `VALUES`.
+4. If a join target is missing, insert zero rows instead of NULL FK values.
+5. Include all NOT NULL columns in seed inserts (`is_system` on `platform_roles`, etc.).
+6. Match partial unique indexes in `ON CONFLICT` clauses exactly.
+
+Fixed issue: `tenant_user_roles.user_id` NULL when auth users were missing or subqueries returned NULL.
+
 ## Related Files
 
 - [[Database_Overview]]

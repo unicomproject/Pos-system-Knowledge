@@ -105,6 +105,42 @@ Test cases should cover:
 
 No full accounting; no direct gateway UI in Angular.
 
+## Platform Admin Subscription Plans List API (Implemented 2026-06-17)
+
+| Item | Contract |
+|---|---|
+| Endpoint | `GET /api/v1/platform/subscription-plans` |
+| Auth | Platform JWT (`PlatformBearer`) |
+| Permission | `platform.subscription_plans.view` |
+| Data source | `subscription_plans`, `subscription_plan_features`, `tenant_subscriptions` |
+| Status mapping | DB `active` → API `published`, DB `retired` → API `archived`, DB `draft` → API `draft` |
+| Billing mapping | DB `yearly` → API `annual`, DB `custom` → API `both` |
+| Active tenant count | `tenant_subscriptions` where status in (`trial`, `active`) |
+| Add-ons count | Returns `0` until add-on pricing table is confirmed in Release 1 database design |
+
+## Platform Admin Subscription UI (Implemented 2026-06-17)
+
+| Item | Contract |
+|---|---|
+| List route | `/admin/subscriptions` |
+| Create route | `/admin/subscriptions/create` |
+| List API | `GET /api/v1/platform/subscription-plans` |
+| Data binding | Plans, tab counts, pagination, and action flags from API only |
+| Modules/features | Loaded via API service; not hardcoded in templates |
+| Wizard | 6 steps with draft summary; create/publish API stubbed pending backend |
+| UX rule | Super Admin creates plan templates, not tenant purchases |
+
+### Permission Enforcement (Verified 2026-06-17)
+
+| Action | Permission |
+|---|---|
+| List plans API | `platform.subscription_plans.view` |
+| Create Plan button | `platform.subscription_plans.create` |
+| Edit / duplicate / archive / delete | Respective `platform.subscription_plans.*` codes via API `can*` flags |
+
+Login response includes resolved `platformPermissions` from role-permission mapping.
+Frontend permission checks are UX only; backend remains final authority.
+
 ## Related Files
 
 - [[01_Module_Overview]]

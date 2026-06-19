@@ -61,6 +61,9 @@ PR/commit reference is recorded.
 | Flutter | POS Shell | POS Home Dashboard | In Progress | - | `pos-home-dashboard` | API dashboard + placeholders |
 | Flutter | Sales | Start Sale UI | In Progress | - | `pos-home-dashboard` | Catalog + local cart partial |
 | Angular | Tenant | Tenant List Page | Not Started | - | - | Example row |
+| Flutter | Sales | Start Sale UI | Not Started | - | - | Example row |
+| Backend | Tenant / Outlet | Outlet Create | Completed | 2026-06-18 | dashboard_tenant | POST /api/v1/tenant-admin/outlets |
+| Flutter | Tenant Admin / Outlet | Outlet Create UI | Completed | 2026-06-18 | tenant-dashboard | Add/Edit outlet screens |
 
 ## Update Process
 
@@ -90,6 +93,7 @@ table file, architecture file, and PR/commit reference where available.
 
 ## Related Files
 
+- [[Tenant_Admin_Test_Cases]]
 - [[../04_MODULE_KNOWLEDGE]]
 - [[../03_USER_JOURNEYS]]
 - [[../11_DEVELOPER_ONBOARDING/Code_Review_Checklist]]

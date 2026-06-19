@@ -8,13 +8,17 @@
         "type": "tabs",
         "children": [
           {
-            "id": "e4b581fe8ebd8db2",
+            "id": "56806a201bd68d51",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "03_USER_JOURNEYS/Platform_Admin/03_Subscription_Payment_Link_Flow.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "03_Subscription_Payment_Link_Flow"
             }
           }
         ]
@@ -74,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 338.5
+    "width": 403.5
   },
   "right": {
     "id": "bb1db1e68db4824b",
@@ -90,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "15_IMPLEMENTATION_TRACKING/Backend/Sales/Create_Sale_Implementation_Status.md",
+                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Create_Sale_Implementation_Status"
+              "title": "Backlinks for 10_Cash_In_Out_Flow"
             }
           },
           {
@@ -179,43 +183,43 @@
       "bases:Create new base": false
     }
   },
-  "active": "e4b581fe8ebd8db2",
+  "active": "56806a201bd68d51",
   "lastOpenFiles": [
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Security_Guardrails.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Pos_Activation_Seed_Migration_Fix.md",
+    "15_IMPLEMENTATION_TRACKING/Angular/Subscription/Subscription_UI_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Angular/Subscription",
+    "14_AI_DEVELOPER_PROMPTS/Frontend_Subscription_UI.md",
+    "09_ANGULAR_ADMIN_KNOWLEDGE/Subscription_UI_Implementation.md",
+    "03_USER_JOURNEYS/Platform_Admin/Subscription_Plan_Management_Flow.md",
+    "07_UI_UX_KNOWLEDGE/Platform_Admin_Subscription_UI.md",
+    "15_IMPLEMENTATION_TRACKING/Flutter/Sales/Start_Sale_UI_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Sales/Create_Sale_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_Admin_Login_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Angular/Tenant/Tenant_List_Page_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/_TEMPLATES/Implementation_Status_Template.md",
+    "15_IMPLEMENTATION_TRACKING/Flutter/Sales",
+    "15_IMPLEMENTATION_TRACKING/Flutter/README.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Sales",
+    "15_IMPLEMENTATION_TRACKING/Backend/README.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Auth",
+    "15_IMPLEMENTATION_TRACKING/Angular/Tenant",
+    "15_IMPLEMENTATION_TRACKING/Angular/README.md",
+    "15_IMPLEMENTATION_TRACKING/Full_Feature_Status_Index.md",
+    "15_IMPLEMENTATION_TRACKING/_TEMPLATES",
+    "15_IMPLEMENTATION_TRACKING/Flutter",
+    "15_IMPLEMENTATION_TRACKING/Backend",
+    "15_IMPLEMENTATION_TRACKING/Angular",
+    "15_IMPLEMENTATION_TRACKING",
+    "10_TESTING_QA/Test_Case/Auth_Test_Cases.md",
     "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Testing.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Hardware_Payment_Receipt.md",
     "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Tenant_Admin_Layout.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_State_Management_Riverpod.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Security_Guardrails.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Routing_Guards.md",
     "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Permission_Based_UI_Rendering.md",
     "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Local_Storage_Cache.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Error_Handling.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_API_Integration.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_API_Network.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Routing_Guards.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_State_Management_Riverpod.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Hardware_Payment_Receipt.md",
     "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Folder_Structure.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_App_Architecture.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter",
-    "08_FLUTTER_POS_KNOWLEDGE",
-    "08_FLUTTER_POS_KNOWLEDGE/Permission_Based_UI_Rendering.md",
-    "08_FLUTTER_POS_KNOWLEDGE/GoRouter_Routing.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter_App_Architecture.md",
-    "09_ANGULAR_ADMIN_KNOWLEDGE/Routing_And_Guards.md",
-    "09_ANGULAR_ADMIN_KNOWLEDGE/Reusable_Component_Strategy.md",
-    "09_ANGULAR_ADMIN_KNOWLEDGE/Platform_Admin_Folder_Structure.md",
-    "09_ANGULAR_ADMIN_KNOWLEDGE/Permission_Based_Menu.md",
-    "09_ANGULAR_ADMIN_KNOWLEDGE/Angular_Testing_Scope.md",
-    "09_ANGULAR_ADMIN_KNOWLEDGE/Angular_State_Management.md",
-    "09_ANGULAR_ADMIN_KNOWLEDGE/Angular_Module_Implementation_Guide.md",
-    "09_ANGULAR_ADMIN_KNOWLEDGE/Angular_Form_Validation_Guide.md",
-    "09_ANGULAR_ADMIN_KNOWLEDGE/Angular_Error_Loading_Handling.md",
-    "09_ANGULAR_ADMIN_KNOWLEDGE/Angular_Environment_Config.md",
-    "10_TESTING_QA/Test_Case",
-    "10_TESTING_QA/Test_Cases",
-    "15_IMPLEMENTATION_TRACKING/Backend/Auth",
-    "15_IMPLEMENTATION_TRACKING/Flutter/Sales",
-    "15_IMPLEMENTATION_TRACKING/Backend/Sales",
-    "15_IMPLEMENTATION_TRACKING/Angular/Tenant",
-    "15_IMPLEMENTATION_TRACKING/_TEMPLATES",
-    "15_IMPLEMENTATION_TRACKING/Flutter"
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Error_Handling.md"
   ]
 }
