@@ -1,7 +1,7 @@
 <!-- title: Flutter State Management Riverpod -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Flutter State Management Riverpod
@@ -30,7 +30,11 @@ Do not create one global POS state object.
 | `outletProvider` | Assigned outlets and selected outlet |
 | `tillProvider` | Selected till, open/close state |
 | `productLookupProvider` | Query, barcode result, product list |
-| `cartProvider` | Items, discounts, tax, totals |
+| `cartProvider` | Items, discounts, tax, totals (target; not implemented) |
+| `posNewSaleCartProvider` | New Sale local cart (implemented) |
+| `posNewSaleCatalogProvider` | New Sale product catalog load |
+| `posHomeDashboardProvider` | POS home dashboard API state |
+| `posSessionBootstrapProvider` | Device/till hydration gate |
 | `customerProvider` | Customer and loyalty eligibility |
 | `checkoutProvider` | Checkout validation and completion |
 | `paymentProvider` | Method, status, card reader result |

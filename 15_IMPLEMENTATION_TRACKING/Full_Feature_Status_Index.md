@@ -1,7 +1,7 @@
 <!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Full Feature Status Index
@@ -57,9 +57,9 @@ PR/commit reference is recorded.
 
 | Platform | Module | Feature | Status | Completed Date | PR / Commit | Notes |
 |---|---|---|---|---|---|---|
-| Backend | Sales | Create Sale | Not Started | - | - | Example row |
+| Backend | Sales | Create Sale API | In Progress | - | `pos-home-dashboard` | API exists; Flutter not wired |
+| Flutter | Sales | Start Sale UI | In Progress | - | `pos-home-dashboard` | Home + New Sale partial |
 | Angular | Tenant | Tenant List Page | Not Started | - | - | Example row |
-| Flutter | Sales | Start Sale UI | Not Started | - | - | Example row |
 
 ## Update Process
 
