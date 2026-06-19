@@ -1,7 +1,7 @@
 <!-- title: Create Sale Implementation Status -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Create Sale Implementation Status
@@ -12,57 +12,51 @@
 |---|---|
 | Platform | Backend |
 | Module | Sales |
-| Feature | Create Sale |
-| Status | Not Started |
+| Feature | Create Sale (checkout API) |
+| Status | In Progress |
 | Completed Date | - |
-| Developer | - |
+| Developer | POS team |
 | Reviewer | - |
-| PR / Commit | - |
-| Tests | Not Run |
+| PR / Commit | `pos-home-dashboard` branch |
+| Tests | Unit tests present |
 
 ## Feature Summary
 
-This is a sample tracking file.
-
-Replace or copy this pattern when a real feature implementation starts.
-
-Do not mark completed until implementation, tests, and Second Brain updates are
-finished.
+Backend exposes `POST /api/v1/pos/sales` (`PosSalesController`) and cart helpers
+under `POST /api/v1/pos/cart/*`. Flutter New Sale UI does **not** call these
+endpoints yet; cart remains client-only in the app.
 
 ## Related Second Brain Files
 
 | Area | File |
 |---|---|
+| Flutter integration status | [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]] |
 | Module overview | [[../../04_MODULE_KNOWLEDGE/Sales/01_Module_Overview]] |
-| Functional rules | [[../../04_MODULE_KNOWLEDGE/Sales/02_Functional_Rules]] |
 | Technical contract | [[../../04_MODULE_KNOWLEDGE/Sales/03_Technical_Contract]] |
-| Database | [[../../06_DATABASE_KNOWLEDGE/Tables/19_Sales_Core]] |
 
 ## Files Changed
 
 ```text
-Not started.
+src/SCS.Api/Modules/Sales/PosSalesController.cs
+src/SCS.Application/Modules/Sales/Services/PosSaleService.cs
+src/SCS.Api/Modules/Cart/PosCartController.cs
+src/SCS.Application/Modules/Cart/Services/PosCartService.cs
+tests/SCS.UnitTests/Modules/Cart/PosCartServiceTests.cs
 ```
 
 ## Tests Written
 
 | Test Type | File / Test Name | Result |
 |---|---|---|
-| Unit | - | Not Run |
-| Integration | - | Not Run |
-| Manual | - | Not Run |
-
-## Test Commands Run
-
-```text
-Not run.
-```
+| Unit | `PosCartServiceTests` | Present |
+| API | `PosProductsControllerTests` | Present |
 
 ## Second Brain Updates
 
 | File Updated | Update Summary |
 |---|---|
-| - | Not started |
+| [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]] | Backend API vs Flutter wiring |
+| [[../Full_Feature_Status_Index]] | Updated status row |
 
 ## Related Files
 

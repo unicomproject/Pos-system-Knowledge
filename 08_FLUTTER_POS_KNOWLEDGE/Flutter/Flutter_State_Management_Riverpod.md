@@ -1,7 +1,7 @@
 <!-- title: Flutter State Management Riverpod -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Flutter State Management Riverpod
@@ -30,12 +30,25 @@ Do not create one global POS state object.
 | `outletProvider` | Assigned outlets and selected outlet |
 | `tillProvider` | Selected till, open/close state |
 | `productLookupProvider` | Query, barcode result, product list |
-| `cartProvider` | Items, discounts, tax, totals |
+| `cartProvider` | Items, discounts, tax, totals (target; not implemented) |
+| `posNewSaleCartProvider` | New Sale local cart (implemented) |
+| `posNewSaleCatalogProvider` | New Sale product catalog load |
+| `posHomeDashboardProvider` | POS home dashboard API state |
+| `posSessionBootstrapProvider` | Device/till hydration gate |
+| `postLoginRouteProvider` | Post-login destination resolver |
+| `posProductDetailProvider` | Product detail for variant sheet |
+| `posShellGrantedPermissionsProvider` | Sidebar permission filter |
+| `posSessionContextProvider` | Session display on device/till screens |
+| `posCatalogRemoteDatasourceProvider` | Catalog HTTP datasource |
+| `authSessionProvider` | JWT session (implemented; not `authProvider`) |
 | `customerProvider` | Customer and loyalty eligibility |
 | `checkoutProvider` | Checkout validation and completion |
 | `paymentProvider` | Method, status, card reader result |
 | `hardwareProvider` | Printer, scanner, drawer, reader status |
 | `connectivityProvider` | Online/offline warning state |
+
+Implemented cashier providers are listed in
+[[Flutter_Cashier_New_Sale_Implementation#State and Models]].
 
 ## Tenant Admin State
 

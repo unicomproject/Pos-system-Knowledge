@@ -1,7 +1,7 @@
 <!-- title: Start Sale Flow -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 # Start Sale Flow
 
@@ -96,8 +96,22 @@ flowchart TD
 - Sensitive actions write audit records where required.
 - UI state and backend state stay consistent after completion.
 
+## Current Flutter Implementation (2026-06-18)
+
+| Journey step | Implemented? | Notes |
+|---|---|---|
+| Tap Start Sale | Yes | `/pos/home` → `/pos/new-sale` when permitted |
+| Search product | Partial | Client-side filter; `products.search` gates top bar |
+| Scan barcode | No | Hint text only; no lookup API |
+| Select variant | Yes | `PosProductVariantSheet` |
+| Add to cart | Yes | Local `posNewSaleCartProvider` only |
+| Proceed payment / park / customer | No / stub | Payment sheet UI only; action bar disabled |
+
+Full code map: [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]].
+
 ## Related Files
 
 - [[../01_RELEASE_SCOPE/Release_1_Scope]]
 - [[../02_ACCESS_CONTROL/Access_Control_Overview]]
 - [[../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]]

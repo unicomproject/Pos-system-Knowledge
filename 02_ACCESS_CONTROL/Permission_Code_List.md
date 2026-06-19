@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 # Permission Code List
 
@@ -129,8 +129,40 @@ Exact seed list must be reviewed against UI journeys before production seeding.
 | `pos.payment.capture` | Take payment |
 | `pos.receipt.print` | Print receipt |
 | `pos.cash.movement` | Cash in/out |
-| `pos.till.open` | Open till |
-| `pos.till.close` | Close till |
+
+## POS New Sale Codes (Seeded + Used in Flutter)
+
+These codes are seeded in `DevelopmentPosNewSalePermissionsSeedData` and referenced
+in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
+
+| Code | Flutter usage |
+|---|---|
+| `pos.home.view` | POS home route and sidebar |
+| `pos.new_sale.view` | New Sale route and sidebar |
+| `products.view` | Product grid |
+| `products.search` | Top-bar search on New Sale |
+| `sales.cart.add_item` | Add product to cart |
+| `sales.cart.update_item` | Change cart quantity |
+| `sales.cart.remove_item` | Remove cart line |
+| `sales.cart.clear` | Clear cart |
+| `customers.view` | Customers nav / action visibility |
+| `customers.create` | Add customer button visibility |
+| `sales.discount.apply` | Apply discount button (stub) |
+| `sales.park.create` | Park sale button (stub) |
+| `sales.checkout` | Proceed to Payment button |
+| `payments.cash.accept` | Cash in payment sheet |
+| `payments.card.accept` | Card in payment sheet |
+| `payments.qr.accept` | QR in payment sheet |
+| `payments.split.accept` | Split in payment sheet |
+| `orders.view` | Orders sidebar (no route yet) |
+| `returns.view` / `refunds.view` | Returns nav |
+| `cash_drawer.view` | Cash drawer nav |
+| `notifications.view` | Notification bell |
+| `pos.till.open` | Till open flow (`canOpenPosTill`) |
+| `tenant.till.manage` | Device activation gate (`canActivatePosDevice`) |
+| `till.session.view` | Home header till status chip |
+
+Implementation map: [[../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]].
 
 POS permission alone is not enough; device and till-session checks still apply.
 

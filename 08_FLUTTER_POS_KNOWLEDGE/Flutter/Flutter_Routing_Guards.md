@@ -1,7 +1,7 @@
 <!-- title: Flutter Routing Guards -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Flutter Routing Guards
@@ -19,6 +19,8 @@ states.
 
 ## POS Routes
 
+### Release 1 target routes
+
 | Route | Purpose |
 |---|---|
 | `/splash` | Startup/session restore |
@@ -27,7 +29,7 @@ states.
 | `/outlet-selection` | Select assigned outlet |
 | `/till-selection` | Select assigned till |
 | `/till-open` | Open till |
-| `/pos-home` | POS home |
+| `/pos-home` | POS home (target naming) |
 | `/checkout` | Checkout |
 | `/payment/cash` | Cash payment |
 | `/payment/card` | Card reader handoff |
@@ -40,6 +42,23 @@ states.
 | `/hardware/settings` | Hardware settings |
 | `/permission-denied` | Access denied |
 | `/session-expired` | Session expired |
+
+### Implemented cashier routes (current code)
+
+| Route | Purpose |
+|---|---|
+| `/tenant-login` | Staff sign-in (auth entry) |
+| `/pos/boot` | POS session bootstrap |
+| `/device-activation`, `/open-till` | Device/till setup |
+| `/pos/home` | POS home dashboard |
+| `/pos/new-sale` | New Sale catalog + local cart |
+| `/pos/customers` | Placeholder |
+| `/pos/returns-refunds` | Placeholder |
+| `/pos/parked-sales` | Placeholder |
+| `/pos/cash-drawer` | Placeholder |
+
+For implemented behavior and conflicts with target routes, see
+[[Flutter_Cashier_New_Sale_Implementation]].
 
 ## Tenant Admin Routes
 
@@ -60,6 +79,8 @@ Tenant Admin routes appear only when backend context allows them.
 
 ## Redirect Rules
 
+### Target Release 1 rules
+
 | Condition | Redirect |
 |---|---|
 | No session | `/sign-in` |
@@ -69,6 +90,17 @@ Tenant Admin routes appear only when backend context allows them.
 | No till for POS | `/till-selection` |
 | Till not opened for checkout | `/till-open` |
 | Missing permission | `/permission-denied` |
+
+### Implemented redirect behavior (current code)
+
+| Condition | Redirect |
+|---|---|
+| No session on protected routes | `/tenant-login` (not `/sign-in`) |
+| Bootstrap not ready | `/pos/boot` |
+| Bootstrap ready on boot route | `postLoginRouteProvider.path` |
+| Wrong POS route for user context | Locked to post-login route |
+
+Full guard table: [[Flutter_Cashier_New_Sale_Implementation#Router Guards (Implemented)]].
 
 ## Guard Flow
 

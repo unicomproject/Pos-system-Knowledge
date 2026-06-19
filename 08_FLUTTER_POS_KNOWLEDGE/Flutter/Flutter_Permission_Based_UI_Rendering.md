@@ -1,7 +1,7 @@
 <!-- title: Flutter Permission Based UI Rendering -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Flutter Permission Based UI Rendering
@@ -45,6 +45,11 @@ Backend remains final authority.
 | UI Action | Required Context |
 |---|---|
 | Start sale | Permission, outlet, trusted device, open till |
+| New Sale product grid | `products.view` |
+| New Sale search field | `products.search` on `/pos/new-sale` only |
+| Cart qty / remove / clear | `sales.cart.update_item`, `remove_item`, `clear` |
+| Proceed to Payment | `sales.checkout` + payment accept permissions |
+| POS sidebar item | Permission on each `PosShellNavDestination` |
 | Apply discount | Discount permission and policy |
 | Redeem loyalty | Loyalty feature and redeem permission |
 | Process refund | Return/refund feature and permission |
@@ -67,5 +72,6 @@ Backend remains final authority.
 ## Related Files
 
 - [[Flutter_Routing_Guards]]
+- [[Flutter_Cashier_New_Sale_Implementation]]
 - [[Flutter_Tenant_Admin_Layout]]
 - [[../02_ACCESS_CONTROL/Access_Control_Overview]]
