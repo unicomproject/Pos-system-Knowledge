@@ -1,41 +1,45 @@
 <!-- title: Frontend Subscription UI -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-17 -->
+<!-- last_updated: 2026-06-19 -->
 
 # Frontend Subscription UI — Implementation Notes
 
-## Confirmed Implementation (2026-06-17)
-
-Super Admin subscription plan management UI implemented in Angular platform
-admin app.
-
 ## Rules for Future Changes
 
-- Do not hardcode plans, modules, features, tab counts, or notification badges
-- Use API service + model layer; no business data in component templates
-- Keep existing dark blue sidebar and admin shell layout
-- Routes use `/admin/subscriptions` prefix (not root `/subscriptions`)
-- No payment checkout wording; use tenant pricing labels
-- No "Modules & Features Seeded" wizard step
-- No Release 2 e-commerce operational flow
-- Backend is final authority for permissions and action flags
+- Use only Release 1 DB-backed subscription plan fields in Create Plan UI
+- Do not add taxMode, visibility, setupFee, effectiveFrom, or planType to Step 1
+- Billing cycle options must match DB: monthly, yearly, custom, trial, demo
+- Backend status values: `draft`, `active`, `retired` — never expect `published`/`archived` in API responses
+- UI labels: Draft / Published (for active) / Archived (for retired)
+- No mock subscription plan rows in list or wizard
+- Save Draft / Pricing / Limits / Publish must call real backend APIs
+- Show success toast only after backend `success: true`
+- Bottom action bar required: Back left, Save Draft + Next right
+- No sidebar collapse button
 
-## Component Structure
+## Step 1 Allowed Fields
 
-```
-features/admin/
-  models/platform-subscription-plan.model.ts
-  services/platform-subscription-plan-api.service.ts
-  pages/platform-subscription-plans-page/
-  pages/platform-create-subscription-plan-page/
-```
+- Plan Name → `name`
+- Plan Code → `plan_code`
+- Description → `description`
+- Billing Cycle → `billing_cycle`
+- Currency → `base_currency`
+- Status read-only Draft → `status = draft`
 
-## API
+## API Methods
 
-List integrated: `GET /api/v1/platform/subscription-plans`
+- `getSubscriptionPlans()`
+- `createSubscriptionPlanDraft()`
+- `updateSubscriptionPlanPricing()`
+- `updateSubscriptionPlanLimits()`
+- `publishSubscriptionPlan()`
 
-Wizard create/publish/catalog methods exist with TODO stubs until backend ready.
+Base URL: `/api/v1` (proxy to `http://localhost:5050`)
+
+## Status mapping utility
+
+`src/app/features/admin/models/subscription-plan-status.util.ts`
 
 ## Related Files
 

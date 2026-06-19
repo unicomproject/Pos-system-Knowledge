@@ -1,7 +1,7 @@
 <!-- title: Subscription Technical Contract -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-19 -->
 
 
 # Subscription Technical Contract
@@ -113,12 +113,21 @@ No full accounting; no direct gateway UI in Angular.
 | Auth | Platform JWT (`PlatformBearer`) |
 | Permission | `platform.subscription_plans.view` |
 | Data source | `subscription_plans`, `subscription_plan_features`, `tenant_subscriptions` |
-| Status mapping | DB `active` → API `published`, DB `retired` → API `archived`, DB `draft` → API `draft` |
+| Status values | API returns DB truth: `draft`, `active`, `retired` (no `published`/`archived` aliases in responses) |
+| Status filter aliases | List query may accept `published`/`archived` as input aliases; they map to DB `active`/`retired` |
+| UI display mapping | Frontend may label DB `active` as **Published** and DB `retired` as **Archived** |
 | Billing mapping | DB `yearly` → API `annual`, DB `custom` → API `both` |
 | Active tenant count | `tenant_subscriptions` where status in (`trial`, `active`) |
 | Add-ons count | Returns `0` until add-on pricing table is confirmed in Release 1 database design |
 
-## Platform Admin Subscription UI (Implemented 2026-06-17)
+## Platform Admin Subscription UI (Implemented 2026-06-19)
+
+Frontend status integration:
+
+- API model accepts `draft`, `active`, `retired`
+- UI maps labels: Draft / Published / Archived
+- List tabs filter with DB values (`active`, `retired`, `draft`)
+- Full wizard API flow verified 2026-06-19 (create → pricing → limits → publish → list)
 
 | Item | Contract |
 |---|---|
@@ -127,10 +136,84 @@ No full accounting; no direct gateway UI in Angular.
 | List API | `GET /api/v1/platform/subscription-plans` |
 | Data binding | Plans, tab counts, pagination, and action flags from API only |
 | Modules/features | Loaded via API service; not hardcoded in templates |
-| Wizard | 6 steps with draft summary; create/publish API stubbed pending backend |
 | UX rule | Super Admin creates plan templates, not tenant purchases |
 
-### Permission Enforcement (Verified 2026-06-17)
+## Platform Admin Create/Publish API (Implemented 2026-06-18)
+
+| Item | Contract |
+|---|---|
+| Create endpoint | `POST /api/v1/platform/subscription-plans` |
+| Pricing endpoint | `PATCH /api/v1/platform/subscription-plans/{planId}/pricing` |
+| Limits endpoint | `PATCH /api/v1/platform/subscription-plans/{planId}/limits` |
+| Publish endpoint | `POST /api/v1/platform/subscription-plans/{planId}/publish` |
+| List endpoint | `GET /api/v1/platform/subscription-plans` |
+| Create permission | `platform.subscription_plans.create` |
+| Pricing permission | `platform.subscription_plans.edit` |
+| Limits permission | `platform.subscription_plans.edit` |
+| Publish permission | `platform.subscription_plans.edit` |
+| List permission | `platform.subscription_plans.view` |
+| Create request fields | `planName`, `planCode`, `description`, `billingCycle`, `currencyCode`, optional limits/pricing |
+| Pricing request fields | `basePrice` only |
+| Limits request fields | `maxOutlets`, `maxTills`, `maxUsers` (>= 0 if provided) |
+| DB status on create | `draft` |
+| DB status on publish | `active` |
+| Publish response status | `active` (same as DB; backend must not return `published`) |
+| List item status | `draft`, `active`, or `retired` from DB |
+
+### Step 1 UI field mapping
+
+| UI | DB |
+|---|---|
+| Plan Name | `subscription_plans.name` |
+| Plan Code | `subscription_plans.plan_code` |
+| Description | `subscription_plans.description` |
+| Billing Cycle | `subscription_plans.billing_cycle` |
+| Currency | `subscription_plans.base_currency` |
+| Status Draft | `subscription_plans.status = draft` |
+
+Do not send or store in R1 UI:
+
+- taxMode
+- visibility
+- setupFee
+- effectiveFrom
+- planType column
+
+### Step 4 Pricing UI field mapping
+
+| UI | DB | Editable on Pricing step |
+|---|---|---|
+| Billing Cycle | `subscription_plans.billing_cycle` | No (from Basics) |
+| Currency | `subscription_plans.base_currency` | No (from Basics) |
+| Base Price | `subscription_plans.base_price` | Yes |
+
+Pricing PATCH request: `{ basePrice }` only. Do not update billing cycle or currency on pricing endpoint.
+
+Do not create monthly_price, annual_price, setup_fee, trial_days, or add-on pricing tables in R1.
+
+### Step 5 Limits API field mapping
+
+| Request field | DB column | Editable on Limits step |
+|---|---|---|
+| `maxOutlets` | `subscription_plans.max_outlets` | Yes |
+| `maxTills` | `subscription_plans.max_tills` | Yes |
+| `maxUsers` | `subscription_plans.max_users` | Yes |
+
+Limits PATCH request updates only provided fields on **draft** plans.
+Response returns saved limits and `status: draft` (DB value).
+
+## Status contract (verified 2026-06-19)
+
+| Layer | Values | Notes |
+|---|---|---|
+| Database | `draft`, `active`, `retired` | Source of truth |
+| API responses | `draft`, `active`, `retired` | Must match DB; no UI-only aliases |
+| Frontend display | e.g. Published for `active` | Presentation only; not returned by backend |
+| List statusCounts | `published`, `archived` tab bucket names | Count keys only; not plan row status |
+
+Do not create a separate limits table or UI-only limit fields.
+
+## Permission and Error State Rules (Verified 2026-06-17)
 
 | Action | Permission |
 |---|---|

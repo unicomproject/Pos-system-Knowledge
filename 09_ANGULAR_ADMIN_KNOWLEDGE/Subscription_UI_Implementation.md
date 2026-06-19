@@ -1,13 +1,13 @@
 <!-- title: Subscription UI Implementation -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-17 -->
+<!-- last_updated: 2026-06-19 -->
 
 # Subscription UI Implementation
 
 ## Summary
 
-Implemented Super Admin Subscription Plans list page and Create Plan wizard in
+Super Admin Subscription Plans list page and Create Plan wizard in
 `nytroz-pos-platform-admin`.
 
 ## Components
@@ -17,79 +17,129 @@ Implemented Super Admin Subscription Plans list page and Create Plan wizard in
 | `PlatformSubscriptionPlansPage` | `features/admin/pages/platform-subscription-plans-page/` |
 | `PlatformCreateSubscriptionPlanPage` | `features/admin/pages/platform-create-subscription-plan-page/` |
 
-Standalone components with inline templates/styles (matches tenant list pattern).
+## API Service
 
-## Data Layer
+`platform-subscription-plan-api.service.ts`
 
-| File | Purpose |
+| Method | Endpoint |
 |---|---|
-| `platform-subscription-plan.model.ts` | UI models and query types |
-| `platform-subscription-plan-api.service.ts` | HTTP client for list + wizard stubs |
+| `getSubscriptionPlans()` | `GET /api/v1/platform/subscription-plans` |
+| `createSubscriptionPlanDraft()` | `POST /api/v1/platform/subscription-plans` |
+| `updateSubscriptionPlanPricing()` | `PATCH /api/v1/platform/subscription-plans/{id}/pricing` |
+| `updateSubscriptionPlanLimits()` | `PATCH /api/v1/platform/subscription-plans/{id}/limits` |
+| `publishSubscriptionPlan()` | `POST /api/v1/platform/subscription-plans/{id}/publish` |
 
-API endpoint config: `apiEndpoints.platform.subscriptionPlans =
-'/platform/subscription-plans'`.
+## Status model
 
-## Routes
+```typescript
+type SubscriptionPlanStatus = 'draft' | 'active' | 'retired';
+```
 
-Updated `admin.routes.ts`:
+Display mapping in `subscription-plan-status.util.ts`:
 
-- `subscriptions` → list page
-- `subscriptions/create` → create wizard (defined before list route segment)
+- `draft` → Draft
+- `active` → Published
+- `retired` → Archived
 
-## Permissions
+List tab filters send DB values (`active`, `retired`, `draft`) to backend.
 
-Frontend permission keys in `permission-keys.ts`:
+## Create Wizard — Step 1 Form State
 
-- `platform.subscription_plans.view`
-- `platform.subscription_plans.create`
-- `platform.subscription_plans.edit`
-- `platform.subscription_plans.duplicate`
-- `platform.subscription_plans.archive`
-- `platform.subscription_plans.delete`
+Reactive form group `basicsForm`:
 
-Create button checks `.create` or legacy `.manage`. Action buttons respect API
-`canView`, `canEdit`, `canDuplicate`, `canArchive`, `canDelete`.
+- `planName` required
+- `planCode` required, auto uppercase
+- `description` max 500
+- `billingCycle` required (`monthly|yearly|custom|trial|demo`)
+- `baseCurrency` required
 
-## State Management
+Read-only status display: Draft
 
-- Angular signals for loading, error, filters, pagination, wizard step
-- RxJS debounced search (300ms)
-- Reactive forms for wizard basics/pricing/limits steps
+Removed from UI/model:
+
+- taxMode
+- visibility
+- setupFee
+- effectiveFrom
+- planType
+
+## Validation Rules
+
+- Plan name is required
+- Plan code is required
+- Billing cycle is required
+- Currency is required
+- Description cannot exceed 500 characters
+
+## Save Draft Behavior
+
+1. Validate Step 1 minimum fields
+2. Map to backend request:
+   - `planName`, `planCode`, `description`, `billingCycle`, `currencyCode`
+3. POST create endpoint
+4. Store returned `id` in wizard state
+5. Show toast only on success:
+   - `Subscription plan saved as draft`
+
+## Bottom Action Bar
+
+- Back (step 1 → `/admin/subscriptions`; pricing → features)
+- Save Draft
+- Next
+
+Top-right action group duplicates bottom controls on all wizard steps.
+
+## Create Wizard — Step 4 Pricing Form State
+
+`pricingForm`:
+
+- `basePrice` required, min 0, maps to `subscription_plans.base_price`
+
+Read-only from Basics:
+
+- `billingCycle` label via `billingCycleLabel()`
+- `baseCurrency` label via `currencyLabel()`
+
+Formatted input:
+
+- Display `12,900.00` with currency prefix
+- Parse commas before API call
+
+Draft summary progress order:
+
+1. Modules
+2. Features
+3. Pricing
+4. Limits
+
+Pricing summary states: `Not configured` | `In progress` | `Configured`
+
+Limits summary shows `Configured` only after Limits step completed (`limitsStepCompleted` signal).
+
+## Save Draft on Limits
+
+1. Validate limits fields
+2. Create draft if no `savedPlanId`
+3. `PATCH .../limits`
+4. Set `limitsSaved` signal; summary shows Configured
+
+## Publish
+
+1. Validate basics, pricing, limits
+2. PATCH pricing → PATCH limits → POST publish
+3. Navigate to list with toast; list reloads via `loadPage()` on init
 
 ## Tests
 
-| File | Coverage |
-|---|---|
-| `platform-subscription-plan-api.service.spec.ts` | GET list endpoint |
-| `platform-subscription-plans-page.spec.ts` | loading, data, empty, error, create link |
-| `platform-create-subscription-plan-page.spec.ts` | wizard steps, publish modal |
-| `sidebar.spec.ts` | Subscriptions active on create route |
+`platform-create-subscription-plan-page.spec.ts` verifies:
 
-Verified: `npm run build` success, 48 unit tests passed.
-
-## Permission Integration Fix (Verified 2026-06-17)
-
-| Item | Detail |
-|---|---|
-| Root cause | Backend returned `403 AccessDenied` because Super Administrator role was not assigned subscription plan permissions in the database |
-| API path | `GET /api/v1/platform/subscription-plans` (via `apiEndpoints.platform.subscriptionPlans`) |
-| Auth state | Login/refresh now maps `user.platformPermissions` from backend into `AuthSession` |
-| Create button | Uses `AccessControlService.hasPermission('platform.subscription_plans.create')` |
-| Tab counts | Show `—` while loading; real `statusCounts` after API success |
-| Sidebar | Active for `/admin/subscriptions` and child routes |
-
-Backend dev startup now applies pending migrations and idempotent platform permission seed.
-
-## TODO (Backend Pending)
-
-- `GET` module catalog for wizard step 2
-- `GET` feature catalog for wizard step 3
-- `POST` save draft
-- `POST` publish plan
-- View/edit/duplicate/archive/delete actions
+- Removed fields not rendered
+- R1 basics fields rendered
+- Save Draft calls API
+- Success toast only after API success
+- Back navigation from step 1
 
 ## Related Files
 
 - [[../07_UI_UX_KNOWLEDGE/Platform_Admin_Subscription_UI]]
-- [[Angular_API_Integration_Guide]]
-- [[Angular_Error_Loading_Handling]]
+- [[../06_DATABASE_KNOWLEDGE/Subscription_Tables]]

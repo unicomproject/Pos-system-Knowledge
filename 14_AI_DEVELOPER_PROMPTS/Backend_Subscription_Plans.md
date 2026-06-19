@@ -1,7 +1,7 @@
 <!-- title: Backend Subscription Plans -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-17 -->
+<!-- last_updated: 2026-06-18 -->
 
 # Backend Subscription Plans
 
@@ -21,6 +21,10 @@ Implementation notes for the Super Admin Subscription Plans list backend API.
 ## API
 
 `GET /api/v1/platform/subscription-plans`
+
+`POST /api/v1/platform/subscription-plans`
+
+`POST /api/v1/platform/subscription-plans/{planId}/publish`
 
 Query parameters:
 
