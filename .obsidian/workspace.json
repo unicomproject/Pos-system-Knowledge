@@ -1,24 +1,24 @@
 {
   "main": {
-    "id": "8f5d5d49e5642147",
+    "id": "1cb734fccc6c8439",
     "type": "split",
     "children": [
       {
-        "id": "9c561de49426fa6e",
+        "id": "f2503a97c3c43573",
         "type": "tabs",
         "children": [
           {
-            "id": "252da568f5b36f62",
+            "id": "56806a201bd68d51",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "14_AI_DEVELOPER_PROMPTS/Testing/01_API_Test_Case_Generation_Prompt.md",
+                "file": "03_USER_JOURNEYS/Platform_Admin/03_Subscription_Payment_Link_Flow.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "01_API_Test_Case_Generation_Prompt"
+              "title": "03_Subscription_Payment_Link_Flow"
             }
           }
         ]
@@ -27,15 +27,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "100a414e7e6e9a27",
+    "id": "d3f87169598919b0",
     "type": "split",
     "children": [
       {
-        "id": "2f3445539d2105c9",
+        "id": "f6617836dfe14690",
         "type": "tabs",
         "children": [
           {
-            "id": "0ce7c63c0b4a42a2",
+            "id": "27fe543d610a8aae",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -48,7 +48,7 @@
             }
           },
           {
-            "id": "69ed34ff6ab04669",
+            "id": "b71489dff0c11785",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -65,7 +65,7 @@
             }
           },
           {
-            "id": "b65a787c066ee299",
+            "id": "1fe9824e1901cf53",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -78,23 +78,23 @@
       }
     ],
     "direction": "horizontal",
-    "width": 379.5
+    "width": 403.5
   },
   "right": {
-    "id": "17789eb71a72b01a",
+    "id": "bb1db1e68db4824b",
     "type": "split",
     "children": [
       {
-        "id": "aab57a02e7c60ffd",
+        "id": "5fdd4342edd2c68d",
         "type": "tabs",
         "children": [
           {
-            "id": "abbe590cbfdba91c",
+            "id": "0fd941b3d7486c35",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Error_Handling.md",
+                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,25 +104,25 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Flutter_Error_Handling"
+              "title": "Backlinks for 10_Cash_In_Out_Flow"
             }
           },
           {
-            "id": "af059d3d41945e6b",
+            "id": "5266211a06e2aa0b",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Error_Handling.md",
+                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Flutter_Error_Handling"
+              "title": "Outgoing links from 10_Cash_In_Out_Flow"
             }
           },
           {
-            "id": "ec48fe3c3d29f83f",
+            "id": "c8dd2289d8f917e9",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -137,7 +137,7 @@
             }
           },
           {
-            "id": "473c3bdf1b54bcfe",
+            "id": "c85a86c08b5b9863",
             "type": "leaf",
             "state": {
               "type": "all-properties",
@@ -151,18 +151,18 @@
             }
           },
           {
-            "id": "7476b1878251f222",
+            "id": "82ef659ed078ee6d",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Error_Handling.md",
+                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Flutter_Error_Handling"
+              "title": "Outline of 10_Cash_In_Out_Flow"
             }
           }
         ]
@@ -183,35 +183,43 @@
       "bases:Create new base": false
     }
   },
-  "active": "252da568f5b36f62",
+  "active": "56806a201bd68d51",
   "lastOpenFiles": [
-    "14_AI_DEVELOPER_PROMPTS/Testing/05_Regression_Checklist_Prompt.md",
-    "14_AI_DEVELOPER_PROMPTS/Testing/04_Tenant_Isolation_Test_Prompt.md",
-    "14_AI_DEVELOPER_PROMPTS/Testing/03_POS_Flow_Test_Case_Prompt.md",
-    "14_AI_DEVELOPER_PROMPTS/Testing/02_Permission_Test_Case_Prompt.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Tenant/Outlet_Create_Implementation_Status.md",
-    "15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin/Tenant_Admin_Test_Cases.md",
-    "14_AI_DEVELOPER_PROMPTS/Backend/Backend feature prompt.md",
-    "15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin/Tenant_Admin_Full_Codebase_Report.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Tenant",
-    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_Admin_Login_Implementation_Status.md",
-    "10_TESTING_QA/Test_Case/Auth_Test_Cases.md",
-    "10_TESTING_QA/API_Test_Cases.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Pos_Activation_Seed_Migration_Fix.md",
+    "15_IMPLEMENTATION_TRACKING/Angular/Subscription/Subscription_UI_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Angular/Subscription",
+    "14_AI_DEVELOPER_PROMPTS/Frontend_Subscription_UI.md",
+    "09_ANGULAR_ADMIN_KNOWLEDGE/Subscription_UI_Implementation.md",
+    "03_USER_JOURNEYS/Platform_Admin/Subscription_Plan_Management_Flow.md",
+    "07_UI_UX_KNOWLEDGE/Platform_Admin_Subscription_UI.md",
     "15_IMPLEMENTATION_TRACKING/Flutter/Sales/Start_Sale_UI_Implementation_Status.md",
-    "06_DATABASE_KNOWLEDGE/Tables/20_Payment_Core.md",
-    "03_USER_JOURNEYS/Cross_Role_Flows/03_Tenant_Suspended_Flow.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Error_Handling.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_App_Architecture.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_API_Network.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_API_Integration.md",
-    "06_DATABASE_KNOWLEDGE/Tables/03_Tenant_Foundation.md",
-    "06_DATABASE_KNOWLEDGE/Tables/01_Platform_Identity.md",
-    "05_BACKEND_ARCHITECTURE/Seed_Data_Standards.md",
-    "05_BACKEND_ARCHITECTURE/Multi_Tenant_Handling.md",
-    "05_BACKEND_ARCHITECTURE/Module_Based_Folder_Structure.md",
-    "05_BACKEND_ARCHITECTURE/Error_Response_Standards.md",
-    "05_BACKEND_ARCHITECTURE/DTO_And_Mapping_Rules.md",
-    "05_BACKEND_ARCHITECTURE/Clean_Architecture_Layers.md",
-    "15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin"
+    "15_IMPLEMENTATION_TRACKING/Backend/Sales/Create_Sale_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_Admin_Login_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Angular/Tenant/Tenant_List_Page_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/_TEMPLATES/Implementation_Status_Template.md",
+    "15_IMPLEMENTATION_TRACKING/Flutter/Sales",
+    "15_IMPLEMENTATION_TRACKING/Flutter/README.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Sales",
+    "15_IMPLEMENTATION_TRACKING/Backend/README.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Auth",
+    "15_IMPLEMENTATION_TRACKING/Angular/Tenant",
+    "15_IMPLEMENTATION_TRACKING/Angular/README.md",
+    "15_IMPLEMENTATION_TRACKING/Full_Feature_Status_Index.md",
+    "15_IMPLEMENTATION_TRACKING/_TEMPLATES",
+    "15_IMPLEMENTATION_TRACKING/Flutter",
+    "15_IMPLEMENTATION_TRACKING/Backend",
+    "15_IMPLEMENTATION_TRACKING/Angular",
+    "15_IMPLEMENTATION_TRACKING",
+    "10_TESTING_QA/Test_Case/Auth_Test_Cases.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Testing.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Tenant_Admin_Layout.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_State_Management_Riverpod.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Security_Guardrails.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Routing_Guards.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Permission_Based_UI_Rendering.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Local_Storage_Cache.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Hardware_Payment_Receipt.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Folder_Structure.md",
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Error_Handling.md"
   ]
 }

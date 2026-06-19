@@ -118,6 +118,18 @@ Common filters:
 - Stock status.
 - Search term.
 
+## Platform Subscription Plans List (Implemented 2026-06-17)
+
+| Item | Standard |
+|---|---|
+| Route | `GET /api/v1/platform/subscription-plans` |
+| Auth | Platform JWT only |
+| Permission | `platform.subscription_plans.view` |
+| Pagination | `pageNumber`, `pageSize` (max 100) |
+| Filters | `search`, `planType`, `status`, `billingCycle`, `currencyCode` |
+| Sorting | `sortBy`, `sortDirection`; default `updatedAt desc` |
+| Response wrapper | Standard success wrapper with paginated `data.items` and `data.statusCounts` |
+
 ## Related Files
 
 - [[DTO_And_Mapping_Rules]]

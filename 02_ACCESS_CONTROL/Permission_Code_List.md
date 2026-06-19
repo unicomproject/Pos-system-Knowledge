@@ -91,6 +91,17 @@ must be seeded and stored in the database.
 | `platform.feature.entitle` | Assign tenant feature entitlement |
 | `platform.audit.view` | View audit logs |
 
+## Subscription Plans (Implemented 2026-06-17)
+
+| Code | Meaning |
+|---|---|
+| `platform.subscription_plans.view` | View subscription plans list |
+| `platform.subscription_plans.create` | Create subscription plans |
+| `platform.subscription_plans.edit` | Edit subscription plans |
+| `platform.subscription_plans.duplicate` | Duplicate subscription plans |
+| `platform.subscription_plans.archive` | Archive subscription plans |
+| `platform.subscription_plans.delete` | Delete subscription plans |
+
 Only confirmed platform actions should be seeded.
 
 ## Tenant Examples

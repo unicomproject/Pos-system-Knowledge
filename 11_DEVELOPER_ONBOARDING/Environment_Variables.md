@@ -1,7 +1,7 @@
 <!-- title: Environment Variables -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Environment Variables
@@ -40,6 +40,19 @@ manager.
 Do not put real values into source-controlled config.
 
 Use placeholders in documentation.
+
+## Development Seed Secrets (Development Only)
+
+`DevelopmentDataSeeder` reads Platform Admin seed values from user secrets in
+Development only. See [[Backend_Local_Development_Setup]].
+
+| Key | Purpose |
+|---|---|
+| `DevelopmentSeed:PlatformAdmin:Email` | Optional seed email (default `admin@nytroz.local`) |
+| `DevelopmentSeed:PlatformAdmin:Password` | Required to create user or reset password hash |
+| `DevelopmentSeed:PlatformAdmin:ResetPassword` | When `true`, updates hash for existing dev user |
+
+Never commit these values. Never enable this seeder outside Development.
 
 ## Angular Environment Config
 
@@ -126,6 +139,7 @@ Tenant context must come from authenticated context and selected tenant flow.
 
 ## Related Files
 
+- [[Backend_Local_Development_Setup]]
 - [[Local_Setup]]
 - [[../09_ANGULAR_ADMIN_KNOWLEDGE/Angular_Environment_Config]]
 - [[../05_BACKEND_ARCHITECTURE/API_Standards]]
