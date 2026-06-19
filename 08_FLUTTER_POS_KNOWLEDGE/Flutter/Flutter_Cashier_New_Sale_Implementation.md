@@ -150,8 +150,9 @@ till status chip (`till.session.view`), and live date/time.
 3. **Footer** (`_CartSummaryFooter`) — subtotal/discount/tax/total + Proceed button.
 
 Footer totals stay fixed while items scroll. Discount and tax always show `LKR 0.00`.
-Cart lines stored in `Map<String, PosNewSaleCartItem>`; new lines append at end
-(recent additions appear at bottom of list). Line tap opens edit sheet.
+Cart lines stored in `Map<String, PosNewSaleCartItem>`; new SKUs append at end.
+Re-adding the same line key updates quantity in place (list order unchanged).
+Line tap opens edit sheet.
 
 ## State and Models
 
