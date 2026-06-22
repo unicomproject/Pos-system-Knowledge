@@ -154,13 +154,13 @@ Alias normalization may use `tenant_admin_permission_aliases.dart` and backend
 |---|---|---|
 | Backend | 184/184 tests passed | Commit `34d10999cbbeb996a80064227cf454d2382d98a5` |
 | Angular Platform Admin | 95/95 tests passed | Commit `9626a85f28bccf379b3bf48d6f51de9718b2bace` |
-| Flutter Tenant Admin | 90/90 tests passed; `dart analyze lib` clean | Pending commit on `Nytroz-POS-App` |
+| Flutter Tenant Admin | 90/90 tests passed; `dart analyze lib` clean | Commit `18e1b29` on `Nytroz-POS-App` |
 
 ## Last Updated
 
 | Date | Change | Commits |
 |---|---|---|
-| 2026-06-18 | Backend-driven permission catalog documented across backend, Angular, and Flutter | Backend `34d10999`, Angular `9626a85f`, Flutter pending |
+| 2026-06-18 | Backend-driven permission catalog documented across backend, Angular, and Flutter | Backend `34d10999`, Angular `9626a85f`, Flutter `18e1b29` |
 
 ## Related Files
 

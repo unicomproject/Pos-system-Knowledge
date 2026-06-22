@@ -89,4 +89,4 @@ Base: `/api/v1/platform-admin/permission-catalog`
 |---|---|---|
 | Backend | 184/184 passed | `34d10999cbbeb996a80064227cf454d2382d98a5` |
 | Angular | 95/95 passed | `9626a85f28bccf379b3bf48d6f51de9718b2bace` |
-| Flutter | 90/90 passed | Pending `Nytroz-POS-App` commit |
+| Flutter | 90/90 passed | `18e1b29` (`Nytroz-POS-App`) |
