@@ -1,7 +1,7 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-19 -->
+<!-- last_updated: 2026-06-22 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -35,6 +35,13 @@ All endpoints require platform JWT authentication.
 | Frontend labels | UI may show Published for `active`; backend does not |
 
 Publish response example: `{ "status": "active", ... }`
+
+## Verification (2026-06-22)
+
+- Swagger at `http://localhost:5050`
+- Full flow: POST create → PATCH pricing → PATCH limits → POST publish → GET list
+- DB table `subscription_plans`: `base_price`, `max_outlets`, `max_tills`, `max_users`, `status = active`
+- Backend unit tests: **109/109 passed**
 
 ## Limits request example
 

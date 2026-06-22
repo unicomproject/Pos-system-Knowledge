@@ -1,4 +1,3 @@
- 
-# Local Obsidian runtime files 
-.obsidian/workspace.json 
-.obsidian/plugins/obsidian-local-rest-api/ 
+.obsidian/workspace.json
+.obsidian/plugins/obsidian-local-rest-api/
+.obsidian/community-plugins.json

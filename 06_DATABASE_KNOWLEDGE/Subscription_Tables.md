@@ -1,7 +1,7 @@
 <!-- title: Subscription Tables -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-19 -->
+<!-- last_updated: 2026-06-22 -->
 
 # Subscription Tables
 
@@ -21,6 +21,8 @@ Release 1 Create Plan UI uses these columns only:
 | `max_tills` | Limits step → `PATCH .../limits` |
 | `max_users` | Limits step → `PATCH .../limits` |
 | `status` | Draft on create; active on publish; retired on archive |
+| `created_at` | System timestamp on create |
+| `updated_at` | System timestamp on update |
 
 Allowed `billing_cycle` values:
 
@@ -56,11 +58,15 @@ List query filter aliases (input only):
 
 These are not stored from the current Create Plan wizard:
 
-- tax mode
+- tax mode / taxMode
 - visibility
-- setup fee
-- effective date
+- setup fee / setupFee
+- effective date / effectiveFrom
 - plan type column (derived in list API only)
+- monthlyPrice / annualPrice / trialDays
+- add-on pricing / revenue preview
+- extra outlet/till/user price
+- storage limit / API access limit / product limit
 
 ## Related entitlement tables
 

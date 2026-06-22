@@ -1,7 +1,7 @@
 <!-- title: Platform Admin Subscription UI -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-19 -->
+<!-- last_updated: 2026-06-22 -->
 
 ## Scope
 
@@ -30,10 +30,10 @@ Layout:
 - Six-step stepper: Basics → Modules → Features → Pricing → Limits → Review & Publish
 - Left card: Plan Basics
 - Right sticky card: Draft Summary
-- Top-right action buttons: Back, Save Draft, Next
-- Bottom sticky action bar:
+- Bottom sticky action bar (single source of wizard actions):
   - Left: **Back** (step 1 returns to list)
-  - Right: **Save Draft** and **Next**
+  - Right: **Save Draft** and **Next** (steps 1–5) or **Publish Plan** (Review & Publish)
+- No duplicate top-right wizard action buttons
 
 ### Allowed Step 1 fields (Release 1 DB-backed)
 
@@ -117,7 +117,7 @@ Layout matches Step 1 shell:
 - Step 4 **Pricing** active in stepper
 - Left card: **Base Pricing**
 - Right sticky card: **Draft Summary**
-- Top-right and bottom action bars: Back, Save Draft, Next
+- Bottom sticky action bar: Back, Save Draft, Next (or Publish Plan on Review)
 
 ### Allowed Pricing fields (Release 1 DB-backed)
 
@@ -186,10 +186,48 @@ Limits must not show **Configured** on Pricing step unless user completed Limits
 
 ### Save Draft on Limits step
 
-1. Validate basics + limits (maxOutlets, maxTills, maxUsers)
-2. Create draft if no `savedPlanId`
-3. `PATCH .../limits`
-4. Toast only on backend success; Draft Summary Limits = Configured after save
+1. Validate `savedPlanId` exists; if missing → redirect Basics with message
+2. Validate `pricingSaved` is true; if missing → redirect Pricing with message
+3. Validate maxOutlets, maxTills, maxUsers (required integers ≥ 1)
+4. `PATCH /api/v1/platform/subscription-plans/{id}/limits` with `{ maxOutlets, maxTills, maxUsers }`
+5. Success toast only after backend success; Draft Summary Limits = **Configured** only after PATCH success
+6. **Next** on Limits → PATCH limits then navigate to Review & Publish
+
+### Allowed Limits fields (Release 1 DB-backed)
+
+| UI field | DB column | Editable |
+|---|---|---|
+| Outlet Limit | `subscription_plans.max_outlets` | Yes |
+| Till Limit | `subscription_plans.max_tills` | Yes |
+| User Limit | `subscription_plans.max_users` | Yes |
+
+Helper text:
+
+- Outlet Limit: Maximum outlets allowed for this plan.
+- Till Limit: Maximum tills allowed for this plan.
+- User Limit: Maximum users allowed for this plan.
+
+Blue info box:
+
+> These limits define the default usage allowance for tenants on this plan.
+
+### Removed non-R1 limits fields
+
+Do not render:
+
+- Product limit
+- Storage limit
+- API access limit
+- Transaction limit
+- Extra outlet/till/user pricing
+
+### Draft Summary on Limits step
+
+Shows Plan Name, Plan Code, Billing Cycle, Currency, Base Price, Status Draft.
+
+Progress: Pricing = Configured only after PATCH pricing; Limits = Configured only after PATCH limits.
+
+Stepper: completed steps show blue checkmark when saved (Basics, Pricing, Limits) or passed (Modules, Features after Basics saved).
 
 ### Publish
 
