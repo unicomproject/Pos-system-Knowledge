@@ -1,7 +1,7 @@
 <!-- title: Database Overview -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Database Overview
@@ -75,6 +75,9 @@ flowchart TD
 
 - Every tenant-owned table has `tenant_id`.
 - Platform-owned catalogs do not contain `tenant_id` unless tenant-specific.
+- Permission catalog hierarchy uses additive columns on `platform_modules`,
+  `platform_features`, `permissions`, and `platform_permissions` (see
+  [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]]).
 - Tenant data uses tenant-aware unique indexes.
 - `document_sequences` generates business document numbers.
 - Ledger tables are append-only.

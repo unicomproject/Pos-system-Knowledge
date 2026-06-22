@@ -1,7 +1,7 @@
 <!-- title: Role Permission Flow -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 # Role Permission Flow
 
@@ -29,34 +29,37 @@ coupon, AI, or accounting scope.
 
 - Tenant Admin is authenticated.
 - Role/permission feature is enabled.
-- Permission catalog is seeded.
+- Permission catalog is seeded and exposed through tenant-admin catalog APIs.
 
 ## Main Flow
 
 | Step | User/System Action | Expected Result |
 |---:|---|---|
-| 1 | Open Roles & Permission | Role list and permission matrix appear |
-| 2 | Create or edit role | Role details are entered |
-| 3 | Select permissions/features | Allowed actions are chosen |
-| 4 | Review assignment | Changes are confirmed |
-| 5 | Save role | Role permissions are stored |
+| 1 | Open Roles & Access | Role list from tenant context; permission catalog loads from backend |
+| 2 | Select role | Role permission editor opens |
+| 3 | Toggle permissions | Entitlement-filtered module → feature → permission tree |
+| 4 | Review assignment | Selected codes reflect current role assignments |
+| 5 | Save role permissions | Role permissions stored via tenant-admin API |
 
 ## Journey Diagram
 
 ```mermaid
 flowchart TD
-    S1[Open Roles & Permission]
-    S1 --> S2[Create or edit role]
-    S2 --> S3[Select permissions/features]
+    S1[Open Roles and Access]
+    S1 --> S2[Select role]
+    S2 --> S3[Toggle permissions from backend catalog]
     S3 --> S4[Review assignment]
-    S4 --> S5[Save role]
+    S4 --> S5[Save role permissions]
     S5 --> Done[Journey completed]
 ```
 
 ## Business Rules
 
 - Role code is tenant-unique.
-- Permission catalog is platform-owned/seeded.
+- Permission catalog is platform-owned, seeded, and served by backend APIs.
+- Flutter must not hardcode catalog trees; use `GET /api/v1/tenant-admin/permission-catalog`.
+- Role list currently comes from `GET /api/v1/tenant-admin/context` → `roles[]`.
+- Role create/edit CRUD remains a future gap; permission assignment is implemented.
 - Feature entitlement must exist before assigning feature access.
 - Permission changes should be audited.
 
@@ -73,8 +76,8 @@ flowchart TD
 
 | Area | References |
 |---|---|
-| API groups | `/api/v1/roles`, `/api/v1/permissions`, `/api/v1/features` |
-| Tables | `roles`, `permissions`, `role_permissions`, `role_feature_assignments`, `tenant_user_roles` |
+| API groups | `/api/v1/tenant-admin/permission-catalog`, `/api/v1/tenant-admin/roles/{roleId}/permissions`, `/api/v1/tenant-admin/context` |
+| Tables | `roles`, `permissions`, `role_permissions`, `platform_modules`, `platform_features`, `tenant_feature_entitlements`, `tenant_user_roles` |
 
 ## Edge Cases
 
@@ -96,6 +99,7 @@ flowchart TD
 
 ## Related Files
 
+- [[../../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]]
 - [[../01_RELEASE_SCOPE/Release_1_Scope]]
 - [[../02_ACCESS_CONTROL/Access_Control_Overview]]
 - [[../05_BACKEND_ARCHITECTURE/API_Standards]]

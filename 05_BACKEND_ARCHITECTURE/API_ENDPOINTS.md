@@ -1,7 +1,7 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-22 -->
+<!-- last_updated: 2026-06-18 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -57,3 +57,36 @@ Publish response example: `{ "status": "active", ... }`
 
 - [[../../04_MODULE_KNOWLEDGE/Subscription/03_Technical_Contract]]
 - [[../../06_DATABASE_KNOWLEDGE/Subscription_Tables]]
+
+---
+
+# Permission Catalog API Endpoints
+
+See [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]] for full
+architecture, frontend routes, alias rules, and known gaps.
+
+## Platform Admin
+
+Base: `/api/v1/platform-admin/permission-catalog`
+
+| Method | Route | Permission |
+|---|---|---|
+| GET | `/api/v1/platform-admin/permission-catalog` | `platform.permissions.view` |
+| GET | `/api/v1/platform-admin/permission-catalog/flat` | `platform.permissions.view` |
+
+## Tenant Admin
+
+| Method | Route | Permission |
+|---|---|---|
+| GET | `/api/v1/tenant-admin/permission-catalog` | `roles.permissions.view` |
+| GET | `/api/v1/tenant-admin/roles/{roleId}/permissions` | `roles.permissions.view` |
+| PUT | `/api/v1/tenant-admin/roles/{roleId}/permissions` | `roles.permissions.update` |
+| GET | `/api/v1/tenant-admin/context` | Authenticated; includes `effectivePermissions`, `enabledFeatures` |
+
+## Verification (2026-06-18)
+
+| Layer | Tests | Commit |
+|---|---|---|
+| Backend | 184/184 passed | `34d10999cbbeb996a80064227cf454d2382d98a5` |
+| Angular | 95/95 passed | `9626a85f28bccf379b3bf48d6f51de9718b2bace` |
+| Flutter | 90/90 passed | Pending `Nytroz-POS-App` commit |

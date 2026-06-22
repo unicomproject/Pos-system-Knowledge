@@ -1,7 +1,7 @@
 <!-- title: Flutter Routing Guards -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Flutter Routing Guards
@@ -49,6 +49,9 @@ states.
 /tenant-admin/tills
 /tenant-admin/users
 /tenant-admin/roles-permissions
+/tenant-admin/roles-permissions/:roleId
+/tenant-admin/roles              → redirect to roles-permissions
+/tenant-admin/roles-access       → redirect to roles-permissions
 /tenant-admin/products
 /tenant-admin/inventory
 /tenant-admin/discounts
@@ -57,6 +60,13 @@ states.
 ```
 
 Tenant Admin routes appear only when backend context allows them.
+
+Roles & Access loads the entitlement-filtered permission catalog from
+`GET /api/v1/tenant-admin/permission-catalog`. Role list currently uses
+`roles[]` from `GET /api/v1/tenant-admin/context`. Access codes in
+`tenant_admin_access_codes.dart` are typed constants only, not catalog data.
+
+See [[../../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
 
 ## Redirect Rules
 

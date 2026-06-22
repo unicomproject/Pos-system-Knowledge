@@ -1,7 +1,7 @@
 <!-- title: Migration Rules -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Migration Rules
@@ -86,6 +86,19 @@ For development-only data migrations such as `20260613120000_SeedDevelopmentPosA
 6. Match partial unique indexes in `ON CONFLICT` clauses exactly.
 
 Fixed issue: `tenant_user_roles.user_id` NULL when auth users were missing or subqueries returned NULL.
+
+## Permission Catalog Migrations (Verified 2026-06-18)
+
+| Migration | Purpose |
+|---|---|
+| `20260620120000_AddPermissionCatalogHierarchyColumns` | Additive hierarchy/display columns on existing catalog tables |
+| `20260620120100_SeedPermissionCatalogRelease1` | Seed Release 1 module → feature → permission catalog |
+
+Rules:
+
+- Additive only; do not create duplicate catalog tables.
+- Preserve existing permission codes as canonical.
+- See [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
 
 ## Related Files
 

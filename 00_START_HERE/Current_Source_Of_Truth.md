@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 # Current Source Of Truth
 
@@ -57,6 +57,10 @@ The access model is not simple role-based access.
 Release 1 uses feature entitlement, role permission, outlet access, trusted POS device, assigned till, and till session checks.
 Permission code values are stored in the database as the source of truth.
 Code must use module-wise permission constants, not one large rigid permission enum.
+
+The permission **catalog tree** (module → feature → permission) is also
+backend-driven. Frontends load it from catalog APIs and must not hardcode catalog
+arrays. See [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
 
 ## Database Source Rule
 

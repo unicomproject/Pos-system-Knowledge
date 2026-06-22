@@ -1,7 +1,7 @@
 <!-- title: Release 1 Scope -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 # Release 1 Scope
 
@@ -85,6 +85,11 @@ management, till management, activation code visibility, user management, role
 and permission management, product onboarding, product management, basic
 inventory, expiry visibility, expiry discount setup, basic loyalty setup, and
 reports access when permitted.
+
+Role permission assignment uses the backend-driven catalog
+(`GET /api/v1/tenant-admin/permission-catalog`); dedicated tenant role list
+CRUD APIs remain future work. See
+[[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
 
 ## Cashier POS Scope
 

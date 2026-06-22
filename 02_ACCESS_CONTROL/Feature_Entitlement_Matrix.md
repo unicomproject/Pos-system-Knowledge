@@ -1,7 +1,7 @@
 <!-- title: Feature Entitlement Matrix -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 # Feature Entitlement Matrix
 
@@ -113,6 +113,9 @@ flag, role feature assignment where used, and permission all allow access.
 
 Backend checks remain mandatory.
 
+Tenant Admin permission catalog APIs filter modules, features, and permissions by
+`tenant_feature_entitlements`. See [[Backend_Driven_Permission_Catalog]].
+
 ## Excluded Entitlements
 
 Do not create active Release 1 entitlement behavior for e-commerce, Click &
@@ -123,6 +126,7 @@ These may appear only as future/deferred catalog values if clearly marked.
 
 ## Related Files
 
+- [[Backend_Driven_Permission_Catalog]]
 - [[Access_Control_Overview]]
 - [[Permission_Code_List]]
 - [[API_Authorization_Rules]]
