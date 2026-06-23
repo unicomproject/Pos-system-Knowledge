@@ -1,7 +1,7 @@
-<!-- title: Developer Reading Guide -->
+git commit <!-- title: Developer Reading Guide -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 # Developer Reading Guide
 
@@ -42,15 +42,16 @@ Always read scope and access-control rules first.
 ## Flutter POS Developer Reading Path
 
 1. Read [[Flutter_App_Architecture]].
-2. Read [[Feature_First_Folder_Structure]].
-3. Read [[Dio_API_Client]].
-4. Read [[Secure_Storage_Token]].
-5. Read [[Permission_Based_UI_Rendering]].
-6. Read Cashier journey files under [[Cashier]].
-7. Read Tenant Admin journeys when building admin screens inside the POS app.
-8. Read [[POS_App_UI_Rules]].
-9. Read [[Empty_Error_Loading_States]].
-10. Read API authorization rules before showing action buttons.
+2. Read [[Flutter_Cashier_New_Sale_Implementation]] when working on POS home or New Sale.
+3. Read [[Feature_First_Folder_Structure]].
+4. Read [[Dio_API_Client]].
+5. Read [[Secure_Storage_Token]].
+6. Read [[Permission_Based_UI_Rendering]].
+7. Read Cashier journey files under [[Cashier]].
+8. Read Tenant Admin journeys when building admin screens inside the POS app.
+9. Read [[POS_App_UI_Rules]].
+10. Read [[Empty_Error_Loading_States]].
+11. Read API authorization rules before showing action buttons.
 
 ## Angular Platform Admin Developer Reading Path
 

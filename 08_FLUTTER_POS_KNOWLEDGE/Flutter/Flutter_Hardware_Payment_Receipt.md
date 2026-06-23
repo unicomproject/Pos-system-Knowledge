@@ -13,13 +13,13 @@ receipt handling.
 
 ## Hardware Scope
 
-| Hardware | Rule |
-|---|---|
-| Barcode scanner | Keyboard wedge/scanner input |
-| Receipt printer | USB/Bluetooth/network service by supported profile |
-| Cash drawer | Trigger through printer command or permitted manual open |
-| Card reader | Supported reader handoff only |
-| Device registration | Backend-recognized device where required |
+| Hardware            | Rule                                                     |
+| ------------------- | -------------------------------------------------------- |
+| Barcode scanner     | Keyboard wedge/scanner input                             |
+| Receipt printer     | USB/Bluetooth/network service by supported profile       |
+| Cash drawer         | Trigger through printer command or permitted manual open |
+| Card reader         | Supported reader handoff only                            |
+| Device registration | Backend-recognized device where required                 |
 
 ## Failure Handling
 

@@ -1,7 +1,7 @@
 <!-- title: Flutter API Integration -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Flutter API Integration
@@ -64,6 +64,8 @@ Do not pass raw DTOs into widgets when domain/view models are expected.
 | Tenant context | Tenant context API |
 | Outlet/till | `/api/v1/outlets`, `/api/v1/tills` |
 | Sales | `/api/v1/pos/sales` |
+| POS catalog (cashier) | `/api/v1/pos/products`, `/api/v1/pos/catalog` |
+| POS home | `/api/v1/pos/home` |
 | Payment/receipt | `/api/v1/pos/payments`, `/api/v1/pos/receipts` |
 | Return/refund | `/api/v1/pos/returns`, `/api/v1/pos/refunds` |
 | Exchange | `/api/v1/pos/exchanges` |
@@ -71,6 +73,10 @@ Do not pass raw DTOs into widgets when domain/view models are expected.
 | Reports | `/api/v1/reports` |
 
 Use exact backend endpoints when implementation contracts exist.
+
+Cashier New Sale currently calls home and product endpoints only. Cart calculate,
+sale checkout, and payment endpoints are not wired in Flutter yet. See
+[[Flutter_Cashier_New_Sale_Implementation]].
 
 ## Backend Authority
 
