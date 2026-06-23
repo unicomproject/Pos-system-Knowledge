@@ -1,4 +1,4 @@
-﻿<!-- title: Platform Admin Role Management -->
+<!-- title: Platform Admin Role Management -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
 <!-- last_updated: 2026-06-23 -->
@@ -110,18 +110,41 @@ Verified on 2026-06-23 through real backend APIs, not mock data:
 - `POST /api/v1/platform-admin/roles` created smoke role `qa_platform_role_145431`.
 - `PUT /api/v1/platform-admin/roles/{roleId}/permissions` assigned `platform.roles.view` and `platform.roles.permissions.view` successfully.
 
-## Angular UI Requirements And Gaps
+## Angular UI Implementation 2026-06-23
 
-Angular Platform Admin UI is not yet implemented for this backend feature.
+Angular Platform Admin Roles & Permissions is implemented at `/admin/roles-permissions`.
 
-When implemented:
+UI source files:
 
-- Load roles from `GET /api/v1/platform-admin/roles`.
-- Load permission catalog from `GET /api/v1/platform-admin/permission-catalog`.
-- Load assignments from `GET /api/v1/platform-admin/roles/{roleId}/permissions`.
-- Save assignments through the matching PUT endpoint.
-- Do not hardcode roles, permission counts, assignment counts, or catalog rows.
-- Respect system role read-only protection in the UI.
+- `src/app/features/admin/pages/platform-permission-catalog-page/platform-permission-catalog-page.ts`
+- `src/app/features/admin/services/platform-role-management-api.service.ts`
+- `src/app/features/admin/models/platform-role-management.model.ts`
+
+The screen uses real backend APIs only:
+
+- `GET /api/v1/platform-admin/permission-catalog`
+- `GET /api/v1/platform-admin/roles`
+- `POST /api/v1/platform-admin/roles`
+- `GET /api/v1/platform-admin/roles/{roleId}`
+- `PUT /api/v1/platform-admin/roles/{roleId}`
+- `GET /api/v1/platform-admin/roles/{roleId}/permissions`
+- `PUT /api/v1/platform-admin/roles/{roleId}/permissions`
+
+Implementation rules:
+
+- Roles, catalog rows, assigned permissions, counts, summaries, and save behavior come from real backend responses.
+- Angular does not hardcode module rows, permission trees, role counts, assigned counts, or fake role data.
+- Create role sends `code`, `name`, `description`, and `status`, then saves selected permissions through the role-permissions PUT endpoint when permissions are selected.
+- Edit role sends `name`, `description`, and `status`, then replaces the full permission set through `PUT /roles/{roleId}/permissions`.
+- System roles are shown as backend-protected and are read-only in the UI because backend rejects metadata and permission replacement for system roles.
+- Permission modes are client-side selection helpers only: Custom Access, Read Only (`*.view` or action `view`), and Full Access.
+- Sensitive permission summary is derived from selected backend permission codes.
+
+Verification on 2026-06-23:
+
+- `npm run build` passed. Warnings remained for component style budgets, including several pre-existing pages and the new role page.
+- `npx.cmd ng test --watch=false` passed: 19 files / 105 tests.
+- Real backend smoke with platform JWT passed for login, permission catalog tree, flat catalog (`data.items`), role list, role detail, and role permissions.
 
 ## Related Files
 
