@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- last_updated: 2026-06-23 -->
 
 # Permission Code List
 
@@ -130,6 +130,22 @@ Only confirmed platform actions should be seeded.
 | `tenant.product.import` | Import products |
 
 Exact seed list must be reviewed against UI journeys before production seeding.
+
+## Tenant Admin Catalog Verification 2026-06-23
+
+Final verification found that `sales.*` permissions were assigned to the
+development `tenant_admin_dev` role but were not linked to the tenant-admin
+`sales` catalog feature. Migration
+`20260623103000_LinkTenantAdminSalesPermissions` links these codes to the
+correct feature so role-permission saves can pass entitlement validation.
+
+Verified through real backend APIs, not mock data:
+
+- Tenant Admin catalog returned 5 modules and 99 permissions.
+- `tenant_admin_dev` returned 84 assigned permissions.
+- `activity.view` was removed with `PUT /api/v1/tenant-admin/roles/{roleId}/permissions`.
+- `activity.view` was restored with the same PUT endpoint.
+- Search codes `role.view`, `roles.permissions.view`, and `outlet.view` were present.
 
 ## POS Examples
 

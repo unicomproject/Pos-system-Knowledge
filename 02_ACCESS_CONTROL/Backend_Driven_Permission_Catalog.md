@@ -1,7 +1,7 @@
 <!-- title: Backend Driven Permission Catalog -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- last_updated: 2026-06-23 -->
 
 # Backend Driven Permission Catalog
 
@@ -65,9 +65,22 @@ Release 1 migrations:
 |---|---|
 | `20260620120000_AddPermissionCatalogHierarchyColumns` | Hierarchy/display columns |
 | `20260620120100_SeedPermissionCatalogRelease1` | Release 1 catalog seed (`PermissionCatalogSeedData`) |
+| `20260623103000_LinkTenantAdminSalesPermissions` | Correct existing databases so tenant-admin `sales.*` permissions link to the `sales` catalog feature |
 
 Seed data must stay aligned with [[../05_BACKEND_ARCHITECTURE/Seed_Data_Standards]] and
 [[Permission_Code_List]].
+
+### Final Verification Fix 2026-06-23
+
+During final Flutter Tenant Admin verification, the `tenant_admin_dev` role had
+`sales.*` permissions assigned, but those permission rows were not linked to the
+tenant-admin `sales` feature. Because Tenant Admin role saves validate the full
+submitted permission set against tenant entitlements, this caused
+`PUT /api/v1/tenant-admin/roles/{roleId}/permissions` to fail with
+`ENTITLEMENT_DENIED`.
+
+The fix is migration `20260623103000_LinkTenantAdminSalesPermissions`, backed by
+the same mapping in `PermissionCatalogSeedData` for fresh databases.
 
 ## Backend APIs
 
@@ -152,15 +165,26 @@ Alias normalization may use `tenant_admin_permission_aliases.dart` and backend
 
 | Layer | Result | Reference |
 |---|---|---|
-| Backend | 184/184 tests passed | Commit `34d10999cbbeb996a80064227cf454d2382d98a5` |
+| Backend | Build passed; migration applied; permission catalog APIs passed | Commit `0c7008e8fda4c9eb0892b44cfe2468155f73ebf6` |
 | Angular Platform Admin | 95/95 tests passed | Commit `9626a85f28bccf379b3bf48d6f51de9718b2bace` |
 | Flutter Tenant Admin | 90/90 tests passed; `dart analyze lib` clean | Commit `18e1b29` on `Nytroz-POS-App` |
+
+Final backend-driven Tenant Admin verification:
+
+- Login used real backend APIs, not mock data.
+- `GET /api/v1/tenant-admin/permission-catalog` returned 5 modules and 99 permissions.
+- `tenant_admin_dev` returned 84 assigned permissions.
+- Search targets existed in the backend catalog: `role.view`, `roles.permissions.view`, and `outlet.view`.
+- `activity.view` was toggled off successfully through `PUT /api/v1/tenant-admin/roles/{roleId}/permissions`.
+- `activity.view` was toggled back on successfully through the same PUT endpoint.
+- Visual browser/remote-debug click-through was not completed; the backend-driven UI flow was verified through real API calls and Flutter tests.
 
 ## Last Updated
 
 | Date | Change | Commits |
 |---|---|---|
 | 2026-06-18 | Backend-driven permission catalog documented across backend, Angular, and Flutter | Backend `34d10999`, Angular `9626a85f`, Flutter `18e1b29` |
+| 2026-06-23 | Recorded final tenant-admin sales permission catalog fix and real API save verification | Backend `0c7008e8`, Flutter `18e1b29` |
 
 ## Related Files
 

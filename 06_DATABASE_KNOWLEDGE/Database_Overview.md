@@ -1,7 +1,7 @@
 <!-- title: Database Overview -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- last_updated: 2026-06-23 -->
 
 
 # Database Overview
@@ -78,6 +78,10 @@ flowchart TD
 - Permission catalog hierarchy uses additive columns on `platform_modules`,
   `platform_features`, `permissions`, and `platform_permissions` (see
   [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]]).
+- Existing databases include corrective migration
+  `20260623103000_LinkTenantAdminSalesPermissions` so tenant-admin `sales.*`
+  permissions are linked to the `sales` catalog feature before role-permission
+  save validation.
 - Tenant data uses tenant-aware unique indexes.
 - `document_sequences` generates business document numbers.
 - Ledger tables are append-only.

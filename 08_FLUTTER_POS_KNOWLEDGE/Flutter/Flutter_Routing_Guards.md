@@ -1,7 +1,7 @@
 <!-- title: Flutter Routing Guards -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- last_updated: 2026-06-23 -->
 
 
 # Flutter Routing Guards
@@ -67,6 +67,21 @@ Roles & Access loads the entitlement-filtered permission catalog from
 `tenant_admin_access_codes.dart` are typed constants only, not catalog data.
 
 See [[../../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
+
+## Verification Note 2026-06-23
+
+Final Roles & Access verification used real backend APIs with
+`USE_DEV_API_FALLBACK` disabled. Visual browser/remote-debug click-through was
+not completed, but the backend-driven flow was verified through API calls and
+Flutter tests:
+
+- `/tenant-admin/roles-permissions` is the active route.
+- Role picker uses `roles[]` from tenant-admin context.
+- Backend catalog returned 5 modules and 99 permissions.
+- `tenant_admin_dev` returned 84 assigned permissions.
+- `activity.view` was toggled off and back on through the real role-permission PUT endpoint.
+- `.\flutter\bin\dart.bat analyze lib` passed.
+- `.\flutter\bin\flutter.bat test --no-pub` passed 90/90.
 
 ## Redirect Rules
 
