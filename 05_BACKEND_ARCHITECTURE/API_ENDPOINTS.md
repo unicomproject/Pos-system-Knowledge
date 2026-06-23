@@ -101,3 +101,35 @@ Tenant Admin save verification used real backend APIs, not mock data:
 The final backend fix was migration
 `20260623103000_LinkTenantAdminSalesPermissions`, which links `sales.*`
 tenant-admin permissions to the Tenant Admin `sales` catalog feature.
+
+---
+
+# Platform Admin Role Management API Endpoints
+
+See [[../02_ACCESS_CONTROL/Platform_Admin_Role_Management]] for the full contract, DTOs, system-role protection, validation, and smoke-test result.
+
+Base: `/api/v1/platform-admin/roles`
+
+All endpoints require platform JWT authentication.
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/platform-admin/roles` | `platform.roles.view` | List platform roles with user and permission counts |
+| POST | `/api/v1/platform-admin/roles` | `platform.roles.create` | Create non-system platform role |
+| PUT | `/api/v1/platform-admin/roles/{roleId}` | `platform.roles.update` | Update non-system role name, description, status |
+| GET | `/api/v1/platform-admin/roles/{roleId}/permissions` | `platform.roles.permissions.view` | Read assigned platform permissions |
+| PUT | `/api/v1/platform-admin/roles/{roleId}/permissions` | `platform.roles.permissions.update` | Replace assigned platform permissions |
+
+Verification on 2026-06-23 used real backend APIs: login `posunique001@gmail.com` / `123456`, catalog returned 15 modules, `super_administrator` returned 14 assigned permissions including the new role codes, smoke role `qa_platform_role_145431` was created, and two permissions were assigned through PUT successfully.
+
+## Platform Admin Role Detail Endpoint 2026-06-23
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/platform-admin/roles/{roleId}` | `platform.roles.view` | Load one platform role detail for edit/view screens |
+
+Response data includes `id`, `code`, `name`, `description`, `isSystem`, `status`, `assignedUserCount`, `permissionCount`, `createdAt`, and `updatedAt`.
+
+Missing roles return the standard API error response with HTTP 404 and error code `NOT_FOUND`.
+
+Smoke verification used a real Platform Admin JWT and passed for role list, role detail, and role permissions endpoints.

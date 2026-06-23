@@ -67,10 +67,11 @@ is explicitly managing a selected tenant.
 |---|---|
 | Auth | `/api/v1/auth` |
 | Admin tenant setup | `/api/v1/tenants`, `/api/v1/platform` |
-| Subscription | `/api/v1/subscriptions` |
+| Subscription plans | `/api/v1/platform/subscription-plans` |
 | Entitlement | `/api/v1/features` |
-| Platform permission catalog | `/api/v1/platform-admin/permission-catalog` |
-| Users/roles/permissions | `/api/v1/users`, tenant-admin role permission APIs |
+| Platform permission catalog | `/api/v1/platform-admin/permission-catalog`, `/api/v1/platform-admin/permission-catalog/flat` |
+| Platform roles and permissions | `/api/v1/platform-admin/roles`, `/api/v1/platform-admin/roles/{roleId}`, `/api/v1/platform-admin/roles/{roleId}/permissions` |
+| Tenant users/roles/permissions | `/api/v1/users`, tenant-admin role permission APIs |
 | Outlets/tills | `/api/v1/outlets`, `/api/v1/tills` |
 | Products/categories | `/api/v1/products`, `/api/v1/categories` |
 | Reports | `/api/v1/reports` |
@@ -100,3 +101,26 @@ Clear tenant-scoped cache when selected tenant changes.
 - [[Routing_And_Guards]]
 - [[Angular_Environment_Config]]
 - [[../05_BACKEND_ARCHITECTURE/API_Standards]]
+
+## Platform Role Management API Rule
+
+Angular Platform Admin role-management screens must use the backend role APIs:
+
+- `GET /api/v1/platform-admin/permission-catalog`
+- `GET /api/v1/platform-admin/permission-catalog/flat` (`data.items`)
+- `GET /api/v1/platform-admin/roles`
+- `POST /api/v1/platform-admin/roles`
+- `GET /api/v1/platform-admin/roles/{roleId}`
+- `PUT /api/v1/platform-admin/roles/{roleId}`
+- `GET /api/v1/platform-admin/roles/{roleId}/permissions`
+- `PUT /api/v1/platform-admin/roles/{roleId}/permissions`
+
+Roles, assigned permission counts, permission codes, and save results must come from these APIs. Do not create fake roles or duplicate the permission catalog tree in Angular.
+
+## Platform Roles & Permissions UI Service 2026-06-23
+
+Angular added a typed `PlatformRoleManagementApiService` and `platform-role-management.model.ts` for the Platform Admin role editor. Page components must use this service instead of building raw URLs.
+
+The page fetches the backend permission catalog through `PlatformPermissionCatalogApiService` and fetches role list/detail/assignments through `PlatformRoleManagementApiService`. Save uses backend responses only and reloads roles/detail/assignments after success.
+
+Unit coverage added for service endpoints and page behavior: two-panel render with no permanent right summary panel, role selection/detail fill, assigned permissions checked, compact summary counts, search/module/scope/action filters, Read Only/Full Access modes, dirty banner, Preview Impact modal, reset, edit save, create save, and API error state.

@@ -211,3 +211,17 @@ Never rename a permission code casually after development starts.
 - [[API_Authorization_Rules]]
 - [[../05_BACKEND_ARCHITECTURE/Authorization_And_Permissions]]
 - [[../06_DATABASE_KNOWLEDGE/Tables/Permissions]]
+
+## Platform Role Management Codes (Implemented 2026-06-23)
+
+| Code | Meaning |
+|---|---|
+| `platform.roles.view` | View platform roles |
+| `platform.roles.create` | Create non-system platform roles |
+| `platform.roles.update` | Update non-system platform role metadata |
+| `platform.roles.permissions.view` | View platform role permission assignments |
+| `platform.roles.permissions.update` | Replace non-system platform role permission assignments |
+
+These codes are seeded under `platform_users` / `platform_role_management` and granted to `super_administrator` by `20260623120000_SeedPlatformRoleManagementPermissions`.
+
+See [[Platform_Admin_Role_Management]].

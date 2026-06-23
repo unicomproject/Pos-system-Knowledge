@@ -114,3 +114,11 @@ Final verification note:
 - [[Tenant_Id_Rules]]
 - [[Table_Naming_Standards]]
 - [[../05_BACKEND_ARCHITECTURE/Seed_Data_Standards]]
+
+## Platform Role Management Migration 2026-06-23
+
+Migration `20260623120000_SeedPlatformRoleManagementPermissions` seeds the Platform Admin `platform_role_management` feature, five platform role-management permissions, and `super_administrator` grants.
+
+This is a seed-only migration over existing tables. It follows the rule that when a seed helper changes after an earlier migration has already run, a corrective migration must be added for existing databases.
+
+Smoke verification passed through real APIs: `GET /platform-admin/roles`, `GET /roles/{roleId}/permissions`, `POST /roles`, and `PUT /roles/{roleId}/permissions`.

@@ -90,3 +90,16 @@ Use:
 - [[../../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]]
 - [[Flutter_API_Integration]]
 - [[Flutter_Error_Handling]]
+
+## Tenant Admin context contract
+
+Tenant Admin clients should parse `effectivePermissions` and `enabledFeatures` first, then fall back to legacy `permissions` and `features` fields if an older response is returned. Role picker data for the Roles & Access screen comes from `roles[]` on `GET /api/v1/tenant-admin/context` until dedicated tenant role CRUD/list APIs exist.
+
+Roles & Access uses real backend APIs only:
+
+- `GET /api/v1/tenant-admin/context`
+- `GET /api/v1/tenant-admin/permission-catalog`
+- `GET /api/v1/tenant-admin/roles/{roleId}/permissions`
+- `PUT /api/v1/tenant-admin/roles/{roleId}/permissions`
+
+Flutter must not hardcode the permission catalog tree, role list, assigned permission counts, or save results.

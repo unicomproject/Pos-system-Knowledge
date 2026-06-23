@@ -144,3 +144,9 @@ Rules:
 - [[Authorization_And_Permissions]]
 - [[Multi_Tenant_Handling]]
 - [[../02_ACCESS_CONTROL/Permission_Code_List]]
+
+## Platform Role Management Seed (Verified 2026-06-23)
+
+Migration `20260623120000_SeedPlatformRoleManagementPermissions` seeds the `platform_role_management` feature under `platform_users`, adds five Platform Admin role-management permissions, and grants them to `super_administrator`.
+
+The same seed helper is used by the Development platform permission seeder so local startup stays aligned with migrated databases.
