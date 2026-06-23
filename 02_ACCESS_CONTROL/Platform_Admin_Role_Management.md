@@ -138,12 +138,14 @@ Implementation rules:
 - Edit role sends `name`, `description`, and `status`, then replaces the full permission set through `PUT /roles/{roleId}/permissions`.
 - System roles are shown as backend-protected and are read-only in the UI because backend rejects metadata and permission replacement for system roles.
 - Permission modes are client-side selection helpers only: Custom Access, Read Only (`*.view` or action `view`), and Full Access.
+- The Angular UI uses a two-panel layout: left role list and center role editor/permission tree. There is no permanent right-side summary panel.
+- Summary, change impact, sensitive permissions, and can/cannot access preview are shown in the Preview Impact modal.
 - Sensitive permission summary is derived from selected backend permission codes.
 
 Verification on 2026-06-23:
 
 - `npm run build` passed. Warnings remained for component style budgets, including several pre-existing pages and the new role page.
-- `npx.cmd ng test --watch=false` passed: 19 files / 105 tests.
+- `npx.cmd ng test --watch=false` passed: 19 files / 106 tests after the two-panel Preview Impact refinement.
 - Real backend smoke with platform JWT passed for login, permission catalog tree, flat catalog (`data.items`), role list, role detail, and role permissions.
 
 ## Related Files

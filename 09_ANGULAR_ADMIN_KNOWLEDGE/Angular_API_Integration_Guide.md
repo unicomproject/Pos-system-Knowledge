@@ -123,4 +123,4 @@ Angular added a typed `PlatformRoleManagementApiService` and `platform-role-mana
 
 The page fetches the backend permission catalog through `PlatformPermissionCatalogApiService` and fetches role list/detail/assignments through `PlatformRoleManagementApiService`. Save uses backend responses only and reloads roles/detail/assignments after success.
 
-Unit coverage added for service endpoints and page behavior: three-panel render, role selection/detail fill, assigned permissions checked, search/module/scope/grant filters, Read Only/Full Access modes, reset, edit save, create save, and API error state.
+Unit coverage added for service endpoints and page behavior: two-panel render with no permanent right summary panel, role selection/detail fill, assigned permissions checked, compact summary counts, search/module/scope/action filters, Read Only/Full Access modes, dirty banner, Preview Impact modal, reset, edit save, create save, and API error state.

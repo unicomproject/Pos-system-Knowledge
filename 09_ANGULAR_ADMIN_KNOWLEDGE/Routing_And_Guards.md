@@ -94,5 +94,6 @@ Rules:
 - Load role detail from `GET /api/v1/platform-admin/roles/{roleId}`.
 - Load assignments from `GET /api/v1/platform-admin/roles/{roleId}/permissions`.
 - Save role metadata and full permission replacement through the matching PUT endpoints.
+- Keep summary and change-impact information inside the editor summary strip and Preview Impact modal, not a permanent right-side panel.
 - Do not mock roles, permission rows, counts, summaries, or assigned permission data in Angular.
 - Respect backend system-role protection by keeping system role editing read-only in the UI.

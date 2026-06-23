@@ -35,25 +35,37 @@ All role, catalog, count, assigned permission, and save data comes from real bac
 ## UI Rules
 
 - Do not use mock roles, fake assigned permissions, hardcoded module rows, hardcoded permission trees, or copied sample counts.
+- Use a two-panel desktop layout only: left role list and center role editor with permission tree.
+- Do not keep a permanent right-side role summary panel.
 - Render the left role list from `GET /roles`.
 - Render the center permission tree from `GET /permission-catalog`.
 - Render checked permissions from `GET /roles/{roleId}/permissions`.
-- Derive summary counts from the loaded catalog and selected permission set.
+- Put compact summary counts inside the center editor: available permissions, granted, not granted, sensitive, assigned users, and unsaved changes.
+- Open Preview Impact from the bottom action bar or dirty-change banner.
+- Preview Impact modal owns the role summary, added/removed permission impact, sensitive permission list, and can/cannot access preview.
+- Apply Changes in the modal closes the modal only; backend save still happens through Save Changes.
 - Create sends role metadata first, then saves selected permission codes if any are selected.
 - Edit saves metadata and then replaces the full permission code set.
 - System roles remain readable but are not editable in the UI because backend protects them.
 - The route stays `/admin/roles-permissions` and uses the existing route guard convention.
+
+## Permission Modes
+
+- Custom Access: manual checkbox selection.
+- Read Only: selects permissions where the code ends with `.view` or action is `view`.
+- Full Access: selects all permissions returned by the backend catalog.
+- Mode changes are local until Save Changes is clicked.
 
 ## Verification
 
 Verified on 2026-06-23:
 
 - `npm run build` passed.
-- `npx.cmd ng test --watch=false` passed: 19 files / 105 tests.
+- `npx.cmd ng test --watch=false` passed: 19 files / 106 tests.
 - Real backend smoke passed using a Platform Admin JWT from `POST /api/v1/auth/platform-login`.
 - Smoke covered permission catalog tree, flat catalog (`data.items`), platform role list, role detail, and role permissions.
 
-Known warning: Angular build reports style budget warnings for multiple component files, including the new role page. The build still completed successfully.
+Known warning: Angular build reports style budget warnings for multiple component files, including the role page. The build still completed successfully.
 
 ## Related Files
 
