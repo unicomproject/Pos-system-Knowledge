@@ -133,3 +133,15 @@ When implemented:
 - [[../05_BACKEND_ARCHITECTURE/Seed_Data_Standards]]
 - [[../06_DATABASE_KNOWLEDGE/Migration_Rules]]
 - [[../09_ANGULAR_ADMIN_KNOWLEDGE/Angular_API_Integration_Guide]]
+
+## Role Detail Endpoint Update 2026-06-23
+
+`GET /api/v1/platform-admin/roles/{roleId}` was added for Angular Platform Admin role editor screens.
+
+Authorization permission: `platform.roles.view`.
+
+Response DTO uses the same role detail shape as create/update responses: `id`, `code`, `name`, `description`, `isSystem`, `status`, `assignedUserCount`, `permissionCount`, `createdAt`, and `updatedAt`.
+
+If `roleId` does not exist, the endpoint returns the standard API error response with HTTP 404 and error code `NOT_FOUND`. It never returns a successful null role.
+
+Smoke verification used a real Platform Admin JWT from `POST /api/v1/auth/platform-login`, then called `GET /api/v1/platform-admin/roles`, `GET /api/v1/platform-admin/roles/{roleId}`, and `GET /api/v1/platform-admin/roles/{roleId}/permissions`. The selected `super_administrator` detail returned successfully with `permissionCount = 14`.

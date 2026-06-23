@@ -121,3 +121,15 @@ All endpoints require platform JWT authentication.
 | PUT | `/api/v1/platform-admin/roles/{roleId}/permissions` | `platform.roles.permissions.update` | Replace assigned platform permissions |
 
 Verification on 2026-06-23 used real backend APIs: login `posunique001@gmail.com` / `123456`, catalog returned 15 modules, `super_administrator` returned 14 assigned permissions including the new role codes, smoke role `qa_platform_role_145431` was created, and two permissions were assigned through PUT successfully.
+
+## Platform Admin Role Detail Endpoint 2026-06-23
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/platform-admin/roles/{roleId}` | `platform.roles.view` | Load one platform role detail for edit/view screens |
+
+Response data includes `id`, `code`, `name`, `description`, `isSystem`, `status`, `assignedUserCount`, `permissionCount`, `createdAt`, and `updatedAt`.
+
+Missing roles return the standard API error response with HTTP 404 and error code `NOT_FOUND`.
+
+Smoke verification used a real Platform Admin JWT and passed for role list, role detail, and role permissions endpoints.
