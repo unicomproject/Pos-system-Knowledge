@@ -137,3 +137,12 @@ completion, cash movement, and report export where required.
 - [[Feature_Entitlement_Matrix]]
 - [[../05_BACKEND_ARCHITECTURE/API_Standards]]
 - [[../05_BACKEND_ARCHITECTURE/Error_Response_Standards]]
+
+## Platform Role Management Authorization 2026-06-23
+
+| API Area | Required Checks |
+|---|---|
+| Platform role list/create/update | Platform JWT and matching `platform.roles.*` permission |
+| Platform role permission read/update | Platform JWT and matching `platform.roles.permissions.*` permission |
+
+System roles are readable but protected from metadata updates and permission replacement. Implemented audit actions are `PLATFORM_ROLE_CREATED`, `PLATFORM_ROLE_UPDATED`, and `PLATFORM_ROLE_PERMISSIONS_UPDATED`.

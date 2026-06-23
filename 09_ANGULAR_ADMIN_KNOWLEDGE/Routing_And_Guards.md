@@ -84,3 +84,9 @@ Platform permission catalog at `/admin/roles-permissions` loads from
 - [[Angular_App_Architecture]]
 - [[../02_ACCESS_CONTROL/API_Authorization_Rules]]
 - [[../07_UI_UX_KNOWLEDGE/Permission_Based_UI_Rules]]
+
+## Platform Role Management UI Gap 2026-06-23
+
+A future Angular Platform Admin role-management route should be guarded by `platform.roles.view` and load data from `/api/v1/platform-admin/roles`. Role assignments must use `/api/v1/platform-admin/roles/{roleId}/permissions`.
+
+Do not mock roles, permissions, counts, summaries, or assigned permission data in Angular.

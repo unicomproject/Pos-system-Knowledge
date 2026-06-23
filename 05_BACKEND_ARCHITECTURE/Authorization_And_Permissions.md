@@ -117,3 +117,15 @@ control.
 - [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]]
 - [[../02_ACCESS_CONTROL/Permission_Code_List]]
 - [[../02_ACCESS_CONTROL/API_Authorization_Rules]]
+
+## Platform Role Management Authorization 2026-06-23
+
+Platform Admin role management requires platform JWT authentication plus platform permissions:
+
+- `platform.roles.view`
+- `platform.roles.create`
+- `platform.roles.update`
+- `platform.roles.permissions.view`
+- `platform.roles.permissions.update`
+
+System roles are protected from update and permission replacement to prevent accidental lockout. Permission replacement is a full-set update, not a patch.

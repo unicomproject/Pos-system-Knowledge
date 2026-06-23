@@ -100,3 +100,15 @@ Clear tenant-scoped cache when selected tenant changes.
 - [[Routing_And_Guards]]
 - [[Angular_Environment_Config]]
 - [[../05_BACKEND_ARCHITECTURE/API_Standards]]
+
+## Platform Role Management API Rule
+
+Angular Platform Admin role-management screens must use the backend role APIs:
+
+- `GET /api/v1/platform-admin/roles`
+- `POST /api/v1/platform-admin/roles`
+- `PUT /api/v1/platform-admin/roles/{roleId}`
+- `GET /api/v1/platform-admin/roles/{roleId}/permissions`
+- `PUT /api/v1/platform-admin/roles/{roleId}/permissions`
+
+Roles, assigned permission counts, permission codes, and save results must come from these APIs. Do not create fake roles or duplicate the permission catalog tree in Angular.

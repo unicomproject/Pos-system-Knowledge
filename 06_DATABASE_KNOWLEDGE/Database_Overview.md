@@ -102,3 +102,7 @@ unless the official Release 1 scope changes.
 - [[Migration_Rules]]
 - [[../01_RELEASE_SCOPE/Release_1_Scope]]
 - [[../05_BACKEND_ARCHITECTURE/Multi_Tenant_Handling]]
+
+## Platform Role Management Tables 2026-06-23
+
+Platform Admin role management reuses `platform_roles`, `platform_role_permissions`, `platform_user_roles`, and `platform_permissions`. Migration `20260623120000_SeedPlatformRoleManagementPermissions` adds only the `platform_role_management` feature and permission rows; it does not add duplicate role tables.

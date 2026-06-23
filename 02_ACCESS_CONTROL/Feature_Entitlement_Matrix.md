@@ -148,3 +148,9 @@ These may appear only as future/deferred catalog values if clearly marked.
 - [[API_Authorization_Rules]]
 - [[../01_RELEASE_SCOPE/Included_Features]]
 - [[../01_RELEASE_SCOPE/Excluded_Features]]
+
+## Platform Role Management Feature 2026-06-23
+
+Platform Admin role management is a platform-side feature under `platform_users` / `platform_role_management`. It uses platform permissions, not tenant feature entitlements. Tenant entitlement filtering does not apply to Platform Admin role assignments.
+
+The feature and its five permissions are seeded by `20260623120000_SeedPlatformRoleManagementPermissions` and granted to `super_administrator`.

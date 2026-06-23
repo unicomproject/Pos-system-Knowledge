@@ -116,3 +116,9 @@ Add unresolved conflicts to [[Open_Questions]].
 - [[ADR_006_Ecommerce_Moved_To_R2]]
 - [[Backend_Overview]]
 - [[Database_Overview]]
+
+## Platform Admin Role Management Source Rule
+
+Platform Admin role management is backend-driven over the existing `platform_roles`, `platform_role_permissions`, `platform_user_roles`, and `platform_permissions` tables. Do not create duplicate role architecture or hardcode role/permission data in Angular.
+
+See [[../02_ACCESS_CONTROL/Platform_Admin_Role_Management]].

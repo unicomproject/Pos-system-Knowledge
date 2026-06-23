@@ -199,3 +199,17 @@ Final backend-driven Tenant Admin verification:
 - [[../06_DATABASE_KNOWLEDGE/Migration_Rules]]
 - [[../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Routing_Guards]]
 - [[../09_ANGULAR_ADMIN_KNOWLEDGE/Routing_And_Guards]]
+
+## Platform Admin Role Management Update 2026-06-23
+
+Platform Admin role management now uses the same backend-driven permission catalog model. The APIs are documented in [[Platform_Admin_Role_Management]].
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/platform-admin/roles` | `platform.roles.view` | List platform roles |
+| POST | `/api/v1/platform-admin/roles` | `platform.roles.create` | Create non-system platform role |
+| PUT | `/api/v1/platform-admin/roles/{roleId}` | `platform.roles.update` | Update non-system platform role metadata |
+| GET | `/api/v1/platform-admin/roles/{roleId}/permissions` | `platform.roles.permissions.view` | Read platform role permission assignments |
+| PUT | `/api/v1/platform-admin/roles/{roleId}/permissions` | `platform.roles.permissions.update` | Replace non-system platform role permission assignments |
+
+Migration `20260623120000_SeedPlatformRoleManagementPermissions` seeds the `platform_role_management` feature and grants the five permissions to `super_administrator`.
