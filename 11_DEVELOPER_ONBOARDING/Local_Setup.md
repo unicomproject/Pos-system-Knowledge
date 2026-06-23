@@ -47,12 +47,44 @@ Create a feature branch before implementation.
 
 Backend must follow the Clean Architecture solution structure.
 
-Run:
+Run from `src/SCS.Api`:
 
 ```text
 dotnet restore
 dotnet build
+dotnet run
 ```
+
+Default HTTP port is **5050** (`Properties/launchSettings.json` → `applicationUrl`).
+
+Swagger: `http://localhost:5050/swagger`
+
+The API listens on `http://0.0.0.0:5050` so Android emulator (`10.0.2.2`) and LAN
+devices can reach the host machine.
+
+Override the port only when needed (ASP.NET Core reads `ASPNETCORE_URLS`):
+
+```text
+dotnet run --urls "http://0.0.0.0:5051"
+```
+
+If Flutter uses a different port, pass matching `--dart-define=API_BASE_URL=...`.
+
+### Port 5050 already in use
+
+Another `dotnet` instance (or another app) is usually still bound to port 5050.
+
+Windows:
+
+```text
+netstat -ano | findstr :5050
+taskkill /PID <PID> /F
+```
+
+Then run `dotnet run` again. Expected log: `Now listening on: http://0.0.0.0:5050`.
+
+`Program.cs` does not add a second Kestrel binding; URLs come from launch settings
+or `ASPNETCORE_URLS` / `--urls`, not from duplicate `UseUrls` in code.
 
 ## Database Setup
 
