@@ -1,7 +1,7 @@
 <!-- title: Subscription UI Implementation -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-19 -->
+<!-- last_updated: 2026-06-22 -->
 
 # Subscription UI Implementation
 
@@ -83,11 +83,12 @@ Removed from UI/model:
 
 ## Bottom Action Bar
 
-- Back (step 1 → `/admin/subscriptions`; pricing → features)
-- Save Draft
-- Next
+Single source of wizard navigation/actions (no duplicate top-right buttons):
 
-Top-right action group duplicates bottom controls on all wizard steps.
+- Back (step 1 → `/admin/subscriptions`; other steps → previous step)
+- Save Draft
+- Next (steps 1–5)
+- Publish Plan (Review & Publish step only; opens publish modal)
 
 ## Create Wizard — Step 4 Pricing Form State
 
@@ -112,16 +113,38 @@ Draft summary progress order:
 3. Pricing
 4. Limits
 
-Pricing summary states: `Not configured` | `In progress` | `Configured`
+Pricing summary states: `Not configured` | `Configured` (Configured only after backend PATCH success)
 
-Limits summary shows `Configured` only after Limits step completed (`limitsStepCompleted` signal).
+Limits summary shows `Configured` only after `limitsSaved` signal (backend PATCH success).
+
+## Create Wizard — Step 5 Limits Form State
+
+`limitsForm`:
+
+- `maxOutlets` required, min 1 → `subscription_plans.max_outlets`
+- `maxTills` required, min 1 → `subscription_plans.max_tills`
+- `maxUsers` required, min 1 → `subscription_plans.max_users`
+
+Guards before PATCH limits:
+
+- `savedPlanId` must exist → else redirect Basics
+- `pricingSaved` must be true → else redirect Pricing
+
+Centralized save: `persistLimits({ advanceToReview })`
+
+- Save Draft → PATCH limits, stay on Limits, toast on success
+- Next → PATCH limits, navigate to Review & Publish
+
+Limits summary shows `Configured` only after `limitsSaved` signal (backend PATCH success).
+
+Stepper done checkmarks: Basics (`basicsSaved`), Modules/Features (passed after Basics saved), Pricing (`pricingSaved`), Limits (`limitsSaved`).
 
 ## Save Draft on Limits
 
 1. Validate limits fields
-2. Create draft if no `savedPlanId`
+2. Require `savedPlanId` and `pricingSaved`
 3. `PATCH .../limits`
-4. Set `limitsSaved` signal; summary shows Configured
+4. Set `limitsSaved` signal; summary shows Configured only after success
 
 ## Publish
 
@@ -131,13 +154,14 @@ Limits summary shows `Configured` only after Limits step completed (`limitsStepC
 
 ## Tests
 
-`platform-create-subscription-plan-page.spec.ts` verifies:
+`platform-create-subscription-plan-page.spec.ts` — **90 tests** including:
 
-- Removed fields not rendered
-- R1 basics fields rendered
-- Save Draft calls API
-- Success toast only after API success
-- Back navigation from step 1
+- Removed non-R1 fields not rendered
+- Real API save flows (create, pricing, limits, publish)
+- No duplicate top-right wizard buttons
+- Bottom sticky action bar controls
+- Pricing/Limits Configured only after backend success
+- planId and pricingSaved guards
 
 ## Related Files
 

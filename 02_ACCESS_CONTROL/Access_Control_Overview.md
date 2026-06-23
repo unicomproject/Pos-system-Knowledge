@@ -1,7 +1,7 @@
 <!-- title: Access Control Overview -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 # Access Control Overview
 
@@ -104,6 +104,23 @@ Both must pass.
 Entitlement without permission must not allow access.
 
 Permission without entitlement must not allow access.
+
+## Permission Catalog Rule
+
+The permission catalog hierarchy is backend-driven:
+
+- Platform Admin loads the full catalog from
+  `/api/v1/platform-admin/permission-catalog`.
+- Tenant Admin loads an entitlement-filtered catalog from
+  `/api/v1/tenant-admin/permission-catalog`.
+- Frontends must not hardcode module → feature → permission trees.
+- Canonical permission codes in the database remain authoritative; alias codes
+  are resolved in the application layer only.
+- Tenant Admin role assignment APIs reject permissions outside tenant
+  entitlements.
+
+See [[Backend_Driven_Permission_Catalog]] for APIs, routes, and implementation
+status.
 
 ## UI Rule
 

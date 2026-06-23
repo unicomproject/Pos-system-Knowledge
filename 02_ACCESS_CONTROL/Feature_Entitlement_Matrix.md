@@ -1,7 +1,7 @@
 <!-- title: Feature Entitlement Matrix -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-23 -->
 
 # Feature Entitlement Matrix
 
@@ -113,6 +113,25 @@ flag, role feature assignment where used, and permission all allow access.
 
 Backend checks remain mandatory.
 
+Tenant Admin permission catalog APIs filter modules, features, and permissions by
+`tenant_feature_entitlements`. See [[Backend_Driven_Permission_Catalog]].
+
+## Final Catalog Entitlement Fix 2026-06-23
+
+Tenant Admin role-permission saves validate every submitted permission against
+the tenant's enabled catalog. Final verification found that `tenant_admin_dev`
+already had `sales.summary.view` and `sales.orders.view`, but these `sales.*`
+permissions were not linked to the Tenant Admin `sales` feature. This made a
+safe save operation fail because the full submitted permission set contained
+permissions outside the entitlement-filtered catalog.
+
+Migration `20260623103000_LinkTenantAdminSalesPermissions` links `sales.*`
+tenant-admin permissions to the `sales` feature. After the migration:
+
+- Tenant Admin catalog returned 5 modules and 99 permissions.
+- `tenant_admin_dev` retained 84 assigned permissions.
+- `activity.view` could be toggled off and back on through the real backend PUT endpoint.
+
 ## Excluded Entitlements
 
 Do not create active Release 1 entitlement behavior for e-commerce, Click &
@@ -123,6 +142,7 @@ These may appear only as future/deferred catalog values if clearly marked.
 
 ## Related Files
 
+- [[Backend_Driven_Permission_Catalog]]
 - [[Access_Control_Overview]]
 - [[Permission_Code_List]]
 - [[API_Authorization_Rules]]

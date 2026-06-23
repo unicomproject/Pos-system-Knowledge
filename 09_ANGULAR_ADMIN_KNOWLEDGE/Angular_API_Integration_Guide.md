@@ -1,7 +1,7 @@
 <!-- title: Angular API Integration Guide -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Angular API Integration Guide
@@ -69,7 +69,8 @@ is explicitly managing a selected tenant.
 | Admin tenant setup | `/api/v1/tenants`, `/api/v1/platform` |
 | Subscription | `/api/v1/subscriptions` |
 | Entitlement | `/api/v1/features` |
-| Users/roles/permissions | `/api/v1/users`, `/api/v1/roles`, `/api/v1/permissions` |
+| Platform permission catalog | `/api/v1/platform-admin/permission-catalog` |
+| Users/roles/permissions | `/api/v1/users`, tenant-admin role permission APIs |
 | Outlets/tills | `/api/v1/outlets`, `/api/v1/tills` |
 | Products/categories | `/api/v1/products`, `/api/v1/categories` |
 | Reports | `/api/v1/reports` |

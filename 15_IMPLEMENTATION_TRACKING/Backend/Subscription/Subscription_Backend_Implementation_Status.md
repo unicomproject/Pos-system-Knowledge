@@ -1,7 +1,7 @@
 <!-- title: Subscription Backend Implementation Status -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-19 -->
+<!-- last_updated: 2026-06-22 -->
 
 # Subscription Backend Implementation Status
 
@@ -11,7 +11,7 @@
 |---|---|
 | Module | Platform Subscription Plans |
 | Status | Release 1 draft/pricing/limits/publish flow complete |
-| Latest update | 2026-06-19 (status contract fix) |
+| Latest update | 2026-06-22 (docs sync) |
 
 ## Status contract fix (2026-06-19)
 

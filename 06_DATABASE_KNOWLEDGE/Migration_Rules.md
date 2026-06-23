@@ -1,7 +1,7 @@
 <!-- title: Migration Rules -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-23 -->
 
 
 # Migration Rules
@@ -86,6 +86,27 @@ For development-only data migrations such as `20260613120000_SeedDevelopmentPosA
 6. Match partial unique indexes in `ON CONFLICT` clauses exactly.
 
 Fixed issue: `tenant_user_roles.user_id` NULL when auth users were missing or subqueries returned NULL.
+
+## Permission Catalog Migrations (Verified 2026-06-18)
+
+| Migration | Purpose |
+|---|---|
+| `20260620120000_AddPermissionCatalogHierarchyColumns` | Additive hierarchy/display columns on existing catalog tables |
+| `20260620120100_SeedPermissionCatalogRelease1` | Seed Release 1 module → feature → permission catalog |
+| `20260623103000_LinkTenantAdminSalesPermissions` | Correct already-migrated databases by linking tenant-admin `sales.*` permissions to the `sales` feature |
+
+Rules:
+
+- Additive only; do not create duplicate catalog tables.
+- Preserve existing permission codes as canonical.
+- If a seed helper changes after its migration already ran, add a corrective migration for existing databases.
+- See [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
+
+Final verification note:
+
+- Migration `20260623103000_LinkTenantAdminSalesPermissions` was needed because `tenant_admin_dev` had `sales.*` permissions assigned, but those permissions were outside the entitlement-filtered catalog.
+- Backend build passed and the migration applied successfully.
+- Real API save verification passed by toggling `activity.view` off and back on through `PUT /api/v1/tenant-admin/roles/{roleId}/permissions`.
 
 ## Related Files
 

@@ -1,7 +1,7 @@
 <!-- title: Feature_Entitlement Technical Contract -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Feature_Entitlement Technical Contract
@@ -67,6 +67,10 @@ Permission codes must be database-seeded values and referenced through
 module-wise constants where needed.
 
 Do not implement one global permission enum as the source of truth.
+
+Tenant Admin permission catalog responses are filtered by
+`tenant_feature_entitlements`. Platform Admin sees the full catalog. See
+[[../../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
 
 ## Data Safety Contract
 

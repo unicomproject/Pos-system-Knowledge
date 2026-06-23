@@ -1,7 +1,7 @@
 <!-- title: Subscription Technical Contract -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-19 -->
+<!-- last_updated: 2026-06-22 -->
 
 
 # Subscription Technical Contract
@@ -212,6 +212,55 @@ Response returns saved limits and `status: draft` (DB value).
 | List statusCounts | `published`, `archived` tab bucket names | Count keys only; not plan row status |
 
 Do not create a separate limits table or UI-only limit fields.
+
+## Subscription wizard flow (Platform Admin)
+
+1. Basics
+2. Modules
+3. Features
+4. Pricing
+5. Limits
+6. Review & Publish
+
+## Real API save flow (verified)
+
+| Step action | API |
+|---|---|
+| Basics Save Draft / Next | `POST /api/v1/platform/subscription-plans` |
+| Pricing Save Draft / Next | `PATCH .../{planId}/pricing` |
+| Limits Save Draft / Next | `PATCH .../{planId}/limits` |
+| Publish | `POST .../{planId}/publish` |
+| List reload | `GET /api/v1/platform/subscription-plans` |
+
+## Frontend UI rules (Release 1)
+
+- No mock/stub/hardcoded runtime subscription rows
+- No fake success toast; toast only after backend `success: true`
+- No fake module/feature counts (`5 selected`, `12 enabled`)
+- Draft Summary from wizard state + backend responses only
+- Pricing **Configured** only after PATCH pricing success
+- Limits **Configured** only after PATCH limits success
+- Bottom sticky action bar is the **single** wizard action source
+- No duplicate top-right Back / Save Draft / Next / Publish buttons
+
+## Release 1 DB-backed `subscription_plans` fields
+
+`plan_code`, `name`, `description`, `billing_cycle`, `base_currency`, `base_price`, `max_outlets`, `max_tills`, `max_users`, `status`, `created_at`, `updated_at`
+
+## Not allowed in Release 1 Create Plan UI
+
+taxMode, visibility, setupFee, effectiveFrom, monthlyPrice, annualPrice, trialDays, add-on pricing, revenue preview, extra outlet/till/user price, storage limit, API access limit, product limit
+
+## Verification status (2026-06-22)
+
+| Layer | Result |
+|---|---|
+| Backend build | Passed (prior); local build may fail if API process locks DLLs |
+| Backend tests | 109/109 passed |
+| Frontend build | Passed |
+| Frontend tests | 90/90 passed |
+| Swagger/API manual | create → pricing → limits → publish → list |
+| DB manual | `base_price`, limits, `status = active` confirmed |
 
 ## Permission and Error State Rules (Verified 2026-06-17)
 

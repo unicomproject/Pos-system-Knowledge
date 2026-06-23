@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- last_updated: 2026-06-23 -->
 
 # Permission Code List
 
@@ -11,6 +11,11 @@ This file defines the Release 1 permission-code strategy.
 
 The database `permissions` and `platform_permissions` tables are the source of
 truth.
+
+The catalog hierarchy (module → feature → permission) is seeded in
+`platform_modules`, `platform_features`, and the permission tables, then
+exposed through backend catalog APIs. Frontends must not duplicate this tree in
+code. See [[Backend_Driven_Permission_Catalog]].
 
 Code constants are only safe references for API attributes, services, seed data,
 and tests.
@@ -57,6 +62,15 @@ must be seeded and stored in the database.
 | Sales | `pos.sale.discount.apply` | Apply discount |
 | Refund | `pos.refund.approve` | Approve refund |
 | Loyalty | `loyalty.redeem` | Redeem loyalty points |
+| Platform catalog | `platform.permissions.view` | View platform permission catalog (Angular `/admin/roles-permissions`) |
+| Tenant roles | `roles.permissions.view` | View tenant permission catalog and role assignments |
+| Tenant roles | `roles.permissions.update` | Update role permission assignments |
+
+## Alias Rule
+
+Canonical seeded codes remain authoritative. Newer or plural alias names may be
+accepted in the application layer for compatibility. Do not insert duplicate
+permission rows for aliases.
 
 ## Required Permission Groups
 
@@ -117,6 +131,22 @@ Only confirmed platform actions should be seeded.
 
 Exact seed list must be reviewed against UI journeys before production seeding.
 
+## Tenant Admin Catalog Verification 2026-06-23
+
+Final verification found that `sales.*` permissions were assigned to the
+development `tenant_admin_dev` role but were not linked to the tenant-admin
+`sales` catalog feature. Migration
+`20260623103000_LinkTenantAdminSalesPermissions` links these codes to the
+correct feature so role-permission saves can pass entitlement validation.
+
+Verified through real backend APIs, not mock data:
+
+- Tenant Admin catalog returned 5 modules and 99 permissions.
+- `tenant_admin_dev` returned 84 assigned permissions.
+- `activity.view` was removed with `PUT /api/v1/tenant-admin/roles/{roleId}/permissions`.
+- `activity.view` was restored with the same PUT endpoint.
+- Search codes `role.view`, `roles.permissions.view`, and `outlet.view` were present.
+
 ## POS Examples
 
 | Code Pattern | Meaning |
@@ -175,6 +205,7 @@ Never rename a permission code casually after development starts.
 
 ## Related Files
 
+- [[Backend_Driven_Permission_Catalog]]
 - [[Access_Control_Overview]]
 - [[Feature_Entitlement_Matrix]]
 - [[API_Authorization_Rules]]
