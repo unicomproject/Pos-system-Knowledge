@@ -67,7 +67,7 @@ is explicitly managing a selected tenant.
 |---|---|
 | Auth | `/api/v1/auth` |
 | Admin tenant setup | `/api/v1/tenants`, `/api/v1/platform` |
-| Subscription | `/api/v1/subscriptions` |
+| Subscription plans | `/api/v1/platform/subscription-plans` |
 | Entitlement | `/api/v1/features` |
 | Platform permission catalog | `/api/v1/platform-admin/permission-catalog`, `/api/v1/platform-admin/permission-catalog/flat` |
 | Platform roles and permissions | `/api/v1/platform-admin/roles`, `/api/v1/platform-admin/roles/{roleId}`, `/api/v1/platform-admin/roles/{roleId}/permissions` |

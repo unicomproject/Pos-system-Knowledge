@@ -122,3 +122,9 @@ Add unresolved conflicts to [[Open_Questions]].
 Platform Admin role management is backend-driven over the existing `platform_roles`, `platform_role_permissions`, `platform_user_roles`, and `platform_permissions` tables. Do not create duplicate role architecture or hardcode role/permission data in Angular.
 
 See [[../02_ACCESS_CONTROL/Platform_Admin_Role_Management]].
+
+## Tenant Admin Role Permission Source Rule
+
+Tenant Admin role permission assignment is backend-driven. Flutter uses `roles[]` from `GET /api/v1/tenant-admin/context`, loads the entitlement-filtered catalog from `GET /api/v1/tenant-admin/permission-catalog`, and saves through tenant-admin role-permission APIs. Do not hardcode permission trees or role assignment data in Flutter.
+
+See [[../08_FLUTTER_POS_KNOWLEDGE/Flutter/Tenant_Admin_Roles_Permissions_UI]].
