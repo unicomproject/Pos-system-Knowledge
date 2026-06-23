@@ -1,7 +1,7 @@
 <!-- title: Routing And Guards -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Routing And Guards
@@ -24,6 +24,7 @@ Routes improve UX but backend remains authoritative.
 | `/admin/subscriptions` | admin | Platform | auth, permission |
 | `/admin/modules` | admin | Platform | auth, permission |
 | `/admin/platform-users` | admin | Platform | auth, permission |
+| `/admin/roles-permissions` | admin | Platform | auth, permission (`platform.permissions.view`) |
 | `/admin/settings/system` | admin | Platform | auth, permission |
 | `/admin/tenant/:tenantId/outlets` | admin | Tenant | auth, tenant-context, permission |
 | `/admin/tenant/:tenantId/tills` | admin | Tenant | auth, tenant-context, permission |
@@ -72,6 +73,10 @@ Do not redirect to login for authenticated users lacking permission.
 If a route is blocked by feature entitlement, show feature-not-enabled state.
 
 Do not expose disabled feature pages as active Release 1 behavior.
+
+Platform permission catalog at `/admin/roles-permissions` loads from
+`GET /api/v1/platform-admin/permission-catalog`. See
+[[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
 
 ## Related Files
 

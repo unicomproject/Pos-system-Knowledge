@@ -1,7 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 # API Authorization Rules
 
@@ -47,6 +47,7 @@ Tenant context must be resolved from token/session and applied in services and r
 | Feature entitlement | Platform user and entitlement permission |
 | Tenant activation | Platform user and activation permission |
 | Platform audit | Platform user and audit permission |
+| Permission catalog read | Platform user and `platform.permissions.view` |
 
 ## Tenant Admin API Rules
 
@@ -56,6 +57,8 @@ Tenant context must be resolved from token/session and applied in services and r
 | Till management | Tenant active, entitlement, permission |
 | User management | Tenant active, entitlement, permission |
 | Role/permission management | Tenant active, entitlement, permission |
+| Permission catalog read | Tenant active, `roles.permissions.view`; catalog filtered by tenant entitlements |
+| Role permission update | Tenant active, `roles.permissions.update`; assigned codes must stay within entitlements |
 | Product management | Catalog entitlement and product permission |
 | Inventory management | Inventory entitlement and inventory permission |
 | Loyalty setup | Loyalty entitlement and loyalty permission |
@@ -128,6 +131,7 @@ completion, cash movement, and report export where required.
 
 ## Related Files
 
+- [[Backend_Driven_Permission_Catalog]]
 - [[Access_Control_Overview]]
 - [[Permission_Code_List]]
 - [[Feature_Entitlement_Matrix]]

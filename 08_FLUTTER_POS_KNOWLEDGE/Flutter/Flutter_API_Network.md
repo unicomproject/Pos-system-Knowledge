@@ -1,7 +1,8 @@
+
 <!-- title: Flutter API Network -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Flutter API Network
@@ -58,6 +59,7 @@ These actions can duplicate business effects.
 | POS sale/payment | Tenant, outlet, till, device, permission |
 | Return/refund | Tenant, outlet/till where required, permission |
 | Tenant Admin setup | Tenant context and permission |
+| Tenant Admin permission catalog | `GET /api/v1/tenant-admin/permission-catalog`, role permission GET/PUT |
 | Hardware settings | Device and permission |
 
 ## Failure Mapping
@@ -71,7 +73,20 @@ BackendValidationFailure, and DatabaseFailure.
 Never log passwords, tokens, POS PINs, full card data, provider secrets, raw
 setup codes, or activation codes.
 
+## Flutter Analyze And Test (Nytroz-POS-App)
+
+Do not run root-level `flutter analyze`; the repo includes a bundled Flutter SDK
+under `flutter/` that produces false positives.
+
+Use:
+
+```powershell
+.\flutter\bin\dart.bat analyze lib
+.\flutter\bin\flutter.bat test --no-pub
+```
+
 ## Related Files
 
+- [[../../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]]
 - [[Flutter_API_Integration]]
 - [[Flutter_Error_Handling]]

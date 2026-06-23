@@ -1,7 +1,7 @@
 <!-- title: Feature_Entitlement Technical Contract -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Feature_Entitlement Technical Contract
@@ -68,6 +68,10 @@ module-wise constants where needed.
 
 Do not implement one global permission enum as the source of truth.
 
+Tenant Admin permission catalog responses are filtered by
+`tenant_feature_entitlements`. Platform Admin sees the full catalog. See
+[[../../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
+
 ## Data Safety Contract
 
 Never expose password hashes, POS PIN hashes, token hashes, raw setup tokens, raw
@@ -102,6 +106,12 @@ Test cases should cover:
 ## Out of Scope
 
 No role-only access without entitlement.
+
+## Subscription Plan Feature Entitlement (Implemented 2026-06-17)
+
+- Included module count is derived from enabled rows in `subscription_plan_features` joined to `platform_features.module_id`.
+- Backend remains final authority for plan entitlements.
+- Frontend must not hardcode module or feature catalog values for the subscription plans list page.
 
 ## Related Files
 

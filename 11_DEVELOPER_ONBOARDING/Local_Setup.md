@@ -1,7 +1,7 @@
 <!-- title: Local Setup -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 
 # Local Setup
@@ -86,6 +86,11 @@ Then run `dotnet run` again. Expected log: `Now listening on: http://0.0.0.0:505
 `Program.cs` does not add a second Kestrel binding; URLs come from launch settings
 or `ASPNETCORE_URLS` / `--urls`, not from duplicate `UseUrls` in code.
 
+For first-time backend setup, user secrets, EF migrations, Development Platform
+Admin seed user, and local login verification, follow:
+
+- [[Backend_Local_Development_Setup]]
+
 ## Database Setup
 
 Use PostgreSQL for local development.
@@ -95,6 +100,9 @@ Local database must match the updated Release 1 database design.
 Apply database changes through migration workflow.
 
 Do not create local tables manually unless migration workflow requires it.
+
+Configure `ConnectionStrings:DefaultConnection` through user secrets, not committed
+config. See [[Backend_Local_Development_Setup]].
 
 ## Angular Platform Admin Setup
 
@@ -166,6 +174,7 @@ Read:
 
 ## Related Files
 
+- [[Backend_Local_Development_Setup]]
 - [[Environment_Variables]]
 - [[Git_Branching_Rules]]
 - [[Pull_Request_Rules]]

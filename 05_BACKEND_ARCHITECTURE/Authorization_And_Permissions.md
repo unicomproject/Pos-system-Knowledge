@@ -1,7 +1,7 @@
 <!-- title: Authorization And Permissions -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 # Authorization And Permissions
 
@@ -63,6 +63,11 @@ permissions.
 The database `platform_permissions` table remains the source of truth for
 platform permissions.
 
+Catalog hierarchy and display metadata live on existing `platform_modules`,
+`platform_features`, and permission tables. Release 1 exposes them through
+permission catalog APIs; do not add parallel catalog tables. See
+[[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
+
 ## Confirmed Permission Examples
 
 | Permission | Usage |
@@ -109,5 +114,6 @@ control.
 
 - [[Authentication]]
 - [[Multi_Tenant_Handling]]
+- [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]]
 - [[../02_ACCESS_CONTROL/Permission_Code_List]]
 - [[../02_ACCESS_CONTROL/API_Authorization_Rules]]

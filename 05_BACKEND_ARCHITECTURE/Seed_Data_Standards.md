@@ -1,7 +1,7 @@
 <!-- title: Seed Data Standards -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-18 -->
 
 # Seed Data Standards
 
@@ -53,6 +53,18 @@ Permission seed data must match:
 - Permission test cases.
 
 Do not rename permission codes casually.
+
+## Permission Catalog Seed (Verified 2026-06-18)
+
+Migration `20260620120100_SeedPermissionCatalogRelease1` seeds Release 1 catalog
+hierarchy through `PermissionCatalogSeedData`:
+
+- Modules and features on `platform_modules` / `platform_features`.
+- Tenant permissions on `permissions`.
+- Platform permissions on `platform_permissions`.
+- Existing canonical codes preserved; aliases handled in application layer only.
+
+See [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
 
 ## Feature Seed Rule
 
@@ -106,6 +118,25 @@ Seeds must be deterministic.
 Do not create random values that break repeatable migrations or tests.
 
 Document any seed dependency between modules.
+
+## Development POS Activation Seed Dependency (Verified 2026-06-17)
+
+`DevelopmentPosActivationSeedData` depends on:
+
+| Dependency | Source |
+|---|---|
+| TENANT001 tenant | `DevelopmentAuthSeedData.EnsureTenantAndUsersSql` |
+| tenantadmin001@gmail.com | Tenant admin user |
+| manager001@gmail.com | Manager user |
+| cashier001@gmail.com | Cashier user |
+| cashier002@gmail.com | Second cashier user |
+| pos_operator_dev role | Created in same POS activation seed |
+
+Rules:
+
+- Bootstrap tenant/users at the start of POS activation seed when auth migration was skipped.
+- Use `INSERT ... SELECT ... JOIN` for role/outlet/till rows; never insert NULL foreign keys.
+- Match partial unique indexes in `ON CONFLICT`, e.g. `WHERE revoked_at IS NULL`.
 
 ## Related Files
 
