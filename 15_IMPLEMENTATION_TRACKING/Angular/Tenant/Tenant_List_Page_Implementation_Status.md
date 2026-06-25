@@ -1,8 +1,7 @@
 <!-- title: Tenant List Page Implementation Status -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
-
+<!-- last_updated: 2026-06-24 -->
 
 # Tenant List Page Implementation Status
 
@@ -13,57 +12,65 @@
 | Platform | Angular |
 | Module | Tenant |
 | Feature | Tenant List Page |
-| Status | Not Started |
+| Status | Implemented in code; current full verification pending |
 | Completed Date | - |
 | Developer | - |
 | Reviewer | - |
 | PR / Commit | - |
-| Tests | Not Run |
+| Tests | Current run pending |
 
 ## Feature Summary
 
-This is a sample tracking file.
+Angular Platform Admin Tenant List code exists and is wired to the backend tenant list API.
 
-Replace or copy this pattern when a real feature implementation starts.
+This file was corrected because the previous document was still a sample tracking file and incorrectly said `Not Started`.
 
-Do not mark completed until implementation, tests, and Second Brain updates are
-finished.
+Do not mark this feature `Completed` until implementation, tests, current verification, and PR/commit reference are all recorded.
 
-## Related Second Brain Files
-
-| Area | File |
-|---|---|
-| Module overview | [[../../04_MODULE_KNOWLEDGE/Tenant/01_Module_Overview]] |
-| Functional rules | [[../../04_MODULE_KNOWLEDGE/Tenant/02_Functional_Rules]] |
-| Technical contract | [[../../04_MODULE_KNOWLEDGE/Tenant/03_Technical_Contract]] |
-| Database | [[../../06_DATABASE_KNOWLEDGE/Tables/19_Tenant_Core]] |
-
-## Files Changed
+## Implemented Code Present
 
 ```text
-Not started.
+nytroz-pos-platform-admin/src/app/features/admin/pages/platform-tenants-page/platform-tenants-page.ts
+nytroz-pos-platform-admin/src/app/features/admin/services/platform-tenant-api.service.ts
+nytroz-pos-platform-admin/src/app/features/admin/models/platform-tenant.model.ts
+nytroz-pos-platform-admin/src/app/core/config/api-endpoints.ts
 ```
+
+## Backend API Used
+
+| Endpoint | Method | Status |
+|---|---|---|
+| `/api/v1/platform-admin/tenants` | GET | Implemented in backend and wired from Angular service |
+
+## Not Implemented In This Feature
+
+- Platform Admin tenant create wizard is pending.
+- Tenant edit/archive/delete actions are pending unless separately implemented and verified.
 
 ## Tests Written
 
 | Test Type | File / Test Name | Result |
 |---|---|---|
-| Unit | - | Not Run |
-| Integration | - | Not Run |
-| Manual | - | Not Run |
+| Unit | Current audit did not verify a tenant-list-specific spec | Pending |
+| Integration | - | Pending |
+| Manual | - | Pending |
 
 ## Test Commands Run
 
 ```text
-Not run.
+Current audit pass pending.
 ```
 
 ## Second Brain Updates
 
 | File Updated | Update Summary |
 |---|---|
-| - | Not started |
+| `15_IMPLEMENTATION_TRACKING/Angular/Tenant/Tenant_List_Page_Implementation_Status.md` | Replaced stale sample `Not Started` status with code-present implementation status. |
 
 ## Related Files
 
-- [[../Full_Feature_Status_Index]]
+- [[../../../../04_MODULE_KNOWLEDGE/Tenant/01_Module_Overview]]
+- [[../../../../04_MODULE_KNOWLEDGE/Tenant/02_Functional_Rules]]
+- [[../../../../04_MODULE_KNOWLEDGE/Tenant/03_Technical_Contract]]
+- [[../../../../06_DATABASE_KNOWLEDGE/Tables/19_Tenant_Core]]
+- [[../../Full_Feature_Status_Index]]
