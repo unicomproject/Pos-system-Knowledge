@@ -185,6 +185,11 @@
   },
   "active": "56806a201bd68d51",
   "lastOpenFiles": [
+    "projects/Nytroz-POS/Tenant_Admin_Frontend_Data_Binding_Update_2026-06-25.md",
+    "projects/Nytroz-POS/Tenant_Admin_Dashboard_UI_Update_2026-06-24.md",
+    "projects/Nytroz-POS",
+    "projects",
+    "15_IMPLEMENTATION_TRACKING/Backend/Tenant/Till_Create_Implementation_Status.md",
     "04_MODULE_KNOWLEDGE/Subscription/04_Subscription_Catalog_Model.md",
     "15_IMPLEMENTATION_TRACKING/Backend/Pos_Activation_Seed_Migration_Fix.md",
     "15_IMPLEMENTATION_TRACKING/Angular/Subscription/Subscription_UI_Implementation_Status.md",
@@ -209,17 +214,12 @@
     "15_IMPLEMENTATION_TRACKING/_TEMPLATES",
     "15_IMPLEMENTATION_TRACKING/Flutter",
     "15_IMPLEMENTATION_TRACKING/Backend",
-    "15_IMPLEMENTATION_TRACKING/Angular",
-    "15_IMPLEMENTATION_TRACKING",
     "10_TESTING_QA/Test_Case/Auth_Test_Cases.md",
     "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Testing.md",
     "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Tenant_Admin_Layout.md",
     "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_State_Management_Riverpod.md",
     "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Security_Guardrails.md",
     "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Routing_Guards.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Permission_Based_UI_Rendering.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Local_Storage_Cache.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Hardware_Payment_Receipt.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Folder_Structure.md"
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Permission_Based_UI_Rendering.md"
   ]
 }
