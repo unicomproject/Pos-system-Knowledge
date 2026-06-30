@@ -50,6 +50,6 @@ refresh token hashes, payment provider secrets, or card data.
 
 ## Related Files
 
-- [[../../05_BACKEND_ARCHITECTURE/DTO_And_Mapping_Rules]]
+- [[99_Archive/05_BACKEND_ARCHITECTURE/DTO_And_Mapping_Rules]]
 - [[../../09_ANGULAR_ADMIN_KNOWLEDGE/Angular_API_Integration_Guide]]
 - [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_App_Architecture]]

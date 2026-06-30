@@ -1,227 +1,140 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-23 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
 
 # Permission Code List
 
 ## Purpose
 
-This file defines the Release 1 permission-code strategy.
+This file defines permission code groups for TM-EPOS MVP.
 
-The database `permissions` and `platform_permissions` tables are the source of
-truth.
+Permission codes are action-level controls.
+They must be stored/seeded through backend permission catalog and used by APIs
+and UI guards.
 
-The catalog hierarchy (module → feature → permission) is seeded in
-`platform_modules`, `platform_features`, and the permission tables, then
-exposed through backend catalog APIs. Frontends must not duplicate this tree in
-code. See [[Backend_Driven_Permission_Catalog]].
+## Naming Rule
 
-Code constants are only safe references for API attributes, services, seed data,
-and tests.
+Use stable dot-separated permission codes.
 
-## Permission Code Rule
+```text
+module.resource.action
+```
 
-Do not create one large `PermissionCode` enum.
+Do not hardcode roles in code.
+Use permission codes and feature entitlements.
 
-Do not place permission codes inside generic `Domain/Enums`.
-
-Use module-wise static constants inside the Domain module folder for permission
-code references.
-
-Do not generate C# enum classes for database status/type/check-value columns.
-Those Domain properties remain strings, while allowed values are enforced through
-Application validation and database CHECK constraints. Permission catalog values
-must be seeded and stored in the database.
-
-## Code Ownership Pattern
-
-| Module | Constant File |
-|---|---|
-| Platform | `PlatformPermissionCodes.cs` |
-| Tenant | `TenantPermissionCodes.cs` |
-| Catalog | `CatalogPermissionCodes.cs` |
-| Inventory | `InventoryPermissionCodes.cs` |
-| Discounts | `DiscountPermissionCodes.cs` |
-| Sales | `SalesPermissionCodes.cs` |
-| Returns | `ReturnsPermissionCodes.cs` |
-| Customer | `CustomerPermissionCodes.cs` |
-| Loyalty | `LoyaltyPermissionCodes.cs` |
-| Reports | `ReportPermissionCodes.cs` |
-| Hardware | `HardwarePermissionCodes.cs` |
-
-## Confirmed Example Codes
-
-| Area | Permission Code | Usage |
-|---|---|---|
-| Platform | `platform.tenant.create` | Create tenant |
-| Catalog | `catalog.product.create` | Create product |
-| Catalog | `catalog.product.update` | Update product |
-| Inventory | `inventory.adjust` | Adjust stock |
-| Sales | `pos.sale.create` | Create POS sale |
-| Sales | `pos.sale.discount.apply` | Apply discount |
-| Refund | `pos.refund.approve` | Approve refund |
-| Loyalty | `loyalty.redeem` | Redeem loyalty points |
-| Platform catalog | `platform.permissions.view` | View platform permission catalog (Angular `/admin/roles-permissions`) |
-| Tenant roles | `roles.permissions.view` | View tenant permission catalog and role assignments |
-| Tenant roles | `roles.permissions.update` | Update role permission assignments |
-
-## Alias Rule
-
-Canonical seeded codes remain authoritative. Newer or plural alias names may be
-accepted in the application layer for compatibility. Do not insert duplicate
-permission rows for aliases.
-
-## Required Permission Groups
-
-| Group | Scope |
-|---|---|
-| Platform | Tenant, subscription, entitlement, audit |
-| Tenant | Tenant profile and setup |
-| User/role | Users, roles, permissions |
-| Outlet | Outlet management and assignment |
-| Till | Till setup, activation code, session |
-| Device | Pairing, trust, hardware testing |
-| Catalog | Product, category, variant, import |
-| Inventory | Stock, adjustment, stocktake, expiry |
-| Discount | Product, POS, approval, expiry |
-| Sales | Sale, park, recall, complete, void |
-| Payment | Payment capture and allocation |
-| Receipt | Generate, print, reprint |
-| Return/refund | Return, refund, approval |
-| Exchange | Exchange creation and completion |
-| Loyalty | Earn, redeem, membership |
-| Reports | Dashboard, report, export |
-| Cash drawer | Cash in/out and till close |
-
-## Platform Examples
-
-| Code Pattern | Meaning |
-|---|---|
-| `platform.tenant.create` | Create tenant |
-| `platform.tenant.update` | Update tenant setup |
-| `platform.tenant.activate` | Activate tenant |
-| `platform.subscription.manage` | Manage subscription setup |
-| `platform.feature.entitle` | Assign tenant feature entitlement |
-| `platform.audit.view` | View audit logs |
-
-## Subscription Plans (Implemented 2026-06-17)
+## Platform Permissions
 
 | Code | Meaning |
 |---|---|
-| `platform.subscription_plans.view` | View subscription plans list |
-| `platform.subscription_plans.create` | Create subscription plans |
-| `platform.subscription_plans.edit` | Edit subscription plans |
-| `platform.subscription_plans.duplicate` | Duplicate subscription plans |
-| `platform.subscription_plans.archive` | Archive subscription plans |
-| `platform.subscription_plans.delete` | Delete subscription plans |
+| platform.tenants.view | View tenants |
+| platform.tenants.create | Create tenant |
+| platform.tenants.update | Update tenant |
+| platform.subscriptions.manage | Manage plans and subscriptions |
+| platform.features.manage | Manage modules/features/entitlements |
+| platform.users.manage | Manage platform users |
+| platform.audit.view | View platform audit |
 
-Only confirmed platform actions should be seeded.
+## Tenant Admin Permissions
 
-## Tenant Examples
-
-| Code Pattern | Meaning |
+| Code | Meaning |
 |---|---|
-| `tenant.outlet.manage` | Manage outlets |
-| `tenant.till.manage` | Manage tills |
-| `tenant.user.manage` | Manage users |
-| `tenant.role.manage` | Manage roles |
-| `tenant.permission.manage` | Manage permissions |
-| `tenant.product.import` | Import products |
+| tenant.dashboard.view | View tenant dashboard |
+| tenant.settings.manage | Manage tenant settings |
+| tenant.outlets.manage | Manage outlets |
+| tenant.tills.manage | Manage tills |
+| tenant.devices.manage | Manage POS devices |
+| tenant.hardware.manage | Manage hardware profiles/devices |
+| tenant.users.manage | Manage tenant users |
+| tenant.roles.manage | Manage roles and permissions |
 
-Exact seed list must be reviewed against UI journeys before production seeding.
+## Product And Inventory Permissions
 
-## Tenant Admin Catalog Verification 2026-06-23
-
-Final verification found that `sales.*` permissions were assigned to the
-development `tenant_admin_dev` role but were not linked to the tenant-admin
-`sales` catalog feature. Migration
-`20260623103000_LinkTenantAdminSalesPermissions` links these codes to the
-correct feature so role-permission saves can pass entitlement validation.
-
-Verified through real backend APIs, not mock data:
-
-- Tenant Admin catalog returned 5 modules and 99 permissions.
-- `tenant_admin_dev` returned 84 assigned permissions.
-- `activity.view` was removed with `PUT /api/v1/tenant-admin/roles/{roleId}/permissions`.
-- `activity.view` was restored with the same PUT endpoint.
-- Search codes `role.view`, `roles.permissions.view`, and `outlet.view` were present.
-
-## POS Examples
-
-| Code Pattern | Meaning |
+| Code | Meaning |
 |---|---|
-| `pos.sale.create` | Start sale |
-| `pos.sale.complete` | Complete sale |
-| `pos.sale.park` | Park sale |
-| `pos.sale.recall` | Recall sale |
-| `pos.sale.discount.apply` | Apply POS discount |
-| `pos.payment.capture` | Take payment |
-| `pos.receipt.print` | Print receipt |
-| `pos.cash.movement` | Cash in/out |
+| catalog.products.view | View products |
+| catalog.products.create | Create products |
+| catalog.products.update | Update products |
+| catalog.products.delete | Delete/deactivate products |
+| catalog.variants.manage | Manage product variants |
+| catalog.barcodes.manage | Manage product barcodes |
+| inventory.stock.view | View stock |
+| inventory.stock.adjust | Adjust stock |
+| inventory.movements.view | View movement history |
+| inventory.alerts.view | View low/expiry stock alerts |
 
-## POS New Sale Codes (Seeded + Used in Flutter)
+## POS Permissions
 
-These codes are seeded in `DevelopmentPosNewSalePermissionsSeedData` and referenced
-in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
-
-| Code | Flutter usage |
+| Code | Meaning |
 |---|---|
-| `pos.home.view` | POS home route and sidebar |
-| `pos.new_sale.view` | New Sale route and sidebar |
-| `products.view` | Product grid |
-| `products.search` | Top-bar search on New Sale |
-| `sales.cart.add_item` | Add product to cart |
-| `sales.cart.update_item` | Change cart quantity |
-| `sales.cart.remove_item` | Remove cart line |
-| `sales.cart.clear` | Clear cart |
-| `customers.view` | Customers nav / action visibility |
-| `customers.create` | Add customer button visibility |
-| `sales.discount.apply` | Apply discount button (stub) |
-| `sales.park.create` | Park sale button (stub) |
-| `sales.checkout` | Proceed to Payment button |
-| `payments.cash.accept` | Cash in payment sheet |
-| `payments.card.accept` | Card in payment sheet |
-| `payments.qr.accept` | QR in payment sheet |
-| `payments.split.accept` | Split in payment sheet |
-| `orders.view` | Orders sidebar (no route yet) |
-| `returns.view` / `refunds.view` | Returns nav |
-| `cash_drawer.view` | Cash drawer nav |
-| `notifications.view` | Notification bell |
-| `pos.till.open` | Till open flow (`canOpenPosTill`) |
-| `tenant.till.manage` | Device activation gate (`canActivatePosDevice`) |
-| `till.session.view` | Home header till status chip |
+| pos.sale.create | Start and complete POS sale |
+| pos.sale.hold | Park/hold sale |
+| pos.sale.recall | Recall held sale |
+| pos.discount.apply | Apply permitted discount |
+| pos.customer.attach | Attach customer |
+| pos.receipt.print | Print receipt |
+| pos.receipt.reprint | Reprint receipt |
+| pos.cash_movement.create | Cash in/out |
+| pos.till.open | Open till session |
+| pos.till.close | Close till session |
 
-Implementation map: [[../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]].
+## Online Store And Checkout Permissions
 
-POS permission alone is not enough; device and till-session checks still apply.
+| Code | Meaning |
+|---|---|
+| online_store.settings.manage | Manage storefront setup |
+| online_store.catalog.publish | Publish products to online store |
+| cart_checkout.sessions.manage | Manage checkout support actions |
+| orders.view | View sales orders |
+| orders.manage | Manage order status |
+| orders.cancel | Cancel eligible order |
 
-## Seed Data Rule
+## Click Collect And Fulfilment Permissions
 
-Seeded permissions must match database codes, module constants, role-permission
-setup, API authorization attributes, UI checks, and test cases.
+| Code | Meaning |
+|---|---|
+| fulfillment.orders.view | View fulfilment orders |
+| fulfillment.orders.manage | Manage fulfilment workflow |
+| pickup.orders.view | View pickup orders |
+| pickup.orders.manage | Manage pickup workflow |
+| pickup.slots.manage | Manage pickup slots/capacity |
 
-Never rename a permission code casually after development starts.
+## Payment, Refund, Return, Exchange Permissions
+
+| Code | Meaning |
+|---|---|
+| payments.view | View payments |
+| payments.process | Process permitted payments |
+| refunds.view | View refunds |
+| refunds.process | Process refund |
+| returns.view | View returns |
+| returns.create | Create return |
+| exchanges.create | Create exchange |
+| return_inspections.manage | Manage return inspection |
+
+## Offline And Sync Permissions
+
+| Code | Meaning |
+|---|---|
+| offline.clients.manage | Manage offline clients/devices |
+| offline.sync.view | View sync state and queue |
+| offline.sync.upload | Upload offline sync batch |
+| offline.sync.resolve | Resolve sync conflicts |
+| offline.cash_sale.create | Capture allowed offline cash sale |
+| offline.number_blocks.manage | Manage offline number blocks |
+
+## Reporting And Integration Permissions
+
+| Code | Meaning |
+|---|---|
+| reports.sales.view | View sales reports |
+| reports.orders.view | View order reports |
+| notifications.manage | Manage notification setup/templates |
+| integrations.manage | Manage integration configuration |
 
 ## Related Files
 
-- [[Backend_Driven_Permission_Catalog]]
-- [[Access_Control_Overview]]
 - [[Feature_Entitlement_Matrix]]
 - [[API_Authorization_Rules]]
-- [[../05_BACKEND_ARCHITECTURE/Authorization_And_Permissions]]
-- [[../06_DATABASE_KNOWLEDGE/Tables/Permissions]]
-
-## Platform Role Management Codes (Implemented 2026-06-23)
-
-| Code | Meaning |
-|---|---|
-| `platform.roles.view` | View platform roles |
-| `platform.roles.create` | Create non-system platform roles |
-| `platform.roles.update` | Update non-system platform role metadata |
-| `platform.roles.permissions.view` | View platform role permission assignments |
-| `platform.roles.permissions.update` | Replace non-system platform role permission assignments |
-
-These codes are seeded under `platform_users` / `platform_role_management` and granted to `super_administrator` by `20260623120000_SeedPlatformRoleManagementPermissions`.
-
-See [[Platform_Admin_Role_Management]].

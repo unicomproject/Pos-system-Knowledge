@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "14_AI_DEVELOPER_PROMPTS/Backend/Backend feature prompt.md",
+                "file": "Backend_Feature_Prompt_With_Optional_Reads_TM_EPOS.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Backend feature prompt"
+              "title": "Backend_Feature_Prompt_With_Optional_Reads_TM_EPOS"
             }
           }
         ]
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "14_AI_DEVELOPER_PROMPTS/Backend/Backend feature prompt.md",
+                "file": "Backend_Feature_Prompt_With_Optional_Reads_TM_EPOS.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Backend feature prompt"
+              "title": "Outline of Backend_Feature_Prompt_With_Optional_Reads_TM_EPOS"
             }
           }
         ],
@@ -183,40 +183,43 @@
       "bases:Create new base": false
     }
   },
-  "active": "252da568f5b36f62",
+  "active": "0ce7c63c0b4a42a2",
   "lastOpenFiles": [
-    "projects/Nytroz-POS/Tenant_Admin_Frontend_Data_Binding_Update_2026-06-25.md",
-    "projects/Nytroz-POS/Tenant_Admin_Dashboard_UI_Update_2026-06-24.md",
-    "projects/Nytroz-POS",
-    "projects",
-    "09_ANGULAR_ADMIN_KNOWLEDGE/Platform_Admin_Roles_Permissions_UI.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Tenant_Admin_Roles_Permissions_UI.md",
-    "02_ACCESS_CONTROL/Platform_Admin_Role_Management.md",
-    "15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin/Tenant_Admin_Full_Codebase_Report.md",
-    "15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin/Tenant_Admin_Test_Cases.md",
-    "15_IMPLEMENTATION_TRACKING/Full_Feature_Status_Index.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Pos_Activation_Seed_Migration_Fix.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Tenant/Till_Create_Implementation_Status.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Tenant/Outlet_Create_Implementation_Status.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/README.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_Admin_Login_Implementation_Status.md",
-    "03_USER_JOURNEYS/_USER_JOURNEY_TEMPLATE.md",
-    "14_AI_DEVELOPER_PROMPTS/Backend/Backend feature prompt.md",
-    "15_IMPLEMENTATION_TRACKING/Flutter/Pos_Shell/Pos_Home_Dashboard_Implementation_Status.md",
-    "15_IMPLEMENTATION_TRACKING/Flutter/Pos_Shell",
-    "15_IMPLEMENTATION_TRACKING/Backend/Subscription/Subscription_Backend_Implementation_Status.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Subscription",
-    "14_AI_DEVELOPER_PROMPTS/Testing/01_API_Test_Case_Generation_Prompt.md",
-    "15_IMPLEMENTATION_TRACKING/Angular/Subscription/Subscription_UI_Implementation_Status.md",
-    "15_IMPLEMENTATION_TRACKING/Angular/Subscription",
-    "14_AI_DEVELOPER_PROMPTS/Frontend_Subscription_UI.md",
-    "14_AI_DEVELOPER_PROMPTS/Backend_Subscription_Plans.md",
-    "11_DEVELOPER_ONBOARDING/Backend_Local_Development_Setup.md",
-    "09_ANGULAR_ADMIN_KNOWLEDGE/Subscription_UI_Implementation.md",
-    "07_UI_UX_KNOWLEDGE/Platform_Admin_Subscription_UI.md",
-    "03_USER_JOURNEYS/Platform_Admin/Subscription_Plan_Management_Flow.md",
-    "14_AI_DEVELOPER_PROMPTS/Testing/05_Regression_Checklist_Prompt.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Tenant",
-    "15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin"
+    "03_USER_JOURNEYS/Tenant_Admin/20_Audit_Logs_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/19_Device_Hardware_Management_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/18_Billing_Subscription_Management_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/17_Reports_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/16_Expiry_Discount_Management_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/15_Stock_Count_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/14_Stock_Transfer_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/13_Stock_Out_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/12_Stock_In_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/11_Stock_Adjustment_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/10_Inventory_Stock_Management_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/09_Product_Management_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/08_Category_Brand_Management_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/07_User_Management_Add_New_User_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/06_Role_Permission_Management_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/05_Till_Management_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/04_Outlet_Management_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/03_Dashboard_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/02_First_Login_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/01_Pre_Login_Payment_Trial_Demo_Flow.md",
+    "03_USER_JOURNEYS/Tenant_Admin/00_Tenant_Admin_User_Flow_Analysis.md",
+    "03_USER_JOURNEYS/Tenant_Admin",
+    "03_USER_JOURNEYS/Platform_Admin/15_System_Settings_Flow.md",
+    "03_USER_JOURNEYS/Platform_Admin/14_Audit_Logs_Flow.md",
+    "03_USER_JOURNEYS/Platform_Admin/13_Platform_User_Management_Flow.md",
+    "03_USER_JOURNEYS/Platform_Admin/12_Subscription_Billing_Management_Flow.md",
+    "03_USER_JOURNEYS/Platform_Admin/11_Tenant_Activation_Flow.md",
+    "03_USER_JOURNEYS/Platform_Admin",
+    "10_TESTING_QA/Test_Case/21_Reports",
+    "10_TESTING_QA/Test_Case/20_Integration",
+    "10_TESTING_QA/Test_Case/19_Notification",
+    "10_TESTING_QA/Test_Case/18_OfflineSync",
+    "10_TESTING_QA/Test_Case/17_ReturnExchange",
+    "10_TESTING_QA/Test_Case/16_Refund",
+    "10_TESTING_QA/Test_Case/15_Payment",
+    "10_TESTING_QA/Test_Case/14_FulfilmentPickup"
   ]
 }

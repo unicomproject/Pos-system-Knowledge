@@ -1,117 +1,74 @@
 <!-- title: Error Response Standards -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
 
 # Error Response Standards
 
 ## Purpose
 
-This file defines backend error response standards for SCS-TIX EPOS Release 1.
+This file defines backend error response standards for TM-EPOS MVP.
 
-Flutter POS and Angular Platform Admin must receive predictable errors.
+Errors must be safe, consistent, and useful without exposing sensitive internals.
 
-## Error Response Shape
+## Standard Error Fields
 
-```json
-{
-  "success": false,
-  "message": "Validation failed",
-  "errorCode": "VALIDATION_ERROR",
-  "errors": [
-    { "field": "barcode", "message": "Barcode is required" }
-  ],
-  "traceId": "00-..."
-}
-```
+| Field | Meaning |
+|---|---|
+| code | Stable application error code |
+| message | Safe user/developer message |
+| details | Optional validation details |
+| traceId | Request trace ID |
+| timestamp | Server timestamp |
 
-## Status Code Rules
+## HTTP Status Rules
 
 | Status | Use |
 |---|---|
-| 400 | Validation failure or bad request |
-| 401 | Missing, invalid, or expired authentication |
-| 403 | Authenticated but blocked |
-| 404 | Resource not found inside allowed scope |
-| 409 | Duplicate, conflict, or concurrency issue |
-| 500 | Unexpected server error |
+| 400 | Validation failure |
+| 401 | Not authenticated |
+| 403 | Authenticated but not allowed |
+| 404 | Resource not found or hidden by tenant boundary |
+| 409 | Conflict, duplicate, invalid state, idempotency conflict |
+| 422 | Business rule validation failure where useful |
+| 429 | Rate limit or abuse protection |
+| 500 | Unexpected server error with safe message |
 
-## 403 Conditions
+## Common Error Codes
 
-Use 403 when blocked by:
-
-- Feature entitlement.
-- Permission.
-- Tenant status.
-- Outlet access.
-- Device trust.
-- Till assignment.
-- Till session.
-- Subscription status.
-
-Do not return 401 for an authenticated user who lacks permission.
-
-## 409 Conditions
-
-Use 409 for:
-
-- Duplicate SKU or barcode.
-- Duplicate outlet/till code.
-- Duplicate document number.
-- Already open till session.
-- Concurrency conflict.
-- Business-state conflict.
-
-## Validation Error Rule
-
-Validation errors must identify the field where possible.
-
-Validation must not expose internal database or implementation details.
-
-## Business Error Rule
-
-Business errors should be clear and safe.
-
-Examples:
-
-- `TILL_SESSION_REQUIRED`
-- `FEATURE_NOT_ENABLED`
-- `PERMISSION_DENIED`
-- `DEVICE_NOT_TRUSTED`
-- `INSUFFICIENT_STOCK`
-- `REFUND_AMOUNT_EXCEEDED`
-- `DUPLICATE_BARCODE`
+| Code | Meaning |
+|---|---|
+| TENANT_INACTIVE | Tenant is not allowed to operate |
+| FEATURE_DISABLED | Feature entitlement missing/disabled |
+| PERMISSION_DENIED | User lacks required permission |
+| OUTLET_ACCESS_DENIED | User/device cannot access outlet |
+| TILL_NOT_OPEN | Billing action requires open till |
+| DEVICE_NOT_TRUSTED | Device/offline client is not trusted |
+| CHECKOUT_VALIDATION_FAILED | Checkout cannot be completed |
+| PAYMENT_DUPLICATE | Payment request was already processed |
+| IDEMPOTENCY_CONFLICT | Idempotency key reused with different payload |
+| PICKUP_SLOT_UNAVAILABLE | Requested pickup slot is unavailable |
+| ORDER_STATE_CONFLICT | Order status transition is invalid |
+| SYNC_CONFLICT | Offline sync item has conflict |
+| SYNC_BATCH_INVALID | Sync batch is invalid or rejected |
 
 ## Security Rule
 
-Never expose:
+Do not return SQL errors, stack traces, raw token values, card data, provider
+secrets, sync payload internals, or credential details.
 
-- Stack traces.
-- SQL errors.
-- Password hashes.
-- Token hashes.
-- Raw setup tokens.
-- Raw activation codes.
-- POS PINs.
-- Card data.
-- Provider secrets.
+## Offline Sync Error Rule
 
-## Global Exception Handling
+Offline sync errors must identify whether the batch, item, client, idempotency
+key, payload version, or conflict resolution failed.
 
-Use global exception middleware for unexpected failures.
+## Payment Error Rule
 
-Unexpected technical details must be logged securely and returned as a safe
-generic error to the client.
-
-## Trace ID Rule
-
-Every error response should include a trace ID.
-
-Logs should include the same trace ID where available.
+Payment errors must be safe and must not expose card data or provider secrets.
 
 ## Related Files
 
 - [[API_Standards]]
-- [[Backend_Coding_Principles]]
+- [[Offline_Operation_Architecture]]
 - [[Audit_Log_Standards]]
-- [[../02_ACCESS_CONTROL/API_Authorization_Rules]]

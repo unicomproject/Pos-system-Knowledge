@@ -1,117 +1,78 @@
 <!-- title: Authentication -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
 
 # Authentication
 
 ## Purpose
 
-This file defines Release 1 authentication rules for SCS-TIX EPOS.
+This file defines authentication boundaries for TM-EPOS MVP backend.
 
 Authentication confirms identity.
+Authorization decides what the authenticated identity can do.
 
-Authorization and POS context checks are handled separately.
+## Identity Types
 
-## Identity Boundaries
-
-| User Type | Identity Table |
+| Identity Type | Used For |
 |---|---|
-| Platform Admin | `platform_users` |
-| Tenant User | `users` |
+| Platform user | Platform admin operations |
+| Tenant user | Business admin, POS, fulfilment, reports |
+| Customer | Online store checkout/profile/order visibility |
+| Offline client/device | Offline operation and sync trust boundary |
 
-Platform admins and tenant users must remain logically separated.
+## Platform User Authentication
 
-## Supported Authentication Flows
+Platform users authenticate through platform authentication endpoints.
 
-Release 1 includes:
+Platform sessions and refresh tokens are separate from tenant users.
 
-- Platform admin login.
-- Tenant user login.
-- Tenant admin setup link.
-- Staff invite acceptance.
-- Password setup.
-- Password reset.
-- Refresh token rotation.
-- Logout.
-- Auth session validation.
+Platform users must not silently act as tenant users without explicit support
+workflow and audit.
 
-## Token Strategy
+## Tenant User Authentication
 
-| Token Type | Storage Rule |
-|---|---|
-| Access token | JWT, short-lived |
-| Refresh token | Hash stored in `refresh_tokens` |
-| Setup token | Hash stored in `user_setup_tokens` |
-| Invite token | Hash stored in `user_invites` |
-| Password reset token | Hash stored in `password_reset_tokens` |
-| Payment link token | Hash stored in `subscription_payment_links` |
-| Till activation code | Hash stored in `till_activation_codes` |
+Tenant users authenticate for business admin, POS, desktop EPOS, fulfilment,
+pickup, reporting, and hardware operations.
 
-Raw tokens and raw activation codes must never be stored.
+Tenant user authentication must resolve tenant context and user status.
 
-## Login Flow
+## Customer Authentication
 
-```mermaid
-flowchart TD
-    A[Submit credentials] --> B[Validate user]
-    B --> C[Validate status]
-    C --> D[Create auth session]
-    D --> E[Issue JWT]
-    E --> F[Issue refresh token]
-```
+Customer authentication may be required for customer profile, saved details,
+order visibility, and pickup status.
 
-## Tenant User Login Rule
+Public catalogue browsing can be tenant/domain/sales-channel scoped without full
+customer login when allowed.
 
-Tenant user login must validate:
+## Offline Client Trust
 
-- User exists.
-- Password is valid.
-- User status allows login.
-- Tenant exists.
-- Tenant status allows operation.
-- Auth session is created.
-- Refresh token is stored as hash.
+Offline client/device trust is not a replacement for user authentication.
 
-## Platform Admin Login Rule
+Offline sync must validate approved client/device, tenant, outlet, and payload
+rules before accepting queued operations.
 
-Platform admin login must validate:
+## Token Rules
 
-- Platform user exists.
-- Password is valid.
-- Platform user status allows login.
-- Platform role/permission boundary applies after login.
+- Store only token hashes in database.
+- Rotate refresh tokens where applicable.
+- Revoke sessions on reuse or suspicious behavior.
+- Never log raw tokens.
+- Never return token hashes to clients.
 
-Platform users do not automatically become tenant users.
+## Session Rules
 
-## Password and PIN Rule
+Logout, session expiry, account lock, tenant suspension, or device deactivation
+must block protected actions.
 
-Passwords and POS PINs must be hashed.
+## Security Audit
 
-Do not log passwords or PINs.
-
-Do not return password or PIN state except safe setup indicators.
-
-## Refresh Token Rule
-
-Refresh tokens must be rotated.
-
-Old refresh tokens must be marked used, revoked, or replaced.
-
-A revoked or expired refresh token must not issue a new access token.
-
-## Logout Rule
-
-Logout must revoke the active auth session or token chain.
-
-For POS, logout must respect till rules.
-
-If a till session is open, the app must handle close-till flow before final logout
-where required by business flow.
+Login success, login failure, lockout, logout, refresh reuse, and suspicious
+offline sync attempts should be auditable.
 
 ## Related Files
 
 - [[Authorization_And_Permissions]]
-- [[Multi_Tenant_Handling]]
 - [[API_Standards]]
-- [[../02_ACCESS_CONTROL/Access_Control_Overview]]
+- [[Offline_Operation_Architecture]]

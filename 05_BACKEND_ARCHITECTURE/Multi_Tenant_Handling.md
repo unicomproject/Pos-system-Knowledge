@@ -1,117 +1,81 @@
 <!-- title: Multi Tenant Handling -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
 
 # Multi Tenant Handling
 
 ## Purpose
 
-This file defines multi-tenant backend handling for SCS-TIX EPOS Release 1.
+This file defines multi-tenant handling rules for TM-EPOS MVP backend.
 
-Tenant isolation is mandatory.
+Tenant isolation must protect platform admin data, business admin data, POS data,
+online store data, orders, payments, fulfilment, notifications, integrations, and
+offline sync records.
 
-Tenant-owned data must not leak between tenants.
+## Tenant Rule
 
-## Tenant Isolation Rule
+Every tenant-owned table and query must be tenant scoped.
 
-All tenant-owned tables must include `tenant_id`.
+The backend must not trust frontend-provided tenant IDs as final authority.
 
-Platform-owned catalog/configuration tables do not require tenant ID unless they
-store tenant-specific data.
-
-## Tenant Context Source
-
-Tenant context must be resolved from server-side authenticated context.
-
-Do not trust frontend-provided `tenant_id` for tenant-owned APIs.
-
-Tenant context may come from:
-
-- Authenticated tenant user.
-- Auth session.
-- Trusted POS device.
-- Server-side tenant management context for Platform Admin actions.
+Tenant context must be resolved from authenticated context, domain, route,
+trusted device, sales channel, or verified token depending on the use case.
 
 ## Tenant-Owned Areas
 
-Tenant-owned data includes:
-
-- Users and roles.
-- Outlets and tills.
-- POS devices.
-- Products and variants.
-- Inventory.
-- Sales and sale lines.
-- Payments and refunds.
-- Returns and exchanges.
-- Customers and loyalty.
-- Reports.
-- Notifications.
-- Hardware records.
-
-## Platform-Owned Areas
-
-Platform-owned data includes:
-
-- Platform users.
-- Platform roles.
-- Platform permissions.
-- Platform modules.
-- Platform features.
-- Subscription plan definitions.
-- Platform settings.
-
-Tenant-specific assignments are tenant-owned.
-
-## Query Filtering Rule
-
-Repositories must filter tenant-owned queries by tenant ID.
-
-List, search, detail, update, and delete/deactivate operations must stay inside
-tenant scope.
-
-A not-found result inside tenant scope should not reveal another tenant's data.
-
-## Unique Index Rule
-
-Use tenant-aware unique constraints for tenant data.
-
-Examples:
-
-| Data | Uniqueness |
+| Area | Tenant Isolation Applies |
 |---|---|
-| Role code | Tenant-scoped |
-| Product code | Tenant-scoped |
-| SKU | Tenant-scoped |
-| Barcode | Tenant-scoped |
-| Outlet code | Tenant-scoped |
-| Till code | Tenant and outlet scoped |
-| Business document number | Tenant-scoped or tenant/outlet scoped |
+| Users/roles/permissions | Yes |
+| Outlets/tills/devices | Yes |
+| Products/prices/taxes/discounts | Yes |
+| Inventory/stock movements | Yes |
+| Carts/checkouts/orders | Yes |
+| Payments/refunds/returns/exchanges | Yes |
+| Fulfilment/pickup | Yes |
+| Notifications/integrations | Yes |
+| Offline clients/sync batches | Yes |
+| Reports | Yes |
 
-## POS Tenant Safety
+## Public Storefront Rule
 
-POS operations must validate that the user, outlet, till, device, sale, payment,
-and inventory records all belong to the same tenant.
+Online store reads must resolve tenant by verified domain, route, channel, or
+storefront context.
 
-Never complete a sale using mixed-tenant records.
+Do not expose another tenant's catalogue, price list, tax rules, pickup slots,
+or order data.
 
-## Document Number Rule
+## POS Device Rule
 
-Use `document_sequences` for business numbers such as sale, return, exchange,
-receipt, invoice, stock adjustment, and stocktake numbers.
+POS device requests must validate tenant, outlet, till, and device assignment.
 
-Document numbers must be generated inside tenant/outlet boundaries.
+A trusted device does not remove the need for user permission.
 
-## Audit Tenant Rule
+## Offline Rule
 
-Audit logs must include tenant ID for tenant actions.
+Offline sync records must include tenant and offline client context.
 
-Platform actions may have null tenant ID unless managing a specific tenant.
+Sync item payload must not be applied outside the owning tenant.
+
+Offline ID mapping must never map one tenant's client record to another tenant's
+server record.
+
+## Cache Key Rule
+
+Tenant-owned cache keys must include tenant ID.
+Outlet/till/device cache must include outlet/till/device identifiers where
+needed.
+
+## Query Rule
+
+Repositories must apply tenant filters before returning tenant-owned data.
+
+Avoid "admin shortcut" queries that skip tenant filters unless the use case is a
+platform admin use case and explicitly audited.
 
 ## Related Files
 
+- [[Virtual_Caching_Architecture]]
+- [[Offline_Operation_Architecture]]
 - [[Authorization_And_Permissions]]
-- [[API_Standards]]
-- [[Audit_Log_Standards]]
-- [[../06_DATABASE_KNOWLEDGE/Tenant_Id_Rules]]

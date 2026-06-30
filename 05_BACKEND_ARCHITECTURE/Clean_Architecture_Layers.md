@@ -1,129 +1,99 @@
 <!-- title: Clean Architecture Layers -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-30 -->
+
 
 # Clean Architecture Layers
 
 ## Purpose
 
-This file explains the backend Clean Architecture layers for humans and AI
-development assistants.
+This file defines how backend code is separated into layers.
 
-The goal is to keep business rules independent from ASP.NET Core, EF Core, AWS,
-payment SDKs, and infrastructure tools.
+The layer rule remains valid after the TM-EPOS MVP scope update.
 
-## Dependency Rule
+## Layer Order
 
-```mermaid
-flowchart TD
-    API[API Layer] --> APP[Application Layer]
-    APP --> DOMAIN[Domain Layer]
-    INFRA[Infrastructure Layer] --> APP
-    INFRA --> DOMAIN
-    TEST[Testing Layer] --> API
-    TEST --> APP
-    TEST --> DOMAIN
-    TEST --> INFRA
+```text
+API -> Application -> Domain -> Infrastructure
 ```
 
-Domain must not reference API or Infrastructure.
-
-Application must not depend on EF Core DbContext directly.
-
-Infrastructure implements Application interfaces.
+Each layer must depend inward, not outward.
 
 ## API Layer
 
-The API layer receives HTTP requests and returns HTTP responses.
+The API layer contains controllers, request binding, authentication entry points,
+response formatting, Swagger metadata, and versioned route grouping.
 
-It contains controllers, middleware, filters, authentication setup, authorization
-attributes, API versioning, request/response formatting, and `Program.cs`.
-
-Controllers must be thin.
-
-They must not contain checkout rules, permission logic, tenant isolation logic, or
-database transaction logic.
+API controllers must not contain business rules.
 
 ## Application Layer
 
-The Application layer coordinates use cases.
+The Application layer contains use-case services, validators, DTO contracts,
+authorization orchestration, transaction boundary coordination, and calls to
+repositories, domain services, and infrastructure abstractions.
 
-It contains services, DTOs, validators, repository interfaces, access decision
-services, permission checkers, feature entitlement checkers, and transaction
-workflow orchestration.
-
-This layer decides the use-case workflow without EF Core implementation details.
-
-## Unit Of Work Rule
-
-Application services may depend on an `IUnitOfWork` abstraction when a use case
-needs to commit changes across multiple repositories.
-
-Application must not depend on EF Core `DbContext` directly.
-
-Infrastructure implements Unit of Work using `AppDbContext`.
-
-EF Core `DbContext` remains the concrete persistence unit of work.
+Application services own workflow logic such as checkout completion, offline sync
+upload, pickup status change, refund processing, till close, and product setup.
 
 ## Domain Layer
 
-The Domain layer contains business concepts independent from technical
-frameworks.
+The Domain layer contains entities, value objects, domain services, business
+rules, repository contracts, constants, and permission-code constants.
 
-It contains entities, value objects, domain rules, module-wise permission code
-constants, and business invariants.
-
-Database status/type fields such as sale status, payment status, and till session
-status must remain string properties in Domain models. Allowed values are enforced
-through Application validation and Infrastructure EF Core database CHECK
-constraints, not C# enum classes.
+Domain must not know EF Core, HTTP, controllers, database migrations, or external
+provider SDKs.
 
 ## Infrastructure Layer
 
-The Infrastructure layer implements technical details.
+Infrastructure contains EF Core DbContext, entity configurations, repository
+implementations, PostgreSQL migrations, external provider clients, file storage,
+email/SMS/payment adapters, cache adapters, and sync persistence adapters.
 
-It contains EF Core DbContext, repository implementations, entity configuration,
-migrations, seed data, S3 service, JWT service, password hashing service, payment
-provider adapters, and email provider adapters.
+## Allowed Dependencies
 
-Infrastructure can depend on Application interfaces and Domain models.
-
-## Testing Layer
-
-The Testing layer verifies behavior.
-
-It contains unit tests, integration tests, API tests, repository tests,
-permission tests, tenant isolation tests, and POS flow tests.
-
-Tests must not change production code to make tests pass.
-
-## Where Rules Belong
-
-| Rule Type | Correct Layer |
+| Layer | Can Depend On |
 |---|---|
-| HTTP route/status code | API |
-| DTO validation | Application |
-| Checkout workflow | Application |
-| Stable business state | Domain |
-| EF table mapping | Infrastructure |
-| Tenant query filter | Infrastructure plus Application checks |
-| Permission decision | Application |
-| Audit persistence | Infrastructure |
-| Test data builder | Testing |
+| API | Application |
+| Application | Domain |
+| Domain | Nothing project-specific outside Domain |
+| Infrastructure | Application contracts and Domain |
 
-## AI Development Rule
+## Module Consistency
 
-When generating code, AI must first identify the target layer.
+Every business-heavy module should follow the same layer structure.
 
-Do not place `.cs` files randomly.
+Examples: Orders, CartCheckout, POS, Payment, Refund, FulfilmentPickup,
+OfflineSync, Product, Inventory, Notification, Integration.
 
-For every feature, generate files under the correct module folder inside each
-layer.
+## Transaction Boundary Rule
+
+Use Application services to coordinate database transactions.
+
+Do not start transactions inside controllers.
+
+Offline sync batch processing, checkout completion, refund, exchange, payment
+status change, and till close must be transaction-safe.
+
+## Validation Rule
+
+Use layered validation:
+
+- Request shape validation in API/Application.
+- Business rule validation in Application/Domain.
+- Database constraints in Infrastructure/PostgreSQL.
+
+## Anti-Patterns
+
+- API controller directly using DbContext.
+- UI-specific DTOs inside Domain.
+- EF Core attributes controlling domain behavior.
+- Infrastructure calling API controllers.
+- Business rules inside repository implementation.
+- Duplicated checkout or payment rules across controllers.
 
 ## Related Files
 
-- [[Module_Based_Folder_Structure]]
+- [[Backend_Overview]]
 - [[Backend_Coding_Principles]]
 - [[DTO_And_Mapping_Rules]]
-- [[Authorization_And_Permissions]]
