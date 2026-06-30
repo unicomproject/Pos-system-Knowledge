@@ -1,7 +1,7 @@
-<!-- title: Platform Subscription Plan API Endpoints -->
+﻿<!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-23 -->
+<!-- last_updated: 2026-06-25 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -14,17 +14,20 @@ All endpoints require platform JWT authentication.
 | Method | Route | Permission | Purpose |
 |---|---|---|---|
 | GET | `/api/v1/platform/subscription-plans` | `platform.subscription_plans.view` | List subscription plans |
+| GET | `/api/v1/platform/subscription-plans/catalog` | `platform.subscription_plans.view` | Read commercial subscription catalog |
 | POST | `/api/v1/platform/subscription-plans` | `platform.subscription_plans.create` | Create draft plan |
 | PATCH | `/api/v1/platform/subscription-plans/{planId}/pricing` | `platform.subscription_plans.edit` | Save draft `base_price` |
 | PATCH | `/api/v1/platform/subscription-plans/{planId}/limits` | `platform.subscription_plans.edit` | Save draft outlet/till/user limits |
-| POST | `/api/v1/platform/subscription-plans/{planId}/publish` | `platform.subscription_plans.edit` | Publish draft → DB `active` |
+| PATCH | `/api/v1/platform/subscription-plans/{planId}/features` | `platform.subscription_plans.edit` | Save draft module/feature entitlements |
+| POST | `/api/v1/platform/subscription-plans/{planId}/publish` | `platform.subscription_plans.edit` | Publish draft â†’ DB `active` |
 
 ## Release 1 write flow
 
-1. **Create draft** — basics fields on `subscription_plans`
-2. **Update pricing** — `base_price` only, draft status required
-3. **Update limits** — `max_outlets`, `max_tills`, `max_users`, draft status required
-4. **Publish** — status `draft` → `active`; API response returns `status: active`
+1. **Create draft** â€” basics fields on `subscription_plans`
+2. **Update pricing** â€” `base_price` only, draft status required
+3. **Update features** â€” module/feature entitlement only, draft status required
+4. **Update limits** â€” `max_outlets`, `max_tills`, `max_users`, draft status required
+5. **Publish** â€” status `draft` â†’ `active`; API response returns `status: active`
 
 ## Status contract
 
@@ -39,7 +42,7 @@ Publish response example: `{ "status": "active", ... }`
 ## Verification (2026-06-22)
 
 - Swagger at `http://localhost:5050`
-- Full flow: POST create → PATCH pricing → PATCH limits → POST publish → GET list
+- Full flow: POST create â†’ PATCH pricing â†’ PATCH limits â†’ POST publish â†’ GET list
 - DB table `subscription_plans`: `base_price`, `max_outlets`, `max_tills`, `max_users`, `status = active`
 - Backend unit tests: **109/109 passed**
 
@@ -133,3 +136,82 @@ Response data includes `id`, `code`, `name`, `description`, `isSystem`, `status`
 Missing roles return the standard API error response with HTTP 404 and error code `NOT_FOUND`.
 
 Smoke verification used a real Platform Admin JWT and passed for role list, role detail, and role permissions endpoints.
+
+## Subscription Features Endpoint Update (2026-06-25)
+
+Endpoint added: `PATCH /api/v1/platform/subscription-plans/{planId}/features`
+
+Permission: `platform.subscription_plans.edit`
+
+Catalog read source for the subscription wizard is the commercial subscription catalog: `GET /api/v1/platform/subscription-plans/catalog`. Do not map permission catalog modules directly as commercial subscription modules.
+
+Request shape:
+
+```json
+{
+  "featureAvailability": {
+    "11111111-1111-1111-1111-111111111111": "included",
+    "22222222-2222-2222-2222-222222222222": "not_available"
+  }
+}
+```
+
+Response data shape:
+
+```json
+{
+  "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+  "includedFeatureIds": ["11111111-1111-1111-1111-111111111111"],
+  "status": "draft"
+}
+```
+
+Validation and persistence rules:
+
+- Plan must exist and must be `draft`.
+- Feature IDs must parse as GUIDs and exist as active `platform_features` rows.
+- Allowed values are `included` and `not_available` only.
+- `addon` is rejected in Release 1 unless real add-on pricing is implemented.
+- `included` rows are persisted in `subscription_plan_features`.
+- `not_available` rows are removed from `subscription_plan_features`.
+- Subscription wizard selects modules/features only; it must not select permissions.
+- Role Permission screens/APIs remain responsible for permission assignment.
+- Wizard must show only tenant/POS entitlement-relevant modules/features; platform-admin-only catalog entries must stay hidden unless explicitly documented as tenant-entitled.
+
+Verification:
+
+- `dotnet test tests\SCS.UnitTests\SCS.UnitTests.csproj --no-restore`: 127/127 passed.
+- `dotnet build SCS.sln --no-restore`: passed after stopping a stale local `.NET Host` process that locked API DLLs.
+
+## Subscription Catalog Architecture Correction 2026-06-25
+
+Supersedes earlier guidance that the subscription wizard should read `GET /api/v1/platform-admin/permission-catalog` directly.
+
+Final catalog read source: `GET /api/v1/platform/subscription-plans/catalog`.
+
+Final feature save endpoint: `PATCH /api/v1/platform/subscription-plans/{planId}/features`.
+
+Rules:
+
+- Permission Catalog = technical access-control hierarchy for role-permission assignment.
+- Subscription Catalog = commercial entitlement hierarchy for subscription plan creation.
+- Subscription wizard selects commercial modules/features only; it must not select permissions.
+- Core/default subscription features are locked included and protected by backend validation.
+- Optional features support only `included` and `not_available`.
+- `addon` is out of Release 1 and must not be rendered or sent.
+- `included` persists enabled rows in `subscription_plan_features`.
+- `not_available` removes or does not persist rows in `subscription_plan_features`.
+- Status truth remains `draft`, `active`, `retired`.
+- POS Online Orders / E-commerce is Release 2/deferred and must not appear in the R1 subscription wizard.
+
+Commercial modules returned to UI:
+
+- Core POS: locked included.
+- Tenant Operations: locked included.
+- Inventory: optional.
+- Customers & Loyalty: optional.
+- Returns & Exchanges: optional.
+- Reports: optional.
+
+See [[04_Subscription_Catalog_Model]] for the final contract, metadata fields, response shape, validation behavior, and verification results.
+

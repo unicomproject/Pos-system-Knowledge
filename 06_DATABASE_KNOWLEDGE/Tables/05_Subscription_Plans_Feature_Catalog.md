@@ -1,7 +1,7 @@
 <!-- title: Subscription Plans Feature Catalog -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-25 -->
 
 # Subscription Plans Feature Catalog
 
@@ -173,7 +173,7 @@ The Super Admin subscription plans list page uses:
 - `GET /api/v1/platform/subscription-plans`
 - Permission: `platform.subscription_plans.view`
 - Existing Release 1 tables only; no new plan/module/add-on tables were added for this task.
-- API status values exposed to frontend: `draft`, `published`, `archived`.
+- API status values exposed to frontend: `draft`, `active`, `retired`.
 - Database status values remain: `draft`, `active`, `retired`.
 
 
@@ -184,3 +184,46 @@ The Super Admin subscription plans list page uses:
 - [[../Table_Naming_Standards]]
 - [[../Migration_Rules]]
 - [[../../05_BACKEND_ARCHITECTURE/DTO_And_Mapping_Rules]]
+
+## Subscription Wizard Feature Save Notes (Implemented 2026-06-25)
+
+- Catalog read source: `GET /api/v1/platform-admin/permission-catalog`.
+- Feature save endpoint: `PATCH /api/v1/platform/subscription-plans/{planId}/features`.
+- No duplicate subscription module/feature catalog read endpoint is required for Release 1.
+- API status values exposed to frontend are `draft`, `active`, and `retired`; stale `published`/`archived` wording is UI-label/filter-alias language only and must not describe backend response status values.
+- `included` features are stored as enabled rows in `subscription_plan_features`.
+- `not_available` features are removed/not persisted in `subscription_plan_features`.
+- `addon` is rejected/out of scope unless real add-on pricing is implemented.
+- The wizard selects module/feature entitlement only; permissions remain role-permission responsibility.
+
+## Subscription Catalog Architecture Correction 2026-06-25
+
+Supersedes earlier guidance that the subscription wizard should read `GET /api/v1/platform-admin/permission-catalog` directly.
+
+Final catalog read source: `GET /api/v1/platform/subscription-plans/catalog`.
+
+Final feature save endpoint: `PATCH /api/v1/platform/subscription-plans/{planId}/features`.
+
+Rules:
+
+- Permission Catalog = technical access-control hierarchy for role-permission assignment.
+- Subscription Catalog = commercial entitlement hierarchy for subscription plan creation.
+- Subscription wizard selects commercial modules/features only; it must not select permissions.
+- Core/default subscription features are locked included and protected by backend validation.
+- Optional features support only `included` and `not_available`.
+- `addon` is out of Release 1 and must not be rendered or sent.
+- `included` persists enabled rows in `subscription_plan_features`.
+- `not_available` removes or does not persist rows in `subscription_plan_features`.
+- Status truth remains `draft`, `active`, `retired`.
+- POS Online Orders / E-commerce is Release 2/deferred and must not appear in the R1 subscription wizard.
+
+Commercial modules returned to UI:
+
+- Core POS: locked included.
+- Tenant Operations: locked included.
+- Inventory: optional.
+- Customers & Loyalty: optional.
+- Returns & Exchanges: optional.
+- Reports: optional.
+
+See [[04_Subscription_Catalog_Model]] for the final contract, metadata fields, response shape, validation behavior, and verification results.

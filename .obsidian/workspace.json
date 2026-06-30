@@ -185,6 +185,7 @@
   },
   "active": "56806a201bd68d51",
   "lastOpenFiles": [
+    "04_MODULE_KNOWLEDGE/Subscription/04_Subscription_Catalog_Model.md",
     "15_IMPLEMENTATION_TRACKING/Backend/Pos_Activation_Seed_Migration_Fix.md",
     "15_IMPLEMENTATION_TRACKING/Angular/Subscription/Subscription_UI_Implementation_Status.md",
     "15_IMPLEMENTATION_TRACKING/Angular/Subscription",
@@ -219,7 +220,6 @@
     "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Permission_Based_UI_Rendering.md",
     "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Local_Storage_Cache.md",
     "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Hardware_Payment_Receipt.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Folder_Structure.md",
-    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Error_Handling.md"
+    "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Folder_Structure.md"
   ]
 }
