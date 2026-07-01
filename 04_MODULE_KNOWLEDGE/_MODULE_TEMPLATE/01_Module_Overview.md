@@ -59,7 +59,7 @@ Database presence does not automatically make a feature active Release 1 scope.
 
 ## Related Files
 
-- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../../05_BACKEND_ARCHITECTURE/Backend_Overview]]
-- [[../../06_DATABASE_KNOWLEDGE/Database_Overview]]
+- [[99_Archive/01_RELEASE_SCOPE/Release_1_Scope]]
+- [[99_Archive/02_ACCESS_CONTROL/Access_Control_Overview]]
+- [[99_Archive/05_BACKEND_ARCHITECTURE/Backend_Overview]]
+- [[99_Archive/06_DATABASE_KNOWLEDGE/Database_Overview]]

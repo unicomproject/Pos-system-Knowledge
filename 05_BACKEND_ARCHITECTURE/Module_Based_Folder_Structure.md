@@ -1,99 +1,101 @@
 <!-- title: Module Based Folder Structure -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-30 -->
+
 
 # Module Based Folder Structure
 
 ## Purpose
 
-This file defines the Release 1 backend folder structure.
+This file defines backend folder structure for TM-EPOS MVP modules.
 
-The backend uses four production layers and a testing layer.
+The structure must support POS, online store, cart/checkout, orders, click and
+collect, offline sync, reporting, notification, and integration modules.
 
-Inside each layer, module name must come first.
-
-## Structure Rule
-
-Each business module owns its own controllers, services, DTOs, validators,
-entities, repositories, permission constants, and tests.
-
-Do not place all files in generic folders.
-
-Do not create Release 1 modules for e-commerce, kiosk, supplier, delivery,
-coupon, AI, or offline sync.
-
-## Solution Layout
+## Solution Structure
 
 ```text
 src/
-  SCS.Api/
-  SCS.Application/
-  SCS.Domain/
-  SCS.Infrastructure/
+  E_POS.Api/
+  E_POS.Application/
+  E_POS.Domain/
+  E_POS.Infrastructure/
 tests/
-  SCS.UnitTests/
-  SCS.IntegrationTests/
-  SCS.ApiTests/
+  E_POS.UnitTests/
+  E_POS.IntegrationTests/
+  E_POS.ApiTests/
 ```
 
-## Layer Examples
+## Module Structure
 
 ```text
-SCS.Api/Modules/Sales/
-  PosSalesController.cs
-  PaymentsController.cs
-  ReceiptsController.cs
-
-SCS.Application/Modules/Sales/
-  PosSalesService.cs
-  PaymentService.cs
-  DTOs/
-  Validators/
-
-SCS.Domain/Modules/Sales/
-  Sale.cs
-  Payment.cs
-  SalesPermissionCodes.cs
-
-SCS.Infrastructure/Modules/Sales/
-  SalesRepository.cs
-  PaymentRepository.cs
-
-SCS.Infrastructure/Shared/Persistence/
-  AppDbContext.cs
-  Migrations/
-  Seed/
+E_POS.Application/
+  Modules/
+    Orders/
+      Contracts/
+      Dtos/
+      Services/
+      Validators/
 ```
 
-## Release 1 Module List
+```text
+E_POS.Domain/
+  Modules/
+    Orders/
+      Constants/
+      Entities/
+      Repositories/
+      Services/
+      ValueObjects/
+```
 
-| Module | Scope |
+```text
+E_POS.Infrastructure/
+  Modules/
+    Orders/
+      Configurations/
+      Persistence/
+      Repositories/
+```
+
+## MVP Backend Modules
+
+| Module | Purpose |
 |---|---|
-| Auth | Login, setup, refresh, logout |
-| Platform/Tenant | Tenant profile and status |
-| Subscription/Billing | Plan, invoice, payment link |
-| Entitlement/Permission | Features, roles, permissions |
-| Outlet/Till/Device | POS operating context |
-| Catalog/Inventory | Product, stock, expiry |
-| Discount | POS/product/expiry discounts |
-| Sales/Payment/Receipt | Checkout and receipt |
-| Return/Refund/Exchange | Post-sale flows |
-| Loyalty/Reports/Hardware | Basic loyalty, reports, hardware records |
+| PlatformAdministration | Platform users, roles, tenants, billing setup |
+| TenantFoundation | Tenants, profiles, addresses, domains, settings |
+| SubscriptionBilling | Plans, add-ons, invoices, payment links, usage |
+| AccessControl | Users, roles, permissions, outlet access |
+| OutletTillDevice | Outlets, tills, devices, assignments |
+| HardwareCash | Hardware operations, till sessions, cash control |
+| CatalogProduct | Products, variants, categories, attributes, images |
+| PricingTax | Price lists, price assignments, tax classes, tax rates |
+| Discount | Discount policies, targeting, expiry discount rules, approvals |
+| Inventory | Locations, balances, stock movements, adjustments |
+| Orders | Unified sales order model |
+| POSOperations | Holds, receipts, till summaries, POS events |
+| CartCheckout | Shopping carts and checkout sessions |
+| FulfilmentPickup | Fulfilment methods, pickup slots, pickup orders |
+| Payment | Payment methods, sales payments, transactions, events |
+| Refund | Sales refunds, refund lines, refund payment allocations |
+| ReturnExchange | Return, inspection, exchange workflows |
+| OfflineSync | Offline clients, number blocks, sync batches |
+| Notification | Events, templates, messages, delivery attempts |
+| Integration | Providers, credentials, webhooks, request logs |
+| Reports | Operational read models and report exports |
 
-## File Placement Rule
+## Naming Rule
 
-| File Type | Location |
-|---|---|
-| Controller | API module folder |
-| Service/DTO/Validator | Application module folder |
-| Entity/Permission constants | Domain module folder |
-| Repository interface | Application module folder |
-| Repository implementation | Infrastructure module folder |
-| DbContext/Migration/Seed | Infrastructure Shared/Persistence |
+Use module names that match business capability, not UI page names.
+
+## Route Group Rule
+
+Route groups may differ from module names, but controllers must map clearly to
+module ownership.
 
 ## Related Files
 
-- [[Clean_Architecture_Layers]]
-- [[Backend_Coding_Principles]]
+- [[Backend_Overview]]
+- [[API_ENDPOINTS]]
 - [[Seed_Data_Standards]]

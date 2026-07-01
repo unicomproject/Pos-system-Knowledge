@@ -1,146 +1,83 @@
 <!-- title: Seed Data Standards -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
 
 # Seed Data Standards
 
 ## Purpose
 
-This file defines seed data standards for SCS-TIX EPOS Release 1.
+This file defines seed data standards for TM-EPOS MVP backend.
 
-Seed data must support platform setup, permissions, features, reference values,
-and safe development/testing.
+Seed data must be deterministic, safe, reviewable, and aligned with the current
+MVP scope.
 
 ## Seed Data Rule
 
-Seed only Release 1-supported data.
+Do not seed random or tenant-specific production data.
 
-Do not seed active Release 2 modules as usable Release 1 features.
+Do not seed secrets.
 
-Future/deferred catalog values must be clearly disabled or excluded if present.
+Use stable codes for modules, features, permissions, settings, payment method
+types, fulfilment methods, notification event types, and integration providers.
 
-## Seeded Data Areas
+## Required Seed Groups
 
-Release 1 may seed:
-
-- Platform roles.
-- Platform permissions.
-- Platform modules.
-- Platform features.
-- Subscription plans.
-- Subscription plan features.
-- Tenant permissions.
-- Payment method types.
-- Discount types.
-- Discount scopes.
-- Stock movement types.
-- Cash movement types.
-- Return reason examples where tenant setup requires them.
-- Default receipt template where required.
-- Report type references where required.
+| Group | Purpose |
+|---|---|
+| Platform modules | Feature grouping |
+| Platform features | Entitlement catalog |
+| Feature limits | Usage and plan limits |
+| Subscription plans | Commercial plans |
+| Permission definitions | Backend-driven authorization |
+| Role templates | Optional starting role templates |
+| Setting definitions | Tenant/system setting keys |
+| Business types | Target business categories |
+| Currency | Currency master data |
+| Payment method types | Cash, card, QR, bank transfer, manual |
+| Fulfilment methods | Immediate and pickup |
+| Notification channels | Email, SMS, WhatsApp, push, in-app |
+| Notification event types | Order, pickup, sync, payment events |
+| Integration providers | Payment, SMS, email, WhatsApp, accounting, analytics |
+| Offline sync settings | Offline client and sync defaults |
 
 ## Permission Seed Rule
 
-Permission seed data must match:
+Every permission must have:
 
-- `permissions.code`.
-- `platform_permissions.code`.
-- Module-wise permission constants.
-- Role-permission assignments.
-- API authorization checks.
-- UI permission checks.
-- Permission test cases.
+- Stable permission code.
+- Name.
+- Module/feature grouping.
+- Status.
+- Description.
+- Intended user type where helpful.
 
-Do not rename permission codes casually.
+## Entitlement Seed Rule
 
-## Permission Catalog Seed (Verified 2026-06-18)
+Feature entitlements must support mobile POS, desktop EPOS, online store,
+cart/checkout, click collect, order management, payment/refund, return/exchange,
+offline sync, reporting, notifications, integrations, product, inventory, and
+hardware/device operations.
 
-Migration `20260620120100_SeedPermissionCatalogRelease1` seeds Release 1 catalog
-hierarchy through `PermissionCatalogSeedData`:
+## Test Seed Rule
 
-- Modules and features on `platform_modules` / `platform_features`.
-- Tenant permissions on `permissions`.
-- Platform permissions on `platform_permissions`.
-- Existing canonical codes preserved; aliases handled in application layer only.
-
-See [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
-
-## Feature Seed Rule
-
-Feature seed data must align with Release 1 included features.
-
-Do not enable e-commerce, offline sync, supplier management, delivery, kiosk,
-coupon engine, AI, or accounting as active Release 1 features.
-
-## Reference Data Rule
-
-Reference data may use stable values from database design.
-
-Examples:
-
-| Reference | Example Values |
-|---|---|
-| Payment method types | cash, card, qr, store_credit |
-| Discount types | percentage, fixed_amount, price_override |
-| Discount scopes | product, variant, sale_line, bill, expiry |
-| Cash movement types | cash_in, cash_out, safe_drop, float_add, paid_out |
-| Sale statuses | draft, held, completed, voided, cancelled |
-
-## Tenant Seed Rule
-
-Production tenant data must not be hardcoded.
-
-Demo or test tenants must be clearly separated from production seed data.
-
-Tenant-specific products, users, outlets, tills, and inventory should not be
-global seed data.
+Development seed data may include test tenants, users, outlets, tills, devices,
+products, and orders only when clearly marked as development/test data.
 
 ## Secret Rule
 
-Never seed real secrets.
-
-Do not seed:
-
-- Real passwords.
-- Raw setup links.
-- Raw activation codes.
-- Real payment provider keys.
-- Real AWS secrets.
-- Real card data.
-
-Use hashes or safe placeholders only where required.
+Do not seed real API keys, card credentials, payment credentials, passwords,
+activation codes, or customer data.
 
 ## Migration Rule
 
-Seeds must be deterministic.
+Seed changes must be migration-safe and idempotent.
 
-Do not create random values that break repeatable migrations or tests.
-
-Document any seed dependency between modules.
-
-## Development POS Activation Seed Dependency (Verified 2026-06-17)
-
-`DevelopmentPosActivationSeedData` depends on:
-
-| Dependency | Source |
-|---|---|
-| TENANT001 tenant | `DevelopmentAuthSeedData.EnsureTenantAndUsersSql` |
-| tenantadmin001@gmail.com | Tenant admin user |
-| manager001@gmail.com | Manager user |
-| cashier001@gmail.com | Cashier user |
-| cashier002@gmail.com | Second cashier user |
-| pos_operator_dev role | Created in same POS activation seed |
-
-Rules:
-
-- Bootstrap tenant/users at the start of POS activation seed when auth migration was skipped.
-- Use `INSERT ... SELECT ... JOIN` for role/outlet/till rows; never insert NULL foreign keys.
-- Match partial unique indexes in `ON CONFLICT`, e.g. `WHERE revoked_at IS NULL`.
+Do not create duplicate permission/module/feature codes.
 
 ## Related Files
 
-- [[Backend_Coding_Principles]]
+- [[Module_Based_Folder_Structure]]
 - [[Authorization_And_Permissions]]
-- [[Multi_Tenant_Handling]]
-- [[../02_ACCESS_CONTROL/Permission_Code_List]]
+- [[Virtual_Caching_Architecture]]

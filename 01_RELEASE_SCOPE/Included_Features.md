@@ -1,140 +1,136 @@
 <!-- title: Included Features -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
 
 # Included Features
 
 ## Purpose
 
-This file lists what developers may implement for Release 1.
+This file lists features that may be implemented for the TM-EPOS MVP.
 
 If a feature is not listed here, check [[Excluded_Features]] before building it.
 
 ## Inclusion Rule
 
-A feature is included only when it supports the POS-first Release 1 scope.
-
+A feature is included only when it supports the updated TM-EPOS MVP scope.
 Do not add modules, APIs, screens, tables, or flows only because they are common
-in POS systems.
+in other EPOS or e-commerce products.
 
 ## Application Surfaces
 
 | Surface | Included | Notes |
 |---|---:|---|
-| Platform Admin Web | Yes | Super Admin / platform setup |
-| Flutter Fixed POS App | Yes | Main POS and tenant operations |
-| Flutter Portable POS Flow | Yes | Queue-busting under POS |
-| Tenant Admin Layout | Yes | Inside Flutter POS app |
-| E-commerce Web | No | Deferred |
+| Mobile POS | Yes | Phone/tablet selling flow |
+| Desktop EPOS | Yes | Laptop/desktop business operation |
+| Online Store | Yes | Customer product browsing and ordering |
+| Click & Collect | Yes | Customer order pickup workflow |
+| Business Admin | Yes | Product, inventory, users, permissions, reports |
+| Platform Admin | Yes | Tenant, plan, entitlement, billing, activation |
+| Offline Operation | Yes | Controlled offline cash operation and sync |
 | Self-service Kiosk | No | Excluded |
+| Delivery Management | No | Deferred |
 
-## Platform Admin
+## Platform And Tenant Setup
 
-Included platform features:
+Included: platform admin login and dashboard, tenant creation/profile/address,
+subscription plan assignment, billing summary/payment link, feature entitlement,
+tenant admin creation, initial outlet/till/user/role/product setup support,
+tenant activation/status control, and audit visibility.
 
-- Platform admin login and dashboard.
-- Tenant creation, profile, business details, and address.
-- Subscription plan assignment.
-- Billing summary and payment link.
-- Module and feature entitlement.
-- Tenant admin account creation.
-- Optional outlet, till, role, user, and product onboarding support.
-- Tenant activation and status control.
-- Audit visibility.
+## Business Admin
 
-## Subscription, Billing, and Access
-
-Included:
-
-- Subscription plans, plan features, tenant subscriptions, subscription history,
-  invoices, invoice lines, payment links, payment transactions, and billing status.
-- Trial, demo, active, suspended, and expired status handling where plan requires it.
-- Platform modules, platform features, tenant feature entitlements, feature flags,
-  roles, permissions, role permissions, role feature assignments, tenant user
-  roles, outlet user roles, permission-based UI, and API authorization.
-
-All tenant-level access must be configurable by entitlement, role, and rights.
-
-## Authentication
-
-Included:
-
-- Platform admin login.
-- Tenant user login.
-- Refresh token flow.
-- Logout.
-- Setup token flow.
-- Staff invite acceptance.
-- Password setup and password reset.
-- Active auth-session validation.
-- Token/session revocation.
-
-Passwords, POS PINs, setup tokens, invite tokens, and refresh tokens must be
-stored as hashes.
-
-## Tenant Admin
-
-Included:
-
-- Setup link and password setup.
-- Billing summary.
-- Outlet and till management.
-- Activation code generation/view.
-- User management.
-- Role and permission management.
-- Product onboarding and product/variant management.
-- Basic inventory management.
-- Expiry tracking and expiry discount setup.
-- Basic loyalty setup.
-- Reports access by permission.
+Included: business setup, outlet/till management, device and hardware profile
+setup, user management, role/permission management, product and variant
+management, category/attribute/image/barcode management, inventory visibility,
+stock in, stock adjustment, alerts, movement history, and reports.
 
 ## POS Operations
 
 Included:
 
-- Device activation, pairing, and trusted POS device.
-- Till open, till close, cash count, and cash movement.
-- Start sale, product search, barcode scan, variant selection, and cart.
-- Park and recall sale.
-- Discount application and manager PIN approval.
-- Customer selection and loyalty use.
-- Cash, card, QR, split payment, receipt, and print log.
-- Return, refund, exchange, and customer credit.
+- Staff sign-in.
+- Device activation and trusted device validation.
+- Outlet and till selection.
+- Till open, current till session, cash count, and cash movements.
+- Product lookup, barcode scan, basket/cart, quantity changes, and item removal.
+- Price, tax, discount, and receipt calculation.
+- Cash payment.
+- Card/QR payment where online/backend/provider validation is available.
+- Receipt print and reprint.
+- Park/hold and recall sale.
+- Return, refund, exchange, and related audit.
+- Close till and reconciliation with backend validation.
 
-## Data and Business Features
-
-Included:
-
-- Categories, brands, tax classes, tax rates, return policies, products,
-  variants, attributes, images, price lists, and product import batches/rows.
-- Inventory balances, stock movements, stock adjustments, stocktakes, product
-  batches, inventory batch stocks, and inventory alerts.
-- Sales, sale lines, payment records, payment transactions, sale payment
-  allocations, receipt templates, receipts, and receipt print logs.
-- Discount policies, product/variant discounts, POS line/bill discounts, expiry
-  discount rules, and expiry discount applications.
-- Customers, memberships, loyalty programs, earning rules, redemption rules, and
-  loyalty transactions.
-- Return reason codes, returns, return lines, refunds, refund allocations,
-  exchanges, exchange lines, customer credits, and credit transactions.
-
-## Reports and Communication Records
+## Online Store
 
 Included:
 
-- Daily sales, payment, inventory, discount, and return summaries.
-- Report export jobs.
-- Sales, till, payment, inventory, product, and return/refund reports.
-- Notification templates, notifications, and delivery logs only for required
-  operational emails/in-app records.
+- Responsive customer website.
+- Product catalogue.
+- Product search.
+- Category filtering.
+- Shopping cart.
+- Online checkout.
+- Mobile responsive design.
+- Browser access without customer app download.
 
-This is not a full notification product module.
+## Click & Collect
+
+Included:
+
+- Online ordering for pickup.
+- Collection time selection.
+- Order notifications where implemented.
+- Collection management.
+- Pickup order tracking.
+- Pickup status history.
+- Customer and staff visibility according to permission.
+
+## Offline Operation And Cache
+
+Included:
+
+- Product catalogue cache.
+- Category cache.
+- Barcode lookup cache.
+- Price cache.
+- Tax rule cache.
+- Permission and feature cache.
+- Outlet, till, and device configuration cache.
+- Hardware configuration cache.
+- Receipt template cache.
+- Active basket/cart cache.
+- Parked sale quick cache.
+- Recent customer basic cache.
+- Offline product lookup and barcode scan.
+- Offline cash sale capture.
+- Offline receipt print.
+- Pending inventory movement.
+- Sync outbox / pending sync queue.
+
+## Unified Commerce Data Areas
+
+Included database-backed areas include unified sales orders, POS operations,
+shopping carts, checkout sessions, fulfilment and pickup, payments and refunds,
+return/inspection/exchange, notification records, integration core, and offline
+sync records.
+
+The updated database design contains dedicated modules for these areas.
+
+## Hardware, Reporting, And Analytics
+
+Included hardware and reporting scope:
+
+- Android phones, iPhones, Android tablets, iPads, Windows laptops, and Windows desktops.
+- Bluetooth, USB, and network receipt printers where supported.
+- Barcode scanners, cash drawers, and card payment machines.
+- Sales, product, inventory, and order reports.
+- Dashboard and basic operational analytics required for the MVP.
 
 ## Related Files
 
 - [[Release_1_Scope]]
 - [[Excluded_Features]]
-- [[../02_ACCESS_CONTROL/Feature_Entitlement_Matrix]]
-- [[../03_USER_JOURNEYS/Cashier/04_Start_Sale_Flow]]
-- [[../06_DATABASE_KNOWLEDGE/Database_Overview]]
+- [[../00_START_HERE/Current_Source_Of_Truth]]

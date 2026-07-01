@@ -1,4 +1,4 @@
-## Implementation Status
+# Implementation Status
 
 | Item | Value |
 |---|---|
@@ -14,7 +14,16 @@
 
 Platform Admin Login authenticates platform administrators through `platform_users` only.
 It validates credentials, active platform user status, creates platform auth session records, issues JWT access tokens and refresh tokens, and stores only token hashes.
-Tenant user login, POS login, platform permission policies, refresh endpoint, and logout endpoint are outside this feature.
+Tenant user login, POS login, and platform permission policies are outside this feature.
+Platform refresh and logout endpoints are implemented in the current backend and are part of the active Platform Admin auth flow.
+
+## Current Platform Auth Endpoints
+
+| Endpoint | Method | Status |
+|---|---|---|
+| `/api/v1/auth/platform-login` | POST | Implemented |
+| `/api/v1/auth/platform-refresh` | POST | Implemented |
+| `/api/v1/auth/platform-logout` | POST | Implemented |
 
 ## Related Second Brain Files
 

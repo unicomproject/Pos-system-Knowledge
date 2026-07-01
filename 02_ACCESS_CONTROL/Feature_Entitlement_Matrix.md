@@ -1,150 +1,96 @@
 <!-- title: Feature Entitlement Matrix -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-23 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
 
 # Feature Entitlement Matrix
 
 ## Purpose
 
-This file explains how tenant feature entitlements control Release 1 access.
+This file defines tenant-level feature entitlements for the TM-EPOS MVP.
 
-Feature entitlement decides whether a tenant can use a feature.
+Feature entitlement decides whether a tenant can use a module.
+Permissions decide what an individual user can do inside that enabled module.
 
-Permission decides whether a specific user can perform an action.
+## Entitlement Rule
 
-Both are required.
+A disabled feature must hide or block related UI and APIs.
 
-## Entitlement Tables
+A permission cannot activate a disabled feature.
 
-| Table | Purpose |
-|---|---|
-| `platform_modules` | Platform-owned module catalog |
-| `platform_features` | Feature catalog |
-| `subscription_plan_features` | Features included in a plan |
-| `tenant_feature_entitlements` | Features enabled for a tenant |
-| `feature_flags` | Runtime enablement by tenant/outlet/user |
-| `role_feature_assignments` | Features assigned to roles |
+## MVP Entitlement Groups
 
-## Entitlement Evaluation
-
-```mermaid
-flowchart TD
-    A[Requested action] --> B[Required feature]
-    B --> C[Tenant entitlement]
-    C --> D[Feature flag scope]
-    D --> E[Role feature assignment]
-    E --> F[Permission]
-    F --> G[Allow only if all pass]
-```
-
-## Feature vs Permission
-
-| Concept | Question |
-|---|---|
-| Feature entitlement | Is the tenant enabled for this feature? |
-| Feature flag | Is the feature enabled for this scope? |
-| Role feature assignment | Is the feature assigned to the role? |
-| Permission | Can the user perform this action? |
-
-Entitlement without permission must not allow access.
-
-Permission without entitlement must not allow access.
-
-## Release 1 Feature Areas
-
-| Feature Area | Release 1 Position |
-|---|---|
-| Platform tenant setup | Included |
-| Subscription/billing | Included |
-| POS and Portable POS | Included |
-| Catalog/product | Included |
-| Basic inventory and expiry | Included |
-| Discount | Included |
-| Customer/loyalty | Included |
-| Return/refund/exchange | Included |
-| Reports and hardware | Included |
-| E-commerce/offline/supplier/kiosk | Excluded |
-
-## POS Entitlement Matrix
-
-| Operation | Required Entitlement | Required Context |
+| Feature Group | MVP Status | Notes |
 |---|---|---|
-| Start sale | POS enabled | Outlet, trusted device, till session |
-| Portable sale | Portable POS/POS enabled | Outlet, trusted device |
-| Apply discount | Discount or POS discount enabled | Sale context and permission |
-| Take payment | POS payment enabled | Open till/session where required |
-| Print receipt | Receipt/POS enabled | Device and receipt template |
-| Return/refund | POS enabled | Original sale validation |
-| Exchange | POS enabled | Return/exchange validation |
-| Cash in/out | POS cash drawer enabled | Open till session |
-| Close till | POS till enabled | Open till session |
+| platform_admin | Included | Platform setup and tenant control |
+| tenant_admin | Included | Business operations setup |
+| mobile_pos | Included | Phone/tablet POS selling |
+| desktop_epos | Included | Laptop/desktop EPOS/admin use |
+| product_management | Included | Products, variants, attributes, barcodes |
+| inventory_management | Included | Stock, adjustments, alerts, movement history |
+| online_store | Included | Customer website and catalogue |
+| cart_checkout | Included | Shopping cart and checkout sessions |
+| click_collect | Included | Pickup method, slots, pickup order handling |
+| order_management | Included | Unified in-store and online order management |
+| payment_refund | Included | Sales payments, transactions, refunds |
+| return_exchange | Included | Return, inspection, refund, exchange |
+| offline_operation_sync | Included | Offline client, sync outbox, conflict handling |
+| reporting_analytics | Included | Dashboard and operational reports |
+| device_hardware | Included | POS device and peripheral integration |
+| notification | Included | Email/SMS/WhatsApp/push/in-app records where configured |
+| integration_core | Included | Provider/integration records and webhook logs |
 
-## Tenant Admin Matrix
+## POS Entitlements
 
-| Operation | Required Entitlement |
+| Feature | Required For |
 |---|---|
-| Manage outlets | Outlet/setup enabled |
-| Manage tills | Till/setup enabled |
-| Manage users | User management enabled |
-| Manage roles/permissions | Role/permission enabled |
-| Manage products | Catalog/product enabled |
-| Import products | Product import enabled |
-| Manage inventory | Inventory enabled |
-| View expiry | Expiry tracking enabled |
-| Configure expiry discount | Discount/expiry discount enabled |
-| Manage loyalty | Loyalty enabled |
-| View reports | Reports enabled |
+| mobile_pos | POS home and selling workflow |
+| payment_refund | Payment and refund screens |
+| return_exchange | Return and exchange actions |
+| device_hardware | Printer, scanner, drawer, card reader setup |
+| offline_operation_sync | Offline operation and sync queue |
+| reporting_analytics | POS reports where exposed |
 
-## Feature Flag Scope
+## Online Store Entitlements
 
-| Scope | Meaning |
+| Feature | Required For |
 |---|---|
-| Tenant | Whole tenant |
-| Outlet | One outlet |
-| User | One user |
+| online_store | Customer storefront |
+| cart_checkout | Cart and checkout |
+| click_collect | Pickup fulfilment method |
+| order_management | Sales order creation and tracking |
+| payment_refund | Online payment/refund records |
+| notification | Order and pickup notifications |
 
-Outlet and user flags must remain inside the same tenant boundary.
+## Admin Entitlements
 
-## UI Rendering Rule
+| Feature | Required For |
+|---|---|
+| tenant_admin | Tenant business admin layout |
+| product_management | Product setup and catalogue |
+| inventory_management | Stock setup and visibility |
+| users_permissions | User, role, permission management |
+| reporting_analytics | Dashboard and report screens |
+| integration_core | Payment/message provider setup where allowed |
 
-Menus, buttons, tabs, and routes must render only when tenant feature, feature
-flag, role feature assignment where used, and permission all allow access.
+## Disabled Feature Behavior
 
-Backend checks remain mandatory.
+| State | Required Behavior |
+|---|---|
+| Disabled entitlement | Hide menu or show feature-not-enabled |
+| Expired entitlement | Block write action and show renewal message |
+| Missing permission | Show permission denied |
+| Missing outlet/device/till context | Redirect to required setup/session flow |
 
-Tenant Admin permission catalog APIs filter modules, features, and permissions by
-`tenant_feature_entitlements`. See [[Backend_Driven_Permission_Catalog]].
+## Excluded Feature Note
 
-## Final Catalog Entitlement Fix 2026-06-23
-
-Tenant Admin role-permission saves validate every submitted permission against
-the tenant's enabled catalog. Final verification found that `tenant_admin_dev`
-already had `sales.summary.view` and `sales.orders.view`, but these `sales.*`
-permissions were not linked to the Tenant Admin `sales` feature. This made a
-safe save operation fail because the full submitted permission set contained
-permissions outside the entitlement-filtered catalog.
-
-Migration `20260623103000_LinkTenantAdminSalesPermissions` links `sales.*`
-tenant-admin permissions to the `sales` feature. After the migration:
-
-- Tenant Admin catalog returned 5 modules and 99 permissions.
-- `tenant_admin_dev` retained 84 assigned permissions.
-- `activity.view` could be toggled off and back on through the real backend PUT endpoint.
-
-## Excluded Entitlements
-
-Do not create active Release 1 entitlement behavior for e-commerce, Click &
-Collect, offline sync, supplier management, stock transfer, delivery, kiosk,
-coupon engine, AI modules, or full accounting.
-
-These may appear only as future/deferred catalog values if clearly marked.
+Self-service kiosk, own delivery management, supplier management, advanced coupon
+engine, AI modules, and full accounting are not active MVP entitlements.
 
 ## Related Files
 
-- [[Backend_Driven_Permission_Catalog]]
 - [[Access_Control_Overview]]
 - [[Permission_Code_List]]
-- [[API_Authorization_Rules]]
 - [[../01_RELEASE_SCOPE/Included_Features]]
 - [[../01_RELEASE_SCOPE/Excluded_Features]]

@@ -1,99 +1,82 @@
 <!-- title: Platform Admin Login Flow -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-30 -->
 
 # Platform Admin Login Flow
 
 ## Purpose
 
-Defines how a Platform Admin signs in before tenant, subscription, entitlement, and activation work.
+Defines secure Platform Admin login before accessing platform-level administration features.
 
-## Source Basis
+## Actor
 
-This journey is based on the uploaded SCS-TIX Release 1 user journey files, UI
-screens, backend architecture, database design, and confirmed project decisions.
+Platform Admin
 
-It must not be expanded into e-commerce, offline sync, supplier, delivery, kiosk,
-coupon, AI, or accounting scope.
+## Source
 
-## Actors
+Derived from `Slide 2 - Super Admin Login Flow` in `SYSTEM_USER_JOURNEY.pptx` and aligned to TM-EPOS MVP Second Brain scope.
 
-| Actor | Responsibility |
-|---|---|
-| Platform Admin | Signs in to the Platform Admin Web application |
-| Backend | Validates credentials and creates authenticated session |
+## Trigger
+
+Platform Admin opens the platform login page.
 
 ## Preconditions
 
-- Platform user account exists.
-- Platform user status allows login.
-- Platform Admin Web is available.
+- Platform admin account exists.
+- Account is active and not locked.
+- Platform login endpoint is available.
 
 ## Main Flow
 
-| Step | User/System Action | Expected Result |
+| Step | Action | System Behavior |
 |---:|---|---|
-| 1 | Open Platform Admin login screen | Login form is displayed |
-| 2 | Enter email and password | Credentials are submitted securely |
-| 3 | Backend validates platform user | Valid session is created if valid |
-| 4 | System loads dashboard | Platform dashboard appears with permitted menus |
+| 1 | Open platform URL | System shows platform login page. |
+| 2 | Enter email or username | System accepts registered platform admin identifier. |
+| 3 | Enter password | System accepts password securely. |
+| 4 | Click login | System submits credentials for validation. |
+| 5 | Validate credentials | System verifies username/email and password. |
+| 6 | Check user status and role | System confirms account is active and has Platform Admin access. |
+| 7 | Load permissions and access rights | System loads platform role, permissions, and allowed platform actions. |
+| 8 | Open dashboard | System redirects to Platform Dashboard. |
 
-## Journey Diagram
+## Data Used Or Captured
 
-```mermaid
-flowchart TD
-    S1[Open Platform Admin login screen]
-    S1 --> S2[Enter email and password]
-    S2 --> S3[Backend validates platform user]
-    S3 --> S4[System loads dashboard]
-    S4 --> Done[Journey completed]
-```
+- Email or username
+- Password
+- Platform admin user status
+- Platform role
+- Platform permission context
+- Login audit event
 
-## Business Rules
+## Access And Security Rules
 
-- Platform identity uses `platform_users`, not tenant `users`.
-- Platform login does not create tenant-user access.
-- Invalid credentials must not reveal account existence.
-- Sensitive login failures should be logged safely.
+- Platform Admin must be authenticated.
+- Platform Admin role/permission must allow the requested action.
+- Platform-level actions must not use frontend-provided tenant_id as trusted authority.
+- Every create/update/status action must be audit logged.
+- Do not expose password, raw token, token hash, or lockout internals.
+- Failed login must not reveal whether email or password was wrong.
 
-## Access-Control Rules
+## Validation And Error Cases
 
-| Control | Required Rule |
-|---|---|
-| Authentication | Required |
-| Platform permission | Required after login for protected actions |
-| Tenant context | Not required for platform dashboard |
-| Audit | Required for sensitive platform actions |
+- Invalid password
+- Inactive user
+- Account locked
+- No platform admin permission
+- 403 forbidden
 
-## Data and API References
+## Outcome
 
-| Area | References |
-|---|---|
-| API groups | `/api/v1/auth`, `/api/v1/platform` |
-| Tables | `platform_users`, `platform_roles`, `platform_user_roles`, `auth_sessions` |
+Platform Admin securely reaches the platform dashboard.
 
-## Edge Cases
+## Related Modules
 
-- Invalid password returns safe login error.
-- Inactive or suspended platform user cannot continue.
-- Expired session requires re-login.
-
-## Out of Scope
-
-- Tenant user login is separate.
-- POS cashier login is separate.
-- E-commerce admin login is not Release 1.
-
-## Completion Criteria
-
-- The user reaches the expected final state without bypassing access control.
-- Tenant-owned data remains inside the resolved tenant context.
-- Sensitive actions write audit records where required.
-- UI state and backend state stay consistent after completion.
+- 01_Platform_Administration
+- 06_Auth_Tokens_Security_Audit
 
 ## Related Files
 
-- [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../05_BACKEND_ARCHITECTURE/API_Standards]]
+- 05_BACKEND_ARCHITECTURE/Authentication.md
+- 05_BACKEND_ARCHITECTURE/Authorization_And_Permissions.md
+- 02_ACCESS_CONTROL/Platform_Admin_Role_Management.md

@@ -1,119 +1,80 @@
 <!-- title: Authorization And Permissions -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
 
 # Authorization And Permissions
 
 ## Purpose
 
-This file defines Release 1 authorization rules.
+This file defines backend authorization rules for TM-EPOS MVP.
 
-Authentication confirms who the user is.
+Authorization must protect platform admin, tenant admin, POS, online store admin,
+cart/checkout, orders, fulfilment, pickup, payments/refunds, offline sync,
+notifications, integrations, and reports.
 
-Authorization confirms what the user can do in the current tenant, outlet, device,
-and till context.
-
-## Authorization Model
-
-SCS-TIX Release 1 uses:
-
-- Feature entitlement.
-- Feature flags.
-- Role permissions.
-- Role feature assignments.
-- Outlet access.
-- Trusted device checks.
-- Assigned till checks.
-- Open till-session checks.
-
-## Required Checks
-
-| Operation Type | Required Checks |
-|---|---|
-| Platform setup | Platform permission |
-| Tenant admin operation | Tenant, entitlement, permission |
-| Outlet operation | Tenant, entitlement, permission, outlet access |
-| POS sale | Tenant, entitlement, permission, outlet, device, till session |
-| Payment/refund | Tenant, entitlement, permission, till session, payment rules |
-| Report | Tenant, entitlement, report permission |
-
-## POS Access Chain
+## Authorization Chain
 
 ```mermaid
 flowchart TD
-    A[Authenticated user] --> B[Active tenant]
-    B --> C[Feature entitlement]
-    C --> D[Permission]
-    D --> E[Outlet access]
-    E --> F[Trusted device]
-    F --> G[Assigned till]
-    G --> H[Open till session]
+    A[Authenticated Request] --> B[Tenant/Platform Context]
+    B --> C[Tenant Status]
+    C --> D[Feature Entitlement]
+    D --> E[Permission]
+    E --> F[Operational Context]
+    F --> G[Use Case]
 ```
 
-## Permission Code Strategy
+## Core Rules
 
-Do not use one rigid permission enum.
+- Backend is final authority.
+- Frontend hiding is not security.
+- Do not hardcode role names.
+- Roles are permission groups.
+- Permission codes are stable action codes.
+- Feature entitlement is checked before permission for module-level access.
 
-Use module-wise permission constants in Domain module folders.
+## Platform Authorization
 
-The database `permissions` table remains the source of truth for tenant
-permissions.
+Platform endpoints require platform user, platform permission, and active
+platform session.
 
-The database `platform_permissions` table remains the source of truth for
-platform permissions.
+Platform users must not bypass tenant permissions for tenant operations unless an
+audited support operation exists.
 
-Catalog hierarchy and display metadata live on existing `platform_modules`,
-`platform_features`, and permission tables. Release 1 exposes them through
-permission catalog APIs; do not add parallel catalog tables. See
-[[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
+## Tenant Authorization
 
-## Confirmed Permission Examples
+Tenant endpoints require tenant user, active tenant, feature entitlement, and
+permission.
 
-| Permission | Usage |
-|---|---|
-| `platform.tenant.create` | Platform tenant creation |
-| `catalog.product.create` | Product creation |
-| `catalog.product.update` | Product update |
-| `inventory.adjust` | Stock adjustment |
-| `pos.sale.create` | POS sale creation |
-| `pos.sale.discount.apply` | POS discount apply |
-| `pos.refund.approve` | Refund approval |
-| `loyalty.redeem` | Loyalty redemption |
+Outlet-level actions require outlet assignment where applicable.
 
-## Feature and Permission Rule
+## POS Authorization
 
-Feature entitlement answers whether the tenant owns the feature.
+POS actions require POS entitlement, user permission, outlet access, trusted
+device where required, selected till, and open till session for billing actions.
 
-Permission answers whether the user can perform the action.
+## Online Store And Checkout Authorization
 
-Both must pass.
+Public storefront reads are tenant/channel scoped.
+Checkout must validate tenant, channel, cart, customer/session, price, tax,
+inventory, fulfilment method, and payment readiness.
 
-## Outlet Rule
+Tenant admin storefront setup requires tenant permissions.
 
-Cashier and outlet-scoped users must be assigned to the outlet.
+## Fulfilment And Pickup Authorization
 
-A user assigned to one outlet must not operate another outlet only by changing
-frontend values.
+Staff pickup and fulfilment actions require order/fulfilment/pickup permissions,
+tenant isolation, outlet/pickup location access, and valid order status.
 
-## Device Rule
+## Offline Sync Authorization
 
-POS device must be trusted before protected POS actions.
-
-Device must belong to the same tenant and outlet.
-
-Where till is required, the device must be assigned to the selected till.
-
-## Till Session Rule
-
-Sale, payment, refund, exchange, cash movement, receipt, and close-till
-operations require an open till session where the business flow requires till
-control.
+Offline sync requires approved offline client/device, tenant, outlet/device
+context, feature entitlement, sync permission, idempotency, and payload validation.
 
 ## Related Files
 
-- [[Authentication]]
-- [[Multi_Tenant_Handling]]
-- [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]]
-- [[../02_ACCESS_CONTROL/Permission_Code_List]]
-- [[../02_ACCESS_CONTROL/API_Authorization_Rules]]
+- [[Access_Control_Overview]]
+- [[API_Standards]]
+- [[Offline_Operation_Architecture]]

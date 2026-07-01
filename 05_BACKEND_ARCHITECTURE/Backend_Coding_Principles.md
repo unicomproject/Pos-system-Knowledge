@@ -1,127 +1,87 @@
 <!-- title: Backend Coding Principles -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-30 -->
+
 
 # Backend Coding Principles
 
 ## Purpose
 
-This file defines backend coding principles for SCS-TIX EPOS Release 1.
+This file defines backend coding rules for TM-EPOS MVP.
 
-It is written for both developers and AI coding assistants.
+The rules prevent duplicated logic, tenant leaks, unsafe offline behavior, and
+unreviewable code.
 
-## Core Principles
-
-The backend must be:
-
-- Tenant-safe.
-- Permission-safe.
-- POS-context-safe.
-- Testable.
-- Maintainable.
-- Clear by module.
-- Free of Release 2 hidden implementation.
-
-## SOLID Principles
-
-| Principle | SCS-TIX Usage |
-|---|---|
-| Single Responsibility | Controller handles HTTP only; service handles use case only |
-| Open/Closed | Add provider adapters without rewriting core payment flow |
-| Liskov Substitution | Interfaces must be replaceable by implementations safely |
-| Interface Segregation | Avoid large service interfaces with unrelated methods |
-| Dependency Inversion | Application depends on abstractions, Infrastructure implements them |
-
-## Clean Code Rules
+## General Principles
 
 - Keep controllers thin.
-- Keep business workflows in Application services.
-- Keep stable business rules in Domain.
-- Keep EF Core code in Infrastructure.
-- Do not inject DbContext into controllers.
-- Do not place tenant checks only in UI.
-- Do not store raw secrets, tokens, passwords, or POS PINs.
-- Do not hardcode tenant-specific business data.
-- Do not add Release 2 logic into Release 1 services.
+- Keep business logic outside controllers.
+- Use Application services for feature workflows.
+- Keep Domain free from infrastructure concerns.
+- Use repositories through contracts.
+- Keep DTOs separate from entities.
+- Use explicit transactions for critical workflows.
+- Use idempotency for duplicate-sensitive commands.
+- Keep permissions backend-driven.
+- Do not hardcode role names.
+
+## Scope Principle
+
+Do not implement excluded MVP areas such as kiosk, delivery management, supplier
+management, stock transfer, advanced coupons, AI modules, or full accounting.
+
+Online store, cart/checkout, click and collect, and offline operation are active
+MVP areas.
 
 ## Naming Principles
 
-| Item | Naming Rule |
+| Item | Rule |
 |---|---|
-| Controller | Plural resource name, e.g. `ProductsController` |
-| Service | Use-case area, e.g. `PosSalesService` |
-| Repository | Entity/module name, e.g. `SalesRepository` |
-| DTO | Action-based name, e.g. `CreateProductRequest` |
-| Validator | DTO name + `Validator` |
-| Permission constants | Module name + `PermissionCodes` |
-| Database tables | snake_case plural names |
-| C# classes | PascalCase |
-| C# methods | PascalCase |
-| Private fields | `_camelCase` |
+| Entities | Business names such as SalesOrder, CheckoutSession |
+| DTOs | Request/Response suffix |
+| Application services | Module/business service names such as CheckoutService; feature actions are service methods such as CompleteCheckoutAsync |
+| Repositories | Interface in Domain, implementation in Infrastructure |
+| Permissions | Stable dot-separated permission codes |
+| Routes | Versioned and module grouped |
 
-## Method Rules
+## Transaction Safety
 
-Methods should:
+Critical workflows must be transaction-safe:
 
-- Do one business task.
-- Validate required context before mutation.
-- Return predictable results.
-- Avoid hidden side effects.
-- Avoid long parameter lists when a request object is clearer.
-- Use async for I/O operations.
+- Checkout completion.
+- POS sale completion.
+- Payment transaction recording.
+- Refund allocation.
+- Return/exchange posting.
+- Offline sync batch processing.
+- Till close.
+- Inventory movement posting.
 
-## Service Rules
+## Idempotency Rule
 
-Application services must:
+Use idempotency keys for payment, checkout, offline sync batch upload, refund,
+exchange, and any retryable command that may create duplicate records.
 
-- Validate feature entitlement and permission.
-- Validate tenant/outlet/device/till context where required.
-- Call repositories through interfaces.
-- Use transaction boundaries for checkout, payment, refund, exchange, stock, and
-  till close operations.
-- Write audit records for sensitive actions.
+## Cache Rule
 
-## Unit Of Work Rules
+Cache is allowed only for safe reference/config/read data.
 
-- Application service owns the transaction boundary.
-- Use Unit of Work for checkout, payment, refund, exchange, stock, and till
-  close workflows.
-- Repositories should not call `SaveChangesAsync` per method unless the use case
-  is intentionally single-step.
-- Use one commit per use case where possible.
+Do not use cache as final authority for payment, inventory, refund, exchange,
+till close, loyalty/store credit, or final sale total.
 
-## Repository Rules
+## Security Rule
 
-Repositories must:
+Never log or expose passwords, raw tokens, card data, POS PINs, provider secrets,
+payment credentials, or raw activation/setup tokens.
 
-- Apply tenant filtering for tenant-owned data.
-- Use `AsNoTracking` for read-only queries.
-- Use projections for list APIs.
-- Avoid loading large object graphs unnecessarily.
-- Respect tenant-aware unique constraints.
-- Never bypass append-only ledger rules.
+## Review Rule
 
-## Error Handling Rules
-
-- Throw application-specific exceptions for business errors.
-- Use global exception middleware.
-- Use 401 for unauthenticated requests.
-- Use 403 for permission, entitlement, outlet, device, or till denial.
-- Use 409 for conflicts and duplicates.
-- Never expose stack traces or database internals to clients.
-
-## Security Rules
-
-- Store password hashes only.
-- Store POS PIN hashes only.
-- Store setup, invite, refresh, payment link, and till activation tokens as hashes.
-- Do not log passwords, tokens, PINs, card data, or secrets.
-- Keep provider secrets outside source code.
+Every backend change must be reviewed against scope, tenant isolation,
+authorization, audit, idempotency, error handling, and database constraints.
 
 ## Related Files
 
-- [[Clean_Architecture_Layers]]
-- [[DTO_And_Mapping_Rules]]
-- [[Error_Response_Standards]]
-- [[Audit_Log_Standards]]
+- [[Virtual_Caching_Architecture]]
+- [[Offline_Operation_Architecture]]
+- [[Authorization_And_Permissions]]

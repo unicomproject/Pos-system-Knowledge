@@ -1,124 +1,116 @@
 <!-- title: Excluded Features -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
 
 # Excluded Features
 
 ## Purpose
 
-This file lists what must not be implemented as Release 1 scope.
+This file lists what must not be implemented as active TM-EPOS MVP scope.
 
-It prevents scope creep from old documents, unused database references, future UI
-ideas, and unsupported assumptions.
+It prevents scope creep from old documents, unused database references, future
+roadmap ideas, and unsupported assumptions.
 
 ## Exclusion Rule
 
-If a feature is listed here, do not build it for Release 1 unless an official
-scope change is recorded in [[../13_DECISIONS_AND_CHANGES/Scope_Change_Log]].
+If a feature is listed here, do not build it for the MVP unless an official scope
+change is recorded in [[../13_DECISIONS_AND_CHANGES/Scope_Change_Log]].
 
-Database presence does not override this file.
+Database presence does not automatically override this file.
 
-## Excluded Summary
+## Important Scope Correction
 
-| Feature Area | Release 1 Decision |
+Online Store, Click & Collect, and Offline Operation are no longer excluded.
+They are part of the current TM-EPOS MVP.
+
+Old files that say e-commerce, click and collect, or offline sync are excluded
+must be treated as outdated until updated.
+
+## Excluded / Deferred Summary
+
+| Feature Area | MVP Decision |
 |---|---|
-| E-commerce / online store | Excluded |
-| Click & Collect | Excluded |
-| Offline POS sync | Excluded |
-| Supplier management | Excluded |
-| Stock transfer between outlets | Excluded |
-| Delivery flow | Excluded |
 | Self-service kiosk | Excluded |
-| Separate queue-busting module | Excluded |
-| Coupons/promotions engine | Excluded |
-| AI onboarding, analytics, accounting | Excluded |
-| Full accounting | Excluded |
-| Redis/caching dependency | Excluded |
-| CQRS/MediatR | Excluded |
+| Own delivery management | Deferred |
+| Driver assignment and delivery tracking | Deferred |
+| Franchise and chain management | Deferred |
+| Full CRM inside TM-EPOS | Deferred / external boundary |
+| Supplier management | Excluded unless separately approved |
+| Purchase order and supplier invoice module | Excluded unless approved |
+| Stock transfer between outlets | Excluded unless approved |
+| Advanced promotion/coupon engine | Excluded |
+| AI onboarding, AI analytics, AI accounting | Excluded |
+| Full accounting/general ledger | Excluded |
+| Unlimited offline commerce | Excluded |
+| Offline card/QR payment finalization | Excluded |
+| Offline refund/exchange finalization | Excluded |
+| Redis/caching dependency | Excluded unless approved |
+| CQRS/MediatR | Excluded unless approved |
 
-## E-commerce and Offline Exclusion
+## Offline Exclusion Boundary
 
-Do not implement online storefront, e-commerce product listing, e-commerce cart,
-Click & Collect checkout, online order placement, online order tracking,
-e-commerce pickup QR, e-commerce order-ready flow, e-commerce web payment, or
-e-commerce branding customization.
+Offline support does not mean every business action is final offline.
 
-Storefront-related database or old UI references are future-reserved unless
-explicitly required for platform tenant setup.
+Do not implement offline final authority for:
 
-Do not implement offline sales queue, offline sync APIs, conflict resolution,
-offline stock logic, offline payment reconciliation, sync retry dashboard, or
-offline-first POS rules.
+- Final inventory quantity.
+- Card payment.
+- QR payment.
+- Refund.
+- Exchange.
+- Loyalty/store credit.
+- Till final close.
+- Final sale total.
 
-## Supplier, Transfer, Delivery, and Kiosk Exclusion
+These require backend validation.
+
+## Delivery And Franchise Exclusion
+
+Do not implement own delivery management, driver assignment, delivery routing,
+delivery tracking, delivery fees, franchise hierarchy, chain management, or
+regional management as MVP scope.
+
+## Supplier And Stock Transfer Exclusion
 
 Do not implement supplier master, supplier contacts, purchase orders, supplier
-invoices, supplier payments, or supplier reports.
+invoices, supplier payments, transfer requests, transfer approvals, transfer
+dispatch, transfer receive, in-transit stock, or transfer reports unless approved.
 
-Do not implement transfer request, transfer approval, transfer dispatch, transfer
-receive, in-transit stock, or transfer reporting.
+Inventory stock in, stock adjustment, low stock alerts, and movement history are
+included.
 
-Do not implement delivery order flow, driver assignment, delivery status, delivery
-fee, delivery address flow, or delivery notifications.
-
-Do not implement kiosk ordering, kiosk payment, kiosk UI, kiosk device assignment,
-or kiosk customer flow.
-
-## Queue-Busting Rule
-
-Queue-busting is not a separate module.
-
-Use this interpretation only:
-
-```text
-Portable POS = queue-busting POS flow
-```
-
-Portable POS uses the same tenant, outlet, permission, device, sale, payment,
-stock, and receipt rules as fixed POS.
-
-## Coupon, Promotion, AI, and Accounting Exclusion
+## Coupon, AI, And Accounting Exclusion
 
 Do not implement coupon code management, campaign builder, promotion stacking,
-advanced offer rules, AI onboarding, AI bulk extraction, AI analytics, AI
-accounting, general ledger, journal posting, trial balance, profit and loss, or
-balance sheet.
+advanced offer rules, AI bulk extraction, AI analytics, AI accounting, general
+ledger, journal posting, trial balance, profit and loss, or balance sheet.
 
-CSV product import can exist without AI.
+POS payments, refunds, till sessions, and cash movements are operational records.
+They are not a full accounting module.
 
-POS payments, refunds, invoices, and cash movements are operational records, not
-a full accounting module.
+## Customer App And Kiosk Exclusion
 
-## Notification Limitation
-
-A full notification module is not Release 1.
-
-Allowed communication records are limited to tenant admin setup, staff invite,
-password reset, subscription payment link, payment success/failure, low stock
-alert, expiry alert, and report ready where implemented.
-
-SMS and WhatsApp receipts are excluded.
+Do not implement a separate customer mobile app or self-service kiosk.
+The customer surface for MVP is the responsive online store.
 
 ## Architecture Exclusions
 
-Do not implement CQRS, MediatR, API Gateway, Redis dependency, separate caching
-layer, Nginx/load-balancer requirement, or Release 2 modules hidden inside
-Release 1 services.
+Do not introduce CQRS, MediatR, API Gateway, Redis dependency, or separate cache
+platform unless approved by architecture decision.
 
-Use Clean Architecture with service and repository pattern.
+Use the confirmed layered/clean architecture style and repository/service
+patterns already documented.
 
 ## Developer Stop Rules
 
-Stop and ask for scope confirmation when a task touches e-commerce, offline
-behavior, supplier, delivery, kiosk, transfer, coupon, AI, accounting, a new
-module not listed in [[Included_Features]], or tables/APIs not supported by the
-confirmed documents.
+Stop and ask for scope confirmation when a task touches delivery, kiosk,
+supplier, stock transfer, full CRM, full accounting, AI, advanced coupons, or
+offline finalization of protected business actions.
 
 ## Related Files
 
 - [[Release_1_Scope]]
 - [[Included_Features]]
-- [[../13_DECISIONS_AND_CHANGES/ADR/ADR_006_Ecommerce_Moved_To_R2]]
-- [[../13_DECISIONS_AND_CHANGES/Deferred_Features]]
-- [[../05_BACKEND_ARCHITECTURE/Backend_Overview]]
+- [[../00_START_HERE/Current_Source_Of_Truth]]

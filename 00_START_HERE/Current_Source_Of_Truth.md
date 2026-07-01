@@ -1,118 +1,120 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
 
 # Current Source Of Truth
 
 ## Purpose
 
-This file defines which project inputs control the SCS-TIX EPOS Release 1 Second Brain.
-It prevents developers and AI assistants from mixing old scope, future scope, and current Release 1 delivery work.
-Use this file before writing, implementing, reviewing, or generating any module documentation.
+This file defines which project inputs control the TM-EPOS MVP Second Brain.
+It prevents developers and AI assistants from mixing old POS-first scope, future
+ideas, and current MVP delivery work.
+Use this file before writing, implementing, reviewing, or generating any module
+documentation.
 
-## Highest Priority Source
+## Highest Priority Decision
 
-The current Release 1 decision is POS-first.
-The backend architecture confirms that Release 1 excludes e-commerce, offline sync, caching dependency, suppliers, delivery, kiosk, coupons, and AI modules.
-The database design is used for table knowledge, but reserve or future tables must not automatically become Release 1 implementation scope.
+The current scope is TM-EPOS MVP.
+
+The MVP includes mobile and desktop EPOS, online store, click and collect,
+offline operation, product and variant management, inventory management, order
+management, reporting, users and permissions, and device/peripheral integration.
+
+Older Second Brain files that say online store, click and collect, or offline
+sync are excluded must be updated or treated as superseded.
 
 ## Source Priority Order
 
-| Priority | Source                        | How To Use                                                 |
-| -------- | ----------------------------- | ---------------------------------------------------------- |
-| 1        | Confirmed project decisions   | Controls final Release 1 boundaries                        |
-| 2        | Release 1 backendarchitecture | Controls backend layering, auth, API, security, exclusions |
-| 3        | Release 1 database design     | Controls data model, tables, attributes, constraints       |
-| 4        | Release 1 software scope      | Confirms high-level application scope                      |
-| 5        | Release 1 hardware scope      | Confirms POS hardware environment                          |
-| 6        | User Journey                  | Controls user journeys and screen intent                   |
-| 7        | UI references                 | Reference only unless aligned to Release 1                 |
+| Priority | Source | How To Use |
+|---:|---|---|
+| 1 | Confirmed project decisions in chat | Controls final MVP interpretation |
+| 2 | Updated TM-EPOS scope images | Controls market, scope, platform, offline direction |
+| 3 | Unified Commerce Database Design | Controls updated data model and table constraints |
+| 4 | Existing Second Brain | Reuse only where it does not conflict |
+| 5 | Backend architecture | Use for layering/security unless contradicted by new scope |
+| 6 | Flutter and Angular architecture | Use after scope correction |
+| 7 | UI references and journeys | Use only when aligned to MVP scope |
 
-## Active Uploaded Documents
+## Active Uploaded Scope Sources
 
-| Source File | Use In Second Brain |
+| Source | Use |
 |---|---|
-| Release_Backend_Architecture.docx | Backend architecture, API groups, auth, authorization, Release 1 exclusions |
-| Release1_Database_Design_V3.docx | Database table dictionary and table-to-flow coverage |
-| EPOS-ROWSAS_REQUIREMENTS.zip | UI journeys, cashier flow, tenant admin flow, platform admin screens |
-| Scope_R1_SW.png | Release 1 software environment validation |
-| Scope_R1_HW.png | Release 1 hardware environment validation |
+| POS MARKET image | Target customers, value promise, selling strategy |
+| pos scope image | MVP modules, supported platforms, hardware scope |
+| offline and cach image | Cache, offline operation, backend-final validation boundary |
+| Unified_Commerce_Databse_Design.docx | Updated database modules, ERDs, constraints |
+| Pos-system-Knowledge.zip | Existing Second Brain to update carefully |
 
-## Backend Architecture Controls
+## Product Name Rule
 
-The backend uses .NET / ASP.NET Core Web API.
-The architecture follows Clean Architecture with API, Application, Domain, Infrastructure, and Testing layers.
-The implementation pattern is Service + Repository Pattern.
-Module-name-first folders must be used inside each main backend layer.
-The backend exposes REST APIs for Flutter POS and Angular Platform Admin.
-PostgreSQL is the transactional database.
-AWS S3 is used for file and image storage.
-GitHub Actions is used for CI/CD.
-AWS EC2 is the Release 1 backend hosting target.
+Use TM-EPOS as the current MVP product/scope name.
 
-## Authorization Source Rule
+Existing SCS-TIX EPOS references are historical or old-folder wording until the
+file is updated. Do not silently mix both names in new content.
 
-The access model is not simple role-based access.
-Release 1 uses feature entitlement, role permission, outlet access, trusted POS device, assigned till, and till session checks.
-Permission code values are stored in the database as the source of truth.
-Code must use module-wise permission constants, not one large rigid permission enum.
-
-The permission **catalog tree** (module → feature → permission) is also
-backend-driven. Frontends load it from catalog APIs and must not hardcode catalog
-arrays. See [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
+When referencing an old file, preserve the old title only if it is the actual
+file name.
 
 ## Database Source Rule
 
-The Release 1 database design defines the table inventory for tenant foundation, subscription, entitlement, identity, till, device, hardware, catalog, inventory, sales, payments, receipts, discounts, expiry discounts, customers, loyalty, returns, refunds, exchanges, reports, and notifications.
-Every tenant-owned table must use tenant-aware ownership and constraints.
-Append-only ledgers are used for stock movements, loyalty transactions, customer credit transactions, and audit logs.
-Setup links, payment links, and activation codes must be stored as hashes.
+The uploaded Unified Commerce database design defines 28 modules, including:
 
-## UI And Journey Source Rule
+- Platform Administration.
+- Tenant Foundation.
+- Subscription catalog, billing, payments, and usage.
+- Tenant users, roles, permissions, and outlet access.
+- Outlet, till, POS device, hardware, till session, and cash control.
+- Catalog, product, variant, combo, pricing, tax, discount, inventory.
+- Unified Order & Sales.
+- POS Operations.
+- Cart & Checkout.
+- Fulfilment & Pickup.
+- Payment & Refund.
+- Return, Inspection & Exchange.
+- Notification.
+- Platform-Level Integration Core.
+- Offline Operation & Sync.
 
-The UI and journey files define real user behavior for Platform Admin, Tenant Admin, and Cashier.
-They must not override current scope exclusions.
-If a UI screen contains e-commerce setup, treat it as deferred unless the current Release 1 scope explicitly includes it.
-Cashier flows are considered Release 1 when aligned with POS sale, till, payment, discount, return, refund, exchange, loyalty, hardware, and cash drawer operations.
+## Offline Source Rule
 
-## Software Scope Image Interpretation
+Offline operation is part of MVP, but backend remains the final source of truth
+for protected business decisions.
 
-The Release 1 software environment includes Super Admin Web, Tenant Admin App, Cashier POS App, Reports, Products and Inventory, Loyalty, and Hardware Integration.
-This image supports the POS-first scope.
-It does not make e-commerce Release 1.
-It must be interpreted together with backend architecture exclusions.
+Allowed offline/cached areas include product lookup, barcode lookup, product
+grid/search, price/tax calculation, active cart save/restore, cash sale, receipt
+print, park/hold sale, current till session, recent customer basic lookup,
+pending inventory movement, and sync outbox.
 
-## Hardware Scope Image Interpretation
+Backend-final areas include final inventory quantity, card/QR payment, refund,
+exchange, loyalty/store credit, till final close, and final sale total.
 
-The hardware scope includes fixed POS terminal, portable POS device, barcode scanner, receipt printer, cash drawer, card reader, network/internet, and optional admin access device.
-Backend does not directly communicate with every hardware device.
-Flutter POS or local device services handle local hardware actions, while backend validates and records business outcomes.
+## Platform Source Rule
 
-## Release 1 Included Decision
+Business user applications now target mobile and desktop devices.
 
-Release 1 includes Platform Admin, Tenant Admin inside POS app, Cashier POS, Portable POS queue-busting, product onboarding, basic inventory, expiry tracking, expiry discount, basic loyalty, payments, roles/permissions, feature entitlement, reports, and hardware-ready POS records.
+Supported business-device direction includes Android phones, iPhones, Android
+tablets, iPads, Windows laptops, and Windows desktops.
 
-## Release 1 Excluded Decision
+Customer online store must work through major browsers.
 
-Release 1 excludes e-commerce Click & Collect, offline sync, supplier management, stock transfer, delivery, kiosk, coupons/promotions engine, AI onboarding, AI analytics, and AI accounting.
-These may appear in old or reserved files but must be documented as deferred.
+## Scope Conflict Rule
 
-## Conflict Resolution Rule
+When a file says a feature is excluded but the updated scope images include it,
+the updated scope wins.
 
-When two sources conflict, use the latest confirmed Release 1 decision first.
-Then check the backend architecture Release 1 exclusion list.
-Then check whether database tables are current implementation tables or reserved/deferred tables.
-Do not resolve conflict by guessing.
-Add unresolved conflicts to [[Open_Questions]].
+When the database contains a table for a feature but the feature is not in the
+updated scope images or confirmed decisions, treat the table as reserved until
+confirmed.
 
+## No-Invention Rule
+
+Do not invent unsupported modules, APIs, roles, permissions, integrations,
+tables, screens, or flows.
 ## Related Files
 
 - [[README]]
 - [[Developer_Reading_Guide]]
-- [[Release_1_Scope]]
-- [[Included_Features]]
-- [[Excluded_Features]]
-- [[ADR_006_Ecommerce_Moved_To_R2]]
-- [[Backend_Overview]]
-- [[Database_Overview]]
+- [[Project_Glossary]]
+- [[../01_RELEASE_SCOPE/Release_1_Scope]]

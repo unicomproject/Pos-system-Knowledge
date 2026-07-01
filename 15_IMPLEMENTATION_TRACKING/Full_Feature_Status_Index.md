@@ -1,8 +1,7 @@
 <!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
-
+<!-- last_updated: 2026-06-24 -->
 
 # Full Feature Status Index
 
@@ -18,12 +17,12 @@ Use this folder for what has been implemented, tested, reviewed, and completed.
 ## Folder Structure
 
 ```text
-12_IMPLEMENTATION_TRACKING/
-├── Backend/[Module_Name]/[Feature_Name]_Implementation_Status.md
-├── Angular/[Module_Name]/[Feature_Name]_Implementation_Status.md
-├── Flutter/[Module_Name]/[Feature_Name]_Implementation_Status.md
-├── _TEMPLATES/Implementation_Status_Template.md
-└── Full_Feature_Status_Index.md
+15_IMPLEMENTATION_TRACKING/
+|-- Backend/[Module_Name]/[Feature_Name]_Implementation_Status.md
+|-- Angular/[Module_Name]/[Feature_Name]_Implementation_Status.md
+|-- Flutter/[Module_Name]/[Feature_Name]_Implementation_Status.md
+|-- _TEMPLATES/Implementation_Status_Template.md
+`-- Full_Feature_Status_Index.md
 ```
 
 ## Platform Meaning
@@ -60,7 +59,7 @@ PR/commit reference is recorded.
 | Backend | Sales | Create Sale API | In Progress | - | `pos-home-dashboard` | API exists; Flutter not wired |
 | Flutter | POS Shell | POS Home Dashboard | In Progress | - | `pos-home-dashboard` | API dashboard + placeholders |
 | Flutter | Sales | Start Sale UI | In Progress | - | `pos-home-dashboard` | Catalog + local cart partial |
-| Angular | Tenant | Tenant List Page | Not Started | - | - | Example row |
+| Angular | Tenant | Tenant List Page | In Progress | - | - | Code exists and is wired to `GET /api/v1/platform-admin/tenants`; current verification pending |
 | Flutter | Sales | Start Sale UI | Not Started | - | - | Example row |
 | Backend | Tenant / Outlet | Outlet Create | Completed | 2026-06-18 | dashboard_tenant | POST /api/v1/tenant-admin/outlets |
 | Flutter | Tenant Admin / Outlet | Outlet Create UI | Completed | 2026-06-18 | tenant-dashboard | Add/Edit outlet screens |
