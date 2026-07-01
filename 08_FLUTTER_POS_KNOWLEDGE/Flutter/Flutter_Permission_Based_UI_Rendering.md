@@ -45,10 +45,15 @@ Backend remains final authority.
 | UI Action | Required Context |
 |---|---|
 | Start sale | Permission, outlet, trusted device, open till |
+| POS dashboard/sidebar | `pos.home.view` or `pos.dashboard.view` |
 | New Sale product grid | `products.view` |
 | New Sale search field | `products.search` on `/pos/new-sale` only |
-| Cart qty / remove / clear | `sales.cart.update_item`, `remove_item`, `clear` |
+| New Sale route/sidebar | `pos.new_sale.view`, `sales.create`, or legacy `pos.sale.start` |
+| Cart add / qty / remove / clear | Granular cart permission or `sales.cart.manage` |
 | Proceed to Payment | `sales.checkout` + payment accept permissions |
+| Cash payment screen | `sales.checkout` + `payments.cash.accept` |
+| Payment success | `sales.view` or `receipts.view` |
+| Print receipt | `receipts.print` |
 | POS sidebar item | Permission on each `PosShellNavDestination` |
 | Apply discount | Discount permission and policy |
 | Redeem loyalty | Loyalty feature and redeem permission |

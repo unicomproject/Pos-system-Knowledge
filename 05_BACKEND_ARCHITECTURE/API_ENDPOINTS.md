@@ -1,9 +1,31 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-23 -->
+<!-- last_updated: 2026-06-24 -->
 
 # Platform Subscription Plan API Endpoints
+
+## Tenant POS Login
+
+Base route: `/api/v1/auth`
+
+| Method | Route | Purpose |
+|---|---|---|
+| POST | `/api/v1/auth/tenant-login` | Cashier / tenant user login for Flutter POS |
+
+Request body:
+
+```json
+{
+  "email": "cashier001@gmail.com",
+  "password": "123456"
+}
+```
+
+Tenant Code is not accepted from the POS login screen. Backend resolves tenant
+from the tenant user email. If the email exists in multiple tenants, the API
+returns `TENANT_SELECTION_REQUIRED` with: "Multiple tenants found for this
+email. Tenant selection is required."
 
 Base route: `/api/v1/platform/subscription-plans`
 
@@ -57,6 +79,56 @@ Publish response example: `{ "status": "active", ... }`
 
 - [[../../04_MODULE_KNOWLEDGE/Subscription/03_Technical_Contract]]
 - [[../../06_DATABASE_KNOWLEDGE/Subscription_Tables]]
+
+---
+
+# POS Payment And Receipt API Endpoints
+
+Base routes: `/api/v1/pos/cart`, `/api/v1/pos/checkout`,
+`/api/v1/pos/sales`, `/api/v1/pos/payments`, `/api/v1/pos/receipts`.
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| POST | `/api/v1/pos/cart/calculate` | `sales.cart.update_item` in the direct controller; `sales.checkout` when called through checkout summary/start-payment | Backend cart totals without saving a sale |
+| POST | `/api/v1/pos/checkout/summary` | `sales.checkout` | Payment screen billing summary and permitted methods |
+| POST | `/api/v1/pos/checkout/start-payment` | `sales.checkout` + selected payment permission | Existing Flutter cash checkout entry point; creates sale/payment/receipt for cash |
+| POST | `/api/v1/pos/sales` | `sales.checkout` | Create draft POS sale |
+| POST | `/api/v1/pos/sales/checkout` | `sales.checkout` | Alias for draft sale creation; does not complete payment by itself |
+| GET | `/api/v1/pos/sales/{saleId}` | `sales.view` | Completed sale details |
+| POST | `/api/v1/pos/payments` | Payment method permission such as `payments.cash.accept` | Record payment against an existing draft sale |
+| GET | `/api/v1/pos/receipts/{saleId}` | `receipts.view` or `receipts.print` | Receipt preview data with `barcodeValue` |
+| POST | `/api/v1/pos/receipts/{saleId}/print` | `receipts.print` | Receipt print audit row |
+
+Cash checkout writes `sales`, `sale_lines`, `payments`,
+`sale_payment_allocations`, and `receipts`. Print audit writes
+`receipt_print_logs`.
+
+Cash checkout request includes `cashReceived`. Successful cash checkout response
+includes backend-sourced `cashReceived` and `changeDue`; Flutter must display
+those returned values instead of recalculating or defaulting locally. Sale detail
+and receipt detail responses also expose `cashReceived` and `changeDue` from the
+saved sale/payment outcome.
+
+Checkout/cart line requests use backend product variant IDs. `GET
+/api/v1/pos/products` exposes `variantId` for simple/non-variant products so
+Flutter can send `{ variantId, qty }` to checkout summary/start-payment without
+substituting product IDs.
+
+`GET /api/v1/pos/products` product summaries expose variant search metadata for
+New Sale filtering. Product name remains the primary search key; variant terms
+only refine product-name searches, while exact SKU/barcode remains a direct
+lookup/search path.
+
+## Needs Verification
+
+- The permission catalog contains `sales.cart.manage`, but current verified
+  backend code still protects direct `POST /api/v1/pos/cart/calculate` with
+  `sales.cart.update_item`. Treat any documentation that says the direct endpoint
+  requires only `sales.cart.manage` as a mismatch until backend access rules are
+  updated.
+- `GET /api/v1/pos/payment-methods` and `GET /api/v1/pos/printer-settings` were
+  not found in the current backend. Flutter payment methods come from checkout
+  summary, and printer selection/config remains local or future scope.
 
 ---
 

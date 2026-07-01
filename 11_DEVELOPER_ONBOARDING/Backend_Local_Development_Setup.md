@@ -173,6 +173,50 @@ Content-Type: application/json
 
 Expected: `200 OK` with JWT/session response.
 
+## Local POS Cashier Login
+
+Use tenant POS login for Flutter cashier sign-in. This is separate from Platform
+Admin login.
+
+| Field | Value |
+|---|---|
+| Email | `cashier001@gmail.com` |
+| Password | `123456` |
+
+API endpoint:
+
+```http
+POST /api/v1/auth/tenant-login
+Content-Type: application/json
+
+{
+  "email": "cashier001@gmail.com",
+  "password": "123456"
+}
+```
+
+PowerShell check:
+
+```powershell
+$body = @{
+  email = "cashier001@gmail.com"
+  password = "123456"
+} | ConvertTo-Json
+
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:5052/api/v1/auth/tenant-login" `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+Expected: `200 OK` with JWT/session response. Do not print or commit returned
+tokens.
+
+Tenant resolution is backend-side for POS login. If the same email exists in
+multiple tenants, the API returns a tenant-selection-required error instead of
+guessing a tenant.
+
 ## Supported Configuration Keys
 
 | Key | Required | Default | Purpose |

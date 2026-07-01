@@ -1,7 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- last_updated: 2026-06-24 -->
 
 # API Authorization Rules
 
@@ -78,6 +78,22 @@ Tenant context must be resolved from token/session and applied in services and r
 | Exchange | POS entitlement, permission, exchange validation |
 | Cash in/out | Cash drawer entitlement, permission, open till |
 | Close till | Till permission, open till, cash count validation |
+
+## POS Payment And Receipt Rules
+
+Verified current backend behavior:
+
+| Endpoint / Action | Required Permission Behavior | Notes |
+|---|---|---|
+| `POST /api/v1/pos/cart/calculate` | `sales.cart.update_item` | Direct cart calculate controller path. Needs Verification against intended `sales.cart.manage` alias. |
+| `POST /api/v1/pos/checkout/summary` | `sales.checkout` | Recalculates totals and returns permitted payment methods. |
+| `POST /api/v1/pos/checkout/start-payment` | `sales.checkout` plus selected method permission such as `payments.cash.accept` | Current Flutter cash completion path. |
+| `POST /api/v1/pos/sales` | `sales.checkout` | Creates draft sale only. |
+| `POST /api/v1/pos/sales/checkout` | `sales.checkout` | Alias for draft sale creation; not the full paid checkout flow. |
+| `GET /api/v1/pos/sales/{saleId}` | `sales.view` | Returns sale/receipt detail for same tenant scope. |
+| `POST /api/v1/pos/payments` | Selected payment method permission | Records payment for existing draft sale; cash completion generates receipt. |
+| `GET /api/v1/pos/receipts/{saleId}` | `receipts.view` or `receipts.print` | Receipt preview/detail endpoint. |
+| `POST /api/v1/pos/receipts/{saleId}/print` | `receipts.print` | Updates print metadata and inserts `receipt_print_logs`. |
 
 ## Device and Till Rules
 

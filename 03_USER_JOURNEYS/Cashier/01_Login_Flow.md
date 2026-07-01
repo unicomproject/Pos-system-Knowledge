@@ -71,8 +71,16 @@ flowchart TD
 
 | Area | References |
 |---|---|
-| API groups | `/api/v1/auth` |
+| API endpoint | `POST /api/v1/auth/tenant-login` |
+| Request fields | `email`, `password` |
 | Tables | `users`, `auth_sessions`, `refresh_tokens`, `tenant_user_roles`, `outlet_user_roles` |
+
+Local development cashier credentials:
+
+```text
+Email: cashier001@gmail.com
+Password: 123456
+```
 
 ## Edge Cases
 
@@ -84,6 +92,7 @@ flowchart TD
 
 - Platform login is separate.
 - Offline login is excluded.
+- Tenant Code is no longer entered on the POS login screen. Backend resolves the tenant from the tenant user email and returns a clear tenant-selection error if the email belongs to multiple tenants.
 
 ## Completion Criteria
 

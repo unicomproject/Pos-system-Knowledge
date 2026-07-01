@@ -1,7 +1,7 @@
 <!-- title: API Standards -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-24 -->
 
 # API Standards
 
@@ -103,6 +103,23 @@ groups for Release 1.
   "traceId": "00-..."
 }
 ```
+
+## POS Checkout Error Rules
+
+POS checkout/payment endpoints must use the standard error response shape.
+
+| Case | Status | Rule |
+|---|---|---|
+| Empty cart / invalid quantity / unsupported payment method / cash short | 400 | Return a clear validation/business message. |
+| Missing or expired authentication | 401 | Authentication middleware response. |
+| Missing permission, device trust, or till access | 403 | Do not return 401 for an authenticated user lacking access. |
+| Product, sale, or receipt not found inside tenant scope | 404 | Return safe not-found message. |
+| Insufficient stock or business-state conflict | 409 | Return conflict message so Flutter can refresh/recalculate cart. |
+| Unexpected failure | 500 | Return safe generic error; do not expose stack trace or SQL details. |
+
+Checkout validation failures must happen before sale/payment persistence where
+possible. Payment success responses must be returned only after database save
+succeeds.
 
 ## List API Rule
 

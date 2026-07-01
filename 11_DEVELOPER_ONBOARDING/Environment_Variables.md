@@ -111,29 +111,29 @@ production=false
 ## Example Flutter Placeholder
 
 ```text
-API_BASE_URL=http://10.0.2.2:5050
+API_BASE_URL=http://10.0.2.2:5052
 APP_ENV=development
 ```
 
-Android emulator may use `10.0.2.2` to reach the host backend on port **5050**
+Android emulator may use `10.0.2.2` to reach the host backend on port **5052**
 (must match `SCS.Api/Properties/launchSettings.json`).
 
 | Platform | Default base URL |
 |---|---|
-| Android emulator | `http://10.0.2.2:5050` |
-| Windows / Chrome / desktop | `http://localhost:5050` |
-| Real device (same Wi-Fi) | `http://<LAPTOP_LAN_IP>:5050` |
+| Android emulator | `http://10.0.2.2:5052` |
+| Windows / Chrome / desktop | `http://localhost:5052` |
+| Real device (same Wi-Fi) | `http://<LAPTOP_LAN_IP>:5052` |
 
 Override when backend uses a different port:
 
 ```text
-flutter run --dart-define=API_BASE_URL=http://10.0.2.2:5051
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:5053
 ```
 
 Backend override:
 
 ```text
-dotnet run --urls "http://0.0.0.0:5051"
+dotnet run --urls "http://0.0.0.0:5053"
 ```
 
 ## Tenant Context Rule

@@ -162,15 +162,19 @@ Verified through real backend APIs, not mock data:
 
 ## POS New Sale Codes (Seeded + Used in Flutter)
 
-These codes are seeded in `DevelopmentPosNewSalePermissionsSeedData` and referenced
+These codes are seeded in `DevelopmentPosNewSalePermissionsSeedData` plus
+`DevelopmentPosPaymentReceiptPermissionsSeedData` and referenced
 in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 
 | Code | Flutter usage |
 |---|---|
 | `pos.home.view` | POS home route and sidebar |
+| `pos.dashboard.view` | POS home route/sidebar alias |
 | `pos.new_sale.view` | New Sale route and sidebar |
+| `sales.create` | New Sale route/sidebar alias |
 | `products.view` | Product grid |
 | `products.search` | Top-bar search on New Sale |
+| `sales.cart.manage` | Add/update/remove/clear cart alias |
 | `sales.cart.add_item` | Add product to cart |
 | `sales.cart.update_item` | Change cart quantity |
 | `sales.cart.remove_item` | Remove cart line |
@@ -184,9 +188,12 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `payments.card.accept` | Card in payment sheet |
 | `payments.qr.accept` | QR in payment sheet |
 | `payments.split.accept` | Split in payment sheet |
+| `sales.view` | Completed payment sale summary and line items |
+| `receipts.view` | Payment success / email receipt access |
+| `receipts.print` | Print receipt screen and print action |
 | `orders.view` | Orders sidebar (no route yet) |
-| `returns.view` / `refunds.view` | Returns nav |
-| `cash_drawer.view` | Cash drawer nav |
+| `returns.view` / `refunds.view` / `refunds.create` | Returns nav |
+| `cash_drawer.view` / `cash_drawer.manage` | Cash drawer nav |
 | `notifications.view` | Notification bell |
 | `pos.till.open` | Till open flow (`canOpenPosTill`) |
 | `tenant.till.manage` | Device activation gate (`canActivatePosDevice`) |
@@ -195,6 +202,10 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 Implementation map: [[../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]].
 
 POS permission alone is not enough; device and till-session checks still apply.
+
+Receipt printer selection/configuration is currently rendered under `receipts.print`.
+Dedicated `hardware.printer.select` / `hardware.printer.configure` permissions are
+not seeded until the backend hardware permission model is introduced.
 
 ## Seed Data Rule
 
