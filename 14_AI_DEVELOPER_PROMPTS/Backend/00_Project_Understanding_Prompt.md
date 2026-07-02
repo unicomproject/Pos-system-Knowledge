@@ -244,6 +244,6 @@ Before the AI starts coding, confirm:
 - [[../../00_START_HERE/Developer_Reading_Guide]]
 - [[../../01_RELEASE_SCOPE/Release_1_Scope]]
 - [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../../04_MODULE_KNOWLEDGE/_MODULE_TEMPLATE/01_Module_Overview]]
+- [[04_MODULE_KNOWLEDGE/_MODULE_TEMPLATE/01_Module_Overview]]
 - [[../../05_BACKEND_ARCHITECTURE/Backend_Overview]]
 - [[../../06_DATABASE_KNOWLEDGE/Database_Overview]]

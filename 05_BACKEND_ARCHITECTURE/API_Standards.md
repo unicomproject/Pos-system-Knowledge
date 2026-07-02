@@ -1,138 +1,84 @@
 <!-- title: API Standards -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
 
 # API Standards
 
 ## Purpose
 
-This file defines Release 1 API standards for SCS-TIX EPOS.
+This file defines API standards for TM-EPOS MVP backend.
 
-APIs must be predictable for Flutter POS and Angular Platform Admin.
+APIs must be consistent, tenant-safe, permission-aware, idempotent where needed,
+and safe for POS, online store, checkout, payment, fulfilment, and offline sync.
 
-## API Style
-
-Use REST APIs.
+## API Versioning
 
 Use versioned routes.
 
-Example:
-
 ```text
-/api/v1/auth/login
-/api/v1/products
-/api/v1/inventory/stock-adjustments
-/api/v1/pos/sales
+/api/v1/...
 ```
+
+Do not create unversioned public APIs.
 
 ## Controller Rule
 
-Controllers must:
+Controllers must be thin.
 
-- Validate authentication/authorization attributes.
-- Accept request DTOs.
-- Call Application services.
-- Return standard responses.
-- Avoid business logic.
-- Avoid direct DbContext access.
+Controllers should handle route binding, authentication context extraction,
+model validation response handling, and service calls.
 
-## HTTP Method Rule
+Business logic belongs in Application services.
 
-| Method | Use |
-|---|---|
-| GET | Read/list/detail |
-| POST | Create or business action |
-| PUT/PATCH | Update |
-| DELETE | Soft delete/deactivate only where safe |
+## Response Rule
 
-## Main API Groups
+Use consistent response shapes for success, validation error, authorization
+failure, conflict, and unexpected errors.
 
-Release 1 API groups include:
+Do not expose stack traces or database internals.
 
-- `/api/v1/auth`
-- `/api/v1/platform`
-- `/api/v1/tenants`
-- `/api/v1/subscriptions`
-- `/api/v1/features`
-- `/api/v1/outlets`
-- `/api/v1/tills`
-- `/api/v1/devices`
-- `/api/v1/users`
-- `/api/v1/roles`
-- `/api/v1/permissions`
-- `/api/v1/products`
-- `/api/v1/categories`
-- `/api/v1/inventory`
-- `/api/v1/discounts`
-- `/api/v1/pos/sales`
-- `/api/v1/pos/payments`
-- `/api/v1/pos/receipts`
-- `/api/v1/pos/returns`
-- `/api/v1/pos/refunds`
-- `/api/v1/pos/exchanges`
-- `/api/v1/customers`
-- `/api/v1/loyalty`
-- `/api/v1/reports`
-- `/api/v1/files`
-- `/api/v1/notifications`
+## Idempotency Rule
 
-Do not add e-commerce, supplier, delivery, kiosk, AI, coupon, or offline-sync API
-groups for Release 1.
+Use idempotency keys for:
 
-## Standard Success Response
+- Checkout completion.
+- Payment transaction creation.
+- Refund processing.
+- Exchange posting.
+- Offline sync batch upload.
+- Cash movement where retry risk exists.
+- Till close.
+- Notification event creation where duplicate risk exists.
 
-```json
-{
-  "success": true,
-  "message": "Product created successfully",
-  "data": {}
-}
-```
+## Retry Rule
 
-## Standard Error Response
+Safe read/idempotent operations may be retried.
 
-```json
-{
-  "success": false,
-  "message": "Validation failed",
-  "errorCode": "VALIDATION_ERROR",
-  "errors": [
-    { "field": "barcode", "message": "Barcode is required" }
-  ],
-  "traceId": "00-..."
-}
-```
+Do not blindly retry payment, refund, exchange, sale completion, cash movement,
+sync batch apply, till open, or till close.
 
-## List API Rule
+## Checkout Rule
 
-List APIs must support pagination from the beginning.
+Backend recalculates totals.
+Frontend totals are advisory only.
 
-Common filters:
+Checkout must validate product visibility, price, tax, discount, inventory,
+fulfilment, pickup, and payment readiness.
 
-- Status.
-- Date range.
-- Outlet.
-- Category.
-- Product type.
-- Stock status.
-- Search term.
+## Offline Sync API Rule
 
-## Platform Subscription Plans List (Implemented 2026-06-17)
+Sync APIs must validate client identity, tenant, device/outlet context,
+idempotency, payload hash/version, operation type, and conflict status.
 
-| Item | Standard |
-|---|---|
-| Route | `GET /api/v1/platform/subscription-plans` |
-| Auth | Platform JWT only |
-| Permission | `platform.subscription_plans.view` |
-| Pagination | `pageNumber`, `pageSize` (max 100) |
-| Filters | `search`, `planType`, `status`, `billingCycle`, `currencyCode` |
-| Sorting | `sortBy`, `sortDirection`; default `updatedAt desc` |
-| Response wrapper | Standard success wrapper with paginated `data.items` and `data.statusCounts` |
+## Pagination Rule
+
+Use pagination for large lists such as products, orders, payments, stock
+movements, sync items, logs, and reports.
 
 ## Related Files
 
-- [[DTO_And_Mapping_Rules]]
+- [[API_ENDPOINTS]]
 - [[Error_Response_Standards]]
-- [[Authentication]]
-- [[Authorization_And_Permissions]]
+- [[Offline_Operation_Architecture]]

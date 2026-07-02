@@ -58,6 +58,6 @@ The backend must reject the action when the user lacks the required permission.
 
 ## Related Files
 
-- [[../../02_ACCESS_CONTROL/API_Authorization_Rules]]
-- [[../../05_BACKEND_ARCHITECTURE/Error_Response_Standards]]
+- [[99_Archive/02_ACCESS_CONTROL/API_Authorization_Rules]]
+- [[99_Archive/05_BACKEND_ARCHITECTURE/Error_Response_Standards]]
 - [[../../07_UI_UX_KNOWLEDGE/Empty_Error_Loading_States]]

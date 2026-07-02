@@ -1,7 +1,90 @@
-﻿<!-- title: Platform Subscription Plan API Endpoints -->
+<!-- title: API Endpoints -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-25 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
+
+# API Endpoints
+
+## Purpose
+
+This file defines API route group guidance for TM-EPOS MVP.
+
+This is not the final full endpoint catalogue. Exact endpoint tables must be
+created module-by-module after module contracts are finalized.
+
+Confirmed Release 1 implemented endpoints are documented in the sections below.
+Use those tables for active backend, Angular, and Flutter integration work.
+
+## Endpoint Rule
+
+Do not invent exact endpoint contracts before module use cases and request/response
+DTOs are confirmed.
+
+Use this file to keep route group naming consistent.
+
+## Base Route
+
+```text
+/api/v1
+```
+
+## MVP Route Groups
+
+| Route Group | Purpose |
+|---|---|
+| `/platform/...` | Platform admin, tenants, plans, entitlements, billing |
+| `/tenant-admin/...` | Tenant business admin context and setup |
+| `/auth/...` | Platform, tenant, customer authentication where applicable |
+| `/pos/...` | POS sale, basket, till, receipt, cash, device operations |
+| `/online-store/...` | Customer storefront catalogue and customer order entry |
+| `/cart-checkout/...` | Cart and checkout session operations |
+| `/orders/...` | Unified sales order management |
+| `/fulfilment-pickup/...` | Fulfilment method, pickup slot, pickup order flows |
+| `/payments-refunds/...` | Sales payments, transactions, refunds, allocations |
+| `/returns-exchanges/...` | Return, inspection, exchange workflows |
+| `/offline-sync/...` | Offline clients, number blocks, sync batches, conflicts |
+| `/notifications/...` | Notification events, templates, messages, delivery |
+| `/integrations/...` | Providers, credentials, webhooks, request logs |
+| `/reports/...` | Operational reports and exports |
+
+## POS Route Boundary
+
+POS routes must validate tenant user, outlet, till, device, permission, and open
+till session where required.
+
+## Online Store Route Boundary
+
+Online store routes must resolve tenant/storefront context safely through domain,
+sales channel, or verified tenant route.
+
+## Offline Sync Route Boundary
+
+Offline sync routes require approved offline client/device, tenant context,
+idempotency, payload validation, and backend revalidation.
+
+## Endpoint Documentation Rule
+
+When a module is implemented, create or update module-level endpoint tables with:
+
+- HTTP method.
+- Route.
+- Purpose.
+- Request DTO.
+- Response DTO.
+- Required permission.
+- Feature entitlement.
+- Idempotency requirement.
+- Audit requirement.
+
+---
+
+# Documented Release 1 Implementations
+
+The sections below record confirmed Release 1 endpoints already implemented in the
+backend and integrated by frontends.
+
+---
 
 # Platform Subscription Plan API Endpoints
 
@@ -19,15 +102,15 @@ All endpoints require platform JWT authentication.
 | PATCH | `/api/v1/platform/subscription-plans/{planId}/pricing` | `platform.subscription_plans.edit` | Save draft `base_price` |
 | PATCH | `/api/v1/platform/subscription-plans/{planId}/limits` | `platform.subscription_plans.edit` | Save draft outlet/till/user limits |
 | PATCH | `/api/v1/platform/subscription-plans/{planId}/features` | `platform.subscription_plans.edit` | Save draft module/feature entitlements |
-| POST | `/api/v1/platform/subscription-plans/{planId}/publish` | `platform.subscription_plans.edit` | Publish draft â†’ DB `active` |
+| POST | `/api/v1/platform/subscription-plans/{planId}/publish` | `platform.subscription_plans.edit` | Publish draft → DB `active` |
 
 ## Release 1 write flow
 
-1. **Create draft** â€” basics fields on `subscription_plans`
-2. **Update pricing** â€” `base_price` only, draft status required
-3. **Update features** â€” module/feature entitlement only, draft status required
-4. **Update limits** â€” `max_outlets`, `max_tills`, `max_users`, draft status required
-5. **Publish** â€” status `draft` â†’ `active`; API response returns `status: active`
+1. **Create draft** — basics fields on `subscription_plans`
+2. **Update pricing** — `base_price` only, draft status required
+3. **Update features** — module/feature entitlement only, draft status required
+4. **Update limits** — `max_outlets`, `max_tills`, `max_users`, draft status required
+5. **Publish** — status `draft` → `active`; API response returns `status: active`
 
 ## Status contract
 
@@ -41,8 +124,8 @@ Publish response example: `{ "status": "active", ... }`
 
 ## Verification (2026-06-22)
 
-- Swagger at `http://localhost:5050`
-- Full flow: POST create â†’ PATCH pricing â†’ PATCH limits â†’ POST publish â†’ GET list
+- Swagger at `http://localhost:5052`
+- Full flow: POST create → PATCH pricing → PATCH limits → POST publish → GET list
 - DB table `subscription_plans`: `base_price`, `max_outlets`, `max_tills`, `max_users`, `status = active`
 - Backend unit tests: **109/109 passed**
 
@@ -55,11 +138,6 @@ Publish response example: `{ "status": "active", ... }`
   "maxUsers": 25
 }
 ```
-
-## Related Files
-
-- [[../../04_MODULE_KNOWLEDGE/Subscription/03_Technical_Contract]]
-- [[../../06_DATABASE_KNOWLEDGE/Subscription_Tables]]
 
 ---
 
@@ -213,5 +291,15 @@ Commercial modules returned to UI:
 - Returns & Exchanges: optional.
 - Reports: optional.
 
-See [[04_Subscription_Catalog_Model]] for the final contract, metadata fields, response shape, validation behavior, and verification results.
+See [[../99_Archive/04_MODULE_KNOWLEDGE/Subscription/04_Subscription_Catalog_Model]] for the final contract, metadata fields, response shape, validation behavior, and verification results.
 
+## Related Files
+
+- [[API_Standards]]
+- [[Authorization_And_Permissions]]
+- [[Offline_Operation_Architecture]]
+- [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]]
+- [[../02_ACCESS_CONTROL/Platform_Admin_Role_Management]]
+- [[../04_MODULE_KNOWLEDGE/03_Subscription_Catalog_Entitlements/03_Technical_Contract]]
+- [[../99_Archive/04_MODULE_KNOWLEDGE/Subscription/04_Subscription_Catalog_Model]]
+- [[../06_DATABASE_KNOWLEDGE/Subscription_Tables]]

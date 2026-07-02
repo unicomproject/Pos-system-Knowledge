@@ -1,67 +1,61 @@
 <!-- title: Table Naming Standards -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+<!-- source: Unified_Commerce_Databse_Design.docx -->
 
 
 # Table Naming Standards
 
 ## Purpose
 
-This file defines database naming standards for SCS-TIX EPOS Release 1.
+This file defines database naming standards for TM-EPOS MVP.
 
-The updated database design uses PostgreSQL-friendly names.
+## Table Rule
 
-## Table Naming Rule
+Use lowercase plural `snake_case` table names.
 
-Use lowercase `snake_case` plural names for tables.
+Examples:
 
-| Correct | Incorrect |
+- `sales_orders`
+- `checkout_sessions`
+- `pickup_orders`
+- `sync_batches`
+
+## Column Rule
+
+Use lowercase `snake_case` column names.
+
+| Pattern | Meaning |
 |---|---|
-| `platform_users` | `PlatformUser` |
-| `tenant_subscriptions` | `TenantSubscription` |
-| `product_variants` | `ProductVariant` |
-| `sale_lines` | `SaleItems` |
-| `cash_movements` | `CashMovement` |
+| `id` | Primary key |
+| `*_id` | Foreign key/reference |
+| `*_code` | Stable business code |
+| `*_number` | Human-readable document number |
+| `*_status` | CHECK-constrained status |
+| `*_type` | CHECK-constrained type |
+| `*_at` | Timestamp |
+| `*_hash` | Stored hash, not raw value |
 
-## Column Naming Rule
+## Constraint Rule
 
-Use lowercase `snake_case` for columns.
+Recommended physical constraint names:
 
-| Pattern | Example |
-|---|---|
-| Primary key | `id` |
-| Tenant foreign key | `tenant_id` |
-| Foreign key | `product_id`, `outlet_id`, `sale_id` |
-| Status column | `status`, `payment_status`, `refund_status` |
-| Timestamp | `created_at`, `updated_at`, `completed_at` |
-| Actor column | `created_by`, `approved_by`, `opened_by` |
-| Hash column | `token_hash`, `activation_code_hash` |
+```text
+pk_<table>
+fk_<table>_<column>_<ref_table>
+uq_<table>_<columns>
+ck_<table>_<column>
+ix_<table>_<columns>
+```
 
-## ID Rule
+## Status And Type Rule
 
-Most business tables use UUID primary keys.
+Use varchar/text + CHECK constraints.
 
-Small stable reference tables may use `smallint`, such as
-`payment_method_types`, `discount_types`, `discount_scopes`,
-`stock_movement_types`, and `cash_movement_types`.
-
-## Business Number Naming
-
-Business numbers use descriptive columns such as `sale_number`,
-`return_number`, `exchange_number`, `receipt_number`, `invoice_number`,
-`credit_number`, `stocktake_number`, and `adjustment_number`.
-
-## Avoid Wrong Names
-
-The updated database uses `sale_lines`.
-
-Do not document or implement this as `sale_items`.
-
-Use the names from the updated database design exactly.
+Do not use database enum datatypes.
 
 ## Related Files
 
-- [[Database_Overview]]
-- [[Migration_Rules]]
-- [[../05_BACKEND_ARCHITECTURE/DTO_And_Mapping_Rules]]
+- [[Status_And_Type_Check_Rules]]
+- [[Tenant_Id_Rules]]

@@ -1,122 +1,84 @@
 <!-- title: DTO And Mapping Rules -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
 
 # DTO And Mapping Rules
 
 ## Purpose
 
-This file defines DTO and mapping rules for SCS-TIX EPOS Release 1 backend.
+This file defines DTO and mapping rules for TM-EPOS backend APIs.
 
-DTOs protect API contracts from database entity leakage.
-
-Entities must not be returned directly from controllers.
+DTOs protect the domain model and prevent internal database structure from being
+leaked to clients.
 
 ## DTO Rule
 
-Use DTOs for all request and response payloads.
+API request and response models must be explicit DTOs.
 
-Do not expose EF Core entities directly to Flutter POS or Angular Platform Admin.
+Do not return EF Core entities directly.
+
+Do not accept database entities directly from API requests.
 
 ## DTO Types
 
 | DTO Type | Purpose |
 |---|---|
-| Request DTO | Input for create, update, action, or search |
-| Response DTO | Output returned to client |
-| List item DTO | Lightweight list/search result |
-| Detail DTO | Full detail view |
-| Filter DTO | Pagination, sorting, filtering |
-| Action DTO | Business command such as close till or apply discount |
+| Request DTO | Input from API client |
+| Response DTO | Output to API client |
+| Summary DTO | List/table/card display |
+| Detail DTO | Single record detail |
+| Command DTO | Command request payload |
+| Sync DTO | Offline sync upload/download payload |
+| Error DTO | Standard error response |
 
-## Naming Examples
+## Mapping Rule
 
-| Use Case | DTO Name |
-|---|---|
-| Create product | `CreateProductRequest` |
-| Update till | `UpdateTillRequest` |
-| Product list row | `ProductListItemResponse` |
-| Sale detail | `SaleDetailResponse` |
-| Apply discount | `ApplyDiscountRequest` |
-| Close till | `CloseTillRequest` |
+Map between DTOs, domain models, and persistence models intentionally.
 
-## Mapping Direction
+Do not expose internal fields such as token hashes, credential values,
+idempotency internals, sync payload hashes, or provider secrets.
 
-```mermaid
-flowchart LR
-    A[Request DTO] --> B[Application Service]
-    B --> C[Domain Entity]
-    C --> D[Projection/Mapper]
-    D --> E[Response DTO]
-```
+## Sensitive Fields
 
-## Request DTO Rules
+Never return:
 
-Request DTOs must contain only fields needed by the action.
+- Password hash.
+- Refresh token hash.
+- Setup token hash.
+- Payment credential secrets.
+- Raw card data.
+- POS PIN.
+- Provider private keys.
+- Internal stack trace.
 
-They must exclude server-controlled fields such as tenant ID, created date, and
-audit actor.
+## Unified Order DTO Rule
 
-They must not accept trusted values from frontend for permissions, entitlements,
-device trust, or till-session validity.
+Sales order DTOs must clearly separate header, lines, options, components,
+discounts, taxes, charges, payment state, fulfilment state, and audit/status
+history where needed.
 
-## Response DTO Rules
+## Checkout DTO Rule
 
-Response DTOs must return only client-needed fields.
+Checkout DTOs must not trust frontend totals.
 
-Never return password hashes, token hashes, POS PIN hashes, secrets, or payment
-sensitive data.
+Backend recalculates price, tax, discount, fulfilment, stock rules, and payment
+readiness.
 
-Include status and readable display values where useful.
+## Offline Sync DTO Rule
 
-## Tenant ID Rule
+Offline sync DTOs must include idempotency, client record IDs, entity names,
+operation types, server versions where needed, and safe payload structure.
 
-Tenant-owned request DTOs must not use frontend-provided `tenant_id` as source of
-truth.
+Do not expose conflict resolution internals unless required by sync UI.
 
-Tenant context is resolved server-side.
+## Versioning Rule
 
-The service may use tenant ID internally after resolution.
-
-## Mapping Rules
-
-Mapping must be explicit enough to avoid accidental field leaks.
-
-Allowed approaches:
-
-- Manual mapping for sensitive flows.
-- Small mapper classes for module DTOs.
-- Projection DTOs in EF queries for read/list endpoints.
-
-Avoid automatic mapping that exposes unwanted fields.
-
-## Validation Rules
-
-Use validators for required fields, length limits, positive amounts, date ranges,
-status values, email/phone format, payment amount rules, and return/refund
-quantity limits.
-
-Business rules still belong in services/domain.
-
-## List and Search DTOs
-
-List endpoints must support page number, page size, search term, status filter,
-date range filter, outlet filter where relevant, and sorting where relevant.
-
-Use projection DTOs for list performance.
-
-## POS DTO Safety
-
-POS DTOs must not allow the frontend to decide tenant ownership, feature access,
-permission result, trusted device result, till session result, stock movement
-result, or refund eligibility.
-
-The backend calculates and validates these.
+If DTO contracts change in a breaking way, version API route or response shape.
 
 ## Related Files
 
 - [[API_Standards]]
-- [[Backend_Coding_Principles]]
-- [[Multi_Tenant_Handling]]
 - [[Error_Response_Standards]]
+- [[Offline_Operation_Architecture]]

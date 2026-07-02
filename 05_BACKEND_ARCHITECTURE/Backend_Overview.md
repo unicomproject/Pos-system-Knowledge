@@ -1,119 +1,78 @@
 <!-- title: Backend Overview -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-06-29 -->
+
 
 # Backend Overview
 
 ## Purpose
 
-This file defines the Release 1 backend architecture overview for SCS-TIX EPOS.
+This file defines the backend architecture direction for TM-EPOS MVP.
 
-Release 1 backend is POS-first.
+The backend supports mobile POS, desktop EPOS, online store, click and collect,
+offline operation, unified order management, payment/refund, reporting, hardware,
+notifications, integrations, and platform/tenant administration.
 
-It supports Platform Admin, Tenant Admin inside the Flutter POS app, fixed POS,
-portable POS, basic inventory, expiry discount, basic loyalty, return/refund,
-exchange, reports, and hardware-ready checkout.
+## Core Backend Decision
 
-## Backend Position
+TM-EPOS backend uses Clean Architecture with module-based folders.
 
-| Area | Decision |
+Controllers are thin.
+Application services own use-case orchestration.
+Domain owns business rules and contracts.
+Infrastructure owns EF Core, PostgreSQL, external providers, and device/sync
+adapters.
+
+## MVP Backend Scope
+
+| Area | Backend Responsibility |
 |---|---|
-| Backend framework | .NET 10 / ASP.NET Core Web API |
-| Language | C# |
-| API style | REST API |
-| Architecture | Clean Architecture with Service + Repository Pattern |
-| Database | PostgreSQL |
-| ORM | Entity Framework Core |
-| Storage | AWS S3 |
-| Hosting | AWS EC2 |
-| CI/CD | GitHub Actions |
-| Cache dependency | No Redis for Release 1 |
+| Platform Admin | Tenants, plans, entitlements, billing setup, platform users |
+| Tenant Admin | Business setup, users, roles, products, inventory, reports |
+| POS | Sale, till, device, cart/basket, receipt, cash movement |
+| Online Store | Storefront catalogue, cart, checkout, customer order flow |
+| Click & Collect | Pickup method, pickup slot/capacity, fulfilment workflow |
+| Orders | Unified in-store and online sales order lifecycle |
+| Payments/Refunds | Payment records, idempotency, refund allocation |
+| Returns/Exchange | Return, inspection, exchange and settlement rules |
+| Offline Operation | Offline clients, number blocks, sync batches, conflicts |
+| Virtual Cache | Reference/config caching and safe invalidation |
+| Notification | Notification event, template, message, delivery tracking |
+| Integration | Provider setup, credentials, webhooks, request logs |
 
-## Release 1 Backend Responsibility
+## Non-Negotiable Rules
 
-The backend must:
+- Backend is final authority for business truth.
+- Frontend cache is not final authority.
+- Offline records must be synced and revalidated.
+- Tenant isolation must be enforced on every tenant-owned query.
+- Feature entitlement and permission checks are mandatory.
+- Payment, refund, exchange, sync, and checkout operations require idempotency.
+- Do not introduce CQRS, MediatR, API Gateway, or Redis unless approved.
+- Do not store raw tokens, passwords, card data, or provider secrets.
 
-- Authenticate platform admins and tenant users.
-- Resolve tenant context securely.
-- Enforce tenant isolation.
-- Enforce feature entitlement and permissions.
-- Validate outlet, device, till, and till session context for POS operations.
-- Store sales, payments, receipts, returns, refunds, exchanges, and cash records.
-- Support product, variant, inventory, batch, expiry, discount, loyalty, and reports.
-- Store hardware configuration, test logs, and payment device references.
-- Write audit logs for sensitive actions.
-
-## Release 1 Backend Exclusions
-
-Do not implement Release 1 backend modules for:
-
-- E-commerce.
-- Offline sync.
-- Supplier management.
-- Stock transfer between outlets.
-- Delivery.
-- Self-service kiosk.
-- Coupons/promotions engine.
-- AI onboarding.
-- AI analytics.
-- AI accounting.
-- Full accounting.
-
-## Application Clients
-
-| Client | Backend Integration |
-|---|---|
-| Platform Admin Web | Tenant, subscription, entitlement, billing, activation APIs |
-| Flutter POS App | Tenant admin, cashier, till, sales, payment, reports APIs |
-| Portable POS Flow | Same POS APIs with portable channel and device rules |
-
-## Backend Access Boundary
-
-Protected POS operations must validate:
-
-1. JWT and active auth session.
-2. Active tenant and subscription status.
-3. Feature entitlement.
-4. User permission.
-5. Outlet access.
-6. Trusted POS device.
-7. Assigned till where required.
-8. Open till session where required.
-
-## High-Level Deployment View
+## Backend Flow
 
 ```mermaid
 flowchart TD
-    A[Flutter POS App] --> B[ASP.NET Core Web API]
-    C[Platform Admin Web] --> B
-    B --> D[PostgreSQL]
-    B --> E[AWS S3]
-    B --> F[Payment/Email Providers]
+    A[API Controller] --> B[Application Service]
+    B --> C[Domain Rules]
+    B --> D[Repository Contract]
+    D --> E[Infrastructure Repository]
+    E --> F[PostgreSQL]
+    B --> G[Audit/Event Log]
 ```
 
-## Core Backend Modules
+## Backend Final Authority
 
-| Module | Release 1 Purpose |
-|---|---|
-| Auth | Login, setup, refresh, logout |
-| Tenant | Tenant profile and status |
-| Subscription | Plan, invoice, payment link |
-| Entitlement | Feature assignment and checks |
-| Role/Permission | Tenant role and permission control |
-| Outlet/Till/Device | POS operating context |
-| Catalog/Inventory | Product, stock, expiry |
-| Sales/Payment | Checkout, payment, receipt |
-| Return/Refund/Exchange | Post-sale operations |
-| Loyalty | Basic earn and redeem |
-| Reports | Summaries and exports |
-| Hardware | Configuration and test records |
+Backend validates final sale total, final inventory quantity, card/QR payment,
+refund, exchange, loyalty/store credit, till final close, tenant access,
+permission, idempotency, and audit.
 
 ## Related Files
 
 - [[Clean_Architecture_Layers]]
 - [[Module_Based_Folder_Structure]]
-- [[Authentication]]
-- [[Authorization_And_Permissions]]
-- [[Multi_Tenant_Handling]]
-- [[../01_RELEASE_SCOPE/Release_1_Scope]]
+- [[Virtual_Caching_Architecture]]
+- [[Offline_Operation_Architecture]]
