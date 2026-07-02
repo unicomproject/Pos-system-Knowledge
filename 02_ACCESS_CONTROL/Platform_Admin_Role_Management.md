@@ -1,7 +1,7 @@
 <!-- title: Platform Admin Role Management -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-02 -->
 
 
 # Platform Admin Role Management
@@ -33,18 +33,40 @@ audited.
 | Platform user roles | Mapping from user to platform roles |
 | Platform direct permissions | Optional direct permission grant |
 
-## Platform Permission Examples
+## Platform Permission Strategy (Option A)
 
-| Code | Meaning |
+Platform permissions use TM-EPOS plural domain codes for lifecycle/admin areas and
+**granular action codes** for implemented modules.
+
+Rules:
+
+- Roles group permission codes; do not hardcode role names in UI or API logic.
+- Angular menu visibility and route guards must use the same codes returned in login `platformPermissions[]`.
+- Backend is the final authority for every protected platform endpoint.
+- Login currently returns permission codes only; role names are not yet exposed to the frontend.
+
+See [[Permission_Code_List]] for the full 31-code platform catalog.
+
+### Domain examples
+
+| Domain | Example codes |
 |---|---|
-| platform.tenants.view | View tenants |
-| platform.tenants.create | Create tenants |
-| platform.tenants.update | Update tenants |
-| platform.subscriptions.manage | Manage plans/subscriptions |
-| platform.features.manage | Manage modules/features/entitlements |
-| platform.users.manage | Manage platform users |
-| platform.audit.view | View platform audit |
-| platform.integrations.manage | Manage platform-level integrations |
+| Dashboard | `platform.dashboard.view` |
+| Tenants | `platform.tenants.view`, `.create`, `.update`, `.activate`, `.suspend`, `.entitlements.update` |
+| Subscription plans | `platform.subscription_plans.view`, `.create`, `.edit`, `.duplicate`, `.archive`, `.delete` |
+| Catalog | `platform.permissions.view`, `platform.modules.view`, `platform.features.view` |
+| Platform roles | `platform.roles.view`, `.create`, `.update`, `.permissions.view`, `.permissions.update` |
+| Platform users | `platform.users.view`, `.create`, `.update`, `.roles.assign` |
+| Settings / audit / billing / integrations | `platform.settings.*`, `platform.audit.view`, `platform.billing.*`, `platform.integrations.manage` |
+
+### Super Administrator development role
+
+Seed role code: `super_administrator`
+
+Expected grants after platform permission foundation migration:
+
+- All 31 platform permission codes listed in [[Permission_Code_List]].
+- Verified on 2026-07-02 against development database and live login API.
 
 ## Tenant Feature Control
 

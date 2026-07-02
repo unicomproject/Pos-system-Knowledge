@@ -1,7 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-02 -->
 
 
 # API Authorization Rules
@@ -34,17 +34,34 @@ flowchart TD
 
 ## Platform APIs
 
-Platform APIs require platform authentication and platform permissions.
+Platform APIs require platform JWT authentication and explicit platform permission codes.
 
-Examples:
+Frontend route guards and menu filtering are UX only. Backend service checks are mandatory.
 
-| API Area | Required Rule |
+### Implemented platform permission mapping (Option A)
+
+| API Area | Required permission(s) |
 |---|---|
-| Tenant create/update | platform.tenants.* |
-| Subscription plans | platform.subscriptions.manage |
-| Feature entitlement | platform.features.manage |
-| Platform users | platform.users.manage |
-| Platform audit | platform.audit.view |
+| Platform dashboard | `platform.dashboard.view` |
+| Tenant list/summary/filter | `platform.tenants.view` |
+| Tenant create | `platform.tenants.create` |
+| Tenant update | `platform.tenants.update` |
+| Tenant activate | `platform.tenants.activate` |
+| Tenant suspend | `platform.tenants.suspend` |
+| Tenant entitlements | `platform.tenants.entitlements.update` |
+| Subscription plan list/catalog | `platform.subscription_plans.view` |
+| Subscription plan create/edit/publish | `platform.subscription_plans.create`, `platform.subscription_plans.edit` |
+| Subscription plan duplicate/archive/delete | respective `platform.subscription_plans.*` codes |
+| Permission catalog | `platform.permissions.view` |
+| Platform roles | `platform.roles.view`, `platform.roles.create`, `platform.roles.update` |
+| Platform role permissions | `platform.roles.permissions.view`, `platform.roles.permissions.update` |
+| Platform users | `platform.users.view`, `platform.users.create`, `platform.users.update`, `platform.users.roles.assign` |
+| Platform settings | `platform.settings.view`, `platform.settings.update` |
+| Platform billing | `platform.billing.view`, `platform.billing.manage` |
+| Platform audit | `platform.audit.view` |
+| Platform integrations | `platform.integrations.manage` |
+
+Do not use umbrella-only checks such as `platform.subscriptions.manage` where granular codes already exist.
 
 ## Tenant Admin APIs
 

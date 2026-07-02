@@ -1,7 +1,7 @@
 <!-- title: API Endpoints -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-02 -->
 
 
 # API Endpoints
@@ -83,6 +83,54 @@ When a module is implemented, create or update module-level endpoint tables with
 
 The sections below record confirmed Release 1 endpoints already implemented in the
 backend and integrated by frontends.
+
+---
+
+# Platform Dashboard API Endpoints
+
+Base route: `/api/v1/platform-admin/dashboard`
+
+All endpoints require platform JWT authentication.
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/platform-admin/dashboard` | `platform.dashboard.view` | Load platform dashboard KPIs and attention items |
+
+Verification on 2026-07-02:
+
+- Migration `20260618180000_SeedPlatformAdminPermissions` applied.
+- Login `posunique001@gmail.com` returned 31 platform permissions for `super_administrator`.
+- Dashboard GET returned 200 with valid JWT.
+
+---
+
+# Platform Tenant List API Endpoints
+
+Base route: `/api/v1/platform-admin/tenants`
+
+All endpoints require platform JWT authentication.
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/platform-admin/tenants` | `platform.tenants.view` | List tenants with paging/filter/sort |
+| GET | `/api/v1/platform-admin/tenants/summary` | `platform.tenants.view` | Load tenant summary cards |
+| GET | `/api/v1/platform-admin/tenants/filter-options` | `platform.tenants.view` | Load filter dropdown options |
+
+Planned next slice (not yet implemented):
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.view` | Tenant detail |
+| POST | `/api/v1/platform-admin/tenants` | `platform.tenants.create` | Create tenant |
+| PUT/PATCH | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.update` | Update tenant |
+| POST | `/api/v1/platform-admin/tenants/{tenantId}/activate` | `platform.tenants.activate` | Activate tenant |
+| POST | `/api/v1/platform-admin/tenants/{tenantId}/suspend` | `platform.tenants.suspend` | Suspend tenant |
+| PUT | `/api/v1/platform-admin/tenants/{tenantId}/entitlements` | `platform.tenants.entitlements.update` | Assign subscription/features |
+
+Verification on 2026-07-02:
+
+- Tenant list GET returned 200 with valid JWT and `platform.tenants.view`.
+- Missing permission returns HTTP 403 from service layer (covered by unit tests).
 
 ---
 
