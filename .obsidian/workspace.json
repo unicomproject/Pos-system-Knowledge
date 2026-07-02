@@ -1,56 +1,41 @@
 {
   "main": {
-    "id": "8f5d5d49e5642147",
+    "id": "1cb734fccc6c8439",
     "type": "split",
     "children": [
       {
-        "id": "a89a5c8d86833458",
+        "id": "f2503a97c3c43573",
         "type": "tabs",
         "children": [
           {
-            "id": "ef55fe1e05a4e2d2",
+            "id": "56806a201bd68d51",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "14_AI_DEVELOPER_PROMPTS/Backend/Backend_Feature_Prompt_With_Optional_Reads_TM_EPOS.md",
+                "file": "03_USER_JOURNEYS/Platform_Admin/04_Create_Tenant_Wizard_Flow.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Backend_Feature_Prompt_With_Optional_Reads_TM_EPOS"
-            }
-          },
-          {
-            "id": "770cfc523b94edb3",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "23_Fulfilment_And_Pickup"
+              "title": "04_Create_Tenant_Wizard_Flow"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
   },
   "left": {
-    "id": "100a414e7e6e9a27",
+    "id": "d3f87169598919b0",
     "type": "split",
     "children": [
       {
-        "id": "2f3445539d2105c9",
+        "id": "f6617836dfe14690",
         "type": "tabs",
         "children": [
           {
-            "id": "0ce7c63c0b4a42a2",
+            "id": "27fe543d610a8aae",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -63,7 +48,7 @@
             }
           },
           {
-            "id": "69ed34ff6ab04669",
+            "id": "b71489dff0c11785",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -80,7 +65,7 @@
             }
           },
           {
-            "id": "b65a787c066ee299",
+            "id": "1fe9824e1901cf53",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -93,23 +78,23 @@
       }
     ],
     "direction": "horizontal",
-    "width": 379.5
+    "width": 403.5
   },
   "right": {
-    "id": "17789eb71a72b01a",
+    "id": "bb1db1e68db4824b",
     "type": "split",
     "children": [
       {
-        "id": "aab57a02e7c60ffd",
+        "id": "5fdd4342edd2c68d",
         "type": "tabs",
         "children": [
           {
-            "id": "abbe590cbfdba91c",
+            "id": "0fd941b3d7486c35",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "14_AI_DEVELOPER_PROMPTS/Backend/Backend feature prompt.md",
+                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -119,25 +104,25 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Backend feature prompt"
+              "title": "Backlinks for 10_Cash_In_Out_Flow"
             }
           },
           {
-            "id": "af059d3d41945e6b",
+            "id": "5266211a06e2aa0b",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Error_Handling.md",
+                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Flutter_Error_Handling"
+              "title": "Outgoing links from 10_Cash_In_Out_Flow"
             }
           },
           {
-            "id": "ec48fe3c3d29f83f",
+            "id": "c8dd2289d8f917e9",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -152,7 +137,7 @@
             }
           },
           {
-            "id": "473c3bdf1b54bcfe",
+            "id": "c85a86c08b5b9863",
             "type": "leaf",
             "state": {
               "type": "all-properties",
@@ -166,22 +151,21 @@
             }
           },
           {
-            "id": "7476b1878251f222",
+            "id": "82ef659ed078ee6d",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup.md",
+                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 23_Fulfilment_And_Pickup"
+              "title": "Outline of 10_Cash_In_Out_Flow"
             }
           }
-        ],
-        "currentTab": 4
+        ]
       }
     ],
     "direction": "horizontal",
@@ -199,54 +183,43 @@
       "bases:Create new base": false
     }
   },
-  "active": "252da568f5b36f62",
+  "active": "56806a201bd68d51",
   "lastOpenFiles": [
     "15_IMPLEMENTATION_TRACKING/Flutter/Sales/Cashier_POS_Second_Brain_vs_Code_Comparison_Implementation_Status.md",
-    "11_DEVELOPER_ONBOARDING/Unified_Commerce_Backend_Known_Limitations.md",
-    "99_Archive/11_DEVELOPER_ONBOARDING/SCS_Nytroz_POS_Backend_Local_Development_Setup_ARCHIVED.md",
-    "99_Archive/11_DEVELOPER_ONBOARDING",
-  "active": "770cfc523b94edb3",
-  "lastOpenFiles": [
     "15_IMPLEMENTATION_TRACKING/Backend/OutletTillDevice/Outlet_CRUD_Implementation_Status.md",
     "15_IMPLEMENTATION_TRACKING/Backend/OutletTillDevice",
-    "10_TESTING_QA/Test_Case/07_Outlet_Till_POS_Device_Foundation/Outlet_CRUD_Test_Cases.md",
-    "10_TESTING_QA/Test_Case/07_Outlet_Till_POS_Device_Foundation",
-    "06_DATABASE_KNOWLEDGE/Tables/08_Outlet_Till_And_POS_Device_Foundation.md",
-    "04_MODULE_KNOWLEDGE/07_Outlet_Till_POS_Device_Foundation/01_Module_Overview.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Backend_Module_Feature_Priority_Order.md",
-    "14_AI_DEVELOPER_PROMPTS/Backend/Backend_Feature_Prompt_With_Optional_Reads_TM_EPOS.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Backend_Feature_Priority_Roadmap.md",
-    "10_TESTING_QA/Test_Case/06_Auth_Tokens_Security_Audit/Tenant_Login_Test_Cases.md",
-    "10_TESTING_QA/Test_Case/06_Auth_Tokens_Security_Audit/Tenant_Logout_Test_Cases.md",
-    "10_TESTING_QA/Test_Case/01_PlatformAdministration/Platform_User_Logout_Test_Cases.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_User_Logout_Implementation_Status.md",
     "15_IMPLEMENTATION_TRACKING/Backend/Auth/Tenant_Logout_Implementation_Status.md",
-    "10_TESTING_QA/Test_Case/01_PlatformAdministration/Platform_Admin_Login_Test_Cases.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_Admin_Login_Implementation_Status.md",
     "15_IMPLEMENTATION_TRACKING/Backend/Auth/Tenant_Login_Implementation_Status.md",
-    "10_TESTING_QA/Test_Case/06_Auth_Tokens_Security_Audit",
-    "05_BACKEND_ARCHITECTURE/Backend_Coding_Principles.md",
-    "99_Archive/05_BACKEND_ARCHITECTURE/Backend_Coding_Principles.md",
-    "Backend_Feature_Prompt_With_Optional_Reads_TM_EPOS.md",
-    "03_USER_JOURNEYS/Tenant_Admin/20_Audit_Logs_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/19_Device_Hardware_Management_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/18_Billing_Subscription_Management_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/17_Reports_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/16_Expiry_Discount_Management_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/15_Stock_Count_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/14_Stock_Transfer_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/13_Stock_Out_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin",
-    "03_USER_JOURNEYS/Platform_Admin/15_System_Settings_Flow.md",
-    "03_USER_JOURNEYS/Platform_Admin/14_Audit_Logs_Flow.md",
-    "03_USER_JOURNEYS/Platform_Admin",
-    "10_TESTING_QA/Test_Case/21_Reports",
-    "10_TESTING_QA/Test_Case/20_Integration",
-    "10_TESTING_QA/Test_Case/19_Notification",
-    "10_TESTING_QA/Test_Case/18_OfflineSync",
-    "10_TESTING_QA/Test_Case/17_ReturnExchange",
-    "10_TESTING_QA/Test_Case/16_Refund",
-    "10_TESTING_QA/Test_Case/15_Payment"
-    "10_TESTING_QA/Test_Case/17_ReturnExchange"
+    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_User_Logout_Implementation_Status.md",
+    "03_USER_JOURNEYS/Platform_Admin/03_Tenant_Management_Flow.md",
+    "03_USER_JOURNEYS/Platform_Admin/05_Outlet_Collection_Point_Setup_Flow.md",
+    "03_USER_JOURNEYS/Platform_Admin/13_Platform_User_Management_Flow.md",
+    "01_RELEASE_SCOPE/Release_1_Scope.md",
+    "04_MODULE_KNOWLEDGE/28_Offline_Operation_Sync/03_Technical_Contract.md",
+    "04_MODULE_KNOWLEDGE/28_Offline_Operation_Sync/02_Functional_Rules.md",
+    "04_MODULE_KNOWLEDGE/28_Offline_Operation_Sync/01_Module_Overview.md",
+    "04_MODULE_KNOWLEDGE/28_Offline_Operation_Sync",
+    "04_MODULE_KNOWLEDGE/27_Reporting_Analytics/03_Technical_Contract.md",
+    "04_MODULE_KNOWLEDGE/27_Reporting_Analytics/02_Functional_Rules.md",
+    "04_MODULE_KNOWLEDGE/27_Reporting_Analytics/01_Module_Overview.md",
+    "04_MODULE_KNOWLEDGE/27_Reporting_Analytics",
+    "04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout/03_Technical_Contract.md",
+    "04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout/02_Functional_Rules.md",
+    "04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout/01_Module_Overview.md",
+    "04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout",
+    "04_MODULE_KNOWLEDGE/21_POS_Operations/03_Technical_Contract.md",
+    "04_MODULE_KNOWLEDGE/21_POS_Operations/02_Functional_Rules.md",
+    "04_MODULE_KNOWLEDGE/21_POS_Operations/01_Module_Overview.md",
+    "04_MODULE_KNOWLEDGE/21_POS_Operations",
+    "04_MODULE_KNOWLEDGE/20_Unified_Order_Sales/01_Module_Overview.md",
+    "04_MODULE_KNOWLEDGE/20_Unified_Order_Sales/03_Technical_Contract.md",
+    "04_MODULE_KNOWLEDGE/20_Unified_Order_Sales/02_Functional_Rules.md",
+    "04_MODULE_KNOWLEDGE/20_Unified_Order_Sales",
+    "04_MODULE_KNOWLEDGE/19_Customer_Account_Consent/03_Technical_Contract.md",
+    "04_MODULE_KNOWLEDGE/19_Customer_Account_Consent/02_Functional_Rules.md",
+    "04_MODULE_KNOWLEDGE/19_Customer_Account_Consent",
+    "04_MODULE_KNOWLEDGE/18_Stock_Adjustment_Transfer_Stocktake",
+    "04_MODULE_KNOWLEDGE/13_Product_Combo_Choice_Inventory_Impact",
+    "04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration"
   ]
 }

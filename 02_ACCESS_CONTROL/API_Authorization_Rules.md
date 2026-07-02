@@ -1,7 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-24 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-02 -->
 
 # API Authorization Rules
 
@@ -40,14 +40,34 @@ Tenant context must be resolved from token/session and applied in services and r
 
 ## Platform API Rules
 
-| API Area | Required Checks |
+Platform APIs require platform JWT authentication and explicit platform permission codes.
+
+Frontend route guards and menu filtering are UX only. Backend service checks are mandatory.
+
+### Implemented platform permission mapping (Option A)
+
+| API Area | Required permission(s) |
 |---|---|
-| Tenant creation | Platform user and platform permission |
-| Subscription setup | Platform user and billing/subscription permission |
-| Feature entitlement | Platform user and entitlement permission |
-| Tenant activation | Platform user and activation permission |
-| Platform audit | Platform user and audit permission |
-| Permission catalog read | Platform user and `platform.permissions.view` |
+| Platform dashboard | `platform.dashboard.view` |
+| Tenant list/summary/filter | `platform.tenants.view` |
+| Tenant create | `platform.tenants.create` |
+| Tenant update | `platform.tenants.update` |
+| Tenant activate | `platform.tenants.activate` |
+| Tenant suspend | `platform.tenants.suspend` |
+| Tenant entitlements | `platform.tenants.entitlements.update` |
+| Subscription plan list/catalog | `platform.subscription_plans.view` |
+| Subscription plan create/edit/publish | `platform.subscription_plans.create`, `platform.subscription_plans.edit` |
+| Subscription plan duplicate/archive/delete | respective `platform.subscription_plans.*` codes |
+| Permission catalog | `platform.permissions.view` |
+| Platform roles | `platform.roles.view`, `platform.roles.create`, `platform.roles.update` |
+| Platform role permissions | `platform.roles.permissions.view`, `platform.roles.permissions.update` |
+| Platform users | `platform.users.view`, `platform.users.create`, `platform.users.update`, `platform.users.roles.assign` |
+| Platform settings | `platform.settings.view`, `platform.settings.update` |
+| Platform billing | `platform.billing.view`, `platform.billing.manage` |
+| Platform audit | `platform.audit.view` |
+| Platform integrations | `platform.integrations.manage` |
+
+Do not use umbrella-only checks such as `platform.subscriptions.manage` where granular codes already exist.
 
 ## Tenant Admin API Rules
 

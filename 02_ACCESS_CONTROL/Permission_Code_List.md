@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-23 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-02 -->
 
 # Permission Code List
 
@@ -26,8 +26,85 @@ Do not create one large `PermissionCode` enum.
 
 Do not place permission codes inside generic `Domain/Enums`.
 
+Platform Admin uses **Option A** permission strategy (TM-EPOS MVP):
+
+- Plural domain codes for tenant lifecycle, users, settings, billing, audit, dashboard.
+- **Granular action codes** for subscription plans, platform roles, and permission catalog (already implemented in backend and Angular).
+- Do **not** collapse implemented granular codes into umbrella codes such as `platform.subscriptions.manage`.
+- Do **not** use legacy singular codes such as `platform.tenant.create`.
+
 Use module-wise static constants inside the Domain module folder for permission
 code references.
+
+### Platform dashboard and tenants
+
+| Code | Meaning |
+|---|---|
+| platform.dashboard.view | View platform dashboard |
+| platform.tenants.view | View tenant list, summary, filters |
+| platform.tenants.create | Create tenant |
+| platform.tenants.update | Update tenant profile/setup |
+| platform.tenants.activate | Activate tenant |
+| platform.tenants.suspend | Suspend tenant |
+| platform.tenants.entitlements.update | Assign or update tenant feature entitlements |
+
+### Platform subscription plans (granular — implemented)
+
+| Code | Meaning |
+|---|---|
+| platform.subscription_plans.view | View subscription plans |
+| platform.subscription_plans.create | Create draft plan |
+| platform.subscription_plans.edit | Edit/publish draft plan |
+| platform.subscription_plans.duplicate | Duplicate plan |
+| platform.subscription_plans.archive | Archive/retire plan |
+| platform.subscription_plans.delete | Delete draft plan |
+
+### Platform catalog (granular — implemented)
+
+| Code | Meaning |
+|---|---|
+| platform.permissions.view | View permission catalog tree |
+| platform.modules.view | View modules catalog |
+| platform.features.view | View features catalog |
+
+### Platform roles (granular — implemented)
+
+| Code | Meaning |
+|---|---|
+| platform.roles.view | View platform roles |
+| platform.roles.create | Create platform roles |
+| platform.roles.update | Update platform role metadata |
+| platform.roles.permissions.view | View role permission assignments |
+| platform.roles.permissions.update | Replace role permission assignments |
+
+### Platform users, settings, billing, audit, integrations
+
+| Code | Meaning |
+|---|---|
+| platform.users.view | View platform users |
+| platform.users.create | Create platform users |
+| platform.users.update | Update platform users |
+| platform.users.roles.assign | Assign platform roles to users |
+| platform.settings.view | View platform settings |
+| platform.settings.update | Update platform settings |
+| platform.billing.view | View tenant billing |
+| platform.billing.manage | Manage billing and payment links |
+| platform.audit.view | View platform audit logs |
+| platform.integrations.manage | Manage platform integrations |
+
+### Deprecated platform codes (do not seed or use)
+
+| Code | Replacement |
+|---|---|
+| platform.tenant.create | platform.tenants.create |
+| platform.tenant.update | platform.tenants.update |
+| platform.tenant.activate | platform.tenants.activate |
+| platform.subscription.manage | platform.subscription_plans.* |
+| platform.feature.entitle | platform.features.view / platform.tenants.entitlements.update |
+
+### Super Administrator seed expectation
+
+Development role `super_administrator` should receive all **31** active platform permission codes above when platform admin permission foundation is fully seeded, plus bootstrap `platform.admin.access` for login routing.
 
 Do not generate C# enum classes for database status/type/check-value columns.
 Those Domain properties remain strings, while allowed values are enforced through
