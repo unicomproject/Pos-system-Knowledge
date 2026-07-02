@@ -1,7 +1,7 @@
 <!-- title: Outlet, Till & POS Device Foundation -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-02 -->
 <!-- source: Unified_Commerce_Databse_Design.docx -->
 
 
@@ -38,6 +38,10 @@ Purpose: Stores outlets records for this module.
 | created_at | timestamptz | NOT | Creation timestamp. |
 | updated_at | timestamptz | NOT | Last update timestamp. |
 | outlet_code | varchar(80) | UNIQUE | Unique business key. |
+| outlet_type | varchar(40) | NOT CHECK DEFAULT | CHECK(outlet_type IN ('STORE', 'WAREHOUSE')); default `STORE`. |
+| is_online_visible | boolean | NOT DEFAULT | Whether outlet can be shown on online/customer-facing surfaces; default `false`. |
+| contact_phone | varchar(40) | NULL | Outlet contact phone. |
+| contact_email | varchar(255) | NULL | Outlet contact email. |
 
 Source constraints from uploaded design:
 
@@ -46,6 +50,7 @@ PK(id)
 FK(tenant_id) REFERENCES tenants(id)
 UNIQUE(tenant_id, outlet_code)
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
+CHECK(outlet_type IN ('STORE', 'WAREHOUSE'))
 ```
 
 ## outlet_addresses
@@ -61,6 +66,12 @@ Purpose: Stores outlet addresses records for this module.
 | created_at | timestamptz | NOT | Creation timestamp. |
 | updated_at | timestamptz | NOT | Last update timestamp. |
 | address_type | varchar(40) | CHECK | CHECK(address_type IN ('PHYSICAL', 'BILLING', 'PICKUP')) |
+| address_line_1 | varchar(255) | NOT DEFAULT | Physical address line 1; default empty for existing rows. |
+| address_line_2 | varchar(255) | NULL | Physical address line 2. |
+| city | varchar(120) | NOT DEFAULT | City; default empty for existing rows. |
+| state_or_province | varchar(120) | NULL | State, province, or region. |
+| postal_code | varchar(30) | NULL | Postal code. |
+| country_code | char(2) | NOT DEFAULT | ISO-style country code; default `LK` for existing rows. |
 
 Source constraints from uploaded design:
 

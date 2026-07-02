@@ -1,7 +1,7 @@
 <!-- title: Platform Administration -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-02 -->
 <!-- source: Unified_Commerce_Databse_Design.docx -->
 
 
@@ -37,6 +37,7 @@ Purpose: Stores platform users records for this module.
 | id | uuid | PK | Primary key. Primary key / source design key. |
 | email | citext | UNIQUE | Unique business key. |
 | normalized_email | citext | UNIQUE | Unique business key. |
+| password_hash | varchar(255) | NOT | Stores the platform user's password hash only. Raw passwords are never stored. |
 | status | varchar(30) | CHECK | CHECK(status IN ('ACTIVE', 'INACTIVE', 'LOCKED', 'DELETED')) |
 | created_at | timestamptz | NOT | Creation timestamp. |
 | updated_at | timestamptz | NOT | Last update timestamp. |
@@ -48,6 +49,7 @@ PK(id)
 UNIQUE(email)
 UNIQUE(normalized_email)
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'LOCKED', 'DELETED'))
+NOT NULL(password_hash)
 ```
 
 ## platform_roles
@@ -208,6 +210,7 @@ Purpose: Stores platform refresh tokens records for this module.
 | updated_at | timestamptz | NOT | Last update timestamp. |
 | platform_auth_session_id | uuid | FK NOT | References `platform_auth_sessions(id)`. |
 | token_hash | varchar(255) | UNIQUE | Unique business key. |
+| expires_at | timestamptz | NOT CHECK | Refresh token expiry timestamp. CHECK(expires_at > created_at). |
 
 Source constraints from uploaded design:
 
@@ -216,6 +219,7 @@ PK(id)
 FK(platform_auth_session_id) REFERENCES platform_auth_sessions(id)
 UNIQUE(token_hash)
 CHECK(status IN ('ACTIVE', 'USED', 'EXPIRED', 'REVOKED'))
+CHECK(expires_at > created_at)
 ```
 
 ## platform_password_reset_tokens

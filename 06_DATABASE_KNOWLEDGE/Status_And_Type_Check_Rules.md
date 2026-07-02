@@ -1,7 +1,7 @@
 <!-- title: Status And Type Check Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-07-02 -->
 <!-- source: Unified_Commerce_Databse_Design.docx -->
 
 
@@ -70,6 +70,7 @@ Do not use database enum datatypes.
 | 07 | `tenant_refresh_tokens` | `CHECK(status IN ('ACTIVE', 'USED', 'EXPIRED', 'REVOKED'))` |
 | 07 | `tenant_login_audits` | `CHECK(login_result IN ('SUCCESS', 'FAILED', 'LOCKED'))` |
 | 08 | `outlets` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
+| 08 | `outlets` | `CHECK(outlet_type IN ('STORE', 'WAREHOUSE'))` |
 | 08 | `outlet_addresses` | `CHECK(address_type IN ('PHYSICAL', 'BILLING', 'PICKUP'))` |
 | 08 | `outlet_business_hours` | `CHECK(day_of_week BETWEEN 0 AND 6)` |
 | 08 | `outlet_business_hours` | `CHECK(open_time < close_time)` |

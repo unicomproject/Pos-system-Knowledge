@@ -43,6 +43,7 @@ Use permission codes and feature entitlements.
 |---|---|
 | tenant.dashboard.view | View tenant dashboard |
 | tenant.settings.manage | Manage tenant settings |
+| tenant.outlets.view | View outlets |
 | tenant.outlets.manage | Manage outlets |
 | tenant.tills.manage | Manage tills |
 | tenant.devices.manage | Manage POS devices |
