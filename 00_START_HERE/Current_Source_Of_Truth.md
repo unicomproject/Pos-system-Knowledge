@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-01 -->
 
 
 # Current Source Of Truth
@@ -112,6 +112,12 @@ confirmed.
 
 Do not invent unsupported modules, APIs, roles, permissions, integrations,
 tables, screens, or flows.
+## Active Backend Setup (read first)
+
+- [[../11_DEVELOPER_ONBOARDING/Backend_Local_Development_Setup]] — Unified Commerce (`E_POS.Api`, port **5187**)
+- [[../11_DEVELOPER_ONBOARDING/Unified_Commerce_Backend_Known_Limitations]] — tenant-login gap
+- Latest Cashier POS documentation-vs-code comparison: [[../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Cashier_POS_Second_Brain_vs_Code_Comparison_Implementation_Status]]
+
 ## Related Files
 
 - [[README]]

@@ -1,7 +1,7 @@
 <!-- title: Local Setup -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-01 -->
 
 
 # Local Setup
@@ -45,19 +45,77 @@ Create a feature branch before implementation.
 
 ## Backend Setup
 
-Backend must follow the Clean Architecture solution structure.
+Backend is **Unified Commerce** (`E_POS.*`) at `POS Backend/Unified-Commerce`.
 
-Run:
+Run from `POS Backend/Unified-Commerce`:
 
-```text
+```powershell
+cd "POS Backend/Unified-Commerce"
 dotnet restore
 dotnet build
+dotnet run --project ".\src\E_POS.Api\E_POS.Api.csproj"
 ```
 
-For first-time backend setup, user secrets, EF migrations, Development Platform
-Admin seed user, and local login verification, follow:
+Default HTTP port (team-verified): **5187**
+(`src/E_POS.Api/Properties/launchSettings.json` → `applicationUrl` — align if
+different).
+
+| Resource | URL |
+|---|---|
+| API | `http://localhost:5187` |
+| Swagger (Development) | `http://localhost:5187/swagger` |
+| Health | `GET http://localhost:5187/api/v1/health` |
+
+For Android emulator, Flutter must reach the host at `http://10.0.2.2:5187`
+(not `localhost`, not port **5052**).
+
+Override port only when needed:
+
+```powershell
+dotnet run --project ".\src\E_POS.Api\E_POS.Api.csproj" --urls "http://0.0.0.0:5187"
+```
+
+If Flutter uses a different port, pass matching `--dart-define=API_BASE_URL=...`.
+
+### Port 5187 already in use
+
+Another `dotnet` instance (or another app) is usually still bound to port 5187.
+
+Windows:
+
+```text
+netstat -ano | findstr :5187
+taskkill /PID <PID> /F
+```
+
+Before killing the process, identify the PID:
+
+```text
+tasklist /FI "PID eq <PID>"
+```
+
+If the process is already `E_POS.Api.dll`, the backend is already running. Do not
+start a second backend; use `http://localhost:5187/swagger` and run Flutter
+against `http://10.0.2.2:5187` on the Android emulator.
+
+### Database clean + migrations
+
+See [[Backend_Local_Development_Setup]] for `dotnet ef database drop` and
+`dotnet ef database update` with explicit `--project` and `--startup-project`.
+
+### Known limitation
+
+Flutter POS login calls `POST /api/v1/auth/tenant-login`, which is **not
+implemented** on Unified Commerce yet. See
+[[Unified_Commerce_Backend_Known_Limitations]].
+
+For first-time backend setup, connection strings, EF migrations, and Swagger
+verification, follow:
 
 - [[Backend_Local_Development_Setup]]
+
+**Archived:** old `SCS.Api` / port **5052** setup →
+[[../99_Archive/11_DEVELOPER_ONBOARDING/SCS_Nytroz_POS_Backend_Local_Development_Setup_ARCHIVED]]
 
 ## Database Setup
 

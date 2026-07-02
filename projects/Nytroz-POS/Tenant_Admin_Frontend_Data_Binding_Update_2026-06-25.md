@@ -1,3 +1,10 @@
+<!-- status: Archived reference — port 5052 / SCS backend obsolete -->
+<!-- superseded_by: ../../11_DEVELOPER_ONBOARDING/Backend_Local_Development_Setup.md -->
+
+> **ARCHIVED NOTE (2026-07-01):** This project note references old port **5052**
+> and `127.0.0.1:5052`. Active backend is Unified Commerce on port **5187**.
+> See [[../../11_DEVELOPER_ONBOARDING/Backend_Local_Development_Setup]].
+
 # Tenant Admin Frontend Data Binding Update - 2026-06-25
 
 ## Summary

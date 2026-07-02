@@ -185,7 +185,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -198,6 +199,12 @@
       "bases:Create new base": false
     }
   },
+  "active": "252da568f5b36f62",
+  "lastOpenFiles": [
+    "15_IMPLEMENTATION_TRACKING/Flutter/Sales/Cashier_POS_Second_Brain_vs_Code_Comparison_Implementation_Status.md",
+    "11_DEVELOPER_ONBOARDING/Unified_Commerce_Backend_Known_Limitations.md",
+    "99_Archive/11_DEVELOPER_ONBOARDING/SCS_Nytroz_POS_Backend_Local_Development_Setup_ARCHIVED.md",
+    "99_Archive/11_DEVELOPER_ONBOARDING",
   "active": "770cfc523b94edb3",
   "lastOpenFiles": [
     "15_IMPLEMENTATION_TRACKING/Backend/OutletTillDevice/Outlet_CRUD_Implementation_Status.md",
@@ -230,11 +237,16 @@
     "03_USER_JOURNEYS/Tenant_Admin/14_Stock_Transfer_Flow.md",
     "03_USER_JOURNEYS/Tenant_Admin/13_Stock_Out_Flow.md",
     "03_USER_JOURNEYS/Tenant_Admin",
+    "03_USER_JOURNEYS/Platform_Admin/15_System_Settings_Flow.md",
+    "03_USER_JOURNEYS/Platform_Admin/14_Audit_Logs_Flow.md",
     "03_USER_JOURNEYS/Platform_Admin",
     "10_TESTING_QA/Test_Case/21_Reports",
     "10_TESTING_QA/Test_Case/20_Integration",
     "10_TESTING_QA/Test_Case/19_Notification",
     "10_TESTING_QA/Test_Case/18_OfflineSync",
+    "10_TESTING_QA/Test_Case/17_ReturnExchange",
+    "10_TESTING_QA/Test_Case/16_Refund",
+    "10_TESTING_QA/Test_Case/15_Payment"
     "10_TESTING_QA/Test_Case/17_ReturnExchange"
   ]
 }
