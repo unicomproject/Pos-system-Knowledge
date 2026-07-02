@@ -1,7 +1,7 @@
 <!-- title: Environment Variables -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-01 -->
 
 
 # Environment Variables
@@ -111,11 +111,33 @@ production=false
 ## Example Flutter Placeholder
 
 ```text
-API_BASE_URL=http://10.0.2.2:5000/api/v1
+API_BASE_URL=http://10.0.2.2:5187
 APP_ENV=development
 ```
 
-Android emulator may use `10.0.2.2` to reach the host backend.
+Android emulator may use `10.0.2.2` to reach the host backend on port **5187**
+(must match Unified Commerce `E_POS.Api` — see
+`POS Backend/Unified-Commerce/src/E_POS.Api/Properties/launchSettings.json`).
+
+| Platform | Default base URL |
+|---|---|
+| Android emulator | `http://10.0.2.2:5187` |
+| Windows / Chrome / desktop | `http://localhost:5187` |
+| Real device (same Wi-Fi) | `http://<LAPTOP_LAN_IP>:5187` |
+
+**Obsolete:** port **5052** and `SCS.Api` paths — archived backend only.
+
+Override when backend uses a different port:
+
+```text
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:5187
+```
+
+Backend override (LAN / physical device):
+
+```text
+dotnet run --project ".\src\E_POS.Api\E_POS.Api.csproj" --urls "http://0.0.0.0:5187"
+```
 
 ## Tenant Context Rule
 
@@ -140,6 +162,7 @@ Tenant context must come from authenticated context and selected tenant flow.
 ## Related Files
 
 - [[Backend_Local_Development_Setup]]
+- [[Unified_Commerce_Backend_Known_Limitations]]
 - [[Local_Setup]]
 - [[../09_ANGULAR_ADMIN_KNOWLEDGE/Angular_Environment_Config]]
 - [[../05_BACKEND_ARCHITECTURE/API_Standards]]

@@ -1,7 +1,7 @@
 vs<!-- title: Flutter Error Handling -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-24 -->
 
 
 # Flutter Error Handling
@@ -37,6 +37,23 @@ Sale completion must use loading/locked state during payment and backend
 submission.
 
 App crash or restart must not create duplicate payments or duplicate sales.
+
+## Checkout API Error Mapping
+
+Flutter checkout must distinguish backend HTTP responses from network failures.
+
+| Case | UI / Failure Rule |
+|---|---|
+| HTTP 400 | Show backend validation/business message and stay on current checkout screen. |
+| HTTP 401 | Treat as unauthenticated/session expired, not network failure. |
+| HTTP 403 | Show permission denied message, not network failure. |
+| HTTP 404 | Show not-found/validation message, not network failure. |
+| HTTP 409 | Show conflict message and guide cashier to refresh or recalculate cart. |
+| HTTP 500 | Show safe server error message. Do not use network fallback when a backend response exists. |
+| Timeout / connection refused / no response | Treat as backend/network unavailable. |
+
+`NETWORK_ERROR` or checkout network fallback is only for requests without a
+backend HTTP response.
 
 ## Receipt Failure Rule
 

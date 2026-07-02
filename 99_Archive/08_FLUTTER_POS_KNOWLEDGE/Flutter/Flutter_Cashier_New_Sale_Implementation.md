@@ -1,7 +1,7 @@
 <!-- title: Flutter Cashier New Sale Implementation -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- last_updated: 2026-06-26 -->
 
 
 # Flutter Cashier New Sale Implementation
@@ -22,7 +22,7 @@ Target journeys: [[04_Start_Sale_Flow]], [[02_Device_Activation_Flow]],
 | POS shell (sidebar, top bar, guards) | Implemented |
 | POS home dashboard | Implemented (API + shell fallback) |
 | New Sale catalog + local cart | Partial |
-| Sale checkout / payment / receipt | Not wired in Flutter |
+| Sale checkout / payment / receipt | Cash path wired to backend checkout + receipt print audit |
 | Barcode scan | UI hint only; no lookup API call |
 | Park / customer / discount on New Sale | Buttons visible; `onPressed: null` |
 | Returns / parked / cash drawer screens | Placeholder routes |
@@ -36,8 +36,9 @@ Target journeys: [[04_Start_Sale_Flow]], [[02_Device_Activation_Flow]],
 | 3 | `/pos/device-activation` or `/pos/open-till` | Post-login resolver when device untrusted or till closed |
 | 4 | `/pos/home` | Dashboard; `GET /api/v1/pos/home` after bootstrap |
 | 5 | Start New Sale → `/pos/new-sale` | Catalog + cart when permitted and till open |
-| 6 | Search / chips / product tap | Client filter; add to `posNewSaleCartProvider` |
-| 7 | Proceed to Payment | Payment-method sheet only; no backend call |
+| 6 | Search / chips / product tap | Client filter; product name is the primary search key; variant terms refine matching products only; add to `posNewSaleCartProvider` |
+| 7 | Proceed to Payment | Backend checkout summary loads billing totals and payment methods |
+| 8 | Confirm Cash Payment | Backend creates sale/payment/receipt and returns receipt data |
 
 `postLoginRouteProvider` picks device activation, open till, POS home, or tenant
 admin dashboard. `canActivatePosDevice` checks `tenant.till.manage` (not a POS-only
@@ -164,7 +165,7 @@ Line tap opens edit sheet.
 | `posNewSaleCatalogProvider` | Product list |
 | `posProductDetailProvider` | Variant detail |
 | `posNewSaleCartProvider` | Local cart (`PosNewSaleCartState`) |
-| `posNewSaleSearchQueryProvider` | Search (needs `products.search`) |
+| `posNewSaleSearchQueryProvider` | Search (needs `products.search`); reset on fresh `/pos/new-sale` entry only |
 | `posShellGrantedPermissionsProvider` | Sidebar visibility |
 | `posSessionContextProvider` | Device/till/outlet display for activation/open-till screens |
 | `posCatalogRemoteDatasourceProvider` | Catalog HTTP client |
@@ -185,11 +186,81 @@ Discount/tax hard-coded `0`. Cart is in-memory only.
 | `POST /api/v1/devices/activate` | Device activation |
 | `GET /api/v1/pos/catalog/categories` | Datasource only; chips static |
 | `GET /api/v1/pos/catalog/products/lookup` | No (barcode) |
-| `POST /api/v1/pos/cart/*` | No |
-| `POST /api/v1/pos/sales` | No |
-| `POST /api/v1/pos/payments` | No |
+| `POST /api/v1/pos/cart/calculate` | Backend endpoint available |
+| `POST /api/v1/pos/checkout/summary` | Yes |
+| `POST /api/v1/pos/checkout/start-payment` | Yes (cash) |
+| `GET /api/v1/pos/receipts/{saleId}` | Backend endpoint available; Flutter print preview does not call it yet |
+| `POST /api/v1/pos/receipts/{saleId}/print` | Yes |
 
 API failure → `pos_catalog_fallback_data.dart` seed products.
+
+## Development Merchandise Catalog Seed (2026-06-26)
+
+Development POS catalog seed `DevelopmentPosCatalogSampleProductsSeedData.cs`
+now replaces the prior mixed demo catalog with merchandise store products.
+
+Old seeded demo products such as tickets, services, memberships, event food, and
+generic retail examples are overwritten or archived inside the deterministic
+development seed range. The seed does not delete active sale history in `UpSql`;
+stale development variants are archived so New Sale excludes them through the
+existing active-status filters.
+
+Seeded active categories:
+
+| Category | Scope |
+|---|---|
+| Clothing | T-shirt, hoodie, polo shirt, denim jacket, sports cap |
+| Footwear | Running shoes, casual sneakers, sandals |
+| Accessories | Wallet, sunglasses, wrist watch, keychain |
+| Bags | Tote bag, backpack, gift bag |
+| Gifts | Gift box, greeting card, ceramic mug |
+| Stationery | Notebook, pen set, pencil case |
+| Snacks | Bottled water, coffee, snack pack |
+
+Variant structure:
+
+| Area | Variant approach |
+|---|---|
+| Clothing | Size `S/M/L/XL`, colour `Black/White/Navy/Grey/Blue`, material where useful |
+| Footwear | Size `39/40/41/42/43`, colour `Black/White/Blue` |
+| Accessories | Colour/material variants where useful; simple variant for keychain |
+| Bags | Size/colour or package-type variants |
+| Gifts and stationery | Simple or package variants depending on product |
+| Snacks | Simple variants only |
+
+Product images are seeded through existing `product_images.storage_key` rows
+using generic HTTPS `placehold.co` URLs. No local image files are downloaded or
+committed. Flutter maps backend `imageStorageKey` as an image URL for New Sale
+tiles and keeps the existing category icon fallback when a URL is missing or
+fails.
+
+Backend local product image upload is available through
+`POST /api/v1/pos/products/{productId}/image?deviceId={deviceId}` with multipart
+form field `image` and optional `altText`. The API stores files under
+`wwwroot/uploads/products`, serves them through ASP.NET static files, and writes
+the public URL back to `product_images.storage_key` as the product primary image.
+Allowed upload formats are JPG, PNG, and WEBP with a 5 MB limit.
+
+Backend product image URL update is available through
+`PUT /api/v1/pos/products/{productId}/image-url?deviceId={deviceId}` with JSON
+body fields `imageUrl` and optional `altText`. The API validates an absolute
+HTTP/HTTPS URL and writes it to the same `product_images.storage_key` primary
+image row, so New Sale consumes URL images and uploaded local images through the
+same catalog response field.
+
+Seed behavior remains idempotent: fixed IDs are reused, products/categories/
+variants/prices/stock/images are upserted, and repeated seed runs should not
+duplicate catalog rows. New Sale should show only active merchandise products
+through `GET /api/v1/pos/products`; product-name search remains primary,
+variant-only search remains restricted, and exact SKU/barcode remains direct.
+
+Needs Verification:
+
+| Item | Note |
+|---|---|
+| Existing databases | Run the development seed/migration path and confirm archived stale variants no longer appear in New Sale. |
+| Image loading | Confirm the POS runtime can reach external HTTPS placeholder image URLs in the target environment. |
+| Local uploads | Confirm uploaded `wwwroot/uploads/products` files are backed up or persisted outside transient deployment storage. |
 
 ## Permissions (New Sale UI)
 
@@ -213,9 +284,16 @@ Router forbidden screen when route permission missing.
 
 ## Cart and Payment Behavior
 
-- Line key: `variantId ?? productId`; max qty from variant `stockQty`.
-- Proceed opens bottom sheet; tap method closes sheet only.
-- No sale record, payment capture, or receipt.
+- UI cart line key: `variantId ?? productId`; max qty from variant `stockQty`.
+  Checkout summary/start-payment lines must send real backend `variantId` only.
+  Product summary responses include `variantId` for simple/non-variant products;
+  variant-parent products get `variantId` from the product detail variant sheet.
+- Cash confirmation creates sale, payment allocation, receipt, and print audit
+  can be recorded from Print Receipt. Card/QR/split remain placeholders.
+- Payment method selection is backed by checkout summary permissions.
+- Print Receipt preview uses checkout success state (`receiptNumber`,
+  `barcodeValue`, totals, and items), not `GET /api/v1/pos/receipts/{saleId}` yet.
+- Email Receipt route/screen exists, but email send is not implemented.
 
 ## Error / Loading / Empty States
 
@@ -261,18 +339,37 @@ bootstrap failure.
 `test/features/till/*`, `test/features/device_activation/*`: till open and device
 activation forms/use cases.
 
-## Not Implemented
+## Not Implemented / Partial
 
-Backend cart calculate/checkout, payment, receipt, park/recall, barcode lookup,
-API category chips, offline queue, real customer/returns/cash-drawer screens.
+| Area | Current State |
+|---|---|
+| Backend cart calculate | Endpoint exists; New Sale totals still come from local cart state until payment summary. |
+| Cash checkout/payment/receipt | Wired through backend checkout start-payment. |
+| Receipt detail GET in Flutter | Backend endpoint exists; print preview does not call it yet. Needs Verification before marking complete. |
+| Physical printing | Not implemented; print action records audit and shows local not-implemented message. |
+| Card/QR/split payments | Placeholder screens. |
+| Park/recall | Placeholder/stub. |
+| Barcode lookup | Not wired to lookup API. |
+| API category chips | Datasource exists; chips remain static. |
+| Offline queue | Not implemented. |
+| Real customer/returns/cash-drawer screens | Placeholder routes. |
 
 ## Developer Notes
 
 1. Wire search to `GET /api/v1/pos/products?search=` and barcode to catalog lookup.
 2. Call `POST /api/v1/pos/cart/calculate` before showing tax/discount.
-3. Checkout: `POST /api/v1/pos/sales` then payments; never trust local totals.
+3. Cash checkout currently uses `POST /api/v1/pos/checkout/start-payment`; do not use `/pos/sales/checkout` as the paid checkout completion endpoint because it creates a draft sale only.
 4. Reconcile [[Flutter_Routing_Guards]] with `/pos/*` paths.
 5. Align [[Permission_Code_List]] POS examples with seeded `sales.*` / `products.*` codes.
+
+## Product Search Rule
+
+- New Sale product search treats the product name as the primary match.
+- Variant terms such as size or colour refine a product-name search only when at least one query term matches the product name.
+- Variant-only search does not return products unless the searched word is part of the product name.
+- Exact SKU/barcode search remains a direct match path.
+- When a product-name + variant query opens a variant product, matching variant attributes are preselected in the variant sheet where possible.
+- Reopening `/pos/new-sale` clears the search query/filter; this does not clear `posNewSaleCartProvider`.
 
 ## Related Files
 

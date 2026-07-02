@@ -60,6 +60,17 @@ The backend must be:
 | C# methods | PascalCase |
 | Private fields | `_camelCase` |
 
+
+## SOLID Principles
+
+| Principle | SCS-TIX Usage |
+|---|---|
+| Single Responsibility | Controller handles HTTP only; service handles use case only |
+| Open/Closed | Add provider adapters without rewriting core payment flow |
+| Liskov Substitution | Interfaces must be replaceable by implementations safely |
+| Interface Segregation | Avoid large service interfaces with unrelated methods |
+| Dependency Inversion | Application depends on abstractions, Infrastructure implements them |
+
 ## Method Rules
 
 Methods should:

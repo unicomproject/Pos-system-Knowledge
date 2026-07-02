@@ -185,6 +185,12 @@
   },
   "active": "56806a201bd68d51",
   "lastOpenFiles": [
+    "15_IMPLEMENTATION_TRACKING/Flutter/Sales/Cashier_POS_Second_Brain_vs_Code_Comparison_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/OutletTillDevice/Outlet_CRUD_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/OutletTillDevice",
+    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Tenant_Logout_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Tenant_Login_Implementation_Status.md",
+    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_User_Logout_Implementation_Status.md",
     "03_USER_JOURNEYS/Platform_Admin/03_Tenant_Management_Flow.md",
     "03_USER_JOURNEYS/Platform_Admin/05_Outlet_Collection_Point_Setup_Flow.md",
     "03_USER_JOURNEYS/Platform_Admin/13_Platform_User_Management_Flow.md",
@@ -211,15 +217,9 @@
     "04_MODULE_KNOWLEDGE/20_Unified_Order_Sales",
     "04_MODULE_KNOWLEDGE/19_Customer_Account_Consent/03_Technical_Contract.md",
     "04_MODULE_KNOWLEDGE/19_Customer_Account_Consent/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/19_Customer_Account_Consent/01_Module_Overview.md",
     "04_MODULE_KNOWLEDGE/19_Customer_Account_Consent",
-    "04_MODULE_KNOWLEDGE/18_Stock_Adjustment_Transfer_Stocktake/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/18_Stock_Adjustment_Transfer_Stocktake/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/18_Stock_Adjustment_Transfer_Stocktake/01_Module_Overview.md",
     "04_MODULE_KNOWLEDGE/18_Stock_Adjustment_Transfer_Stocktake",
-    "04_MODULE_KNOWLEDGE/13_Product_Combo_Choice_Inventory_Impact/03_Technical_Contract.md",
     "04_MODULE_KNOWLEDGE/13_Product_Combo_Choice_Inventory_Impact",
-    "04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration",
-    "04_MODULE_KNOWLEDGE/11_Product_Media_Attributes_Channel_Visibility"
+    "04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration"
   ]
 }

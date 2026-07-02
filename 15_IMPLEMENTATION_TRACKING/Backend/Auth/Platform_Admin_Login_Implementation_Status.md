@@ -3,131 +3,140 @@
 | Item | Value |
 |---|---|
 | Feature | Platform Admin Login |
-| Module | Auth |
+| Module | PlatformAdministration / Auth |
 | Platform | Backend |
 | Status | Completed |
-| Completed Date | 2026-06-12 |
+| Completed Date | 2026-07-01 |
 | Tests | Passed |
 | PR / Commit | - |
 
 ## Feature Summary
 
-Platform Admin Login authenticates platform administrators through `platform_users` only.
-It validates credentials, active platform user status, creates platform auth session records, issues JWT access tokens and refresh tokens, and stores only token hashes.
-Tenant user login, POS login, and platform permission policies are outside this feature.
-Platform refresh and logout endpoints are implemented in the current backend and are part of the active Platform Admin auth flow.
+Platform Admin Login authenticates platform administrators through `platform_users`. It validates email and password, checks active platform access, creates a platform auth session, issues a JWT access token, creates a refresh token, stores token hashes, and writes login audit records.
 
-## Current Platform Auth Endpoints
+The refresh token is stored in an HttpOnly cookie named `platform_refresh_token`; it is not exposed to JavaScript in the response body.
+
+## Current Platform Auth Endpoint
 
 | Endpoint | Method | Status |
 |---|---|---|
-| `/api/v1/auth/platform-login` | POST | Implemented |
-| `/api/v1/auth/platform-refresh` | POST | Implemented |
-| `/api/v1/auth/platform-logout` | POST | Implemented |
+| `/api/v1/platform-auth/login` | POST | Implemented |
 
 ## Related Second Brain Files
 
 | Area | File |
 |---|---|
-| User journey | `03_USER_JOURNEYS/Platform_Admin/01_Login_Flow.md` |
-| Module overview | `04_MODULE_KNOWLEDGE/Auth/01_Module_Overview.md` |
-| Functional rules | `04_MODULE_KNOWLEDGE/Auth/02_Functional_Rules.md` |
-| Technical contract | `04_MODULE_KNOWLEDGE/Auth/03_Technical_Contract.md` |
-| Database | `06_DATABASE_KNOWLEDGE/Tables/01_Platform_Identity.md` |
+| Database | `06_DATABASE_KNOWLEDGE/Tables/01_Platform_Administration.md` |
 | Architecture | `05_BACKEND_ARCHITECTURE/Authentication.md` |
+| API standards | `05_BACKEND_ARCHITECTURE/API_Standards.md` |
+| Testing | `10_TESTING_QA/Test_Case/01_PlatformAdministration/Platform_Admin_Login_Test_Cases.md` |
 
 ## Files Changed
 
 ```text
-src/SCS.Api/Modules/Auth/AuthController.cs
-src/SCS.Api/Common/Responses/ApiResponse.cs
-src/SCS.Api/Common/Responses/ApiErrorResponse.cs
-src/SCS.Api/Common/Responses/ApiErrorDetail.cs
-src/SCS.Api/appsettings.json
-src/SCS.Application/Modules/Auth/DTOs/PlatformAdminLoginRequest.cs
-src/SCS.Application/Modules/Auth/DTOs/PlatformAdminLoginResponse.cs
-src/SCS.Application/Modules/Auth/DTOs/PlatformAdminLoginUserResponse.cs
-src/SCS.Application/Modules/Auth/Interfaces/IPlatformAuthRepository.cs
-src/SCS.Application/Modules/Auth/Interfaces/IPasswordHashService.cs
-src/SCS.Application/Modules/Auth/Interfaces/IPlatformTokenService.cs
-src/SCS.Application/Modules/Auth/Interfaces/ITokenHashService.cs
-src/SCS.Application/Modules/Auth/Services/IPlatformAuthService.cs
-src/SCS.Application/Modules/Auth/Services/PlatformAuthService.cs
-src/SCS.Application/Modules/Auth/Services/PlatformAdminLoginResult.cs
-src/SCS.Application/Modules/Auth/Services/PlatformAdminLoginErrorCodes.cs
-src/SCS.Application/Modules/Auth/Services/PlatformLoginClientContext.cs
-src/SCS.Infrastructure/Modules/Auth/PlatformAuthRepository.cs
-src/SCS.Infrastructure/Modules/Auth/PasswordHashService.cs
-src/SCS.Infrastructure/Modules/Auth/PlatformTokenService.cs
-src/SCS.Infrastructure/Modules/Auth/TokenHashService.cs
-src/SCS.Infrastructure/Modules/Auth/JwtOptions.cs
-tests/SCS.UnitTests/Modules/Auth/PlatformAuthServiceTests.cs
-tests/SCS.IntegrationTests/Modules/Auth/AuthInfrastructureServiceTests.cs
-tests/SCS.ApiTests/Modules/Auth/AuthControllerTests.cs
+src/E_POS.Api/Controllers/PlatformAuthController.cs
+src/E_POS.Api/Program.cs
+src/E_POS.Api/E_POS.Api.csproj
+src/E_POS.Application/DependencyInjection.cs
+src/E_POS.Application/Modules/PlatformAdministration/Contracts/IJwtTokenService.cs
+src/E_POS.Application/Modules/PlatformAdministration/Contracts/IPasswordHashService.cs
+src/E_POS.Application/Modules/PlatformAdministration/Contracts/IPlatformAuthRepository.cs
+src/E_POS.Application/Modules/PlatformAdministration/Contracts/IPlatformAuthService.cs
+src/E_POS.Application/Modules/PlatformAdministration/Contracts/IRefreshTokenService.cs
+src/E_POS.Application/Modules/PlatformAdministration/Contracts/ITokenHashService.cs
+src/E_POS.Application/Modules/PlatformAdministration/Dtos/PlatformAdminLoginRequest.cs
+src/E_POS.Application/Modules/PlatformAdministration/Dtos/PlatformAdminLoginResponse.cs
+src/E_POS.Application/Modules/PlatformAdministration/Dtos/PlatformAdminUserDto.cs
+src/E_POS.Application/Modules/PlatformAdministration/Services/PlatformAuthService.cs
+src/E_POS.Domain/Modules/PlatformAdministration/Constants/PlatformAuthConstants.cs
+src/E_POS.Domain/Modules/PlatformAdministration/Entities/PlatformAuthSession.cs
+src/E_POS.Domain/Modules/PlatformAdministration/Entities/PlatformLoginAudit.cs
+src/E_POS.Domain/Modules/PlatformAdministration/Entities/PlatformPermission.cs
+src/E_POS.Domain/Modules/PlatformAdministration/Entities/PlatformRefreshToken.cs
+src/E_POS.Domain/Modules/PlatformAdministration/Entities/PlatformUser.cs
+src/E_POS.Domain/Modules/PlatformAdministration/Entities/PlatformUserPermission.cs
+src/E_POS.Infrastructure/DependencyInjection.cs
+src/E_POS.Infrastructure/Modules/PlatformAdministration/Repositories/PlatformAuthRepository.cs
+src/E_POS.Infrastructure/Modules/PlatformAdministration/Services/JwtTokenService.cs
+src/E_POS.Infrastructure/Modules/PlatformAdministration/Services/PasswordHashService.cs
+src/E_POS.Infrastructure/Modules/PlatformAdministration/Services/PlatformJwtOptions.cs
+src/E_POS.Infrastructure/Modules/PlatformAdministration/Services/RefreshTokenService.cs
+src/E_POS.Infrastructure/Modules/PlatformAdministration/Services/TokenHashService.cs
+src/E_POS.Infrastructure/Persistence/Migrations/20260701042423_AddPlatformUserPasswordHash.cs
+src/E_POS.Infrastructure/Persistence/Migrations/20260701053000_SeedPlatformAdmin.cs
+tests/E_POS.UnitTests/PlatformAdministration/PlatformAuthServiceTests.cs
+tests/E_POS.IntegrationTests/PlatformAdministration/PlatformSecurityServiceTests.cs
+tests/E_POS.ApiTests/PlatformAdministration/PlatformAuthControllerTests.cs
 ```
 
 ## Access Checks Implemented
 
 | Check | Status | Notes |
 |---|---|---|
-| Authentication | Done | Login validates platform credentials and issues tokens. |
-| Platform user status | Done | Only `active` platform users can login. |
-| Platform identity boundary | Done | Uses `platform_users`; does not use tenant `users`. |
-| Tenant status | N/A | No tenant context for platform login. |
-| Feature entitlement | N/A | Not required for platform login. |
-| Permission | N/A | Platform permissions apply after login for protected platform APIs. |
-| Outlet access | N/A | Not part of platform login. |
-| Trusted device | N/A | Not part of platform login. |
-| Assigned till | N/A | Not part of platform login. |
-| Open till session | N/A | Not part of platform login. |
+| Authentication | Done | Login validates platform admin credentials and issues JWT access token. |
+| Platform user status | Done | Only active platform users can login. |
+| Platform access | Done | User must have at least one active platform permission. |
+| Permission claims | Done | Active platform permission codes are added to the JWT. |
+| Tenant safety | Done | Platform login does not trust or require frontend `tenant_id`. |
+| Refresh token safety | Done | Refresh token is stored in HttpOnly cookie and token hashes are persisted. |
+| Audit | Done | Success and failed login attempts write platform login audit entries. |
 
 ## Database Tables Used
 
 | Table | Usage |
 |---|---|
-| `platform_users` | Read platform identity and update last login timestamp. |
-| `platform_auth_sessions` | Write hashed access/session token record. |
-| `platform_refresh_tokens` | Write hashed refresh token record. |
+| `platform_users` | Read platform identity, status, email, and password hash. |
+| `platform_permissions` | Read active permission codes. |
+| `platform_user_permissions` | Resolve direct user permissions. |
+| `platform_user_roles` | Resolve role-based permissions. |
+| `platform_role_permissions` | Resolve role-based permission codes. |
+| `platform_auth_sessions` | Store session record and access token identifier hash. |
+| `platform_refresh_tokens` | Store refresh token hash and expiry state. |
+| `platform_login_audits` | Store login result audit. |
+
+## Seed Data
+
+| Item | Value |
+|---|---|
+| Seed migration | `20260701053000_SeedPlatformAdmin` |
+| Email | `posunique001@gmail.com` |
+| Password | `123456` |
+| Permission | `platform.admin.access` |
+| Status | Active |
 
 ## Tests Written
 
 | Test Type | File / Test Name | Result |
 |---|---|---|
-| Unit | `tests/SCS.UnitTests/Modules/Auth/PlatformAuthServiceTests.cs` / `LoginPlatformAdminAsync_WithValidCredentials_CreatesSessionAndRefreshToken` | Passed |
-| Unit | `tests/SCS.UnitTests/Modules/Auth/PlatformAuthServiceTests.cs` / `LoginPlatformAdminAsync_WithInvalidPassword_ReturnsSafeInvalidCredentials` | Passed |
-| Unit | `tests/SCS.UnitTests/Modules/Auth/PlatformAuthServiceTests.cs` / `LoginPlatformAdminAsync_WithInactiveUser_ReturnsLoginNotAllowed` | Passed |
-| Unit | `tests/SCS.UnitTests/Modules/Auth/PlatformAuthServiceTests.cs` / `LoginPlatformAdminAsync_WithMissingFields_ReturnsValidationFailure` | Passed |
-| Integration | `tests/SCS.IntegrationTests/Modules/Auth/AuthInfrastructureServiceTests.cs` / `PasswordHashService_HashedPassword_VerifiesOnlyCorrectPassword` | Passed |
-| Integration | `tests/SCS.IntegrationTests/Modules/Auth/AuthInfrastructureServiceTests.cs` / `TokenHashService_HashToken_DoesNotReturnRawToken` | Passed |
-| API | `tests/SCS.ApiTests/Modules/Auth/AuthControllerTests.cs` / `AuthController_UsesExpectedPlatformLoginRoute` | Passed |
-| API | `tests/SCS.ApiTests/Modules/Auth/AuthControllerTests.cs` / `PlatformLogin_WithInvalidCredentials_ReturnsUnauthorizedStandardError` | Passed |
+| Unit | `tests/E_POS.UnitTests/PlatformAdministration/PlatformAuthServiceTests.cs` / `LoginAsync_WithValidPlatformAdmin_CreatesSessionRefreshTokenAndSuccessAudit` | Passed |
+| Unit | `tests/E_POS.UnitTests/PlatformAdministration/PlatformAuthServiceTests.cs` / `LoginAsync_WithInvalidPassword_ReturnsGenericFailureAndWritesFailedAudit` | Passed |
+| Unit | `tests/E_POS.UnitTests/PlatformAdministration/PlatformAuthServiceTests.cs` / `LoginAsync_WithoutPlatformPermissions_ReturnsAccessDeniedAndWritesFailedAudit` | Passed |
+| Integration | `tests/E_POS.IntegrationTests/PlatformAdministration/PlatformSecurityServiceTests.cs` / `PasswordHashService_VerifiesCorrectPasswordAndRejectsWrongPassword` | Passed |
+| Integration | `tests/E_POS.IntegrationTests/PlatformAdministration/PlatformSecurityServiceTests.cs` / `JwtTokenFactory_CreatesJwtWithPlatformClaimsAndPermissions` | Passed |
+| API | `tests/E_POS.ApiTests/PlatformAdministration/PlatformAuthControllerTests.cs` / `Login_WithSuccessfulServiceResult_ReturnsOkResponse` | Passed |
+| API | `tests/E_POS.ApiTests/PlatformAdministration/PlatformAuthControllerTests.cs` / `Login_WithInvalidCredentials_ReturnsUnauthorized` | Passed |
+| API | `tests/E_POS.ApiTests/PlatformAdministration/PlatformAuthControllerTests.cs` / `Login_WithoutPlatformAccess_ReturnsForbidden` | Passed |
 
-## Test Commands Run
+## Test Commands
 
-```text
-dotnet restore SCS.sln
-dotnet build SCS.sln --no-restore -maxcpucount:1 /p:UseAppHost=false
-dotnet test SCS.sln --no-build --no-restore -maxcpucount:1 --logger "console;verbosity=minimal"
+```powershell
+dotnet build E_POS.sln -m:1 --no-restore
+dotnet test tests\E_POS.UnitTests\E_POS.UnitTests.csproj --no-restore
+dotnet test tests\E_POS.IntegrationTests\E_POS.IntegrationTests.csproj --no-restore
+dotnet test tests\E_POS.ApiTests\E_POS.ApiTests.csproj --no-restore
 ```
 
 ## Test Result Summary
 
-All tests passed.
-
-```text
-SCS.UnitTests: Passed 6, Failed 0
-SCS.IntegrationTests: Passed 4, Failed 0
-SCS.ApiTests: Passed 4, Failed 0
-Total: Passed 14, Failed 0
-```
+Platform Admin Login automated unit, integration, and API tests were added and passed. Later full solution test execution can be affected by the local Windows Application Control policy blocking generated test/API DLLs; that is an environment policy issue, not a source compilation issue.
 
 ## Second Brain Updates
 
 | File Updated | Update Summary |
 |---|---|
-| `06_DATABASE_KNOWLEDGE/Tables/01_Platform_Identity.md` | Added platform auth session and platform refresh token table definitions. |
-| `10_TESTING_QA/API_Test_Cases.md` | Added Platform Admin Login API test coverage summary. |
-| `15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_Admin_Login_Implementation_Status.md` | Added implementation status, files changed, access checks, tables, test cases, commands, and result summary. |
+| `06_DATABASE_KNOWLEDGE/Tables/01_Platform_Administration.md` | Added/confirmed platform user password hash knowledge. |
+| `10_TESTING_QA/Test_Case/01_PlatformAdministration/Platform_Admin_Login_Test_Cases.md` | Added current E_POS Platform Admin Login test cases and automated coverage. |
+| `15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_Admin_Login_Implementation_Status.md` | Replaced old SCS tracking with current E_POS implementation status. |
 
 ## Final Completion Checklist
 
@@ -136,7 +145,9 @@ Total: Passed 14, Failed 0
 | Implementation completed | Yes |
 | Tests written | Yes |
 | Tests run | Yes |
-| PR/commit recorded | - |
+| Swagger endpoint visible | Yes |
+| Seed migration created | Yes |
+| Database seed applied | Yes |
 | Second Brain updated | Yes |
 | Completed date added | Yes |
 | No unsupported scope added | Yes |

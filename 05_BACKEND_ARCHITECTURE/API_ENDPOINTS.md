@@ -1,14 +1,17 @@
-<!-- title: API Endpoints -->
+<!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
 <!-- last_updated: 2026-07-02 -->
 
+# Platform Subscription Plan API Endpoints
 
-# API Endpoints
+## Tenant POS Login
 
-## Purpose
+Base route: `/api/v1/auth`
 
-This file defines API route group guidance for TM-EPOS MVP.
+| Method | Route | Unified Commerce status |
+|---|---|---|
+| POST | `/api/v1/auth/tenant-login` | **Not implemented** (Flutter still calls this — returns 404 on port 5187) |
 
 This is not the final full endpoint catalogue. Exact endpoint tables must be
 created module-by-module after module contracts are finalized.
@@ -16,66 +19,72 @@ created module-by-module after module contracts are finalized.
 Confirmed Release 1 implemented endpoints are documented in the sections below.
 Use those tables for active backend, Angular, and Flutter integration work.
 
-## Endpoint Rule
+> **Active backend:** `Nytroz POS - Backend New/Unified-Commerce` · Platform Admin dev URL `http://localhost:5150`
+>
+> **Obsolete:** port **5052**, `Nytroz-POS-Backend` / `SCS.Api` — see
+> [[../11_DEVELOPER_ONBOARDING/Unified_Commerce_Backend_Known_Limitations]]
 
-Do not invent exact endpoint contracts before module use cases and request/response
-DTOs are confirmed.
+Request body (Flutter contract — pending backend implementation):
 
-Use this file to keep route group naming consistent.
-
-## Base Route
-
-```text
-/api/v1
+```json
+{
+  "email": "cashier001@gmail.com",
+  "password": "123456"
+}
 ```
 
-## MVP Route Groups
+Tenant Code is not accepted from the POS login screen. Backend resolves tenant
+from the tenant user email. If the email exists in multiple tenants, the API
+returns `TENANT_SELECTION_REQUIRED` with: "Multiple tenants found for this
+email. Tenant selection is required."
 
-| Route Group | Purpose |
+Base route: `/api/v1/platform/subscription-plans`
+
+All endpoints require platform JWT authentication.
+
+## Endpoints
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/platform/subscription-plans` | `platform.subscription_plans.view` | List subscription plans |
+| POST | `/api/v1/platform/subscription-plans` | `platform.subscription_plans.create` | Create draft plan |
+| PATCH | `/api/v1/platform/subscription-plans/{planId}/pricing` | `platform.subscription_plans.edit` | Save draft `base_price` |
+| PATCH | `/api/v1/platform/subscription-plans/{planId}/limits` | `platform.subscription_plans.edit` | Save draft outlet/till/user limits |
+| POST | `/api/v1/platform/subscription-plans/{planId}/publish` | `platform.subscription_plans.edit` | Publish draft → DB `active` |
+
+## Release 1 write flow
+
+1. **Create draft** — basics fields on `subscription_plans`
+2. **Update pricing** — `base_price` only, draft status required
+3. **Update limits** — `max_outlets`, `max_tills`, `max_users`, draft status required
+4. **Publish** — status `draft` → `active`; API response returns `status: active`
+
+## Status contract
+
+| Layer | Values |
 |---|---|
-| `/platform/...` | Platform admin, tenants, plans, entitlements, billing |
-| `/tenant-admin/...` | Tenant business admin context and setup |
-| `/auth/...` | Platform, tenant, customer authentication where applicable |
-| `/pos/...` | POS sale, basket, till, receipt, cash, device operations |
-| `/online-store/...` | Customer storefront catalogue and customer order entry |
-| `/cart-checkout/...` | Cart and checkout session operations |
-| `/orders/...` | Unified sales order management |
-| `/fulfilment-pickup/...` | Fulfilment method, pickup slot, pickup order flows |
-| `/payments-refunds/...` | Sales payments, transactions, refunds, allocations |
-| `/returns-exchanges/...` | Return, inspection, exchange workflows |
-| `/offline-sync/...` | Offline clients, number blocks, sync batches, conflicts |
-| `/notifications/...` | Notification events, templates, messages, delivery |
-| `/integrations/...` | Providers, credentials, webhooks, request logs |
-| `/reports/...` | Operational reports and exports |
+| Database | `draft`, `active`, `retired` |
+| API plan `status` field | Same DB values (no `published`/`archived` in responses) |
+| Frontend labels | UI may show Published for `active`; backend does not |
 
-## POS Route Boundary
+Publish response example: `{ "status": "active", ... }`
 
-POS routes must validate tenant user, outlet, till, device, permission, and open
-till session where required.
+## Verification (2026-06-22)
 
-## Online Store Route Boundary
+- Swagger at `http://localhost:5050`
+- Full flow: POST create → PATCH pricing → PATCH limits → POST publish → GET list
+- DB table `subscription_plans`: `base_price`, `max_outlets`, `max_tills`, `max_users`, `status = active`
+- Backend unit tests: **109/109 passed**
 
-Online store routes must resolve tenant/storefront context safely through domain,
-sales channel, or verified tenant route.
+## Limits request example
 
-## Offline Sync Route Boundary
-
-Offline sync routes require approved offline client/device, tenant context,
-idempotency, payload validation, and backend revalidation.
-
-## Endpoint Documentation Rule
-
-When a module is implemented, create or update module-level endpoint tables with:
-
-- HTTP method.
-- Route.
-- Purpose.
-- Request DTO.
-- Response DTO.
-- Required permission.
-- Feature entitlement.
-- Idempotency requirement.
-- Audit requirement.
+```json
+{
+  "maxOutlets": 5,
+  "maxTills": 10,
+  "maxUsers": 25
+}
+```
 
 ---
 
@@ -120,12 +129,17 @@ Planned next slice (not yet implemented):
 
 | Method | Route | Permission | Purpose |
 |---|---|---|---|
-| GET | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.view` | Tenant detail |
 | POST | `/api/v1/platform-admin/tenants` | `platform.tenants.create` | Create tenant |
 | PUT/PATCH | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.update` | Update tenant |
 | POST | `/api/v1/platform-admin/tenants/{tenantId}/activate` | `platform.tenants.activate` | Activate tenant |
 | POST | `/api/v1/platform-admin/tenants/{tenantId}/suspend` | `platform.tenants.suspend` | Suspend tenant |
 | PUT | `/api/v1/platform-admin/tenants/{tenantId}/entitlements` | `platform.tenants.entitlements.update` | Assign subscription/features |
+
+Implemented in Unified-Commerce backend (2026-07-02):
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.view` | Tenant detail |
 
 Verification on 2026-07-02:
 
@@ -351,3 +365,54 @@ See [[../99_Archive/04_MODULE_KNOWLEDGE/Subscription/04_Subscription_Catalog_Mod
 - [[../04_MODULE_KNOWLEDGE/03_Subscription_Catalog_Entitlements/03_Technical_Contract]]
 - [[../99_Archive/04_MODULE_KNOWLEDGE/Subscription/04_Subscription_Catalog_Model]]
 - [[../06_DATABASE_KNOWLEDGE/Subscription_Tables]]
+- [[../11_DEVELOPER_ONBOARDING/Unified_Commerce_Backend_Known_Limitations]]
+
+---
+
+# POS Payment And Receipt API Endpoints
+
+Base routes: `/api/v1/pos/cart`, `/api/v1/pos/checkout`,
+`/api/v1/pos/sales`, `/api/v1/pos/payments`, `/api/v1/pos/receipts`.
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| POST | `/api/v1/pos/cart/calculate` | `sales.cart.update_item` in the direct controller; `sales.checkout` when called through checkout summary/start-payment | Backend cart totals without saving a sale |
+| POST | `/api/v1/pos/checkout/summary` | `sales.checkout` | Payment screen billing summary and permitted methods |
+| POST | `/api/v1/pos/checkout/start-payment` | `sales.checkout` + selected payment permission | Existing Flutter cash checkout entry point; creates sale/payment/receipt for cash |
+| POST | `/api/v1/pos/sales` | `sales.checkout` | Create draft POS sale |
+| POST | `/api/v1/pos/sales/checkout` | `sales.checkout` | Alias for draft sale creation; does not complete payment by itself |
+| GET | `/api/v1/pos/sales/{saleId}` | `sales.view` | Completed sale details |
+| POST | `/api/v1/pos/payments` | Payment method permission such as `payments.cash.accept` | Record payment against an existing draft sale |
+| GET | `/api/v1/pos/receipts/{saleId}` | `receipts.view` or `receipts.print` | Receipt preview data with `barcodeValue` |
+| POST | `/api/v1/pos/receipts/{saleId}/print` | `receipts.print` | Receipt print audit row |
+
+Cash checkout writes `sales`, `sale_lines`, `payments`,
+`sale_payment_allocations`, and `receipts`. Print audit writes
+`receipt_print_logs`.
+
+Cash checkout request includes `cashReceived`. Successful cash checkout response
+includes backend-sourced `cashReceived` and `changeDue`; Flutter must display
+those returned values instead of recalculating or defaulting locally. Sale detail
+and receipt detail responses also expose `cashReceived` and `changeDue` from the
+saved sale/payment outcome.
+
+Checkout/cart line requests use backend product variant IDs. `GET
+/api/v1/pos/products` exposes `variantId` for simple/non-variant products so
+Flutter can send `{ variantId, qty }` to checkout summary/start-payment without
+substituting product IDs.
+
+`GET /api/v1/pos/products` product summaries expose variant search metadata for
+New Sale filtering. Product name remains the primary search key; variant terms
+only refine product-name searches, while exact SKU/barcode remains a direct
+lookup/search path.
+
+## Needs Verification
+
+- The permission catalog contains `sales.cart.manage`, but current verified
+  backend code still protects direct `POST /api/v1/pos/cart/calculate` with
+  `sales.cart.update_item`. Treat any documentation that says the direct endpoint
+  requires only `sales.cart.manage` as a mismatch until backend access rules are
+  updated.
+- `GET /api/v1/pos/payment-methods` and `GET /api/v1/pos/printer-settings` were
+  not found in the current backend. Flutter payment methods come from checkout
+  summary, and printer selection/config remains local or future scope.

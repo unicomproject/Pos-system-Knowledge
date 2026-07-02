@@ -1,7 +1,7 @@
 <!-- title: Backend Feature Prompt With Optional Reads -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-07-01 -->
 
 # Backend Feature Prompt With Optional Reads
 
@@ -35,6 +35,7 @@ First, read only the related Second Brain files:
 05_BACKEND_ARCHITECTURE/
 â”œâ”€â”€ Clean_Architecture_Layers.md
 â”œâ”€â”€ Module_Based_Folder_Structure.md
+â”œâ”€â”€ Backend_Coding_Principles.md
 â”œâ”€â”€ DTO_And_Mapping_Rules.md
 â”œâ”€â”€ API_Standards.md
 â””â”€â”€ Error_Response_Standards.md
@@ -102,6 +103,13 @@ Do not trust frontend tenant_id.
 Resolve tenant context server-side.
 Use DTOs and mapping.
 Do not return EF Core entities directly.
+
+Comment rule:
+- Do not add comments that repeat what the code already says.
+- Add short single-line comments only for non-obvious business, security, data, or architecture intent.
+- Comment important reasons such as generic auth failures, token/cookie security, tenant isolation, permission checks, idempotency, audit intent, cache authority limits, or unusual database constraints.
+- API purpose belongs in route/action names and Swagger/OpenAPI; code comments should explain why, not what.
+- Use XML docs only for shared/public APIs when API consumer documentation benefits.
 
 ```
 

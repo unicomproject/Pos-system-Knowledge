@@ -1,14 +1,14 @@
 <!-- title: Code Review Checklist -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-01 -->
 
 
 # Code Review Checklist
 
 ## Purpose
 
-This file defines the SCS-TIX EPOS Release 1 code review checklist.
+This file defines the TM-EPOS MVP code review checklist.
 
 Reviewers must check correctness, scope, architecture, security, tenant safety,
 and maintainability.
@@ -34,6 +34,8 @@ and maintainability.
 | No CQRS/MediatR/Redis introduced | Yes |
 | DTOs used for API contracts | Yes |
 | EF entities not returned directly | Yes |
+| Meaningful comments explain non-obvious business/security intent | Yes |
+| No noisy comments that repeat obvious code | Yes |
 
 ## Access Control Review
 
@@ -126,6 +128,8 @@ Rejected
 
 Reject immediately if the PR adds unsupported scope, breaks tenant isolation, or
 exposes secrets.
+
+Comments are required only where they explain why important logic exists, such as security, tenant isolation, idempotency, audit, cache authority limits, or unusual database constraints.
 
 ## Related Files
 
