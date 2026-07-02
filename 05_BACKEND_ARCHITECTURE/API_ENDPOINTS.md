@@ -124,27 +124,33 @@ All endpoints require platform JWT authentication.
 | GET | `/api/v1/platform-admin/tenants` | `platform.tenants.view` | List tenants with paging/filter/sort |
 | GET | `/api/v1/platform-admin/tenants/summary` | `platform.tenants.view` | Load tenant summary cards |
 | GET | `/api/v1/platform-admin/tenants/filter-options` | `platform.tenants.view` | Load filter dropdown options |
-
-Planned next slice (not yet implemented):
-
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| POST | `/api/v1/platform-admin/tenants` | `platform.tenants.create` | Create tenant |
-| PUT/PATCH | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.update` | Update tenant |
+| GET | `/api/v1/platform-admin/tenants/create-options` | `platform.tenants.create` | Load tenant create wizard options |
+| GET | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.view` | Tenant detail |
+| POST | `/api/v1/platform-admin/tenants` | `platform.tenants.create` | Create tenant (legacy minimal or full 7-step wizard payload) |
+| PUT | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.update` | Update tenant |
 | POST | `/api/v1/platform-admin/tenants/{tenantId}/activate` | `platform.tenants.activate` | Activate tenant |
 | POST | `/api/v1/platform-admin/tenants/{tenantId}/suspend` | `platform.tenants.suspend` | Suspend tenant |
 | PUT | `/api/v1/platform-admin/tenants/{tenantId}/entitlements` | `platform.tenants.entitlements.update` | Assign subscription/features |
 
-Implemented in Unified-Commerce backend (2026-07-02):
+## Tenant Create Wizard (2026-07-02)
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.view` | Tenant detail |
+`GET /api/v1/platform-admin/tenants/create-options` returns active plans (with included features), addons, commercial catalog modules/features, and lookup values for billing modes, currencies, timezones, locales, business types, operating modes, subscription statuses, and billing cycles.
+
+`POST /api/v1/platform-admin/tenants` wizard payload persists in one transaction:
+
+- tenant + profile + registered address
+- subscription with billing/limit override fields
+- subscription addons
+- tenant feature entitlements (auto-seeded from plan when omitted)
+- tenant admin user + TENANT_ADMIN role + permissions + invite row
+- optional draft subscription invoice
+
+Tenant admin invite is persisted as `INVITED` with pending password hash; email is not sent in this slice.
 
 Verification on 2026-07-02:
 
-- Tenant list GET returned 200 with valid JWT and `platform.tenants.view`.
-- Missing permission returns HTTP 403 from service layer (covered by unit tests).
+- `dotnet test`: 257/257 passed
+- Angular `npm test -- --watch=false`: 140/140 passed
 
 ---
 

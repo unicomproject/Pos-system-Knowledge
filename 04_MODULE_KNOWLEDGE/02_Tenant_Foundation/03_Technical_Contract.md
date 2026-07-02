@@ -25,7 +25,7 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
 | API Group | Purpose |
 |---|---|
-| `/api/v1/platform-admin/tenants` | Module API group |
+| `/api/v1/platform-admin/tenants` | Platform tenant CRUD, create-options, activate/suspend; wizard create persists tenant + profile + address + subscription bootstrap |
 | `/api/v1/tenants` | Module API group |
 | `/api/v1/tenant-admin/context` | Module API group |
 | `/api/v1/tenant-admin/settings` | Module API group |
@@ -37,8 +37,8 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 | `currencies` | Used by this module |
 | `business_types` | Used by this module |
 | `tenants` | Used by this module |
-| `tenant_profiles` | Used by this module |
-| `tenant_addresses` | Used by this module |
+| `tenant_profiles` | Legal/contact/country fields populated by platform tenant create wizard |
+| `tenant_addresses` | Registered address line1/2, city, state, postal_code, country_code |
 | `tenant_domains` | Used by this module |
 | `setting_definitions` | Used by this module |
 | `tenant_settings` | Used by this module |

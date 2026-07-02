@@ -14,7 +14,7 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
 | Area | Contract |
 |---|---|
-| API groups | `/api/v1/platform-admin/users`, `/api/v1/platform-admin/roles`, `/api/v1/platform-admin/permissions`, `/api/v1/platform-admin/settings`, `/api/v1/platform-admin/audit` |
+| API groups | `/api/v1/platform-admin/users`, `/api/v1/platform-admin/roles`, `/api/v1/platform-admin/permissions`, `/api/v1/platform-admin/settings`, `/api/v1/platform-admin/audit`, `/api/v1/platform-admin/tenants` |
 | Request format | Typed request DTOs; no raw map payloads in application layer |
 | Response format | Typed response DTOs with safe fields only |
 | Error format | Standard API error response |
@@ -29,7 +29,7 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 | `/api/v1/platform-admin/roles` | Module API group |
 | `/api/v1/platform-admin/permissions` | Module API group |
 | `/api/v1/platform-admin/settings` | Module API group |
-| `/api/v1/platform-admin/audit` | Module API group |
+| `/api/v1/platform-admin/tenants` | Tenant list, detail, create-options, create, update, activate, suspend, entitlements |
 
 ## Database Contract
 
