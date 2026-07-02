@@ -36,19 +36,20 @@ Purpose: Stores tenant users records for this module.
 | Attribute | Type | Key / Constraint | Reference / Note |
 | --- | --- | --- | --- |
 | id | uuid | PK | Primary key. Primary key / source design key. |
-| tenant_id | uuid | FK NOT UNIQUE | References `tenants(id)`. Unique business key. Unique business key. Partial unique where normalized_phone IS NOT NULL. |
-| normalized_email | citext | UNIQUE | Unique business key. |
-| normalized_phone | varchar(40) | UNIQUE | Unique business key. Partial unique where normalized_phone IS NOT NULL. |
+| tenant_id | uuid | FK NOT | References `tenants(id)`. Tenant context is resolved server-side after login. |
+| normalized_email | citext | UNIQUE NOT | Globally unique tenant user login email. Same email cannot be reused in another tenant. |
+| normalized_phone | varchar(40) | UNIQUE NULL | Unique business key. Partial unique where normalized_phone IS NOT NULL. |
+| password_hash | varchar(255) | NULL | Required after user setup. Raw passwords are never stored. |
 | status | varchar(30) | CHECK | CHECK(status IN ('ACTIVE', 'INACTIVE', 'INVITED', 'LOCKED', 'DELETED')) |
 | created_at | timestamptz | NOT | Creation timestamp. |
 | updated_at | timestamptz | NOT | Last update timestamp. |
 
-Source constraints from uploaded design:
+Source constraints from uploaded design and MVP login rule:
 
 ```text
 PK(id)
 FK(tenant_id) REFERENCES tenants(id)
-UNIQUE(tenant_id, normalized_email)
+UNIQUE(normalized_email)
 UNIQUE(tenant_id, normalized_phone) WHERE normalized_phone IS NOT NULL
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'INVITED', 'LOCKED', 'DELETED'))
 ```

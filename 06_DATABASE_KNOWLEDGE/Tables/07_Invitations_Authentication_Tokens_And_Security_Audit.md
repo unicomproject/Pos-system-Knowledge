@@ -1,7 +1,7 @@
 <!-- title: Invitations, Authentication, Tokens & Security Audit -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-02 -->
 <!-- source: Unified_Commerce_Databse_Design.docx -->
 
 
@@ -157,6 +157,7 @@ Purpose: Stores tenant refresh tokens records for this module.
 | updated_at | timestamptz | NOT | Last update timestamp. |
 | tenant_auth_session_id | uuid | FK NOT | References `tenant_auth_sessions(id)`. |
 | token_hash | varchar(255) | UNIQUE | Unique business key. |
+| expires_at | timestamptz | NOT CHECK | Refresh token expiry timestamp. CHECK(expires_at > created_at). |
 
 Source constraints from uploaded design:
 
@@ -165,6 +166,7 @@ PK(id)
 FK(tenant_auth_session_id) REFERENCES tenant_auth_sessions(id)
 UNIQUE(token_hash)
 CHECK(status IN ('ACTIVE', 'USED', 'EXPIRED', 'REVOKED'))
+CHECK(expires_at > created_at)
 ```
 
 ## tenant_login_audits

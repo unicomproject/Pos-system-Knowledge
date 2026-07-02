@@ -33,6 +33,19 @@ Do not generate C# enum classes for database status/type/check-value columns.
 Those Domain properties remain strings, while allowed values are enforced through
 Application validation and database CHECK constraints. Permission catalog values
 must be seeded and stored in the database.
+## Tenant Admin Permissions
+
+| Code | Meaning |
+|---|---|
+| tenant.dashboard.view | View tenant dashboard |
+| tenant.settings.manage | Manage tenant settings |
+| tenant.outlets.view | View outlets |
+| tenant.outlets.manage | Manage outlets |
+| tenant.tills.manage | Manage tills |
+| tenant.devices.manage | Manage POS devices |
+| tenant.hardware.manage | Manage hardware profiles/devices |
+| tenant.users.manage | Manage tenant users |
+| tenant.roles.manage | Manage roles and permissions |
 
 ## Code Ownership Pattern
 
