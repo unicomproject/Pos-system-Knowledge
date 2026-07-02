@@ -1,302 +1,249 @@
 <!-- title: Backend Local Development Setup -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- system: TM-EPOS MVP / Unified Commerce -->
+<!-- last_updated: 2026-07-01 -->
 
 
 # Backend Local Development Setup
 
 ## Purpose
 
-This guide explains how to clone the Nytroz POS / SCS-TIX backend, configure local
-secrets, apply EF migrations, and sign in as the Development Platform Admin.
+This guide explains how to clone, build, migrate, and run the **Unified Commerce**
+backend (`E_POS.*`) used by TM-EPOS MVP development.
 
-It documents `DevelopmentDataSeeder.cs`, which creates or updates the local
-Platform Admin user used for Platform Admin login only.
+It replaces the archived **SCS / Nytroz-POS-Backend** setup
+(`SCS.Api`, port **5052**). See
+[[../99_Archive/11_DEVELOPER_ONBOARDING/SCS_Nytroz_POS_Backend_Local_Development_Setup_ARCHIVED]].
 
-## Why Development Only
+## Active Backend Repository
 
-`DevelopmentDataSeeder` runs from `Program.cs` only when
-`ASPNETCORE_ENVIRONMENT=Development`.
-
-The seeder also checks the host environment internally and skips itself outside
-Development.
-
-It must never run in Production. Do not move seed credentials into
-`appsettings.json` or commit user secrets.
-
-## What DevelopmentDataSeeder Does
-
-On backend startup in Development:
-
-1. Applies EF migrations automatically (`Program.cs`).
-2. Runs `DevelopmentDataSeeder` to ensure one Platform Admin user exists.
-3. Runs `DevelopmentPlatformPermissionSeeder` for development permission data.
-
-Default seed email:
-
-```text
-admin@nytroz.local
-```
-
-Password is never stored in source control. It is read from user secrets at:
-
-```text
-DevelopmentSeed:PlatformAdmin:Password
-```
-
-### Seed Behavior
-
-| Scenario | Behavior |
+| Item | Value |
 |---|---|
-| User does not exist | Requires seed password; creates active Platform Admin with hashed password |
-| User already exists | Keeps existing password unless reset is enabled |
-| `ResetPassword=true` and password configured | Updates password hash and `UpdatedAt` |
-| `ResetPassword=false` | Does not change password hash |
-| User exists but password secret missing | Logs warning; does not crash |
-| User missing and password secret missing | Throws clear error with setup command |
-| Non-Development environment | Seeder skipped |
+| Workspace path | `POS Backend/Unified-Commerce` |
+| Git branch (cashier flow) | `cashier-flow` |
+| API project | `src/E_POS.Api/E_POS.Api.csproj` |
+| Infrastructure (EF) | `src/E_POS.Infrastructure/E_POS.Infrastructure.csproj` |
+| Domain | `src/E_POS.Domain` |
+| Application | `src/E_POS.Application` |
+| Architecture | Clean Architecture + Service/Repository (no CQRS/MediatR) |
 
-This fixes local login failures when `admin@nytroz.local` already exists with an
-old or wrong password hash. Set `DevelopmentSeed:PlatformAdmin:ResetPassword` to
-`true` once, run the backend, then set it back to `false` if you prefer.
+## Verified Local URLs (2026-07-01)
+
+| Service | URL |
+|---|---|
+| HTTP API | `http://localhost:5187` |
+| Swagger (Development) | `http://localhost:5187/swagger` |
+| Health check | `GET http://localhost:5187/api/v1/health` |
+
+> **Port note:** Team-verified dev port is **5187**. If `dotnet run` binds to a
+> different port, check `src/E_POS.Api/Properties/launchSettings.json` and align
+> `applicationUrl`, or run with
+> `dotnet run --urls "http://localhost:5187"`.
+
+**Old port 5052 is wrong** for this backend. Do not use it in Flutter, docs, or
+HTTP clients.
 
 ## Prerequisites
 
 | Tool | Notes |
 |---|---|
-| .NET 10 SDK | Backend target framework |
-| PostgreSQL | Local instance on port 5432 |
-| dotnet-ef | EF Core CLI for manual migration runs |
+| .NET 10 SDK | `dotnet restore` / `dotnet build` verified |
+| PostgreSQL | Local instance (default port 5432) |
+| dotnet-ef | EF Core CLI for migrations |
 
-Install EF Core tools if missing:
+Install EF tools if missing:
 
 ```powershell
 dotnet tool install --global dotnet-ef
 ```
 
-## Repository Path
+## Step 1 — Restore, Build, Test
 
-```text
-C:\Users\User\Desktop\Nytroz__POS\Nytroz POS - Backend\Nytroz-POS-Backend
-```
-
-Backend API project:
-
-```text
-src\SCS.Api
-```
-
-User secrets id is configured in `SCS.Api.csproj` (`UserSecretsId`).
-
-## Step 1 — Restore and Build
-
-From backend root:
+From `POS Backend/Unified-Commerce`:
 
 ```powershell
+cd "POS Backend/Unified-Commerce"
+
+git checkout cashier-flow
+git pull
+
 dotnet restore
 dotnet build
+dotnet test
 ```
 
-## Step 2 — Configure User Secrets
+## Step 2 — Database Connection
 
-Run these commands from `src\SCS.Api`:
+Development connection string lives in
+`src/E_POS.Api/appsettings.Development.json` (placeholder values only — do not
+commit real passwords).
+
+Example shape:
+
+```text
+Host=localhost;Port=5432;Database=UnifiedCommerceDb;Username=postgres;Password=CHANGE_ME
+```
+
+Prefer `dotnet user-secrets` from `src/E_POS.Api` for local overrides:
 
 ```powershell
-cd src\SCS.Api
-
-dotnet user-secrets init
-
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=nytroz_pos_dev;Username=postgres;Password=YOUR_POSTGRES_PASSWORD"
-
-dotnet user-secrets set "DevelopmentSeed:PlatformAdmin:Password" "Admin@12345"
-
-dotnet user-secrets set "DevelopmentSeed:PlatformAdmin:ResetPassword" "true"
+cd src/E_POS.Api
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=UnifiedCommerceDb;Username=postgres;Password=YOUR_POSTGRES_PASSWORD"
 ```
 
-Optional overrides:
+## Step 3 — Database Clean (drop + recreate)
+
+Run from `POS Backend/Unified-Commerce` when you need a **fresh local database**
+(schema reset). This **destroys all data** in the target database.
 
 ```powershell
-dotnet user-secrets set "DevelopmentSeed:PlatformAdmin:Email" "admin@nytroz.local"
+cd "POS Backend/Unified-Commerce"
+
+dotnet ef database drop --force `
+  --project ".\src\E_POS.Infrastructure\E_POS.Infrastructure.csproj" `
+  --startup-project ".\src\E_POS.Api\E_POS.Api.csproj"
+
+dotnet ef database update `
+  --project ".\src\E_POS.Infrastructure\E_POS.Infrastructure.csproj" `
+  --startup-project ".\src\E_POS.Api\E_POS.Api.csproj"
 ```
 
-After first successful login, you may set:
-
-```powershell
-dotnet user-secrets set "DevelopmentSeed:PlatformAdmin:ResetPassword" "false"
-```
-
-## Step 3 — Apply EF Migrations
-
-From `src\SCS.Api`:
-
-```powershell
-dotnet ef database update --project ..\SCS.Infrastructure\SCS.Infrastructure.csproj --startup-project .\SCS.Api.csproj
-```
-
-Note: `Program.cs` also runs `MigrateAsync()` on startup in Development. Manual
-`dotnet ef database update` is still recommended after clone or pull when schema
-changed.
+EF commands **require** explicit `--project` and `--startup-project` paths.
 
 ## Step 4 — Run the Backend
 
-From `src\SCS.Api`:
+From `POS Backend/Unified-Commerce`:
 
 ```powershell
+dotnet run --project ".\src\E_POS.Api\E_POS.Api.csproj"
+```
+
+Or:
+
+```powershell
+cd src/E_POS.Api
 dotnet run
 ```
 
-Ensure environment is Development (default for `dotnet run` locally).
+Ensure `ASPNETCORE_ENVIRONMENT=Development` (default in `launchSettings.json`).
 
-Swagger is available in Development.
+Expected:
 
-## Local Platform Admin Login
+- Log: `Now listening on: http://localhost:5187` (or your configured URL)
+- Swagger UI: `http://localhost:5187/swagger`
+- Health: `GET /api/v1/health` → `200 OK`
 
-Use Platform Admin login only. This does not affect Tenant Admin or POS login.
+### Reach backend from Flutter (frontend not changed in this doc)
 
-| Field | Value |
+| Flutter target | Base URL |
 |---|---|
-| Email | `admin@nytroz.local` |
-| Password | `Admin@12345` (or your configured user secret) |
+| Android emulator | `http://10.0.2.2:5187` |
+| Windows desktop / Flutter web (same PC) | `http://localhost:5187` |
+| Physical device (same Wi‑Fi) | `http://<PC-LAN-IP>:5187` |
 
-API endpoint:
+For a physical device, start the API on all interfaces:
 
-```http
-POST /api/v1/auth/platform-login
-Content-Type: application/json
-
-{
-  "email": "admin@nytroz.local",
-  "password": "Admin@12345"
-}
+```powershell
+dotnet run --project ".\src\E_POS.Api\E_POS.Api.csproj" --urls "http://0.0.0.0:5187"
 ```
 
-Expected: `200 OK` with JWT/session response.
+## Implemented API Endpoints (current)
 
-## Local POS Cashier Login
+| Method | Route | Status |
+|---|---|---|
+| GET | `/api/v1/health` | **Implemented** |
+| POST | `/api/v1/platform-auth/login` | **Implemented** (Platform Admin) |
 
-Use tenant POS login for Flutter cashier sign-in. This is separate from Platform
-Admin login.
+Controller: `src/E_POS.Api/Controllers/PlatformAuthController.cs`
 
-| Field | Value |
-|---|---|
-| Email | `cashier001@gmail.com` |
-| Password | `123456` |
+## Known Limitation — Flutter POS Login (tenant-login)
 
-API endpoint:
+The Flutter POS app still calls:
 
 ```http
 POST /api/v1/auth/tenant-login
+```
+
+This route is **not implemented** in the Unified Commerce backend yet.
+
+| Symptom | Cause |
+|---|---|
+| `NETWORK_ERROR` on login | Flutter still points at old port **5052** or unreachable host |
+| `404` after fixing port to **5187** | `tenant-login` endpoint missing on new backend |
+
+PowerShell verification:
+
+```powershell
+# Should succeed
+Invoke-RestMethod -Uri "http://localhost:5187/api/v1/health"
+
+# Currently returns 404 until tenant-login is implemented
+Invoke-RestMethod -Method Post -Uri "http://localhost:5187/api/v1/auth/tenant-login" `
+  -ContentType "application/json" -Body '{"email":"cashier001@gmail.com","password":"123456"}'
+```
+
+**Action required (future backend work):** implement `POST /api/v1/auth/tenant-login`
+for cashier/Tenant Admin POS sign-in, or update Flutter to the new auth contract
+after API design is confirmed.
+
+Until then, Flutter POS login cannot complete against Unified Commerce even when
+the port is correct.
+
+## Platform Admin Login (implemented)
+
+```http
+POST /api/v1/platform-auth/login
 Content-Type: application/json
 
 {
-  "email": "cashier001@gmail.com",
-  "password": "123456"
+  "email": "<platform-admin-email>",
+  "password": "<password>"
 }
 ```
 
-PowerShell check:
-
-```powershell
-$body = @{
-  email = "cashier001@gmail.com"
-  password = "123456"
-} | ConvertTo-Json
-
-Invoke-RestMethod `
-  -Method Post `
-  -Uri "http://localhost:5052/api/v1/auth/tenant-login" `
-  -ContentType "application/json" `
-  -Body $body
-```
-
-Expected: `200 OK` with JWT/session response. Do not print or commit returned
-tokens.
-
-Tenant resolution is backend-side for POS login. If the same email exists in
-multiple tenants, the API returns a tenant-selection-required error instead of
-guessing a tenant.
-
-## Supported Configuration Keys
-
-| Key | Required | Default | Purpose |
-|---|---|---|---|
-| `ConnectionStrings:DefaultConnection` | Yes | none | PostgreSQL connection |
-| `DevelopmentSeed:PlatformAdmin:Email` | No | `admin@nytroz.local` | Seed user email |
-| `DevelopmentSeed:PlatformAdmin:Password` | Yes on first create / reset | none | Plaintext input hashed by `PasswordHashService` |
-| `DevelopmentSeed:PlatformAdmin:ResetPassword` | No | `false` | When `true`, updates hash for existing user |
+Use Swagger at `http://localhost:5187/swagger` to inspect the request/response
+schema.
 
 ## Troubleshooting
 
-### DefaultConnection missing
-
-Symptom: startup fails with connection string not configured.
-
-Fix:
+### Port 5187 already in use
 
 ```powershell
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=nytroz_pos_dev;Username=postgres;Password=YOUR_POSTGRES_PASSWORD"
+netstat -ano | findstr :5187
+taskkill /PID <PID> /F
 ```
 
-### DevelopmentSeed password missing
-
-Symptom on first run: exception referencing `DevelopmentSeed:PlatformAdmin:Password`.
-
-Fix:
-
-```powershell
-dotnet user-secrets set "DevelopmentSeed:PlatformAdmin:Password" "Admin@12345"
-```
-
-If user already exists, backend starts but logs a warning that password reset was
-skipped.
-
-### Invalid email/password due to old hash
-
-Symptom: `401` / invalid credentials for `admin@nytroz.local`.
-
-Fix:
-
-```powershell
-dotnet user-secrets set "DevelopmentSeed:PlatformAdmin:Password" "Admin@12345"
-dotnet user-secrets set "DevelopmentSeed:PlatformAdmin:ResetPassword" "true"
-dotnet run
-```
-
-Restart backend once. Password hash is corrected in Development only.
-
-### dotnet-ef missing
-
-Symptom: `dotnet ef` command not found.
-
-Fix:
+### dotnet ef not found
 
 ```powershell
 dotnet tool install --global dotnet-ef
 ```
 
-### PostgreSQL not running
-
-Symptom: connection refused or database does not exist.
-
-Fix:
+### PostgreSQL connection refused
 
 1. Start PostgreSQL service.
-2. Create database if needed: `nytroz_pos_dev`
-3. Verify host, port, username, and password in user secrets.
+2. Confirm database name (`UnifiedCommerceDb` or your override).
+3. Verify connection string in user secrets or `appsettings.Development.json`.
+
+### Flutter NETWORK_ERROR (Android emulator)
+
+- Wrong port (**5052** → use **5187**).
+- Emulator must use **`http://10.0.2.2:5187`**, not `http://localhost:5187`.
+- Cleartext HTTP is allowed in Flutter Android manifest (`usesCleartextTraffic=true`).
+- CORS is **not** required for Android native HTTP; it matters for Flutter **web** only.
 
 ## Security Warning
 
-- Do not commit passwords, connection strings, or JWT signing keys.
-- Do not put secrets in `appsettings.json` or Markdown files.
-- Use `dotnet user-secrets` locally and a secret manager in deployed environments.
-- `DevelopmentDataSeeder` must not run in Production.
-- Passwords are hashed through existing `PasswordHashService`; plaintext is never
-  stored in the database or logs.
+- Do not commit real database passwords or JWT signing keys.
+- `appsettings.Development.json` may contain dev placeholders — use user secrets
+  for machine-specific values.
+- Do not paste live tokens into Markdown or chat logs.
 
 ## Related Files
 
 - [[Local_Setup]]
 - [[Environment_Variables]]
+- [[Unified_Commerce_Backend_Known_Limitations]]
 - [[../05_BACKEND_ARCHITECTURE/Backend_Overview]]
+- [[../05_BACKEND_ARCHITECTURE/Module_Based_Folder_Structure]]
 - [[../06_DATABASE_KNOWLEDGE/Migration_Rules]]

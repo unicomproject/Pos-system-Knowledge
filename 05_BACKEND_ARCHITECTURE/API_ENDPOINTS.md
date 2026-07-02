@@ -9,11 +9,16 @@
 
 Base route: `/api/v1/auth`
 
-| Method | Route | Purpose |
+| Method | Route | Unified Commerce status |
 |---|---|---|
-| POST | `/api/v1/auth/tenant-login` | Cashier / tenant user login for Flutter POS |
+| POST | `/api/v1/auth/tenant-login` | **Not implemented** (Flutter still calls this — returns 404 on port 5187) |
 
-Request body:
+> **Active backend:** `POS Backend/Unified-Commerce` · dev URL `http://localhost:5187`
+>
+> **Obsolete:** port **5052**, `Nytroz-POS-Backend` / `SCS.Api` — see
+> [[../11_DEVELOPER_ONBOARDING/Unified_Commerce_Backend_Known_Limitations]]
+
+Request body (Flutter contract — pending backend implementation):
 
 ```json
 {

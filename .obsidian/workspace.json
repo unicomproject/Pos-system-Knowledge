@@ -170,7 +170,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -183,8 +184,12 @@
       "bases:Create new base": false
     }
   },
-  "active": "0ce7c63c0b4a42a2",
+  "active": "252da568f5b36f62",
   "lastOpenFiles": [
+    "15_IMPLEMENTATION_TRACKING/Flutter/Sales/Cashier_POS_Second_Brain_vs_Code_Comparison_Implementation_Status.md",
+    "11_DEVELOPER_ONBOARDING/Unified_Commerce_Backend_Known_Limitations.md",
+    "99_Archive/11_DEVELOPER_ONBOARDING/SCS_Nytroz_POS_Backend_Local_Development_Setup_ARCHIVED.md",
+    "99_Archive/11_DEVELOPER_ONBOARDING",
     "03_USER_JOURNEYS/Tenant_Admin/20_Audit_Logs_Flow.md",
     "03_USER_JOURNEYS/Tenant_Admin/19_Device_Hardware_Management_Flow.md",
     "03_USER_JOURNEYS/Tenant_Admin/18_Billing_Subscription_Management_Flow.md",
@@ -209,9 +214,6 @@
     "03_USER_JOURNEYS/Tenant_Admin",
     "03_USER_JOURNEYS/Platform_Admin/15_System_Settings_Flow.md",
     "03_USER_JOURNEYS/Platform_Admin/14_Audit_Logs_Flow.md",
-    "03_USER_JOURNEYS/Platform_Admin/13_Platform_User_Management_Flow.md",
-    "03_USER_JOURNEYS/Platform_Admin/12_Subscription_Billing_Management_Flow.md",
-    "03_USER_JOURNEYS/Platform_Admin/11_Tenant_Activation_Flow.md",
     "03_USER_JOURNEYS/Platform_Admin",
     "10_TESTING_QA/Test_Case/21_Reports",
     "10_TESTING_QA/Test_Case/20_Integration",
@@ -219,7 +221,6 @@
     "10_TESTING_QA/Test_Case/18_OfflineSync",
     "10_TESTING_QA/Test_Case/17_ReturnExchange",
     "10_TESTING_QA/Test_Case/16_Refund",
-    "10_TESTING_QA/Test_Case/15_Payment",
-    "10_TESTING_QA/Test_Case/14_FulfilmentPickup"
+    "10_TESTING_QA/Test_Case/15_Payment"
   ]
 }

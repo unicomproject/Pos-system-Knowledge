@@ -70,6 +70,22 @@ Backend validates final sale total, final inventory quantity, card/QR payment,
 refund, exchange, loyalty/store credit, till final close, tenant access,
 permission, idempotency, and audit.
 
+## Backend Repository (active)
+
+```text
+POS Backend/Unified-Commerce
+  src/E_POS.Api/
+  src/E_POS.Application/
+  src/E_POS.Domain/
+  src/E_POS.Infrastructure/
+```
+
+Local dev URL: `http://localhost:5187` · Swagger: `/swagger`
+
+Setup: [[../11_DEVELOPER_ONBOARDING/Backend_Local_Development_Setup]]
+
+Known gaps: [[../11_DEVELOPER_ONBOARDING/Unified_Commerce_Backend_Known_Limitations]]
+
 ## Related Files
 
 - [[Clean_Architecture_Layers]]
