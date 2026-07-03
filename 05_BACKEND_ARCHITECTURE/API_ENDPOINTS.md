@@ -285,6 +285,95 @@ tenant-admin permissions to the Tenant Admin `sales` catalog feature.
 
 ---
 
+# Platform Admin Users API Endpoints
+
+Controller: `PlatformAdminUsersController`  
+Base: `/api/v1/platform-admin/users`
+
+All endpoints require platform JWT authentication (`PlatformOnly` policy).
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/platform-admin/users` | `platform.users.view` | List platform users with role summaries |
+| GET | `/api/v1/platform-admin/users/{userId}` | `platform.users.view` | Load one platform user detail |
+| POST | `/api/v1/platform-admin/users` | `platform.users.create` | Create platform user invite |
+| PUT | `/api/v1/platform-admin/users/{userId}` | `platform.users.update` | Update platform user status |
+| PUT | `/api/v1/platform-admin/users/{userId}/roles` | `platform.users.roles.assign` | Replace assigned platform roles |
+
+## List response shape
+
+```json
+{
+  "success": true,
+  "data": {
+    "users": [
+      {
+        "id": "guid",
+        "email": "staff@nytroz.local",
+        "displayName": "Staff User",
+        "status": "ACTIVE",
+        "roleCodes": ["support_admin"],
+        "roleNames": ["Support Admin"],
+        "permissionCount": 12,
+        "lastLoginAt": null,
+        "createdAt": "2026-07-01T00:00:00Z",
+        "updatedAt": "2026-07-01T00:00:00Z"
+      }
+    ]
+  }
+}
+```
+
+## Detail response shape
+
+Same fields as list item plus `invitePending: boolean`.
+
+## Create request
+
+At least one role is required (`roleIds` and/or `roleCodes`).
+
+```json
+{
+  "email": "new@nytroz.local",
+  "status": "INACTIVE",
+  "roleIds": ["role-guid"]
+}
+```
+
+## Update request
+
+Status only on this endpoint:
+
+```json
+{
+  "status": "LOCKED"
+}
+```
+
+## Assign roles request
+
+Replaces the user's platform roles:
+
+```json
+{
+  "roleIds": ["role-guid-1", "role-guid-2"]
+}
+```
+
+Allowed statuses: `ACTIVE`, `INACTIVE`, `LOCKED`, `DELETED`.
+
+Role options for Angular create/edit must come from `GET /api/v1/platform-admin/roles`; do not hardcode role names in the users UI.
+
+## Angular route
+
+| Route | Permission | Component |
+|---|---|---|
+| `/admin/platform-users` | `platform.users.view` | `PlatformUsersPage` |
+
+Frontend tests (2026-07-03): `platform-users-page.spec.ts`, `platform-user-api.service.spec.ts`.
+
+---
+
 # Platform Admin Role Management API Endpoints
 
 See [[../02_ACCESS_CONTROL/Platform_Admin_Role_Management]] for the full contract, DTOs, system-role protection, validation, and smoke-test result.
