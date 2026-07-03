@@ -247,6 +247,33 @@ FK(setting_definition_id) REFERENCES setting_definitions(id)
 UNIQUE(tenant_id, setting_definition_id)
 ```
 
+## tenant_profiles (Unified-Commerce implemented columns)
+
+| Attribute | Notes |
+|---|---|
+| legal_name | Business legal name |
+| registration_number | Optional registration number |
+| tax_number | Optional tax identifier |
+| primary_contact_name | Primary business contact |
+| primary_email | Primary business email |
+| primary_phone | Primary business phone |
+| website_url | Optional website |
+| country_code | ISO country code |
+
+## tenant_addresses (Unified-Commerce implemented columns)
+
+| Attribute | Notes |
+|---|---|
+| address_type | BILLING / REGISTERED / CONTACT |
+| line1, line2, city, state, postal_code, country_code | Registered address captured in wizard step 1 |
+
+## tenant_users (wizard admin bootstrap)
+
+| Attribute | Notes |
+|---|---|
+| first_name, last_name | Tenant admin names from wizard step 5 |
+| status | `INVITED` when sendInvite=true; `ACTIVE` when password provisioned |
+
 ## Related Files
 
 - [[../Database_Overview]]

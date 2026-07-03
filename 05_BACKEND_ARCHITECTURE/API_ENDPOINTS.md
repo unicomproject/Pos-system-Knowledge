@@ -1,7 +1,7 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-02 -->
+<!-- last_updated: 2026-07-03 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -124,27 +124,65 @@ All endpoints require platform JWT authentication.
 | GET | `/api/v1/platform-admin/tenants` | `platform.tenants.view` | List tenants with paging/filter/sort |
 | GET | `/api/v1/platform-admin/tenants/summary` | `platform.tenants.view` | Load tenant summary cards |
 | GET | `/api/v1/platform-admin/tenants/filter-options` | `platform.tenants.view` | Load filter dropdown options |
-
-Planned next slice (not yet implemented):
-
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| POST | `/api/v1/platform-admin/tenants` | `platform.tenants.create` | Create tenant |
-| PUT/PATCH | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.update` | Update tenant |
+| GET | `/api/v1/platform-admin/tenants/create-options` | `platform.tenants.create` | Load tenant create wizard options |
+| GET | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.view` | Tenant detail |
+| POST | `/api/v1/platform-admin/tenants` | `platform.tenants.create` | Create tenant (legacy minimal or full 7-step wizard payload) |
+| PUT | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.update` | Update tenant |
 | POST | `/api/v1/platform-admin/tenants/{tenantId}/activate` | `platform.tenants.activate` | Activate tenant |
 | POST | `/api/v1/platform-admin/tenants/{tenantId}/suspend` | `platform.tenants.suspend` | Suspend tenant |
 | PUT | `/api/v1/platform-admin/tenants/{tenantId}/entitlements` | `platform.tenants.entitlements.update` | Assign subscription/features |
 
-Implemented in Unified-Commerce backend (2026-07-02):
+## Tenant Create Wizard (2026-07-02)
 
-| Method | Route | Permission | Purpose |
+`GET /api/v1/platform-admin/tenants/create-options` returns active plans (with included features), addons, commercial catalog modules/features, and lookup values for `billingStatuses`, `paymentMethods`, `countryCodes`, currencies, timezones, locales, business types, operating modes, subscription statuses, and billing cycles.
+
+Lookup items use `{ value, label }` except `countryCodes[]`, which uses `{ code, name }`.
+
+`POST /api/v1/platform-admin/tenants` wizard payload persists in one transaction:
+
+- tenant + profile + registered address
+- subscription with billing/limit override fields
+- subscription addons
+- tenant feature entitlements (auto-seeded from plan when omitted)
+- tenant admin user + TENANT_ADMIN role + permissions + invite row
+- optional draft subscription invoice
+
+Tenant admin invite is persisted as `INVITED` with pending password hash; email is not sent in this slice.
+
+### CreateTenant validation contract (before SaveChanges)
+
+Application validator `PlatformTenantCreateRequestValidator.ValidateWizard` runs in the wizard service before any DB transaction. Invalid payloads return HTTP 400 with the standard error envelope and field-level `errors[]`; PostgreSQL length overflow (e.g. `22001`) must not reach the UI.
+
+Wizard path is selected when the request includes wizard-only blocks (`tenantAdmin`, `subscription`, `addons`, `address`, `primaryContact`, or profile identifiers). See [[../03_USER_JOURNEYS/Platform_Admin/16_Platform_Tenant_Create_Wizard_Alignment]] for the full request shape.
+
+| Field | Rule | Example valid | Example invalid |
 |---|---|---|---|
-| GET | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.view` | Tenant detail |
+| `countryCode` | Exactly 2 letters when present | `LK` | `Sri Lanka` |
+| `address.countryCode` | Exactly 2 letters when present | `LK` | `Sri Lanka` |
+| `baseCurrency` | Exactly 3 letters when present | `LKR` | `LK` |
+| `billingStatus` | One of allowed billing statuses | `pending` | `trial` |
+| `subscription.subscriptionStatus` | Valid subscription lifecycle value | `trial` | (empty when subscription block sent) |
+| `subscription.paymentMethod` | One of seeded payment methods | `manual`, `bank_transfer` | `pending` |
+| `tenantAdmin.email` | Required valid email when `tenantAdmin` block sent | `admin@tenant.com` | `not-an-email` |
 
-Verification on 2026-07-02:
+Validation failure response shape:
 
-- Tenant list GET returned 200 with valid JWT and `platform.tenants.view`.
-- Missing permission returns HTTP 403 from service layer (covered by unit tests).
+```json
+{
+  "success": false,
+  "message": "One or more tenant create fields are invalid.",
+  "errorCode": "platform_tenants.validation_failed",
+  "errors": [
+    { "field": "countryCode", "message": "Country code must be exactly 2 letters (for example LK)." }
+  ]
+}
+```
+
+Verification on 2026-07-03:
+
+- Backend `dotnet test`: **266/266 passed** (136 unit + 81 API + 49 integration)
+- Angular `npm test -- --watch=false`: **158/158 passed**
+- Angular `npm run build`: passed (style budget warnings only)
 
 ---
 

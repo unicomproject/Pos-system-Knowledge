@@ -277,6 +277,23 @@ UNIQUE(tenant_id, platform_feature_id, usage_period_start)
 CHECK(used_quantity >= 0)
 ```
 
+## tenant_subscriptions (wizard billing fields)
+
+Additional Unified-Commerce columns used by tenant create wizard step 6:
+
+- `billing_cycle`, `trial_start_at`, `trial_end_at`, `billing_start_at`, `next_billing_at`
+- `auto_renew`, `discount_type`, `discount_value`, `tax_percentage`
+- `invoice_email`, `payment_method`, `notes`
+- `max_outlets_override`, `max_tills_override`, `max_users_override`
+
+## tenant_subscription_addons
+
+- `quantity` column added for wizard add-on selections
+
+## subscription_invoices
+
+- `invoice_status`, `billing_cycle`, `due_at` used for draft invoice creation on pending billing
+
 ## Related Files
 
 - [[../Database_Overview]]
