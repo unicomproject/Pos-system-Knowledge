@@ -88,6 +88,28 @@ Failures return `ApplicationError.ValidationFailed` (`errorCode: platform_tenant
 
 Angular wizard mirrors ISO/billing rules client-side via `platform-tenant-create.validators.ts` but backend remains authoritative.
 
+## Platform Users UI Contract
+
+Controller: `PlatformAdminUsersController` · Angular route `/admin/platform-users`.
+
+| Screen action | API | Permission |
+|---|---|---|
+| List + search | `GET /api/v1/platform-admin/users` | `platform.users.view` |
+| Open edit panel | `GET /api/v1/platform-admin/users/{userId}` | `platform.users.view` |
+| Create user | `POST /api/v1/platform-admin/users` | `platform.users.create` |
+| Save status | `PUT /api/v1/platform-admin/users/{userId}` | `platform.users.update` |
+| Save roles | `PUT /api/v1/platform-admin/users/{userId}/roles` | `platform.users.roles.assign` |
+| Role checkbox options | `GET /api/v1/platform-admin/roles` | `platform.roles.view` |
+
+Implementation notes:
+
+- `PlatformUserApiService` owns HTTP calls; the page component does not call APIs directly except through services.
+- Role pickers load from the roles API and filter to non-inactive roles; no hardcoded Super Admin / Support Admin lists in UI code.
+- Create requires email plus at least one `roleId`; edit splits status update and role assignment into separate save actions matching backend endpoints.
+- UI exposes loading, empty, error-with-retry, and editor error states.
+
+See [[03_USER_JOURNEYS/Platform_Admin/13_Platform_User_Management_Flow]] and [[05_BACKEND_ARCHITECTURE/API_ENDPOINTS]] for DTO shapes and error codes.
+
 ## Permission And Entitlement Contract
 
 - Permission codes must be database-seeded and module-scoped.
