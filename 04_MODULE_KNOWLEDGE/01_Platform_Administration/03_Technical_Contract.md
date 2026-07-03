@@ -110,6 +110,27 @@ Implementation notes:
 
 See [[03_USER_JOURNEYS/Platform_Admin/13_Platform_User_Management_Flow]] and [[05_BACKEND_ARCHITECTURE/API_ENDPOINTS]] for DTO shapes and error codes.
 
+## Platform Tenant Detail Entitlements UI Contract
+
+Angular route: `/admin/tenants/{tenantId}` · component `PlatformTenantDetailPage`.
+
+| Screen action | API | Permission |
+|---|---|---|
+| Load detail (includes enabled arrays) | `GET /api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.view` |
+| Open entitlement editor | `GET /api/v1/platform-admin/tenants/{tenantId}/entitlement-options` | `platform.tenants.entitlements.update` |
+| Save plan / features | `PUT /api/v1/platform-admin/tenants/{tenantId}/entitlements` | `platform.tenants.entitlements.update` |
+
+Implementation notes:
+
+- Detail response includes `enabledFeatureIds` and `enabledFeatureCodes` sourced from `tenant_feature_entitlements` (ENABLED rows only), in addition to legacy boolean flags.
+- Entitlement editor must call **entitlement-options**, not `GET .../tenants/create-options`. Create-options requires `platform.tenants.create` and is reserved for the tenant create wizard.
+- Feature checkboxes come from `catalogModules[].features`; allowed selections are constrained by the selected plan's `includedFeatureIds` / `includedFeatureCodes` from entitlement-options `plans[]`.
+- Do not hardcode feature codes in UI components or constants.
+- Save sends `{ subscriptionPlanId?, enabledFeatureIds?, enabledFeatureCodes? }`; backend replaces tenant entitlements and may change plan when `subscriptionPlanId` differs from current subscription.
+- Expose loading, error, permission-denied, and empty-catalog states on the editor panel.
+
+See [[03_USER_JOURNEYS/Platform_Admin/17_Platform_Tenant_Detail_Entitlements_Alignment]] and [[05_BACKEND_ARCHITECTURE/API_ENDPOINTS]] for JSON shapes.
+
 ## Permission And Entitlement Contract
 
 - Permission codes must be database-seeded and module-scoped.

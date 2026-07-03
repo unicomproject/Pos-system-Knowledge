@@ -130,7 +130,101 @@ All endpoints require platform JWT authentication.
 | PUT | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.update` | Update tenant |
 | POST | `/api/v1/platform-admin/tenants/{tenantId}/activate` | `platform.tenants.activate` | Activate tenant |
 | POST | `/api/v1/platform-admin/tenants/{tenantId}/suspend` | `platform.tenants.suspend` | Suspend tenant |
-| PUT | `/api/v1/platform-admin/tenants/{tenantId}/entitlements` | `platform.tenants.entitlements.update` | Assign subscription/features |
+| PUT | `/api/v1/platform-admin/tenants/{tenantId}/entitlements` | `platform.tenants.entitlements.update` | Replace tenant plan/features |
+
+## Tenant Detail Entitlements (2026-07-03)
+
+Backend branch: `feat/platform-tenant-entitlements-read-contract` · commit `8e65c32`.
+
+Alignment doc: [[../03_USER_JOURNEYS/Platform_Admin/17_Platform_Tenant_Detail_Entitlements_Alignment]].
+
+### GET tenant detail — entitlement fields
+
+`GET /api/v1/platform-admin/tenants/{tenantId}` · permission `platform.tenants.view`.
+
+Detail response includes authoritative enabled sets from `tenant_feature_entitlements`:
+
+```json
+{
+  "enabledFeatureIds": ["88888888-8888-4888-8888-888888888801"],
+  "enabledFeatureCodes": ["online_store"],
+  "onlineStoreEnabled": true,
+  "clickCollectEnabled": false,
+  "offlineEnabled": false,
+  "canManageEntitlements": true
+}
+```
+
+Legacy boolean flags remain for summary display; Angular entitlement editor should prefer `enabledFeatureIds` / `enabledFeatureCodes`.
+
+### GET entitlement-options
+
+`GET /api/v1/platform-admin/tenants/{tenantId}/entitlement-options` · permission `platform.tenants.entitlements.update`.
+
+**Do not** use `GET .../tenants/create-options` for the tenant detail entitlement editor.
+
+Requires tenant subscription; missing subscription → HTTP 400 `platform_tenants.validation_failed`.
+
+```json
+{
+  "success": true,
+  "data": {
+    "tenantId": "guid",
+    "currentSubscriptionPlanId": "guid",
+    "currentSubscriptionPlanCode": "STARTER",
+    "currentSubscriptionPlanName": "Starter Plan",
+    "enabledFeatureIds": ["guid"],
+    "enabledFeatureCodes": ["online_store"],
+    "plans": [
+      {
+        "id": "guid",
+        "code": "STARTER",
+        "name": "Starter Plan",
+        "status": "active",
+        "includedFeatureIds": ["guid"],
+        "includedFeatureCodes": ["online_store"]
+      }
+    ],
+    "catalogModules": [
+      {
+        "id": "guid",
+        "code": "commerce",
+        "name": "Commerce",
+        "features": [
+          {
+            "id": "guid",
+            "code": "online_store",
+            "name": "Online Store",
+            "description": "Online store entitlement"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+UI rule: only features included in the selected plan may be checked. Feature list comes from `catalogModules`; do not hardcode codes in frontend.
+
+### PUT entitlements
+
+`PUT /api/v1/platform-admin/tenants/{tenantId}/entitlements` · permission `platform.tenants.entitlements.update`.
+
+Replaces enabled tenant features and optionally changes subscription plan.
+
+```json
+{
+  "subscriptionPlanId": "guid",
+  "enabledFeatureIds": ["guid"],
+  "enabledFeatureCodes": ["online_store"]
+}
+```
+
+Response: updated `PlatformTenantDetailResponse` (same shape as GET detail, including new `enabledFeatureIds/Codes`).
+
+Validation: features must resolve to active platform features and belong to the effective plan's included set; tenant subscription must exist.
+
+Verification on 2026-07-03: backend `dotnet test` **291/291 passed**.
 
 ## Tenant Create Wizard (2026-07-02)
 
