@@ -14,7 +14,7 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
 | Area | Contract |
 |---|---|
-| API groups | `/api/v1/platform-admin/users`, `/api/v1/platform-admin/roles`, `/api/v1/platform-admin/permissions`, `/api/v1/platform-admin/settings`, `/api/v1/platform-admin/audit`, `/api/v1/platform-admin/tenants` |
+| API groups | `/api/v1/platform-admin/users`, `/api/v1/platform-admin/roles`, `/api/v1/platform-admin/permissions`, `/api/v1/platform-admin/settings`, `/api/v1/platform-admin/audit`, `/api/v1/platform-admin/tenants`, `/api/v1/platform-admin/catalog` |
 | Request format | Typed request DTOs; no raw map payloads in application layer |
 | Response format | Typed response DTOs with safe fields only |
 | Error format | Standard API error response |
@@ -30,6 +30,7 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 | `/api/v1/platform-admin/permissions` | Module API group |
 | `/api/v1/platform-admin/settings` | Module API group |
 | `/api/v1/platform-admin/tenants` | Tenant list, detail, create-options, create, update, activate, suspend, entitlements |
+| `/api/v1/platform-admin/catalog` | Platform modules catalog read for Modules & Features admin page |
 
 ## Database Contract
 
@@ -130,6 +131,27 @@ Implementation notes:
 - Expose loading, error, permission-denied, and empty-catalog states on the editor panel.
 
 See [[03_USER_JOURNEYS/Platform_Admin/17_Platform_Tenant_Detail_Entitlements_Alignment]] and [[05_BACKEND_ARCHITECTURE/API_ENDPOINTS]] for JSON shapes.
+
+## Platform Modules & Features Catalog UI Contract
+
+Angular route: `/admin/modules` · component `PlatformModulesCatalogPage`.
+
+| Screen action | API | Permission |
+|---|---|---|
+| Load modules catalog | `GET /api/v1/platform-admin/catalog/modules` | `platform.modules.view` |
+| View nested feature rows | same response `modules[].features[]` | `platform.features.view` (backend omits features without this permission) |
+
+Implementation notes:
+
+- `PlatformModulesCatalogApiService` calls **`GET /api/v1/platform-admin/catalog/modules` only**. Do not use `GET /api/v1/platform/subscription-plans/catalog` on this page.
+- Subscription wizard catalog (`GET /api/v1/platform/subscription-plans/catalog`, `platform.subscription_plans.view`) remains reserved for create/edit subscription plan flows.
+- Map response fields `moduleCode`, `featureCode`, `sortOrder`, and `status` from the backend; do not hardcode module or feature lists in UI code.
+- Search/filter is client-side over module name, `moduleCode`, feature name, and `featureCode`.
+- Feature detail table is hidden in UI when the session lacks `platform.features.view`; show modules with feature counts and a permission notice instead.
+- Expose loading, empty, error-with-retry, and no-search-results states.
+- No create/edit/delete on this page unless a future backend write contract is documented.
+
+See [[05_BACKEND_ARCHITECTURE/API_ENDPOINTS]] and [[09_ANGULAR_ADMIN_KNOWLEDGE/Routing_And_Guards]] for route guard and response JSON.
 
 ## Permission And Entitlement Contract
 

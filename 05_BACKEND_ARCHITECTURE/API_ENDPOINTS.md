@@ -291,7 +291,7 @@ All endpoints require platform JWT authentication.
 | Method | Route | Permission | Purpose |
 |---|---|---|---|
 | GET | `/api/v1/platform/subscription-plans` | `platform.subscription_plans.view` | List subscription plans |
-| GET | `/api/v1/platform/subscription-plans/catalog` | `platform.subscription_plans.view` | Read commercial subscription catalog |
+| GET | `/api/v1/platform/subscription-plans/catalog` | `platform.subscription_plans.view` | Read commercial subscription catalog (**subscription wizard only**; not the Modules & Features admin page) |
 | POST | `/api/v1/platform/subscription-plans` | `platform.subscription_plans.create` | Create draft plan |
 | PATCH | `/api/v1/platform/subscription-plans/{planId}/pricing` | `platform.subscription_plans.edit` | Save draft `base_price` |
 | PATCH | `/api/v1/platform/subscription-plans/{planId}/limits` | `platform.subscription_plans.edit` | Save draft outlet/till/user limits |
@@ -332,6 +332,75 @@ Publish response example: `{ "status": "active", ... }`
   "maxUsers": 25
 }
 ```
+
+---
+
+# Platform Modules & Features Catalog API Endpoints
+
+Controller: `PlatformAdminCatalogController`  
+Base: `/api/v1/platform-admin/catalog`
+
+All endpoints require platform JWT authentication (`PlatformOnly` policy).
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/platform-admin/catalog/modules` | `platform.modules.view` | Read active platform modules catalog for the Modules & Features admin page |
+
+## Feature visibility rule
+
+- Caller must have `platform.modules.view` to call the endpoint.
+- Nested `features[]` are returned only when the caller also has `platform.features.view`.
+- Without `platform.features.view`, each module is returned with `features: []` (modules-only response).
+
+## Data source
+
+- Modules from `platform_modules` where `status = ACTIVE`.
+- Features from `platform_features` where `status = ACTIVE` and `platform_module_id` matches the module.
+- Do not use this endpoint for the subscription plan wizard; the wizard continues to use `GET /api/v1/platform/subscription-plans/catalog` (`platform.subscription_plans.view`).
+
+## Response shape
+
+```json
+{
+  "success": true,
+  "data": {
+    "modules": [
+      {
+        "id": "guid",
+        "moduleCode": "core_pos",
+        "name": "Core POS",
+        "description": "Core point of sale module",
+        "sortOrder": 10,
+        "status": "ACTIVE",
+        "features": [
+          {
+            "id": "guid",
+            "featureCode": "pos.sales",
+            "name": "POS Sales",
+            "description": "Start sale",
+            "sortOrder": 1,
+            "status": "ACTIVE"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## Angular integration
+
+- Route: `/admin/modules` · component `PlatformModulesCatalogPage`
+- Service: `PlatformModulesCatalogApiService.getCatalog()` → `GET /api/v1/platform-admin/catalog/modules`
+- Route guard: `platform.modules.view`
+- Feature table in UI is hidden when the session lacks `platform.features.view` (backend also omits feature rows without that permission).
+
+## Verification (2026-07-03)
+
+| Layer | Result |
+|---|---|
+| Backend | `dotnet test`: 300/300 passed · commit `fd60e5a` |
+| Angular | `npm test -- --watch=false`: 186/186 passed · commit `1b67f1b` |
 
 ---
 
@@ -504,7 +573,7 @@ Endpoint added: `PATCH /api/v1/platform/subscription-plans/{planId}/features`
 
 Permission: `platform.subscription_plans.edit`
 
-Catalog read source for the subscription wizard is the commercial subscription catalog: `GET /api/v1/platform/subscription-plans/catalog`. Do not map permission catalog modules directly as commercial subscription modules.
+Catalog read source for the subscription wizard is the commercial subscription catalog: `GET /api/v1/platform/subscription-plans/catalog`. Do not map permission catalog modules directly as commercial subscription modules. The Modules & Features admin page at `/admin/modules` uses `GET /api/v1/platform-admin/catalog/modules` instead (`platform.modules.view` / `platform.features.view`).
 
 Request shape:
 

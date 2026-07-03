@@ -1,7 +1,7 @@
 <!-- title: Routing And Guards -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- last_updated: 2026-07-03 -->
 
 
 # Routing And Guards
@@ -22,7 +22,7 @@ Routes improve UX but backend remains authoritative.
 | `/admin/tenants` | admin | Platform | auth, permission |
 | `/admin/tenants/create` | admin | Platform | auth, permission |
 | `/admin/subscriptions` | admin | Platform | auth, permission |
-| `/admin/modules` | admin | Platform | auth, permission |
+| `/admin/modules` | admin | Platform | auth, permission (`platform.modules.view`) |
 | `/admin/platform-users` | admin | Platform | auth, permission |
 | `/admin/roles-permissions` | admin | Platform | auth, permission (`platform.permissions.view`) |
 | `/admin/settings/system` | admin | Platform | auth, permission |
@@ -75,6 +75,21 @@ If a route is blocked by feature entitlement, show feature-not-enabled state.
 Do not expose disabled feature pages as active Release 1 behavior.
 
 Platform Admin Roles & Permissions at `/admin/roles-permissions` loads the backend-driven permission catalog and platform role APIs. The current route guard remains `platform.permissions.view`; role-management API calls are additionally authorized by backend permissions such as `platform.roles.view`, `platform.roles.create`, `platform.roles.update`, `platform.roles.permissions.view`, and `platform.roles.permissions.update`. See [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]].
+
+## Platform Modules & Features Catalog UI (2026-07-03)
+
+Angular Platform Admin Modules & Features is implemented at `/admin/modules`.
+
+Rules:
+
+- Route guard: `platform.modules.view` in route metadata and sidebar menu visibility.
+- Load catalog from `GET /api/v1/platform-admin/catalog/modules` via `PlatformModulesCatalogApiService`.
+- Do **not** call `GET /api/v1/platform/subscription-plans/catalog` on this page; that endpoint is for the subscription plan wizard only (`platform.subscription_plans.view`).
+- Backend returns `modules[].moduleCode`, `sortOrder`, `status`, and nested `features[]` with `featureCode`, `sortOrder`, `status` when the caller has `platform.features.view`.
+- Without `platform.features.view`, backend returns modules with empty `features[]`; UI hides the feature table and shows a permission notice.
+- Component: `PlatformModulesCatalogPage` · expose loading, empty, error, and search-no-results states.
+
+See [[../04_MODULE_KNOWLEDGE/01_Platform_Administration/03_Technical_Contract]] and [[../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]].
 
 ## Related Files
 
