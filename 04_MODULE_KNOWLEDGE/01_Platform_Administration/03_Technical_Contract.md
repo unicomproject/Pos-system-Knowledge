@@ -1,7 +1,7 @@
 <!-- title: Platform Administration Technical Contract -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-03 -->
 
 # Platform Administration Technical Contract
 
@@ -68,6 +68,25 @@ history/ledger behavior where applicable.
 - Repository interfaces stay in application layer; EF implementations stay in infrastructure layer.
 - Audit/event rows are written for sensitive state changes.
 - Idempotency keys are required for retryable commands that can create duplicates.
+
+## Platform Tenant Create Validation
+
+Wizard create (`POST /api/v1/platform-admin/tenants` with full payload) is validated by `PlatformTenantCreateRequestValidator.ValidateWizard` in `E_POS.Application/Modules/PlatformAdministration/Validators/` **before** any DB transaction starts.
+
+The service routes to the wizard path when `tenantAdmin`, `subscription`, `addons`, `address`, `primaryContact`, or profile fields (`legalName`, `registrationNumber`, `taxNumber`) are present; otherwise the legacy minimal create path runs.
+
+Validated fields:
+
+- Country codes (`countryCode`, `address.countryCode`): exactly 2 ISO letters (e.g. `LK`).
+- Currency (`baseCurrency`): exactly 3 ISO letters (e.g. `LKR`).
+- `billingStatus`: `pending`, `paid`, `overdue`, `failed`, `waived` only.
+- `subscription.subscriptionStatus`: `trial`, `active`, `past_due`, `cancelled`, `expired` when present.
+- `subscription.paymentMethod`: seeded values (`manual`, `bank_transfer`) when present.
+- `tenantAdmin.email`: required and must be a valid email when `tenantAdmin` block is sent.
+
+Failures return `ApplicationError.ValidationFailed` (`errorCode: platform_tenants.validation_failed`) with `ApplicationFieldError` items; `PlatformAdminTenantsController` maps these to HTTP 400 with `errors[]` in the legacy API envelope.
+
+Angular wizard mirrors ISO/billing rules client-side via `platform-tenant-create.validators.ts` but backend remains authoritative.
 
 ## Permission And Entitlement Contract
 

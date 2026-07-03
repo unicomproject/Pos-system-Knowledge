@@ -1,7 +1,7 @@
 <!-- title: Create Tenant Wizard Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-02 -->
+<!-- last_updated: 2026-07-03 -->
 
 # Create Tenant Wizard Flow
 
@@ -23,7 +23,7 @@ Platform Admin
 
 | Step | UI label | Backend persistence |
 |---:|---|---|
-| 1 | Business Information | `tenants`, `tenant_profiles`, `tenant_addresses` |
+| 1 | Business Info | `tenants`, `tenant_profiles`, `tenant_addresses` |
 | 2 | Plan Selection | `tenant_subscriptions.subscription_plan_id` |
 | 3 | Limits & Add-ons | `tenant_subscriptions.max_*_override`, `tenant_subscription_addons` |
 | 4 | Feature Entitlements | `tenant_feature_entitlements` (auto-seeded from plan when none selected) |
@@ -45,6 +45,45 @@ Platform Admin
 - Payment gateway and payment links are not invoked in this slice; draft invoices may be created when billing mode requires it.
 - Feature entitlements must belong to the selected plan; empty selection auto-copies plan included features.
 - Optional post-create setup (outlets, tills, products) remains on tenant detail follow-up flows.
+
+## Validation Behavior (UI)
+
+Each wizard step validates before Next is enabled. The Review step shows a validation summary when any step is incomplete.
+
+| Behavior | Rule |
+|---|---|
+| Field-level errors | Visible under the control after touch or step validation (country, currency, billing, admin email, etc.) |
+| Step error count | Stepper badge shows count of unresolved issues per step |
+| Next button | Disabled while the current step has validation issues |
+| Create button | Disabled while any step has validation issues |
+| Review summary | Lists all unresolved issues before create |
+| Server errors | Field-level `errors[]` from API mapped to form controls via `ApiErrorService`; no raw PostgreSQL/DB exception text shown |
+| Client validators | `isoCountryCodeValidator`, `isoCurrencyCodeValidator` in `platform-tenant-create.validators.ts` mirror backend ISO rules |
+| Country / currency | Dropdown labels (e.g. Sri Lanka, LKR - Sri Lankan Rupee) post ISO codes (`LK`, `LKR`) only |
+
+### Example valid create payload values
+
+| Field | UI label example | API value |
+|---|---|---|
+| `countryCode` | Sri Lanka | `LK` |
+| `address.countryCode` | Sri Lanka | `LK` |
+| `baseCurrency` | LKR - Sri Lankan Rupee | `LKR` |
+| `billingStatus` | Pending | `pending` |
+| `subscription.subscriptionStatus` | Trial | `trial` |
+| `subscription.paymentMethod` | Manual | `manual` |
+
+Invalid examples blocked client-side and server-side: `countryCode = "Sri Lanka"`, `baseCurrency = "LK"`, `billingStatus = "trial"` (trial belongs on subscription status, not billing status).
+
+## Frontend Source Files
+
+- Route: `/admin/tenants/create` (`platformPermissions.tenantsCreate`)
+- Page: `platform-create-tenant-page.ts`
+- Mapper: `platform-tenant-create.mapper.ts` (`mapCreateOptions`, `mapCreateTenantRequest`)
+- Validators: `platform-tenant-create.validators.ts`
+- API service: `platform-tenant-api.service.ts` (`getCreateOptions`, `createTenant`)
+- Error handling: `api-error.service.ts`
+
+See [[16_Platform_Tenant_Create_Wizard_Alignment]] for full request/response contract and server field mapping table.
 
 ## Related Files
 

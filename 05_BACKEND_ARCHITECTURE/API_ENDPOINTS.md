@@ -1,7 +1,7 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-02 -->
+<!-- last_updated: 2026-07-03 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -134,7 +134,9 @@ All endpoints require platform JWT authentication.
 
 ## Tenant Create Wizard (2026-07-02)
 
-`GET /api/v1/platform-admin/tenants/create-options` returns active plans (with included features), addons, commercial catalog modules/features, and lookup values for billing modes, currencies, timezones, locales, business types, operating modes, subscription statuses, and billing cycles.
+`GET /api/v1/platform-admin/tenants/create-options` returns active plans (with included features), addons, commercial catalog modules/features, and lookup values for `billingStatuses`, `paymentMethods`, `countryCodes`, currencies, timezones, locales, business types, operating modes, subscription statuses, and billing cycles.
+
+Lookup items use `{ value, label }` except `countryCodes[]`, which uses `{ code, name }`.
 
 `POST /api/v1/platform-admin/tenants` wizard payload persists in one transaction:
 
@@ -147,10 +149,40 @@ All endpoints require platform JWT authentication.
 
 Tenant admin invite is persisted as `INVITED` with pending password hash; email is not sent in this slice.
 
-Verification on 2026-07-02:
+### CreateTenant validation contract (before SaveChanges)
 
-- `dotnet test`: 257/257 passed
-- Angular `npm test -- --watch=false`: 140/140 passed
+Application validator `PlatformTenantCreateRequestValidator.ValidateWizard` runs in the wizard service before any DB transaction. Invalid payloads return HTTP 400 with the standard error envelope and field-level `errors[]`; PostgreSQL length overflow (e.g. `22001`) must not reach the UI.
+
+Wizard path is selected when the request includes wizard-only blocks (`tenantAdmin`, `subscription`, `addons`, `address`, `primaryContact`, or profile identifiers). See [[../03_USER_JOURNEYS/Platform_Admin/16_Platform_Tenant_Create_Wizard_Alignment]] for the full request shape.
+
+| Field | Rule | Example valid | Example invalid |
+|---|---|---|---|
+| `countryCode` | Exactly 2 letters when present | `LK` | `Sri Lanka` |
+| `address.countryCode` | Exactly 2 letters when present | `LK` | `Sri Lanka` |
+| `baseCurrency` | Exactly 3 letters when present | `LKR` | `LK` |
+| `billingStatus` | One of allowed billing statuses | `pending` | `trial` |
+| `subscription.subscriptionStatus` | Valid subscription lifecycle value | `trial` | (empty when subscription block sent) |
+| `subscription.paymentMethod` | One of seeded payment methods | `manual`, `bank_transfer` | `pending` |
+| `tenantAdmin.email` | Required valid email when `tenantAdmin` block sent | `admin@tenant.com` | `not-an-email` |
+
+Validation failure response shape:
+
+```json
+{
+  "success": false,
+  "message": "One or more tenant create fields are invalid.",
+  "errorCode": "platform_tenants.validation_failed",
+  "errors": [
+    { "field": "countryCode", "message": "Country code must be exactly 2 letters (for example LK)." }
+  ]
+}
+```
+
+Verification on 2026-07-03:
+
+- Backend `dotnet test`: **266/266 passed** (136 unit + 81 API + 49 integration)
+- Angular `npm test -- --watch=false`: **158/158 passed**
+- Angular `npm run build`: passed (style budget warnings only)
 
 ---
 
