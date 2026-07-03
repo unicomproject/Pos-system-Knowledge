@@ -14,7 +14,7 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
 | Area | Contract |
 |---|---|
-| API groups | `/api/v1/platform-admin/users`, `/api/v1/platform-admin/roles`, `/api/v1/platform-admin/permissions`, `/api/v1/platform-admin/settings`, `/api/v1/platform-admin/audit`, `/api/v1/platform-admin/tenants`, `/api/v1/platform-admin/catalog` |
+| API groups | `/api/v1/platform-admin/users`, `/api/v1/platform-admin/roles`, `/api/v1/platform-admin/permissions`, `/api/v1/platform-admin/settings`, `/api/v1/platform-admin/audit-logs`, `/api/v1/platform-admin/tenants`, `/api/v1/platform-admin/catalog` |
 | Request format | Typed request DTOs; no raw map payloads in application layer |
 | Response format | Typed response DTOs with safe fields only |
 | Error format | Standard API error response |
@@ -29,6 +29,7 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 | `/api/v1/platform-admin/roles` | Module API group |
 | `/api/v1/platform-admin/permissions` | Module API group |
 | `/api/v1/platform-admin/settings` | Module API group |
+| `/api/v1/platform-admin/audit-logs` | Read-only platform login/security audit list (`platform_login_audits`) |
 | `/api/v1/platform-admin/tenants` | Tenant list, detail, create-options, create, update, activate, suspend, entitlements |
 | `/api/v1/platform-admin/catalog` | Platform modules catalog read for Modules & Features admin page |
 
@@ -45,9 +46,9 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 | `platform_auth_sessions` | Used by this module |
 | `platform_refresh_tokens` | Used by this module |
 | `platform_password_reset_tokens` | Used by this module |
-| `platform_login_audits` | Used by this module |
+| `platform_login_audits` | Used by this module (R1 audit read API source) |
 | `platform_settings` | Used by this module |
-| `audit_logs` | Used by this module |
+| `audit_logs` | **Not implemented in Unified Commerce R1** — archived target design only; future business audit migration |
 
 Entity mappings must preserve exact table names, column names, tenant foreign keys,
 unique constraints, CHECK constraints, hash-only token rules, and append-only
@@ -152,6 +153,43 @@ Implementation notes:
 - No create/edit/delete on this page unless a future backend write contract is documented.
 
 See [[05_BACKEND_ARCHITECTURE/API_ENDPOINTS]] and [[09_ANGULAR_ADMIN_KNOWLEDGE/Routing_And_Guards]] for route guard and response JSON.
+
+## Platform Audit Logs UI Contract (R1)
+
+Controller: `PlatformAdminAuditLogsController` · future Angular route `/admin/audit-logs`.
+
+| Screen action | API | Permission |
+|---|---|---|
+| Load paginated audit list | `GET /api/v1/platform-admin/audit-logs` | `platform.audit.view` |
+
+### R1 data scope
+
+- Generic `audit_logs` table **does not exist** in Unified Commerce R1.
+- R1 endpoint reads **`platform_login_audits` only**.
+- Response includes `auditScope: platform_login_security` and `auditScopeDescription` so UI must not imply full business audit coverage.
+- Business events such as tenant update, entitlement changes, role edits, and settings changes are **future scope** until generic `audit_logs` migration exists.
+
+### Response fields
+
+Paginated envelope: `auditScope`, `auditScopeDescription`, `items[]`, `pageNumber`, `pageSize`, `totalCount`, `totalPages`.
+
+Each item: `id`, `occurredAt`, `actor.platformUserId`, `actor.email`, `action`, `area`, `entityType`, `entityId`, `summary`, `ipAddress`, `userAgent`.
+
+`ipAddress` and `userAgent` are **`null` in R1** because `platform_login_audits` does not store them.
+
+### Supported query filters
+
+`pageNumber`, `pageSize`, `from`, `to`, `action`, `actorPlatformUserId`, `entityType`, `search`.
+
+### Implementation notes
+
+- Read-only in R1; no create/update/delete audit endpoints.
+- Order: latest first (`occurredAt` descending).
+- Map login results to actions: `platform.login.success`, `platform.login.failed`, `platform.login.locked`.
+- Expose loading, empty, error-with-retry, and invalid-date-range states on future UI.
+- Do not fake business audit rows in UI when backend scope is login/security only.
+
+See [[03_USER_JOURNEYS/Platform_Admin/14_Audit_Logs_Flow]] and [[05_BACKEND_ARCHITECTURE/API_ENDPOINTS]] for JSON shapes and verification.
 
 ## Permission And Entitlement Contract
 

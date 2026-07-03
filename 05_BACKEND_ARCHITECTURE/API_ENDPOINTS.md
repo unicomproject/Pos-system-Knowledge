@@ -404,6 +404,92 @@ All endpoints require platform JWT authentication (`PlatformOnly` policy).
 
 ---
 
+# Platform Audit Logs API Endpoints
+
+Controller: `PlatformAdminAuditLogsController`  
+Base: `/api/v1/platform-admin/audit-logs`
+
+All endpoints require platform JWT authentication (`PlatformOnly` policy).
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/platform-admin/audit-logs` | `platform.audit.view` | Read paginated platform login/security audit list |
+
+## R1 data scope
+
+- Generic `audit_logs` table **does not exist** in Unified Commerce Release 1.
+- This endpoint reads **`platform_login_audits` only**.
+- Response `auditScope` is always `platform_login_security`.
+- Business audit events (tenant update, entitlement changes, role edits, settings changes) are **future scope** until a generic `audit_logs` migration exists.
+
+## Query parameters
+
+| Parameter | Purpose |
+|---|---|
+| `pageNumber` | Page index (default `1`) |
+| `pageSize` | Page size (default `20`, max `100`) |
+| `from` | Inclusive start of date range on `occurredAt` |
+| `to` | Inclusive end of date range on `occurredAt` |
+| `action` | Filter by mapped action (`platform.login.success` / `platform.login.failed` / `platform.login.locked`) or raw login result (`SUCCESS` / `FAILED` / `LOCKED`) |
+| `actorPlatformUserId` | Filter by platform user actor |
+| `entityType` | R1 rows use `platform_user` only; other values return empty page |
+| `search` | Match actor email, login result, or action code |
+
+Invalid date range (`from > to`) returns HTTP 400 `platform_audit.validation_failed`.
+
+## Response shape
+
+```json
+{
+  "success": true,
+  "data": {
+    "auditScope": "platform_login_security",
+    "auditScopeDescription": "Platform login and authentication security events from platform_login_audits. Generic business audit logs are not available in Release 1.",
+    "items": [
+      {
+        "id": "guid",
+        "occurredAt": "2026-07-03T12:00:00Z",
+        "actor": {
+          "platformUserId": "guid",
+          "email": "admin@nytroz.local"
+        },
+        "action": "platform.login.success",
+        "area": "platform_auth",
+        "entityType": "platform_user",
+        "entityId": "guid",
+        "summary": "Platform login succeeded.",
+        "ipAddress": null,
+        "userAgent": null
+      }
+    ],
+    "pageNumber": 1,
+    "pageSize": 20,
+    "totalCount": 1,
+    "totalPages": 1
+  }
+}
+```
+
+## Field notes
+
+| Field | R1 note |
+|---|---|
+| `auditScope` | Always `platform_login_security` until generic audit migration |
+| `auditScopeDescription` | Explains login-only scope to UI consumers |
+| `ipAddress` | Always `null` — not stored on `platform_login_audits` |
+| `userAgent` | Always `null` — not stored on `platform_login_audits` |
+| `action` | Mapped from `login_result`: `SUCCESS` → `platform.login.success`, `FAILED` → `platform.login.failed`, `LOCKED` → `platform.login.locked` |
+
+Ordering: latest first (`occurredAt` descending, then `id` descending).
+
+## Verification (2026-07-03)
+
+| Layer | Result |
+|---|---|
+| Backend | `dotnet test`: 380/380 passed · branch `feat/platform-audit-logs-minimal` · commit `ac1afae` |
+
+---
+
 # Permission Catalog API Endpoints
 
 See [[../02_ACCESS_CONTROL/Backend_Driven_Permission_Catalog]] for full

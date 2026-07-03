@@ -1,7 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-02 -->
+<!-- last_updated: 2026-07-03 -->
 
 # API Authorization Rules
 
@@ -64,7 +64,7 @@ Frontend route guards and menu filtering are UX only. Backend service checks are
 | Platform users | `platform.users.view`, `platform.users.create`, `platform.users.update`, `platform.users.roles.assign` |
 | Platform settings | `platform.settings.view`, `platform.settings.update` |
 | Platform billing | `platform.billing.view`, `platform.billing.manage` |
-| Platform audit | `platform.audit.view` |
+| Platform audit logs (R1 login/security) | `platform.audit.view` → `GET /api/v1/platform-admin/audit-logs` |
 | Platform integrations | `platform.integrations.manage` |
 
 Do not use umbrella-only checks such as `platform.subscriptions.manage` where granular codes already exist.
@@ -164,6 +164,13 @@ secrets in API responses.
 Audit tenant activation, payment status change, permission change, device
 activation, till open/close, discount approval, refund approval, exchange
 completion, cash movement, and report export where required.
+
+### Platform Admin audit read (R1)
+
+- Permission: `platform.audit.view`
+- Endpoint: `GET /api/v1/platform-admin/audit-logs`
+- R1 reads `platform_login_audits` only (`auditScope: platform_login_security`).
+- Generic `audit_logs` business audit is not implemented in Unified Commerce R1.
 
 ## Related Files
 
