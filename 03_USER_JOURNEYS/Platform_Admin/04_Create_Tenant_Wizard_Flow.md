@@ -1,90 +1,95 @@
 <!-- title: Create Tenant Wizard Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-07-03 -->
 
 # Create Tenant Wizard Flow
 
 ## Purpose
 
-Defines end-to-end tenant onboarding through the platform create tenant wizard.
+Defines the implemented 7-step Platform Admin tenant create wizard aligned to the uploaded Super Admin UI and Unified-Commerce backend.
 
 ## Actor
 
 Platform Admin
 
-## Source
-
-Derived from `Slide 3 - Create Tenant Wizard Flow` in `SYSTEM_USER_JOURNEY.pptx` and aligned to TM-EPOS MVP Second Brain scope.
-
-## Trigger
-
-Platform Admin starts new tenant onboarding.
-
 ## Preconditions
 
-- Platform Admin has create-tenant permission.
-- Subscription catalog and entitlement catalog are available.
+- Platform Admin has `platform.tenants.create`.
+- Active subscription plans exist in `subscription_plans`.
+- Create-options endpoint returns catalog, addons, and lookup values.
 
-## Main Flow
+## Implemented 7-Step Flow
 
-| Step | Action | System Behavior |
+| Step | UI label | Backend persistence |
 |---:|---|---|
-| 1 | Start new tenant | System opens create tenant wizard. |
-| 2 | Enter business info | Platform Admin provides business name, contact email, phone, currency, and time zone. |
-| 3 | Enter tenant admin info | Platform Admin provides primary tenant admin name, email, and phone. |
-| 4 | Assign package or subscription | Platform Admin selects base plan or subscription package. |
-| 5 | Select add-ons | Platform Admin enables additional add-ons based on business needs. |
-| 6 | Choose module and feature entitlements | Platform Admin selects modules/features the tenant can access. |
-| 7 | Review billing summary | System shows selected plan, add-ons, entitlements, and estimated charges. |
-| 8 | Choose billing mode | Platform Admin chooses pay now, send payment link, start trial, or demo access. |
-| 9 | Optional setup checklist | Platform Admin may set outlet, till, roles, users, product onboarding, and online store setup. |
-| 10 | Review and create tenant | System validates info, confirms selections, and creates tenant. |
+| 1 | Business Info | `tenants`, `tenant_profiles`, `tenant_addresses` |
+| 2 | Plan Selection | `tenant_subscriptions.subscription_plan_id` |
+| 3 | Limits & Add-ons | `tenant_subscriptions.max_*_override`, `tenant_subscription_addons` |
+| 4 | Feature Entitlements | `tenant_feature_entitlements` (auto-seeded from plan when none selected) |
+| 5 | Tenant Admin | `tenant_users` (`INVITED` or `ACTIVE`), `tenant_roles`, `tenant_role_permissions`, `tenant_user_roles`, `user_invites` |
+| 6 | Billing & Subscription | `tenants.billing_status`, `tenant_subscriptions` billing fields, optional `subscription_invoices` draft |
+| 7 | Review & Create | Single transactional `POST /api/v1/platform-admin/tenants` |
 
-## Data Used Or Captured
+## API Flow
 
-- Business profile
-- Tenant admin profile
-- Plan/package
-- Add-ons
-- Feature entitlements
-- Billing mode
-- Optional setup checklist
+1. `GET /api/v1/platform-admin/tenants/create-options`
+2. Wizard collects step data client-side only from returned options.
+3. `POST /api/v1/platform-admin/tenants` with full wizard payload.
+4. Navigate to tenant detail; activate separately via `POST .../activate` when `canActivate` is true.
 
-## Access And Security Rules
+## Rules
 
-- Platform Admin must be authenticated.
-- Platform Admin role/permission must allow the requested action.
-- Platform-level actions must not use frontend-provided tenant_id as trusted authority.
-- Every create/update/status action must be audit logged.
-- Tenant admin email must be unique where required.
-- Feature entitlement must come from platform catalog, not frontend hardcoding.
+- No mock create-options in Angular.
+- Tenant admin invite stores `PENDING_INVITE:UNSET` password hash and `user_invites.invite_status = PENDING`. No email is sent until notification infrastructure exists.
+- Payment gateway and payment links are not invoked in this slice; draft invoices may be created when billing mode requires it.
+- Feature entitlements must belong to the selected plan; empty selection auto-copies plan included features.
+- Optional post-create setup (outlets, tills, products) remains on tenant detail follow-up flows.
 
-## Validation And Error Cases
+## Validation Behavior (UI)
 
-- Duplicate tenant/contact
-- Invalid plan or inactive package
-- Missing required business/admin info
-- Invalid billing mode
-- Entitlement not available for selected plan
+Each wizard step validates before Next is enabled. The Review step shows a validation summary when any step is incomplete.
 
-## Outcome
+| Behavior | Rule |
+|---|---|
+| Field-level errors | Visible under the control after touch or step validation (country, currency, billing, admin email, etc.) |
+| Step error count | Stepper badge shows count of unresolved issues per step |
+| Next button | Disabled while the current step has validation issues |
+| Create button | Disabled while any step has validation issues |
+| Review summary | Lists all unresolved issues before create |
+| Server errors | Field-level `errors[]` from API mapped to form controls via `ApiErrorService`; no raw PostgreSQL/DB exception text shown |
+| Client validators | `isoCountryCodeValidator`, `isoCurrencyCodeValidator` in `platform-tenant-create.validators.ts` mirror backend ISO rules |
+| Country / currency | Dropdown labels (e.g. Sri Lanka, LKR - Sri Lankan Rupee) post ISO codes (`LK`, `LKR`) only |
 
-Tenant is created as pending activation or ready for activation based on billing mode and setup completion.
+### Example valid create payload values
 
-## Related Modules
+| Field | UI label example | API value |
+|---|---|---|
+| `countryCode` | Sri Lanka | `LK` |
+| `address.countryCode` | Sri Lanka | `LK` |
+| `baseCurrency` | LKR - Sri Lankan Rupee | `LKR` |
+| `billingStatus` | Pending | `pending` |
+| `subscription.subscriptionStatus` | Trial | `trial` |
+| `subscription.paymentMethod` | Manual | `manual` |
 
-- 01_Platform_Administration
-- 02_Tenant_Foundation
-- 03_Subscription_Catalog_Entitlements
-- 04_Subscription_Billing_Usage
-- 05_Tenant_User_Permission_Access
+Invalid examples blocked client-side and server-side: `countryCode = "Sri Lanka"`, `baseCurrency = "LK"`, `billingStatus = "trial"` (trial belongs on subscription status, not billing status).
+
+## Frontend Source Files
+
+- Route: `/admin/tenants/create` (`platformPermissions.tenantsCreate`)
+- Page: `platform-create-tenant-page.ts`
+- Mapper: `platform-tenant-create.mapper.ts` (`mapCreateOptions`, `mapCreateTenantRequest`)
+- Validators: `platform-tenant-create.validators.ts`
+- API service: `platform-tenant-api.service.ts` (`getCreateOptions`, `createTenant`)
+- Error handling: `api-error.service.ts`
+
+See [[16_Platform_Tenant_Create_Wizard_Alignment]] for full request/response contract and server field mapping table.
 
 ## Related Files
 
-- 06_DATABASE_KNOWLEDGE/Tables/02_Tenant_Foundation.md
-- 06_DATABASE_KNOWLEDGE/Tables/03_04_Catalog_And_Subscription_Catalog_Plans_Addons_And_Entitlements.md
-
-## Implementation Notes
-
-- Optional setup steps are skippable; tenant can be created first and completed later.
+- [[../../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]]
+- [[../../04_MODULE_KNOWLEDGE/01_Platform_Administration/03_Technical_Contract]]
+- [[../../04_MODULE_KNOWLEDGE/02_Tenant_Foundation/03_Technical_Contract]]
+- [[../../06_DATABASE_KNOWLEDGE/Tables/02_Tenant_Foundation]]
+- [[../../06_DATABASE_KNOWLEDGE/Tables/05_Subscription_Billing_Payments_And_Usage]]
+- [[16_Platform_Tenant_Create_Wizard_Alignment]]

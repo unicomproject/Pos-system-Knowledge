@@ -59,6 +59,7 @@ PR/commit reference is recorded.
 | Backend | Sales | Create Sale API | In Progress | - | `pos-home-dashboard` | API exists; Flutter not wired |
 | Flutter | POS Shell | POS Home Dashboard | In Progress | - | `pos-home-dashboard` | API dashboard + placeholders |
 | Flutter | Sales | Start Sale UI | In Progress | - | `pos-home-dashboard` | Catalog + local cart partial |
+| Flutter | Sales | Cashier POS Second Brain vs Code Comparison | Completed | 2026-07-02 | - | Documentation audit/status note added |
 | Angular | Tenant | Tenant List Page | In Progress | - | - | Code exists and is wired to `GET /api/v1/platform-admin/tenants`; current verification pending |
 | Flutter | Sales | Start Sale UI | Not Started | - | - | Example row |
 | Backend | Tenant / Outlet | Outlet Create | Completed | 2026-06-18 | dashboard_tenant | POST /api/v1/tenant-admin/outlets |

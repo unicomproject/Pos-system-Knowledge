@@ -52,10 +52,15 @@ states.
 | `/device-activation`, `/open-till` | Device/till setup |
 | `/pos/home` | POS home dashboard |
 | `/pos/new-sale` | New Sale catalog + local cart |
+| `/pos/new-sale/payment` | Payment method selection (`sales.checkout`) |
+| `/pos/new-sale/payment/cash` | Cash payment (`sales.checkout` + `payments.cash.accept`) |
+| `/pos/new-sale/payment/cash/success` | Payment success (`sales.view` or `receipts.view`) |
+| `/pos/new-sale/payment/cash/success/print-receipt` | Print receipt (`receipts.print`) |
+| `/pos/new-sale/payment/cash/success/email-receipt` | Email receipt preview (`receipts.view`) |
 | `/pos/customers` | Placeholder |
 | `/pos/returns-refunds` | Placeholder |
-| `/pos/parked-sales` | Placeholder |
-| `/pos/cash-drawer` | Placeholder |
+| `/pos/parked-sales` | Placeholder guarded by parked-sale permissions |
+| `/pos/cash-drawer` | Placeholder guarded by cash-drawer permissions |
 
 For implemented behavior and conflicts with target routes, see
 [[Flutter_Cashier_New_Sale_Implementation]].

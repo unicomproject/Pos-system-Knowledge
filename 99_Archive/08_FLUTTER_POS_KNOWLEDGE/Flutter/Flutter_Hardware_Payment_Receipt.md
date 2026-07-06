@@ -1,7 +1,7 @@
 <!-- title: Flutter Hardware Payment Receipt -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-06-24 -->
 
 
 # Flutter Hardware Payment Receipt
@@ -59,6 +59,19 @@ flowchart TD
 Receipt generation must use tenant/outlet receipt template settings.
 
 Receipt print failure must not cancel a completed backend sale.
+
+## Current Implementation Notes
+
+Verified current state:
+
+| Area | Status |
+|---|---|
+| Receipt number/barcode | Backend cash checkout returns `receiptNumber` and `barcodeValue`; Flutter renders this in the receipt preview barcode. |
+| Cash received/change due | Backend cash checkout returns `cashReceived` and `changeDue`; Flutter receipt preview displays these backend-returned values. |
+| Receipt print audit | Flutter calls `POST /api/v1/pos/receipts/{saleId}/print` from Print Receipt when a completed `saleId` is available. |
+| Physical receipt printer | Not implemented in Flutter yet; current Print Receipt action records audit and shows a local not-implemented message. |
+| Backend printer control | Backend does not talk to USB/Bluetooth/network printers directly in the verified code. |
+| Printer settings API | No `GET /api/v1/pos/printer-settings` endpoint found. Needs Verification before documenting a backend printer-settings contract. |
 
 ## Receipt Types
 
