@@ -1,7 +1,7 @@
 <!-- title: Catalog Master Data Module Overview -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-03 -->
 
 # Catalog Master Data Module Overview
 
@@ -22,7 +22,7 @@ merchandising, attractions, and temporary retail locations.
 | Module number | 09 |
 | Primary users | Tenant Admin, Platform Admin support, Store Manager |
 | Frontend surfaces | Catalog setup, Category/brand setup, Return policy setup, Product filter setup |
-| API groups | `/api/v1/catalog/departments`, `/api/v1/categories`, `/api/v1/brands`, `/api/v1/collections`, `/api/v1/return-policies` |
+| API groups | `/api/v1/catalog/departments`, `/api/v1/categories`, `/api/v1/brands`, `/api/v1/collections`, `/api/v1/unit-of-measures`, `/api/v1/return-policies`, `/api/v1/platform/return-policy-templates` |
 
 ## Main Tables
 
@@ -34,12 +34,13 @@ merchandising, attractions, and temporary retail locations.
 | `brands` | Used by this module |
 | `collections` | Used by this module |
 | `unit_of_measures` | Used by this module |
-| `return_policies` | Used by this module |
+| `return_policy_templates` | Platform/system reusable return policy templates. |
+| `return_policies` | Tenant-owned return policies. |
 
 ## Core Business Rules
 
 - Category and brand values must be tenant/business-scope safe.
-- Return policies drive POS and online return eligibility.
+- Platform return policy templates provide reusable defaults; tenant return policies drive POS and online return eligibility.
 - Units of measure must match inventory and pricing behavior.
 - Master data can be shown in online store filters only when linked to visible products.
 - Do not store product price or stock in master data tables.

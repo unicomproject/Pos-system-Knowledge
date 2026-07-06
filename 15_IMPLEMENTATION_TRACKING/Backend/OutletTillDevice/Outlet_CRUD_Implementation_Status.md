@@ -20,6 +20,18 @@
 ## Notes
 
 - Implements tenant-protected full profile Outlet CRUD under `/api/v1/outlets`.
+- Auto-generates outlet code without exposing outletCode in create/update request bodies.
 - Uses server-side tenant context with `tenant.outlets.view` for reads and `tenant.outlets.manage` for writes.
 - Adds outlet profile columns, address detail columns, business hours handling, and optional pickup collection-point mapping through existing fulfillment tables.
 - EF migration applied locally: `20260702064117_AddOutletFullProfile`.
+
+
+## Latest Test Result
+
+| Test Project | Result |
+|---|---|
+| E_POS.UnitTests | Passed: 28 |
+| E_POS.IntegrationTests | Passed: 20 |
+| E_POS.ApiTests | Passed: 25 |
+
+

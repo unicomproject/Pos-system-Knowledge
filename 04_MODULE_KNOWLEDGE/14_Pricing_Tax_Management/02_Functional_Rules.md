@@ -1,7 +1,7 @@
-<!-- title: Pricing & Tax Management Functional Rules -->
+﻿<!-- title: Pricing & Tax Management Functional Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-04 -->
 
 # Pricing & Tax Management Functional Rules
 
@@ -13,7 +13,14 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 ## Business Rules
 
-- Price can vary by outlet and sales channel.
+- Price can vary by outlet and sales channel through price_list_outlets and price_list_channels.
+- A tenant can mark one active default price list; backend must resolve the best active price list by outlet/channel, validity window, and priority.
+- Price list items can be product-level when product_variant_id is null, or variant-level when it is present.
+- selling_price must be non-negative; compare_at_price must be null or greater than or equal to selling_price.
+- min_quantity enables quantity-tier pricing and must be greater than zero.
+- Tax jurisdictions may be hierarchical, but a jurisdiction cannot be its own parent.
+- Tax rates must be greater than zero and less than or equal to 100 percent.
+- Product tax assignments must not overlap for the same product/variant when active.
 - Tax must be calculated from assigned tax class/rate rules.
 - Checkout snapshots price and tax on order lines.
 - Cached price/tax is only a reference; backend validates final totals.
@@ -74,3 +81,4 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 - [[04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/03_Technical_Contract]]
+

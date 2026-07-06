@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-03 -->
 
 
 # Permission Code List
@@ -36,6 +36,11 @@ Use permission codes and feature entitlements.
 | platform.features.manage | Manage modules/features/entitlements |
 | platform.users.manage | Manage platform users |
 | platform.audit.view | View platform audit |
+| platform.return_policy_templates.view | View platform return policy templates |
+| platform.return_policy_templates.create | Create platform return policy templates |
+| platform.return_policy_templates.update | Update platform return policy templates |
+| platform.return_policy_templates.delete | Delete platform return policy templates |
+| platform.return_policy_templates.manage | Manage all platform return policy template actions |
 
 ## Tenant Admin Permissions
 
@@ -45,7 +50,11 @@ Use permission codes and feature entitlements.
 | tenant.settings.manage | Manage tenant settings |
 | tenant.outlets.view | View outlets |
 | tenant.outlets.manage | Manage outlets |
-| tenant.tills.manage | Manage tills |
+| tenant.tills.view | View tills |
+| tenant.tills.create | Create tills |
+| tenant.tills.update | Update tills |
+| tenant.tills.delete | Delete tills |
+| tenant.tills.manage | Manage all till actions |
 | tenant.devices.manage | Manage POS devices |
 | tenant.hardware.manage | Manage hardware profiles/devices |
 | tenant.users.manage | Manage tenant users |
@@ -55,6 +64,31 @@ Use permission codes and feature entitlements.
 
 | Code | Meaning |
 |---|---|
+| catalog.departments.view | View departments |
+| catalog.departments.create | Create departments |
+| catalog.departments.update | Update departments |
+| catalog.departments.delete | Delete/deactivate departments |
+| catalog.departments.manage | Manage all department actions |
+| catalog.categories.view | View categories |
+| catalog.categories.create | Create categories |
+| catalog.categories.update | Update categories |
+| catalog.categories.delete | Delete/deactivate categories |
+| catalog.categories.manage | Manage all category actions |
+| catalog.brands.view | View brands |
+| catalog.brands.create | Create brands |
+| catalog.brands.update | Update brands |
+| catalog.brands.delete | Delete/deactivate brands |
+| catalog.brands.manage | Manage all brand actions |
+| catalog.collections.view | View collections |
+| catalog.collections.create | Create collections |
+| catalog.collections.update | Update collections |
+| catalog.collections.delete | Delete/deactivate collections |
+| catalog.collections.manage | Manage all collection actions |
+| catalog.return_policies.view | View tenant return policies |
+| catalog.return_policies.create | Create tenant return policies |
+| catalog.return_policies.update | Update tenant return policies |
+| catalog.return_policies.delete | Delete/deactivate tenant return policies |
+| catalog.return_policies.manage | Manage all tenant return policy actions |
 | catalog.products.view | View products |
 | catalog.products.create | Create products |
 | catalog.products.update | Update products |

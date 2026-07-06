@@ -13,30 +13,15 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "14_AI_DEVELOPER_PROMPTS/Backend/Backend_Feature_Prompt_With_Optional_Reads_TM_EPOS.md",
+                "file": "06_DATABASE_KNOWLEDGE/Tables/06_Tenant_Users_Roles_Permissions_And_Outlet_Access_UPDATED.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Backend_Feature_Prompt_With_Optional_Reads_TM_EPOS"
-            }
-          },
-          {
-            "id": "770cfc523b94edb3",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "23_Fulfilment_And_Pickup"
+              "title": "06_Tenant_Users_Roles_Permissions_And_Outlet_Access_UPDATED"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -93,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 379.5
+    "width": 592.5
   },
   "right": {
     "id": "17789eb71a72b01a",
@@ -171,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup.md",
+                "file": "06_DATABASE_KNOWLEDGE/Tables/06_Tenant_Users_Roles_Permissions_And_Outlet_Access_UPDATED.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 23_Fulfilment_And_Pickup"
+              "title": "Outline of 06_Tenant_Users_Roles_Permissions_And_Outlet_Access_UPDATED"
             }
           }
         ],
@@ -185,7 +170,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 263.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -198,43 +183,43 @@
       "bases:Create new base": false
     }
   },
-  "active": "770cfc523b94edb3",
+  "active": "ef55fe1e05a4e2d2",
   "lastOpenFiles": [
-    "15_IMPLEMENTATION_TRACKING/Backend/OutletTillDevice/Outlet_CRUD_Implementation_Status.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/OutletTillDevice",
-    "10_TESTING_QA/Test_Case/07_Outlet_Till_POS_Device_Foundation/Outlet_CRUD_Test_Cases.md",
-    "10_TESTING_QA/Test_Case/07_Outlet_Till_POS_Device_Foundation",
+    "06_DATABASE_KNOWLEDGE/Tables/05_Subscription_Billing_Payments_And_Usage_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/04_Subscription_Catalog_Plans_Addons_And_Entitlements_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/02_Tenant_Foundation_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/01_Platform_Administration_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/07_Invitations_Authentication_Tokens_And_Security_Audit.md",
+    "06_DATABASE_KNOWLEDGE/Tables/05_Subscription_Billing_Payments_And_Usage.md",
+    "06_DATABASE_KNOWLEDGE/Tables/03_04_Catalog_And_Subscription_Catalog_Plans_Addons_And_Entitlements.md",
+    "06_DATABASE_KNOWLEDGE/Tables/02_Tenant_Foundation.md",
+    "06_DATABASE_KNOWLEDGE/Tables/01_Platform_Administration.md",
     "06_DATABASE_KNOWLEDGE/Tables/08_Outlet_Till_And_POS_Device_Foundation.md",
-    "04_MODULE_KNOWLEDGE/07_Outlet_Till_POS_Device_Foundation/01_Module_Overview.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Backend_Module_Feature_Priority_Order.md",
-    "14_AI_DEVELOPER_PROMPTS/Backend/Backend_Feature_Prompt_With_Optional_Reads_TM_EPOS.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Backend_Feature_Priority_Roadmap.md",
-    "10_TESTING_QA/Test_Case/06_Auth_Tokens_Security_Audit/Tenant_Login_Test_Cases.md",
-    "10_TESTING_QA/Test_Case/06_Auth_Tokens_Security_Audit/Tenant_Logout_Test_Cases.md",
-    "10_TESTING_QA/Test_Case/01_PlatformAdministration/Platform_User_Logout_Test_Cases.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_User_Logout_Implementation_Status.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Tenant_Logout_Implementation_Status.md",
-    "10_TESTING_QA/Test_Case/01_PlatformAdministration/Platform_Admin_Login_Test_Cases.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_Admin_Login_Implementation_Status.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Tenant_Login_Implementation_Status.md",
-    "10_TESTING_QA/Test_Case/06_Auth_Tokens_Security_Audit",
+    "06_DATABASE_KNOWLEDGE/Tables/09_Hardware_Operations_Till_Session_And_Cash_Control_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/09_Hardware_Operations_Till_Session_And_Cash_Control.md",
+    "06_DATABASE_KNOWLEDGE/Tables/06_Tenant_Users_Roles_Permissions_And_Outlet_Access_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/16_Inventory_Foundation_Product_Tracking_And_Stock_Availability.md",
+    "06_DATABASE_KNOWLEDGE/Tables/06_Tenant_Users_Roles_Permissions_And_Outlet_Access.md",
+    "04_MODULE_KNOWLEDGE/05_Tenant_User_Permission_Access/03_Technical_Contract.md",
+    "04_MODULE_KNOWLEDGE/05_Tenant_User_Permission_Access/02_Functional_Rules.md",
+    "04_MODULE_KNOWLEDGE/05_Tenant_User_Permission_Access/01_Module_Overview.md",
+    "04_MODULE_KNOWLEDGE/05_Tenant_User_Permission_Access",
+    "04_MODULE_KNOWLEDGE/06_Tenant_Users_Roles_Permissions_And_Outlet_Access_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/10_Catalog_Master_Data_And_Product_Core_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/25_Return_Inspection_And_Exchange_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/12_Product_Option_Templates_And_Variant_Configuration.md",
+    "06_DATABASE_KNOWLEDGE/Tables/11_Product_Mapping_Media_Attributes_And_Channel_Visibility_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/21_POS_Operations_UPDATED.md",
     "05_BACKEND_ARCHITECTURE/Backend_Coding_Principles.md",
-    "99_Archive/05_BACKEND_ARCHITECTURE/Backend_Coding_Principles.md",
-    "Backend_Feature_Prompt_With_Optional_Reads_TM_EPOS.md",
-    "03_USER_JOURNEYS/Tenant_Admin/20_Audit_Logs_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/19_Device_Hardware_Management_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/18_Billing_Subscription_Management_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/17_Reports_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/16_Expiry_Discount_Management_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/15_Stock_Count_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/14_Stock_Transfer_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin/13_Stock_Out_Flow.md",
-    "03_USER_JOURNEYS/Tenant_Admin",
-    "03_USER_JOURNEYS/Platform_Admin",
-    "10_TESTING_QA/Test_Case/21_Reports",
-    "10_TESTING_QA/Test_Case/20_Integration",
-    "10_TESTING_QA/Test_Case/19_Notification",
-    "10_TESTING_QA/Test_Case/18_OfflineSync",
-    "10_TESTING_QA/Test_Case/17_ReturnExchange"
+    "15_IMPLEMENTATION_TRACKING/Backend/14_Pricing_Tax_Management",
+    "10_TESTING_QA/Test_Case/14_Pricing_Tax_Management",
+    "15_IMPLEMENTATION_TRACKING/Backend/10_Product_Core",
+    "10_TESTING_QA/Test_Case/10_Product_Core",
+    "10_TESTING_QA/Test_Case/CatalogProduct",
+    "15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct",
+    "15_IMPLEMENTATION_TRACKING/Backend/OutletTillDevice",
+    "10_TESTING_QA/Test_Case/07_Outlet_Till_POS_Device_Foundation",
+    "10_TESTING_QA/Test_Case/06_Auth_Tokens_Security_Audit"
   ]
 }

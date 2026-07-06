@@ -1,7 +1,7 @@
-<!-- title: Pricing & Tax Management Module Overview -->
+﻿<!-- title: Pricing & Tax Management Module Overview -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-04 -->
 
 # Pricing & Tax Management Module Overview
 
@@ -40,7 +40,9 @@ merchandising, attractions, and temporary retail locations.
 
 ## Core Business Rules
 
-- Price can vary by outlet and sales channel.
+- Price can vary by outlet and sales channel through price list assignments.
+- Price list items support product-level, variant-level, UOM-level, and minimum-quantity pricing.
+- Price list validity windows and priority determine which active price can be selected when multiple price lists match.
 - Tax must be calculated from assigned tax class/rate rules.
 - Checkout snapshots price and tax on order lines.
 - Cached price/tax is only a reference; backend validates final totals.
@@ -74,3 +76,4 @@ merchandising, attractions, and temporary retail locations.
 
 - [[04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/02_Functional_Rules]]
 - [[04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/03_Technical_Contract]]
+

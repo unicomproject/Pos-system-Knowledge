@@ -1,7 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-03 -->
 
 
 # API Authorization Rules
@@ -45,6 +45,7 @@ Examples:
 | Feature entitlement | platform.features.manage |
 | Platform users | platform.users.manage |
 | Platform audit | platform.audit.view |
+| Return policy templates | platform.return_policy_templates.* |
 
 ## Tenant Admin APIs
 
@@ -57,6 +58,7 @@ Examples:
 |---|---|
 | Outlet/till/device setup | tenant/outlet/till/device permissions |
 | User/role management | tenant.users.manage or tenant.roles.manage |
+| Catalog master data | catalog.departments.*, catalog.categories.*, catalog.brands.*, catalog.collections.*, catalog.return_policies.* |
 | Product setup | catalog permissions |
 | Inventory setup | inventory permissions |
 | Reports | reports permissions |
