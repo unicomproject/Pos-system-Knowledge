@@ -1,7 +1,12 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
+<<<<<<< HEAD
+<!-- last_updated: 2026-07-03 -->
+
+=======
 <!-- last_updated: 2026-07-02 -->
+>>>>>>> 6cdb2685b4386b2f86e0815c9a35d554093f9b25
 
 # Permission Code List
 
@@ -43,10 +48,23 @@ code references.
 | platform.dashboard.view | View platform dashboard |
 | platform.tenants.view | View tenant list, summary, filters |
 | platform.tenants.create | Create tenant |
+<<<<<<< HEAD
+| platform.tenants.update | Update tenant |
+| platform.subscriptions.manage | Manage plans and subscriptions |
+| platform.features.manage | Manage modules/features/entitlements |
+| platform.users.manage | Manage platform users |
+| platform.audit.view | View platform audit |
+| platform.return_policy_templates.view | View platform return policy templates |
+| platform.return_policy_templates.create | Create platform return policy templates |
+| platform.return_policy_templates.update | Update platform return policy templates |
+| platform.return_policy_templates.delete | Delete platform return policy templates |
+| platform.return_policy_templates.manage | Manage all platform return policy template actions |
+=======
 | platform.tenants.update | Update tenant profile/setup |
 | platform.tenants.activate | Activate tenant |
 | platform.tenants.suspend | Suspend tenant |
 | platform.tenants.entitlements.update | Assign or update tenant feature entitlements |
+>>>>>>> 6cdb2685b4386b2f86e0815c9a35d554093f9b25
 
 ### Platform subscription plans (granular — implemented)
 
@@ -118,7 +136,11 @@ must be seeded and stored in the database.
 | tenant.settings.manage | Manage tenant settings |
 | tenant.outlets.view | View outlets |
 | tenant.outlets.manage | Manage outlets |
-| tenant.tills.manage | Manage tills |
+| tenant.tills.view | View tills |
+| tenant.tills.create | Create tills |
+| tenant.tills.update | Update tills |
+| tenant.tills.delete | Delete tills |
+| tenant.tills.manage | Manage all till actions |
 | tenant.devices.manage | Manage POS devices |
 | tenant.hardware.manage | Manage hardware profiles/devices |
 | tenant.users.manage | Manage tenant users |
@@ -199,12 +221,50 @@ permission rows for aliases.
 
 | Code | Meaning |
 |---|---|
+<<<<<<< HEAD
+| catalog.departments.view | View departments |
+| catalog.departments.create | Create departments |
+| catalog.departments.update | Update departments |
+| catalog.departments.delete | Delete/deactivate departments |
+| catalog.departments.manage | Manage all department actions |
+| catalog.categories.view | View categories |
+| catalog.categories.create | Create categories |
+| catalog.categories.update | Update categories |
+| catalog.categories.delete | Delete/deactivate categories |
+| catalog.categories.manage | Manage all category actions |
+| catalog.brands.view | View brands |
+| catalog.brands.create | Create brands |
+| catalog.brands.update | Update brands |
+| catalog.brands.delete | Delete/deactivate brands |
+| catalog.brands.manage | Manage all brand actions |
+| catalog.collections.view | View collections |
+| catalog.collections.create | Create collections |
+| catalog.collections.update | Update collections |
+| catalog.collections.delete | Delete/deactivate collections |
+| catalog.collections.manage | Manage all collection actions |
+| catalog.return_policies.view | View tenant return policies |
+| catalog.return_policies.create | Create tenant return policies |
+| catalog.return_policies.update | Update tenant return policies |
+| catalog.return_policies.delete | Delete/deactivate tenant return policies |
+| catalog.return_policies.manage | Manage all tenant return policy actions |
+| catalog.products.view | View products |
+| catalog.products.create | Create products |
+| catalog.products.update | Update products |
+| catalog.products.delete | Delete/deactivate products |
+| catalog.variants.manage | Manage product variants |
+| catalog.barcodes.manage | Manage product barcodes |
+| inventory.stock.view | View stock |
+| inventory.stock.adjust | Adjust stock |
+| inventory.movements.view | View movement history |
+| inventory.alerts.view | View low/expiry stock alerts |
+=======
 | `platform.subscription_plans.view` | View subscription plans list |
 | `platform.subscription_plans.create` | Create subscription plans |
 | `platform.subscription_plans.edit` | Edit subscription plans |
 | `platform.subscription_plans.duplicate` | Duplicate subscription plans |
 | `platform.subscription_plans.archive` | Archive subscription plans |
 | `platform.subscription_plans.delete` | Delete subscription plans |
+>>>>>>> 6cdb2685b4386b2f86e0815c9a35d554093f9b25
 
 Only confirmed platform actions should be seeded.
 

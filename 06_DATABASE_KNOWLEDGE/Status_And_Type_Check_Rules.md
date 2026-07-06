@@ -1,7 +1,7 @@
-<!-- title: Status And Type Check Rules -->
+﻿<!-- title: Status And Type Check Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-02 -->
+<!-- last_updated: 2026-07-04 -->
 <!-- source: Unified_Commerce_Databse_Design.docx -->
 
 
@@ -88,7 +88,10 @@ Do not use database enum datatypes.
 | 10 | `brands` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
 | 10 | `collections` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
 | 10 | `unit_of_measures` | `CHECK(conversion_factor IS NULL OR conversion_factor > 0)` |
+| 10 | `return_policy_templates` | `CHECK(return_window_days IS NULL OR return_window_days >= 0)` |
+| 10 | `return_policy_templates` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
 | 10 | `return_policies` | `CHECK(return_window_days IS NULL OR return_window_days >= 0)` |
+| 10 | `return_policies` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
 | 10 | `products` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
 | 11 | `product_images` | `CHECK(sort_order >= 0)` |
 | 12 | `product_option_template_values` | `CHECK(sort_order >= 0)` |
@@ -104,8 +107,26 @@ Do not use database enum datatypes.
 | 13 | `choice_options` | `CHECK(sort_order >= 0)` |
 | 13 | `choice_option_inventory_impacts` | `CHECK(quantity_delta <> 0)` |
 | 14 | `price_lists` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
-| 14 | `price_list_items` | `CHECK(price_amount >= 0)` |
-| 14 | `tax_rates` | `CHECK(rate_percent >= 0)` |
+| 14 | `price_lists` | `CHECK(priority >= 0)` |
+| 14 | `price_lists` | `CHECK(valid_until IS NULL OR valid_from IS NULL OR valid_until >= valid_from)` |
+| 14 | `price_list_outlets` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
+| 14 | `price_list_channels` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
+| 14 | `price_list_items` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
+| 14 | `price_list_items` | `CHECK(selling_price >= 0)` |
+| 14 | `price_list_items` | `CHECK(compare_at_price IS NULL OR compare_at_price >= selling_price)` |
+| 14 | `price_list_items` | `CHECK(min_quantity > 0)` |
+| 14 | `price_list_items` | `CHECK(valid_until IS NULL OR valid_from IS NULL OR valid_until >= valid_from)` |
+| 14 | `tax_jurisdictions` | `CHECK(parent_jurisdiction_id IS NULL OR parent_jurisdiction_id <> id)` |
+| 14 | `tax_jurisdictions` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
+| 14 | `tax_classes` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
+| 14 | `tax_rates` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
+| 14 | `tax_rates` | `CHECK(rate_percent > 0)` |
+| 14 | `tax_rates` | `CHECK(rate_percent <= 100)` |
+| 14 | `tax_rates` | `CHECK(valid_until IS NULL OR valid_from IS NULL OR valid_until >= valid_from)` |
+| 14 | `tax_class_rates` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
+| 14 | `tax_class_rates` | `CHECK(sort_order >= 0)` |
+| 14 | `product_tax_assignments` | `CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))` |
+| 14 | `product_tax_assignments` | `CHECK(applies_until IS NULL OR applies_from IS NULL OR applies_until >= applies_from)` |
 | 15 | `discount_policies` | `CHECK(discount_value >= 0)` |
 | 15 | `discount_policy_conditions` | `CHECK(condition_sequence > 0)` |
 | 15 | `expiry_discount_rule_tiers` | `CHECK(days_before_expiry >= 0)` |
@@ -234,3 +255,4 @@ Every new status or type value must update:
 
 - [[Migration_Rules]]
 - [[Database_Overview]]
+

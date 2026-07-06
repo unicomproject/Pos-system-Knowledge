@@ -1,7 +1,7 @@
 <!-- title: Catalog Master Data Technical Contract -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-03 -->
 
 # Catalog Master Data Technical Contract
 
@@ -14,7 +14,7 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
 | Area | Contract |
 |---|---|
-| API groups | `/api/v1/catalog/departments`, `/api/v1/categories`, `/api/v1/brands`, `/api/v1/collections`, `/api/v1/return-policies` |
+| API groups | `/api/v1/catalog/departments`, `/api/v1/categories`, `/api/v1/brands`, `/api/v1/collections`, `/api/v1/unit-of-measures`, `/api/v1/return-policies`, `/api/v1/platform/return-policy-templates` |
 | Request format | Typed request DTOs; no raw map payloads in application layer |
 | Response format | Typed response DTOs with safe fields only |
 | Error format | Standard API error response |
@@ -25,11 +25,13 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
 | API Group | Purpose |
 |---|---|
-| `/api/v1/catalog/departments` | Module API group |
-| `/api/v1/categories` | Module API group |
-| `/api/v1/brands` | Module API group |
-| `/api/v1/collections` | Module API group |
-| `/api/v1/return-policies` | Module API group |
+| `/api/v1/catalog/departments` | Department setup API group |
+| `/api/v1/categories` | Category setup API group |
+| `/api/v1/brands` | Brand setup API group |
+| `/api/v1/collections` | Collection setup API group |
+| `/api/v1/unit-of-measures` | Unit-of-measure reference list API group |
+| `/api/v1/platform/return-policy-templates` | Platform-owned return policy template API group |
+| `/api/v1/return-policies` | Tenant-owned return policy API group |
 
 ## Database Contract
 
@@ -41,7 +43,8 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 | `brands` | Used by this module |
 | `collections` | Used by this module |
 | `unit_of_measures` | Used by this module |
-| `return_policies` | Used by this module |
+| `return_policy_templates` | Platform/system reusable return policy templates |
+| `return_policies` | Tenant-owned return policies |
 
 Entity mappings must preserve exact table names, column names, tenant foreign keys,
 unique constraints, CHECK constraints, hash-only token rules, and append-only

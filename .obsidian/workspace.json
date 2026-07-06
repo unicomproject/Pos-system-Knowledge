@@ -1,24 +1,24 @@
 {
   "main": {
-    "id": "1cb734fccc6c8439",
+    "id": "0ea50eb8fbf08a14",
     "type": "split",
     "children": [
       {
-        "id": "f2503a97c3c43573",
+        "id": "5ed568d401eb73f7",
         "type": "tabs",
         "children": [
           {
-            "id": "56806a201bd68d51",
+            "id": "ca78ae5de696dc63",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "03_USER_JOURNEYS/Platform_Admin/04_Create_Tenant_Wizard_Flow.md",
+                "file": "06_DATABASE_KNOWLEDGE/Tables/02_Tenant_Foundation_UPDATED.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "04_Create_Tenant_Wizard_Flow"
+              "title": "02_Tenant_Foundation_UPDATED"
             }
           }
         ]
@@ -27,15 +27,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "d3f87169598919b0",
+    "id": "e6213d6c930e7c1f",
     "type": "split",
     "children": [
       {
-        "id": "f6617836dfe14690",
+        "id": "d278ec9351cd979c",
         "type": "tabs",
         "children": [
           {
-            "id": "27fe543d610a8aae",
+            "id": "4dca6cdac7b1a3a8",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -48,7 +48,7 @@
             }
           },
           {
-            "id": "b71489dff0c11785",
+            "id": "8cb80830421e1dd8",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -65,7 +65,7 @@
             }
           },
           {
-            "id": "1fe9824e1901cf53",
+            "id": "a92b544de44e4ba6",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -78,23 +78,23 @@
       }
     ],
     "direction": "horizontal",
-    "width": 403.5
+    "width": 300
   },
   "right": {
-    "id": "bb1db1e68db4824b",
+    "id": "f2cdd132295797b9",
     "type": "split",
     "children": [
       {
-        "id": "5fdd4342edd2c68d",
+        "id": "86e02c7c0749bdd1",
         "type": "tabs",
         "children": [
           {
-            "id": "0fd941b3d7486c35",
+            "id": "fac006816524a74f",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
+                "file": "06_DATABASE_KNOWLEDGE/Tables/02_Tenant_Foundation_UPDATED.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,25 +104,25 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for 10_Cash_In_Out_Flow"
+              "title": "Backlinks for 02_Tenant_Foundation_UPDATED"
             }
           },
           {
-            "id": "5266211a06e2aa0b",
+            "id": "0211ed447eee10f1",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
+                "file": "06_DATABASE_KNOWLEDGE/Tables/02_Tenant_Foundation_UPDATED.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from 10_Cash_In_Out_Flow"
+              "title": "Outgoing links from 02_Tenant_Foundation_UPDATED"
             }
           },
           {
-            "id": "c8dd2289d8f917e9",
+            "id": "44dcc8e569738389",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -137,7 +137,7 @@
             }
           },
           {
-            "id": "c85a86c08b5b9863",
+            "id": "8f01de98c71294d0",
             "type": "leaf",
             "state": {
               "type": "all-properties",
@@ -151,26 +151,25 @@
             }
           },
           {
-            "id": "82ef659ed078ee6d",
+            "id": "8f88fb294bd7aecd",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow.md",
+                "file": "06_DATABASE_KNOWLEDGE/Tables/02_Tenant_Foundation_UPDATED.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 10_Cash_In_Out_Flow"
+              "title": "Outline of 02_Tenant_Foundation_UPDATED"
             }
           }
         ]
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -183,43 +182,18 @@
       "bases:Create new base": false
     }
   },
-  "active": "56806a201bd68d51",
+  "active": "ca78ae5de696dc63",
   "lastOpenFiles": [
-    "15_IMPLEMENTATION_TRACKING/Flutter/Sales/Cashier_POS_Second_Brain_vs_Code_Comparison_Implementation_Status.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/OutletTillDevice/Outlet_CRUD_Implementation_Status.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/OutletTillDevice",
-    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Tenant_Logout_Implementation_Status.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Tenant_Login_Implementation_Status.md",
-    "15_IMPLEMENTATION_TRACKING/Backend/Auth/Platform_User_Logout_Implementation_Status.md",
-    "03_USER_JOURNEYS/Platform_Admin/03_Tenant_Management_Flow.md",
-    "03_USER_JOURNEYS/Platform_Admin/05_Outlet_Collection_Point_Setup_Flow.md",
-    "03_USER_JOURNEYS/Platform_Admin/13_Platform_User_Management_Flow.md",
-    "01_RELEASE_SCOPE/Release_1_Scope.md",
-    "04_MODULE_KNOWLEDGE/28_Offline_Operation_Sync/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/28_Offline_Operation_Sync/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/28_Offline_Operation_Sync/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/28_Offline_Operation_Sync",
-    "04_MODULE_KNOWLEDGE/27_Reporting_Analytics/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/27_Reporting_Analytics/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/27_Reporting_Analytics/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/27_Reporting_Analytics",
-    "04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout",
-    "04_MODULE_KNOWLEDGE/21_POS_Operations/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/21_POS_Operations/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/21_POS_Operations/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/21_POS_Operations",
-    "04_MODULE_KNOWLEDGE/20_Unified_Order_Sales/01_Module_Overview.md",
-    "04_MODULE_KNOWLEDGE/20_Unified_Order_Sales/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/20_Unified_Order_Sales/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/20_Unified_Order_Sales",
-    "04_MODULE_KNOWLEDGE/19_Customer_Account_Consent/03_Technical_Contract.md",
-    "04_MODULE_KNOWLEDGE/19_Customer_Account_Consent/02_Functional_Rules.md",
-    "04_MODULE_KNOWLEDGE/19_Customer_Account_Consent",
-    "04_MODULE_KNOWLEDGE/18_Stock_Adjustment_Transfer_Stocktake",
-    "04_MODULE_KNOWLEDGE/13_Product_Combo_Choice_Inventory_Impact",
-    "04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration"
+    "02_Tenant_Foundation_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/02_Tenant_Foundation_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/02_Tenant_Foundation.md",
+    "06_DATABASE_KNOWLEDGE/Tables/06_Tenant_Users_Roles_Permissions_And_Outlet_Access_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/05_Subscription_Billing_Payments_And_Usage.md",
+    "06_DATABASE_KNOWLEDGE/Tables/04_Subscription_Catalog_Plans_Addons_And_Entitlements_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/01_Platform_Administration_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/16_Inventory_Foundation_Product_Tracking_And_Stock_Availability.md",
+    "06_DATABASE_KNOWLEDGE/Tables/22_Cart_And_Checkout_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/09_Hardware_Operations_Till_Session_And_Cash_Control_UPDATED.md",
+    "06_DATABASE_KNOWLEDGE/Tables/08_Outlet_Till_And_POS_Device_Foundation.md"
   ]
 }

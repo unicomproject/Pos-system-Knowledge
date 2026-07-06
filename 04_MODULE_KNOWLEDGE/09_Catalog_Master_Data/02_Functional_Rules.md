@@ -1,7 +1,7 @@
 <!-- title: Catalog Master Data Functional Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-03 -->
 
 # Catalog Master Data Functional Rules
 
@@ -14,11 +14,19 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 ## Business Rules
 
 - Category and brand values must be tenant/business-scope safe.
-- Return policies drive POS and online return eligibility.
+- Platform return policy templates provide reusable defaults; tenant return policies drive POS and online return eligibility.
 - Units of measure must match inventory and pricing behavior.
 - Master data can be shown in online store filters only when linked to visible products.
 - Do not store product price or stock in master data tables.
 
+
+## Return Policy Setup Rules
+
+- Platform admins manage reusable system return policy templates in `return_policy_templates`.
+- Tenant admins manage tenant-owned return policies in `return_policies`.
+- Return policy codes must be normalized to uppercase and unique within their owning scope.
+- Return window days must be null or greater than/equal to zero.
+- Product-to-return-policy assignment and non-returnable product behavior are separate feature slices.
 ## User Rules
 
 | User Type | Rule |

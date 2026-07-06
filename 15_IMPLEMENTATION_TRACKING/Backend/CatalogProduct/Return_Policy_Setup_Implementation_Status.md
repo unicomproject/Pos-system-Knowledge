@@ -1,0 +1,40 @@
+<!-- title: Return Policy Setup Implementation Status -->
+<!-- status: Completed -->
+<!-- system: TM-EPOS MVP -->
+<!-- module: CatalogProduct -->
+<!-- feature: Return Policy Templates / Return Policy CRUD -->
+<!-- last_updated: 2026-07-03 -->
+
+# Return Policy Templates / Return Policy CRUD Implementation Status
+
+## Implementation Status
+
+| Item | Value |
+|---|---|
+| Feature | Return Policy Templates / Return Policy CRUD |
+| Module | CatalogProduct |
+| Platform | Backend |
+| Status | Completed |
+| Completed Date | 2026-07-03 |
+| Tests | Passed |
+| PR / Commit | - |
+
+## Implemented Scope
+
+- Platform-protected Return Policy Template CRUD under `/api/v1/platform/return-policy-templates`.
+- Tenant-protected Return Policy CRUD under `/api/v1/return-policies`.
+- New platform/system table `return_policy_templates` with seeded defaults: `NO_RETURN`, `SAME_DAY`, `7DAYS`, `14DAYS`.
+- Existing tenant table `return_policies` now includes `status` for soft delete.
+- Server-side tenant context from JWT claims; request body does not accept `tenant_id`.
+- DTO-based responses only; EF entities are not returned directly.
+- Platform permissions: `platform.return_policy_templates.view`, `platform.return_policy_templates.create`, `platform.return_policy_templates.update`, `platform.return_policy_templates.delete`, `platform.return_policy_templates.manage`.
+- Tenant permissions: `catalog.return_policies.view`, `catalog.return_policies.create`, `catalog.return_policies.update`, `catalog.return_policies.delete`, `catalog.return_policies.manage`.
+- Migration seeds platform permissions, tenant permissions, and development role assignments.
+
+## Not Included
+
+- Product-to-return-policy assignment.
+- Product non-returnable flag/table.
+- Return request/refund workflow.
+- Customer-facing return policy display API.
+- Import/export for return policies.
