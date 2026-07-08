@@ -73,6 +73,12 @@ operation types, server versions where needed, and safe payload structure.
 
 Do not expose conflict resolution internals unless required by sync UI.
 
+## Cross-Module DTO & Mapping Rule
+
+Modules must not share core Domain Entities directly across boundaries.
+When Module A requests data or actions from Module B (via service contract interfaces), it must only use the public DTOs or contract contracts defined by Module B.
+This maintains strict logical boundaries and prevents database structure/model leakage between isolated services.
+
 ## Versioning Rule
 
 If DTO contracts change in a breaking way, version API route or response shape.
