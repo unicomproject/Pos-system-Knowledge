@@ -1,12 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<<<<<<< HEAD
-<!-- last_updated: 2026-07-03 -->
-
-=======
-<!-- last_updated: 2026-07-02 -->
->>>>>>> 6cdb2685b4386b2f86e0815c9a35d554093f9b25
+<!-- last_updated: 2026-07-13 -->
 
 # Permission Code List
 
@@ -48,23 +43,10 @@ code references.
 | platform.dashboard.view | View platform dashboard |
 | platform.tenants.view | View tenant list, summary, filters |
 | platform.tenants.create | Create tenant |
-<<<<<<< HEAD
-| platform.tenants.update | Update tenant |
-| platform.subscriptions.manage | Manage plans and subscriptions |
-| platform.features.manage | Manage modules/features/entitlements |
-| platform.users.manage | Manage platform users |
-| platform.audit.view | View platform audit |
-| platform.return_policy_templates.view | View platform return policy templates |
-| platform.return_policy_templates.create | Create platform return policy templates |
-| platform.return_policy_templates.update | Update platform return policy templates |
-| platform.return_policy_templates.delete | Delete platform return policy templates |
-| platform.return_policy_templates.manage | Manage all platform return policy template actions |
-=======
 | platform.tenants.update | Update tenant profile/setup |
 | platform.tenants.activate | Activate tenant |
 | platform.tenants.suspend | Suspend tenant |
 | platform.tenants.entitlements.update | Assign or update tenant feature entitlements |
->>>>>>> 6cdb2685b4386b2f86e0815c9a35d554093f9b25
 
 ### Platform subscription plans (granular — implemented)
 
@@ -76,6 +58,21 @@ code references.
 | platform.subscription_plans.duplicate | Duplicate plan |
 | platform.subscription_plans.archive | Archive/retire plan |
 | platform.subscription_plans.delete | Delete draft plan |
+
+`platform.subscription_plans.edit` also authorizes publishing an eligible
+draft. `platform.subscription_plans.archive` authorizes both archiving an
+active plan and reactivating an archived plan; there is no separate live
+reactivate permission code.
+
+### Platform return-policy templates
+
+| Code | Meaning |
+|---|---|
+| platform.return_policy_templates.view | View platform return policy templates |
+| platform.return_policy_templates.create | Create platform return policy templates |
+| platform.return_policy_templates.update | Update platform return policy templates |
+| platform.return_policy_templates.delete | Delete platform return policy templates |
+| platform.return_policy_templates.manage | Manage all platform return policy template actions |
 
 ### Platform catalog (granular — implemented)
 
@@ -122,7 +119,9 @@ code references.
 
 ### Super Administrator seed expectation
 
-Development role `super_administrator` should receive all **31** active platform permission codes above when platform admin permission foundation is fully seeded, plus bootstrap `platform.admin.access` for login routing.
+Development role `super_administrator` should receive all **36** codes exposed by
+`PlatformPermissionCodes.All` when the platform admin permission foundation is
+fully seeded, plus bootstrap `platform.admin.access` for login routing.
 
 Do not generate C# enum classes for database status/type/check-value columns.
 Those Domain properties remain strings, while allowed values are enforced through
@@ -166,7 +165,7 @@ must be seeded and stored in the database.
 
 | Area | Permission Code | Usage |
 |---|---|---|
-| Platform | `platform.tenant.create` | Create tenant |
+| Platform | `platform.tenants.create` | Create tenant |
 | Catalog | `catalog.product.create` | Create product |
 | Catalog | `catalog.product.update` | Update product |
 | Inventory | `inventory.adjust` | Adjust stock |
@@ -210,18 +209,28 @@ permission rows for aliases.
 
 | Code Pattern | Meaning |
 |---|---|
-| `platform.tenant.create` | Create tenant |
-| `platform.tenant.update` | Update tenant setup |
-| `platform.tenant.activate` | Activate tenant |
-| `platform.subscription.manage` | Manage subscription setup |
-| `platform.feature.entitle` | Assign tenant feature entitlement |
+| `platform.tenants.create` | Create tenant |
+| `platform.tenants.update` | Update tenant setup |
+| `platform.tenants.activate` | Activate tenant |
+| `platform.subscription_plans.*` | Granular subscription-plan lifecycle actions |
+| `platform.tenants.entitlements.update` | Assign tenant feature entitlement |
 | `platform.audit.view` | View audit logs |
 
 ## Subscription Plans (Implemented 2026-06-17)
 
 | Code | Meaning |
 |---|---|
-<<<<<<< HEAD
+| `platform.subscription_plans.view` | View subscription plans list and detail |
+| `platform.subscription_plans.create` | Create subscription plans |
+| `platform.subscription_plans.edit` | Edit and publish draft subscription plans |
+| `platform.subscription_plans.duplicate` | Duplicate subscription plans |
+| `platform.subscription_plans.archive` | Archive or reactivate subscription plans |
+| `platform.subscription_plans.delete` | Delete eligible unused draft plans |
+
+## Catalog and Inventory Codes Present in the Current Permission Catalog
+
+| Code | Meaning |
+|---|---|
 | catalog.departments.view | View departments |
 | catalog.departments.create | Create departments |
 | catalog.departments.update | Update departments |
@@ -257,14 +266,6 @@ permission rows for aliases.
 | inventory.stock.adjust | Adjust stock |
 | inventory.movements.view | View movement history |
 | inventory.alerts.view | View low/expiry stock alerts |
-=======
-| `platform.subscription_plans.view` | View subscription plans list |
-| `platform.subscription_plans.create` | Create subscription plans |
-| `platform.subscription_plans.edit` | Edit subscription plans |
-| `platform.subscription_plans.duplicate` | Duplicate subscription plans |
-| `platform.subscription_plans.archive` | Archive subscription plans |
-| `platform.subscription_plans.delete` | Delete subscription plans |
->>>>>>> 6cdb2685b4386b2f86e0815c9a35d554093f9b25
 
 Only confirmed platform actions should be seeded.
 
