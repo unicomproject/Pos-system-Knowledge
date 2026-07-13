@@ -104,17 +104,15 @@ Relationships:
 
 ## `sales_channels`
 
-Purpose: Stores tenant-owned sales/order channels. POS and E-commerce are stored as rows in this common table; separate `pos_channels` or `ecommerce_channels` tables are not required.
+Purpose: Stores tenant-owned sales/order channels. POS and E-commerce are stored as rows in this common table, linked to the global `platform_sales_channels` master data.
 
 | Attribute | Type | Key | Null | Reference / Note |
 |---|---|---|---|---|
 | `id` | uuid | PK | NOT NULL | Primary key |
 | `tenant_id` | uuid | FK | NOT NULL | References tenants(id); sales channels are tenant-specific |
-| `channel_code` | varchar(80) |  | NOT NULL | Tenant-scoped stable code, e.g. POS or ECOM |
-| `channel_name` | varchar(150) |  | NOT NULL | Display name shown in admin/user interfaces |
-| `channel_type` | varchar(40) |  | NOT NULL | Channel category such as POS or E_COMMERCE |
-| `channel_mode` | varchar(40) |  | NULL | Optional mode such as ONLINE, OFFLINE, or HYBRID |
-| `status` | varchar(40) |  | NOT NULL | Original ERD domain represented as varchar; active/inactive/deleted lifecycle |
+| `platform_sales_channel_id` | uuid | FK | NOT NULL | References platform_sales_channels(id) |
+| `custom_name` | varchar(150) |  | NOT NULL | Tenant's custom display name |
+| `status` | varchar(40) |  | NOT NULL | Active/inactive lifecycle |
 | `sort_order` | int |  | NOT NULL DEFAULT 0 | Display order; lower values appear first |
 | `created_at` | timestamptz |  | NOT NULL | Creation timestamp |
 | `updated_at` | timestamptz |  | NOT NULL | Last update timestamp |
@@ -124,9 +122,8 @@ Constraints / Notes:
 ```text
 PK(id)
 FK(tenant_id) REFERENCES tenants(id)
-UNIQUE(tenant_id, channel_code)
-CHECK(channel_type IN ('POS', 'E_COMMERCE'))
-CHECK(channel_mode IS NULL OR channel_mode IN ('ONLINE', 'OFFLINE', 'HYBRID'))
+FK(platform_sales_channel_id) REFERENCES platform_sales_channels(id)
+UNIQUE(tenant_id, platform_sales_channel_id)
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 CHECK(sort_order >= 0)
 ```
@@ -134,12 +131,13 @@ CHECK(sort_order >= 0)
 Relationships:
 
 - sales_channels.tenant_id -> tenants.id
+- sales_channels.platform_sales_channel_id -> platform_sales_channels.id
 
 Example rows:
 
 ```text
-Tenant A + POS  -> channel_type = 'POS'
-Tenant A + ECOM -> channel_type = 'E_COMMERCE'
+Tenant A + Platform Channel 1 (PHYSICAL) -> custom_name = 'Main POS'
+Tenant A + Platform Channel 2 (ONLINE) -> custom_name = 'Web Store'
 ```
 
 ## `tenant_profiles`
@@ -215,7 +213,8 @@ Purpose: Stores tenant domain configuration and verification status.
 |---|---|---|---|---|
 | `id` | uuid | PK | NOT NULL | Primary key |
 | `tenant_id` | uuid | FK | NOT NULL | References tenants(id) |
-| `domain_type` | varchar(40) |  | NOT NULL | Original ERD domain: domain_type |
+| `sales_channel_id` | uuid | FK | NULL | References sales_channels(id); Used to link a domain to a specific storefront/channel. |
+| `domain_type` | varchar(40) |  | NOT NULL | Original ERD domain: domain_type (e.g. STOREFRONT, ADMIN_PORTAL) |
 | `domain_name` | varchar(255) |  | NOT NULL |  |
 | `is_primary` | boolean |  | NOT NULL |  |
 | `verification_status` | varchar(40) |  | NOT NULL | Original ERD domain: domain_verification_status |
@@ -241,6 +240,7 @@ One primary domain per tenant
 Relationships:
 
 - tenant_domains.tenant_id -> tenants.id
+- tenant_domains.sales_channel_id -> sales_channels.id
 
 ## `setting_definitions`
 

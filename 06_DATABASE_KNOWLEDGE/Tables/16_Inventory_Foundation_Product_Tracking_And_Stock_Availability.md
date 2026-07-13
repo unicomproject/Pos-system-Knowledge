@@ -79,6 +79,7 @@ CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 | `requires_expiry_tracking` | boolean | NOT NULL DEFAULT false | Whether expiry tracking is required. |
 | `requires_serial_tracking` | boolean | NOT NULL DEFAULT false | Whether serial tracking is required. |
 | `costing_method` | varchar(40) | NOT NULL | Costing method. Allowed values must be enforced using CHECK/backend constants. |
+| `low_stock_threshold` | numeric(18,4) | NOT NULL DEFAULT 0 | Threshold for low stock warning. |
 | `status` | varchar(30) | NOT NULL CHECK | Lifecycle status. |
 | `created_at` | timestamptz | NOT NULL | Creation timestamp. |
 | `created_by_tenant_user_id` | uuid | FK NULL | References `tenant_users(id)`. |

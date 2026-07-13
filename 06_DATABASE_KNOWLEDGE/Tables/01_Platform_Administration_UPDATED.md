@@ -23,6 +23,7 @@ This file documents the entity tables, attributes, keys, nullability, constraint
 | `platform_refresh_tokens` | Stores platform refresh tokens and token replacement chain. |
 | `platform_password_reset_tokens` | Stores platform user password reset tokens. |
 | `platform_login_audits` | Append-only platform login audit log. |
+| `platform_sales_channels` | Global master data for types of sales channels. |
 
 ## `platform_users`
 
@@ -310,6 +311,30 @@ Relationships:
 
 - platform_login_audits.platform_user_id -> platform_users.id
 - platform_login_audits.platform_auth_session_id -> platform_auth_sessions.id
+
+## `platform_sales_channels`
+
+Purpose: Global master data for types of sales channels available across the platform (e.g. PHYSICAL, ONLINE).
+
+| Attribute | Type | Key | Null | Reference / Note |
+|---|---|---|---|---|
+| `id` | uuid | PK | NOT NULL | Primary key |
+| `channel_code` | varchar(50) | | NOT NULL | Developer code (e.g. PHYSICAL) |
+| `default_name` | varchar(100) | | NOT NULL | Default display name |
+| `channel_type` | varchar(40) | | NOT NULL | Type (PHYSICAL, ONLINE, AGGREGATOR, B2B, OTHER) |
+| `created_at` | timestamptz | | NOT NULL | |
+| `updated_at` | timestamptz | | NOT NULL | |
+
+Constraints / Notes:
+
+```text
+UNIQUE(channel_code)
+CHECK(channel_type IN ('PHYSICAL', 'ONLINE', 'AGGREGATOR', 'B2B', 'OTHER'))
+```
+
+Relationships:
+
+- (None)
 
 ## Reference Entities (External)
 

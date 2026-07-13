@@ -27,6 +27,8 @@ This markdown version follows the uploaded ERD image as the source of truth. Ent
 | `return_policies` | Stores tenant product return policy records. |
 | `products` | Stores tenant product master records. |
 | `product_variants` | Stores sellable product variants. |
+| `product_reviews` | Stores 1-5 star customer ratings and text reviews for products. |
+| `product_rating_summaries` | Stores the aggregated rating summary for fast loading on product pages. |
 
 ## `business_types`
 
@@ -344,6 +346,56 @@ One active default variant per product.
 UNIQUE(tenant_id, product_id, option_combination_hash) WHERE option_combination_hash IS NOT NULL
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 ```
+
+## `product_reviews`
+
+Purpose: Stores 1-5 star customer ratings and text reviews for products.
+
+| Attribute | Type | Key | Null | Reference / Note |
+| --- | --- | --- | --- | --- |
+| `id` | uuid | PK | NOT NULL | Primary key |
+| `tenant_id` | uuid | FK | NOT NULL | References tenants(id) |
+| `product_id` | uuid | FK | NOT NULL | References products(id) |
+| `customer_id` | uuid | FK | NOT NULL | References customers(id) |
+| `rating_value` | int |  | NOT NULL | Rating 1 to 5 |
+| `review_title` | varchar(150) |  | NULL | Short summary of review |
+| `review_text` | text |  | NULL | Detailed review content |
+| `status` | varchar(30) |  | NOT NULL | Status (PENDING, APPROVED, REJECTED) |
+| `created_at` | timestamptz |  | NOT NULL | Created timestamp |
+| `created_by` | uuid | FK | NULL | Creator ID |
+| `updated_at` | timestamptz |  | NULL | Updated timestamp |
+| `updated_by` | uuid | FK | NULL | Updater ID |
+
+Indexes / Constraints / Notes:
+- FK(tenant_id)
+- FK(product_id) CASCADE
+- FK(customer_id)
+
+## `product_rating_summaries`
+
+Purpose: Stores the aggregated rating summary for fast loading on product pages.
+
+| Attribute | Type | Key | Null | Reference / Note |
+| --- | --- | --- | --- | --- |
+| `id` | uuid | PK | NOT NULL | Primary key |
+| `tenant_id` | uuid | FK | NOT NULL | References tenants(id) |
+| `product_id` | uuid | FK | NOT NULL | References products(id) |
+| `average_rating` | numeric(3,2)|  | NOT NULL | Pre-calculated average |
+| `total_reviews` | int |  | NOT NULL | Total review count |
+| `five_star_count` | int |  | NOT NULL | Count of 5 stars |
+| `four_star_count` | int |  | NOT NULL | Count of 4 stars |
+| `three_star_count`| int |  | NOT NULL | Count of 3 stars |
+| `two_star_count` | int |  | NOT NULL | Count of 2 stars |
+| `one_star_count` | int |  | NOT NULL | Count of 1 stars |
+| `created_at` | timestamptz |  | NOT NULL | Created timestamp |
+| `created_by` | uuid | FK | NULL | Creator ID |
+| `updated_at` | timestamptz |  | NULL | Updated timestamp |
+| `updated_by` | uuid | FK | NULL | Updater ID |
+
+Indexes / Constraints / Notes:
+- UNIQUE(product_id) - One summary per product
+- FK(tenant_id)
+- FK(product_id) CASCADE
 
 ## Reference Entities (External)
 

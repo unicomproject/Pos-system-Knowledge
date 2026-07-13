@@ -37,7 +37,7 @@ Purpose: Stores active/converted online shopping carts.
 | --- | --- | --- | --- | --- |
 | `id` | uuid | PK | NOT NULL | Primary key. |
 | `tenant_id` | uuid | FK | NOT NULL | References tenants(id). |
-| `online_store_id` | uuid | FK | NULL | References online_stores(id). |
+| `sales_channel_id` | uuid | FK | NULL | References sales_channels(id). |
 | `customer_id` | uuid | FK | NULL | References customers(id). |
 | `anonymous_session_id` | varchar(120) |  | NULL | Anonymous browser/session identifier. |
 | `cart_number` | varchar(60) |  | NOT NULL | Tenant-scoped cart number. |
@@ -60,7 +60,7 @@ Indexes / Constraints / Notes:
 ```text
 PK(id)
 FK(tenant_id) REFERENCES tenants(id)
-FK(online_store_id) REFERENCES online_stores(id)
+FK(sales_channel_id) REFERENCES sales_channels(id)
 FK(customer_id) REFERENCES customers(id)
 FK(currency_code) REFERENCES currencies(currency_code)
 UNIQUE(tenant_id, cart_number)
@@ -152,7 +152,7 @@ Purpose: Stores checkout attempts and calculated checkout totals.
 | --- | --- | --- | --- | --- |
 | `id` | uuid | PK | NOT NULL | Primary key. |
 | `tenant_id` | uuid | FK | NOT NULL | References tenants(id). |
-| `online_store_id` | uuid | FK | NULL | References online_stores(id). |
+| `sales_channel_id` | uuid | FK | NULL | References sales_channels(id). |
 | `cart_id` | uuid | FK | NOT NULL | References shopping_carts(id). |
 | `customer_id` | uuid | FK | NULL | References customers(id). |
 | `anonymous_session_id` | varchar(120) |  | NULL | Anonymous browser/session identifier. |
@@ -183,7 +183,7 @@ Indexes / Constraints / Notes:
 ```text
 PK(id)
 FK(tenant_id) REFERENCES tenants(id)
-FK(online_store_id) REFERENCES online_stores(id)
+FK(sales_channel_id) REFERENCES sales_channels(id)
 FK(cart_id) REFERENCES shopping_carts(id)
 FK(customer_id) REFERENCES customers(id)
 FK(selected_outlet_id) REFERENCES outlets(id)
@@ -330,7 +330,7 @@ Append-only audit trail for checkout lifecycle.
 | --- | --- | --- |
 | `tenants` | id uuid PK | Tenant reference |
 | `tenant_users` | id uuid PK, tenant_id uuid FK | User/audit reference |
-| `online_stores` | id uuid PK, tenant_id uuid FK | Online store reference |
+| `sales_channels` | id uuid PK, tenant_id uuid FK | Sales channel reference |
 | `customers` | id uuid PK, tenant_id uuid FK | Customer reference |
 | `products` | id uuid PK, tenant_id uuid FK | Product reference |
 | `product_variants` | id uuid PK, product_id uuid FK | Product variant reference |
