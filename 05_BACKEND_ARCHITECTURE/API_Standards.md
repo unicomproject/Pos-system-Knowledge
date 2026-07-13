@@ -1,13 +1,13 @@
 <!-- title: API Standards -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-24 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-13 -->
 
 # API Standards
 
 ## Purpose
 
-This file defines Release 1 API standards for SCS-TIX EPOS.
+This file defines Release 1 API standards for the TM-EPOS MVP.
 
 APIs must be predictable for Flutter POS and Angular Platform Admin.
 
@@ -77,8 +77,23 @@ Release 1 API groups include:
 - `/api/v1/files`
 - `/api/v1/notifications`
 
-Do not add e-commerce, supplier, delivery, kiosk, AI, coupon, or offline-sync API
-groups for Release 1.
+E-commerce and offline operation/sync are approved TM-EPOS MVP areas under
+[[../00_START_HERE/Current_Source_Of_Truth]]. Add their API groups only in work
+explicitly scoped to those areas. Supplier, delivery, kiosk, AI, and coupon API
+groups remain reserved until separately confirmed.
+
+## Current Super Admin Completion Scope
+
+The current Platform Admin completion branch includes subscription-plan
+lifecycle and a dedicated subscription-plan detail view; tenant details and
+editing; tenant subscription assignment and entitlements; and tenant suspension
+and reactivation.
+
+This branch does not include Tenant Audit History viewing, Flutter POS or Tenant
+Admin Flutter work, checkout, inventory, returns/refunds, e-commerce, or offline
+sync. These branch exclusions do not remove separately approved TM-EPOS MVP
+scope. No tenant audit-history endpoint or placeholder UI is required for this
+release.
 
 ## Standard Success Response
 

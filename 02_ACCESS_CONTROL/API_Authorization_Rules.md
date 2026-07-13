@@ -1,11 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-03 -->
-<<<<<<< HEAD
-
-=======
->>>>>>> 6cdb2685b4386b2f86e0815c9a35d554093f9b25
+<!-- last_updated: 2026-07-13 -->
 
 # API Authorization Rules
 
@@ -52,14 +48,6 @@ Frontend route guards and menu filtering are UX only. Backend service checks are
 
 | API Area | Required permission(s) |
 |---|---|
-<<<<<<< HEAD
-| Tenant create/update | platform.tenants.* |
-| Subscription plans | platform.subscriptions.manage |
-| Feature entitlement | platform.features.manage |
-| Platform users | platform.users.manage |
-| Platform audit | platform.audit.view |
-| Return policy templates | platform.return_policy_templates.* |
-=======
 | Platform dashboard | `platform.dashboard.view` |
 | Tenant list/summary/filter | `platform.tenants.view` |
 | Tenant create | `platform.tenants.create` |
@@ -78,7 +66,7 @@ Frontend route guards and menu filtering are UX only. Backend service checks are
 | Platform billing | `platform.billing.view`, `platform.billing.manage` |
 | Platform audit logs (R1 login/security) | `platform.audit.view` → `GET /api/v1/platform-admin/audit-logs` |
 | Platform integrations | `platform.integrations.manage` |
->>>>>>> 6cdb2685b4386b2f86e0815c9a35d554093f9b25
+| Return policy templates | Respective `platform.return_policy_templates.*` action code |
 
 Do not use umbrella-only checks such as `platform.subscriptions.manage` where granular codes already exist.
 
@@ -86,25 +74,18 @@ Do not use umbrella-only checks such as `platform.subscriptions.manage` where gr
 
 | API Area | Required Checks |
 |---|---|
-<<<<<<< HEAD
-| Outlet/till/device setup | tenant/outlet/till/device permissions |
-| User/role management | tenant.users.manage or tenant.roles.manage |
-| Catalog master data | catalog.departments.*, catalog.categories.*, catalog.brands.*, catalog.collections.*, catalog.return_policies.* |
-| Product setup | catalog permissions |
-| Inventory setup | inventory permissions |
-| Reports | reports permissions |
-=======
 | Outlet management | Tenant active, entitlement, permission |
 | Till management | Tenant active, entitlement, permission |
+| Device setup | Tenant active, entitlement, device permission |
 | User management | Tenant active, entitlement, permission |
 | Role/permission management | Tenant active, entitlement, permission |
 | Permission catalog read | Tenant active, `roles.permissions.view`; catalog filtered by tenant entitlements |
 | Role permission update | Tenant active, `roles.permissions.update`; assigned codes must stay within entitlements |
 | Product management | Catalog entitlement and product permission |
+| Catalog master data | Catalog entitlement and respective department, category, brand, collection, or return-policy permission |
 | Inventory management | Inventory entitlement and inventory permission |
 | Loyalty setup | Loyalty entitlement and loyalty permission |
 | Reports | Reports entitlement and report permission |
->>>>>>> 6cdb2685b4386b2f86e0815c9a35d554093f9b25
 
 ## POS API Rules
 
