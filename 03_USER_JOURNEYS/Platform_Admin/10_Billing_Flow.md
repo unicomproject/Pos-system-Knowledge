@@ -1,80 +1,65 @@
-<!-- title: Billing Flow -->
+<!-- title: Platform Billing Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- system: Unified Commerce Release 1 -->
+<!-- last_updated: 2026-07-13 -->
 
-# Billing Flow
+# Platform Billing Flow
 
 ## Purpose
 
-Defines how Platform Admin follows up tenant billing, payment links, reminders, activation, and suspension outcomes.
-
-## Actor
-
-Platform Admin
-
-## Source
-
-Derived from `Slide 6 - Billing Flow` in `SYSTEM_USER_JOURNEY.pptx` and aligned to TM-EPOS MVP Second Brain scope.
-
-## Trigger
-
-Platform Admin opens billing management.
+Defines the implemented Release 1 Platform Admin workflow for subscription invoices. This document supersedes the older payment-link/reminder/suspension flow for R1.
 
 ## Preconditions
 
-- Tenant billing record exists.
-- Platform Admin has billing permission.
+- The Platform Admin is authenticated.
+- Read operations require `platform.billing.view`.
+- Invoice transitions require `platform.billing.manage`.
+- Invoices are created by the tenant onboarding/subscription workflow. Manual invoice creation is not a Billing R1 capability.
 
 ## Main Flow
 
-| Step | Action | System Behavior |
-|---:|---|---|
-| 1 | Open billing management | System opens billing module. |
-| 2 | View billing list | System loads tenant billing records. |
-| 3 | Search or select tenant | Platform Admin selects target tenant. |
-| 4 | Review billing details | System shows invoice/payment details. |
-| 5 | Choose billing action | Platform Admin chooses action based on payment status. |
-| 6 | If payment completed | System activates or continues tenant and updates invoice as paid. |
-| 7 | If payment pending | Platform Admin may send reminder, monitor due date, keep tenant active, and update billing record. |
-| 8 | If failed or overdue | Platform Admin may resend payment link, mark failed/overdue, suspend tenant if policy applies, and update billing record. |
+1. Open `/admin/billing`.
+2. Load the summary, tenant/status filter options, and first server-paged invoice result.
+3. Search by invoice number or tenant, or filter by tenant, status, issue/due date range.
+4. Sort and page using server-side query parameters.
+5. Open an invoice at `/admin/billing/invoices/{invoiceId}` to review amounts, billing period, line items, and recorded payment transactions. The route supports direct entry, refresh, browser back, retry, and closing back to `/admin/billing`.
+6. If the stored status is `DRAFT`, an authorized user may issue it.
+7. If the stored status is `PENDING`, an authorized user may mark it paid.
+8. Reload after success or after a concurrency conflict.
 
-## Data Used Or Captured
+## Status Truth
 
-- Tenant billing record
-- Invoice status
-- Payment status
-- Due date
-- Reminder state
-- Suspension state
-- Audit log
+| Stored status | Display status | Allowed R1 transition |
+|---|---|---|
+| `DRAFT` | Draft | `DRAFT -> PENDING` (Issue) |
+| `PENDING`, due date not passed | Pending | `PENDING -> PAID` (Mark paid) |
+| `PENDING`, due date passed | Overdue | `PENDING -> PAID` (Mark paid) |
+| `PAID` | Paid | None |
 
-## Access And Security Rules
+`OVERDUE` is derived at read time; it is not stored. `PAST_DUE`, `CANCELLED`, and `VOID` invoice transitions are not invented for R1.
 
-- Platform Admin must be authenticated.
-- Platform Admin role/permission must allow the requested action.
-- Platform-level actions must not use frontend-provided tenant_id as trusted authority.
-- Every create/update/status action must be audit logged.
-- Paid status activates or continues tenant service.
-- Suspension happens only if billing policy or grace period requires it.
+## KPI Definitions
 
-## Validation And Error Cases
+- Paid Revenue: sum of `total_amount` for paid invoices in the selected date/filter scope.
+- Outstanding: sum of `balance_due` for stored `PENDING` invoices, including pending invoices displayed as Overdue. `DRAFT` invoices are not issued and therefore do not count as outstanding.
+- Overdue: sum of `balance_due` for unpaid stored `PENDING` invoices whose `due_at` is before the server clock. Draft invoices are never treated as overdue.
+- Total Invoices: count in the selected filter scope.
+- Monetary values are grouped by `currency_code`; currencies are never added together.
 
-- Payment link generation failed
-- Invalid billing status transition
-- Tenant suspension blocked by policy
-- Concurrent payment update
+## Concurrency And Errors
 
-## Outcome
+- Commands send the invoice `updated_at` value read by the UI.
+- `updated_at` is an EF concurrency token and protects the final update.
+- Stale updates return `platform_billing.concurrency_conflict` with HTTP 409.
+- Invalid transitions return `platform_billing.invalid_transition` with HTTP 409.
+- Missing invoices return HTTP 404; permission failures return HTTP 403.
 
-Tenant billing state is updated and platform action is auditable.
+## Explicitly Deferred
 
-## Related Modules
-
-- 04_Subscription_Billing_Usage
-- 02_Tenant_Foundation
-- 26_Notification
+Gateway integration, automatic charging, live payment-link generation/resend, reminders, refunds, credit-note actions, accounting, suspension automation, advanced usage billing, and manual invoice creation.
 
 ## Related Files
 
-- 06_DATABASE_KNOWLEDGE/Tables/05_Subscription_Billing_Payments_And_Usage.md
+- [[../../04_MODULE_KNOWLEDGE/04_Subscription_Billing_Usage/03_Technical_Contract]]
+- [[../../15_IMPLEMENTATION_TRACKING/Backend/Subscription/Platform_Billing_R1_Implementation_Status]]
+- [[../../15_IMPLEMENTATION_TRACKING/Angular/Subscription/Platform_Billing_R1_UI_Implementation_Status]]

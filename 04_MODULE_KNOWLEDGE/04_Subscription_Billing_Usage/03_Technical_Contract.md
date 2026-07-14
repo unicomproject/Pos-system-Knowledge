@@ -1,7 +1,7 @@
 <!-- title: Subscription Billing, Payments & Usage Technical Contract -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-13 -->
 
 # Subscription Billing, Payments & Usage Technical Contract
 
@@ -11,6 +11,28 @@ Defines the implementation contract for `Subscription_Billing_Usage`. This contr
 new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
 ## API Contract
+
+### Platform Admin Billing Release 1
+
+The implemented Platform Admin surface is rooted at `/api/v1/platform-admin/billing`:
+
+| Method | Endpoint | Permission |
+|---|---|---|
+| GET | `/summary` | `platform.billing.view` |
+| GET | `/invoices` | `platform.billing.view` |
+| GET | `/invoices/{invoiceId}` | `platform.billing.view` |
+| GET | `/invoices/{invoiceId}/payments` | `platform.billing.view` |
+| GET | `/filter-options` | `platform.billing.view` |
+| POST | `/invoices/{invoiceId}/issue` | `platform.billing.manage` |
+| POST | `/invoices/{invoiceId}/mark-paid` | `platform.billing.manage` |
+
+List queries support server-side page/page-size, search, tenant, status, issue/due date range, sort field, and direction. `OVERDUE` is a derived query/display state for pending invoices past `due_at`. Summary amounts are grouped by currency. Transition requests include `expectedUpdatedAt`; stale or raced writes return HTTP 409.
+
+Financial definitions are deliberately narrow: revenue includes only persisted `PAID` invoices in the selected scope; outstanding includes unpaid persisted `PENDING` invoices (including the overdue subset); overdue includes persisted `PENDING` invoices whose due date has passed. `DRAFT` invoices are neither issued nor outstanding. USD, LKR, and every other currency are returned as separate summary rows and must never be arithmetically combined.
+
+The Angular detail surface is route-backed at `/admin/billing/invoices/{invoiceId}` while retaining the approved drawer presentation. Direct URL, refresh, back/close navigation, retry, permission denial, and not-found behavior use the same Billing page and API contract.
+
+There is no manual invoice-create endpoint in this release. Draft invoices continue to originate in the tenant onboarding/subscription workflow.
 
 | Area | Contract |
 |---|---|
