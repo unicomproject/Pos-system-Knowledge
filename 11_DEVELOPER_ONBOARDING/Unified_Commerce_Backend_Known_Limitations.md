@@ -1,7 +1,7 @@
 <!-- title: Unified Commerce Backend — Known Limitations -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-01 -->
+<!-- last_updated: 2026-07-10 -->
 
 
 # Unified Commerce Backend — Known Limitations
@@ -9,72 +9,70 @@
 ## Purpose
 
 Track gaps between the **active Unified Commerce backend** (`E_POS.Api`) and the
-**Flutter POS frontend** / Second Brain API contracts during the `cashier-flow`
-migration.
+**Flutter POS frontend** / Second Brain API contracts.
 
 ## Active Backend
 
 | Item | Value |
 |---|---|
 | Path | `POS Backend/Unified-Commerce` |
-| Branch | `cashier-flow` |
-| Dev URL | `http://localhost:5187` |
-| Swagger | `http://localhost:5187/swagger` |
+| Branch | `Sale_Screen` / `POS_UI` (verify current) |
+| Dev URL | `http://localhost:5150` (see `launchSettings.json`) |
+| Swagger | `/swagger` in Development |
 
-## Limitation 1 — Flutter POS tenant-login missing
+## Resolved (2026-07-10)
+
+| Item | Previous doc state | Current verified state |
+|---|---|---|
+| Tenant POS login | Missing `auth/tenant-login` | **Implemented** at `POST /api/v1/tenant-auth/login` |
+| POS home API | Missing | **Implemented** `GET /api/v1/pos/home` |
+| Till session APIs | Missing | **Implemented** current-session / open / close |
+| Device bootstrap | Missing | **Implemented** devices/current + activate |
+| POS products list | Missing | **Implemented** on `Sale_Screen` branch |
+
+## Active Limitation 1 — POS checkout APIs missing
 
 | | |
 |---|---|
-| **Flutter calls** | `POST /api/v1/auth/tenant-login` |
-| **Unified Commerce exposes** | `GET /api/v1/health`, `POST /api/v1/platform-auth/login` |
-| **Result after port fix** | HTTP **404** on login |
-| **Blocks** | Cashier POS sign-in, device activation, till, New Sale API flows |
+| **Flutter calls** | `POST /api/v1/pos/checkout/summary`, `start-payment`, receipt routes |
+| **Unified Commerce exposes** | No matching `E_POS.Api` controllers (verified 2026-07-10) |
+| **Blocks** | Cash payment completion, receipt fetch, backend-validated totals |
 
-**Not a CORS or cleartext issue** on Android emulator once port **5187** is used.
+## Active Limitation 2 — POS catalog detail routes missing
 
-## Limitation 2 — Old backend port still in Flutter source
+| | |
+|---|---|
+| **Flutter calls** | `GET /api/v1/pos/products/{id}`, `GET /api/v1/pos/catalog/categories` |
+| **Unified Commerce exposes** | List endpoint only (`GET /api/v1/pos/products`) |
+| **Blocks** | Variant sheet detail from API, dynamic category chips |
 
-Flutter `lib/core/network/api_config.dart` still defaults to port **5052**
-(stale `SCS.Api` reference). Android emulator resolves to
-`http://10.0.2.2:5052` → connection failure (`NETWORK_ERROR`).
+## Active Limitation 3 — Real product data required
 
-Correct emulator URL: `http://10.0.2.2:5187`
+No POS catalog mock/seed is used. New Sale shows only tenant-created products with
+active status, sellable flag, and default price list pricing.
 
-Frontend code change is tracked separately; this doc records the mismatch.
+## Active Limitation 4 — Dev port alignment
 
-## Limitation 3 — launchSettings port drift
+Flutter `api_config.dart` defaults to port **5150**. Confirm with
+`launchSettings.json` before testing on emulator or device.
 
-`src/E_POS.Api/Properties/launchSettings.json` may list a different HTTP port
-(e.g. `5150`) than the team-verified dev URL (`5187`). Confirm with:
+Physical devices need `--dart-define=API_BASE_URL` or `PC_LAN_IP`.
 
-```powershell
-netstat -ano | findstr LISTENING | findstr :5187
-```
-
-Align `applicationUrl` or use `dotnet run --urls "http://localhost:5187"`.
-
-## Limitation 4 — Physical device LAN access
-
-Default Kestrel bind is often `127.0.0.1` only. Physical phones/tablets need:
-
-```powershell
-dotnet run --project ".\src\E_POS.Api\E_POS.Api.csproj" --urls "http://0.0.0.0:5187"
-```
-
-and Flutter `--dart-define=API_BASE_URL=http://<PC-LAN-IP>:5187`.
-
-## What works today
+## What works today (cashier bootstrap)
 
 | Check | Expected |
 |---|---|
-| `dotnet restore` / `build` / `test` | Success |
-| `GET /api/v1/health` | `200 OK` |
-| Swagger in Development | Opens at `/swagger` |
-| EF `database drop` + `database update` | Works with explicit project paths |
-| `POST /api/v1/platform-auth/login` | Platform Admin auth (if user seeded) |
+| `POST /api/v1/tenant-auth/login` | JWT + permissions |
+| `GET /api/v1/devices/current` | Device context |
+| `GET /api/v1/tills/current-session` | Open session or not found |
+| `POST /api/v1/tills/open` / `close` | Session lifecycle |
+| `GET /api/v1/pos/home` | Dashboard payload |
+| `GET /api/v1/pos/products` | Product list (branch dependent) |
 
 ## Related Files
 
 - [[Backend_Local_Development_Setup]]
 - [[Environment_Variables]]
 - [[../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cashier_POS_Implementation_Map]]
+- [[../15_IMPLEMENTATION_TRACKING/Backend/Sales/Create_Sale_Implementation_Status]]

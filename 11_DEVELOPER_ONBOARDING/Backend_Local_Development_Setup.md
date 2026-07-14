@@ -156,38 +156,19 @@ dotnet run --project ".\src\E_POS.Api\E_POS.Api.csproj" --urls "http://0.0.0.0:5
 
 Controller: `src/E_POS.Api/Controllers/PlatformAuthController.cs`
 
-## Known Limitation — Flutter POS Login (tenant-login)
+## Flutter POS Login (tenant-auth)
 
-The Flutter POS app still calls:
+Flutter POS calls:
 
 ```http
-POST /api/v1/auth/tenant-login
+POST /api/v1/tenant-auth/login
 ```
 
-This route is **not implemented** in the Unified Commerce backend yet.
+This route is **implemented** in Unified Commerce. Use port **5150** unless
+overridden in `launchSettings.json` or `--dart-define=API_BASE_URL`.
 
-| Symptom | Cause |
-|---|---|
-| `NETWORK_ERROR` on login | Flutter still points at old port **5052** or unreachable host |
-| `404` after fixing port to **5187** | `tenant-login` endpoint missing on new backend |
-
-PowerShell verification:
-
-```powershell
-# Should succeed
-Invoke-RestMethod -Uri "http://localhost:5187/api/v1/health"
-
-# Currently returns 404 until tenant-login is implemented
-Invoke-RestMethod -Method Post -Uri "http://localhost:5187/api/v1/auth/tenant-login" `
-  -ContentType "application/json" -Body '{"email":"cashier001@gmail.com","password":"123456"}'
-```
-
-**Action required (future backend work):** implement `POST /api/v1/auth/tenant-login`
-for cashier/Tenant Admin POS sign-in, or update Flutter to the new auth contract
-after API design is confirmed.
-
-Until then, Flutter POS login cannot complete against Unified Commerce even when
-the port is correct.
+Remaining cashier limitation: POS checkout/receipt endpoints are not implemented
+yet. See [[Unified_Commerce_Backend_Known_Limitations]].
 
 ## Platform Admin Login (implemented)
 

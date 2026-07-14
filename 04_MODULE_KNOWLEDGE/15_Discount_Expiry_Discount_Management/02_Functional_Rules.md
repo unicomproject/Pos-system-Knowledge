@@ -1,7 +1,7 @@
 <!-- title: Discount & Expiry Discount Management Functional Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-13 -->
 
 # Discount & Expiry Discount Management Functional Rules
 
@@ -18,6 +18,23 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - POS discount application must snapshot policy and approval result.
 - Manager approval is required when the cashier exceeds allowed limit.
 - Coupon campaign engine is not part of this module unless explicitly added later.
+- A POS cashier's percentage and fixed-amount authority limits are user-specific.
+- A request at or below cashier authority may be applied directly.
+- A request above cashier authority but at or below the policy absolute limit creates a `PENDING_APPROVAL` application.
+- A request above the policy absolute limit is rejected and must not create an application.
+- The user who requested a discount must not approve their own request.
+- Approval does not bypass checkout revalidation: cart fingerprint, requester, device, till session, expiry, and active policy are checked again.
+- Successful payment snapshots the approved application into `sales_order_discounts` and marks the application `APPLIED`.
+- POS runtime supports two sources: `MANUAL` and `POLICY`.
+- `POLICY` source is server-authoritative: policy scope, value, calculation method, active dates, outlet/channel targeting, target rules, conditions, approval requirement, and stacking settings are reloaded from the database.
+- `MANUAL` source does not require the cashier to select a fake policy in the POS UI; the backend resolves the internal manual authority envelope by calculation method.
+- Manual POS discounts are resolved by both calculation method and requested scope. The internal envelopes are order percentage, order fixed amount, line percentage, and line fixed amount; an order envelope must never be reused for a line discount.
+- `ORDER` discounts apply to the cart. `LINE` discounts require a selected variant in the cart. The client cannot apply an `ORDER` policy as `LINE` or a `LINE` policy as `ORDER`.
+- POS runtime must support manual order, manual line, predefined order, and predefined line application. Line application must include a target variant that exists in the current cart.
+- Discount target matching uses `discount_policy_targets`: `EXCLUDE` matches always reject; if any `INCLUDE` target exists, at least one include must match; if no include target exists, the policy remains eligible unless excluded.
+- Product, product variant, category, brand, and collection targets are derived from tenant-owned backend catalog data. Frontend-supplied product/category/brand identifiers are not trusted for policy matching.
+- Active conditions currently supported by POS runtime are minimum cart/order/eligible amount, minimum quantity, and customer-required checks. Unknown active condition types fail closed.
+- Clearing a backend-backed POS discount calls the cancel lifecycle and preserves audit history; records are not physically deleted.
 
 ## User Rules
 
@@ -62,6 +79,12 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 | Invalid business data | Return 400 with safe field/form errors |
 | Duplicate or conflict | Return 409 with safe conflict message |
 | Offline blocked action | Explain that online backend validation is required |
+| Scope tampering | Reject with `pos_discounts.scope_mismatch` |
+| Target not applicable | Reject with `pos_discounts.policy_not_applicable` |
+| Missing manual scope envelope | Reject with `pos_discounts.manual_configuration_not_found` |
+| Missing line target | Reject with `pos_discounts.target_required` |
+| Line target not in cart | Reject with `pos_discounts.target_not_in_cart` |
+| Stacking conflict | Reject with `pos_discounts.stacking_not_allowed` |
 
 ## Out Of Scope
 

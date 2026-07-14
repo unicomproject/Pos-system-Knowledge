@@ -103,10 +103,12 @@ against `http://10.0.2.2:5187` on the Android emulator.
 See [[Backend_Local_Development_Setup]] for `dotnet ef database drop` and
 `dotnet ef database update` with explicit `--project` and `--startup-project`.
 
-### Known limitation
+### Cashier login note (2026-07-10)
 
-Flutter POS login calls `POST /api/v1/auth/tenant-login`, which is **not
-implemented** on Unified Commerce yet. See
+Flutter POS login calls `POST /api/v1/tenant-auth/login` (implemented in
+Unified-Commerce). Obsolete `POST /api/v1/auth/tenant-login` is legacy `SCS.Api`.
+
+Remaining cashier gaps are checkout/receipt APIs — see
 [[Unified_Commerce_Backend_Known_Limitations]].
 
 For first-time backend setup, connection strings, EF migrations, and Swagger

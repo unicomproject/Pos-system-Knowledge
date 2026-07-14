@@ -16,16 +16,16 @@ This markdown version follows the uploaded ERD image as the source of truth. Tab
 
 ## Entity Tables
 
-| Table | Purpose |
-| --- | --- |
-| `return_reasons` | Stores return/exchange reason setup. |
-| `sales_returns` | Stores sales return headers. |
-| `sales_return_lines` | Stores returned line quantities and values. |
-| `return_inspections` | Stores inspection and restock decisions for returned lines. |
-| `sales_return_events` | Stores append-only return lifecycle audit. |
-| `sales_exchanges` | Stores exchange headers linked to return and replacement order. |
-| `sales_exchange_lines` | Stores line-level exchange mapping. |
-| `sales_exchange_events` | Stores append-only exchange lifecycle audit. |
+| Table                   | Purpose                                                         |
+| ----------------------- | --------------------------------------------------------------- |
+| `return_reasons`        | Stores return/exchange reason setup.                            |
+| `sales_returns`         | Stores sales return headers.                                    |
+| `sales_return_lines`    | Stores returned line quantities and values.                     |
+| `return_inspections`    | Stores inspection and restock decisions for returned lines.     |
+| `sales_return_events`   | Stores append-only return lifecycle audit.                      |
+| `sales_exchanges`       | Stores exchange headers linked to return and replacement order. |
+| `sales_exchange_lines`  | Stores line-level exchange mapping.                             |
+| `sales_exchange_events` | Stores append-only exchange lifecycle audit.                    |
 
 ## `return_reasons`
 

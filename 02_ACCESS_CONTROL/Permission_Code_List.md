@@ -332,6 +332,7 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `customers.view` | Customers nav / action visibility |
 | `customers.create` | Add customer button visibility |
 | `sales.discount.apply` | Apply discount button (stub) |
+| `sales.discount.approve` | Approve/reject above-authority POS discounts; never assigned to cashier by default |
 | `sales.park.create` | Park sale button (stub) |
 | `sales.checkout` | Proceed to Payment button |
 | `payments.cash.accept` | Cash in payment sheet |
@@ -346,6 +347,7 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `cash_drawer.view` / `cash_drawer.manage` | Cash drawer nav |
 | `notifications.view` | Notification bell |
 | `pos.till.open` | Till open flow (`canOpenPosTill`) |
+| `pos.till.close` | End Shift / close currently assigned open till session |
 | `tenant.till.manage` | Device activation gate (`canActivatePosDevice`) |
 | `till.session.view` | Home header till status chip |
 
