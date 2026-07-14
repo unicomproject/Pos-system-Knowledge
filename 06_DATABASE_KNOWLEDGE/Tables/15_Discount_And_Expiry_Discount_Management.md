@@ -1,7 +1,7 @@
 <!-- title: Discount & Expiry Discount Management -->
 <!-- status: ERD aligned -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-04 -->
+<!-- last_updated: 2026-07-13 -->
 <!-- source: 15_Discount & Expiry Discount Management(1).png -->
 
 # 15. Discount & Expiry Discount Management
@@ -23,6 +23,37 @@ This module defines discount types, tenant discount policies, policy outlet/chan
 | 7 | `expiry_discount_rules` | Expiry markdown rule linked to a discount policy. |
 | 8 | `expiry_discount_rule_tiers` | Date-window tiers for expiry discounts. |
 | 9 | `expiry_discount_applications` | Applied/approved expiry discount per product batch and outlet. |
+| 10 | `pos_discount_authority_limits` | Per-user POS percentage and fixed-amount authority. |
+| 11 | `pos_discount_applications` | Persistent POS cart discount request, approval, hash, and sale linkage. |
+| 12 | `pos_discount_application_events` | Append-only POS discount lifecycle audit. |
+
+## POS Runtime Discount Extension
+
+`pos_discount_authority_limits` is unique by `(tenant_id, tenant_user_id)` and
+stores `max_percentage`, `max_fixed_amount`, `currency_code`, and lifecycle status.
+
+`pos_discount_applications` snapshots tenant/outlet/till/session/device/requester,
+policy/type, calculation method, requested/cashier/absolute values, cart and eligible
+subtotals, discount outcome, currency, canonical cart JSON, SHA-256 cart hash,
+idempotency key, approval decision, expiry, and final sales-order linkage. Status is
+one of `PENDING_APPROVAL`, `APPROVED`, `REJECTED`, `EXPIRED`, `APPLIED`, `CANCELLED`.
+
+`pos_discount_application_events` is append-only and records requester/manager actor,
+from/to status, event type, note, and occurrence time.
+
+2026-07-13 implementation note:
+
+- No new discount schema objects were required.
+- Development POS seed data includes internal manual policies for order percentage,
+  order fixed amount, line percentage, and line fixed amount. These rows are
+  policy configuration, not user-entered request data.
+- Development POS seed data also includes one predefined line policy targeting
+  the seeded team jersey product variant for runtime line-discount verification.
+- POS policy matching reads `discount_policy_targets` for `PRODUCT`, `PRODUCT_VARIANT`, `CATEGORY`, `BRAND`, and `COLLECTION`.
+- Target matching is tenant-scoped and derives catalog relationships from backend product tables.
+- `discount_policy_conditions` active rows are fail-closed. POS runtime supports minimum amount, minimum quantity, and customer-required conditions; unsupported condition types are not treated as eligible.
+- Admin policy create/update writes policies as `INACTIVE` until activated, matching the existing `ACTIVE`/`INACTIVE`/`DELETED` status constraint.
+- Cancellation changes `pos_discount_applications.application_status` to `CANCELLED` and appends a `pos_discount_application_events` row.
 
 ## Reference Entities
 

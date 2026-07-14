@@ -1,7 +1,7 @@
 <!-- title: Cashier POS Second Brain vs Code Comparison Status -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-02 -->
+<!-- last_updated: 2026-07-10 -->
 
 
 # Cashier POS Second Brain vs Code Comparison
@@ -44,9 +44,24 @@ This is analysis/status only. No frontend/backend code changes are included.
 - Different behavior count: **7**
 - Wrong folder structure count: **0**
 - Highest risk areas:
-  - backend/auth source-of-truth mismatch across notes,
-  - returns/cash drawer/orders not fully implemented,
+  - checkout APIs missing in Unified-Commerce while Flutter still calls them,
+  - returns/cash drawer detail/orders not fully implemented,
   - print/email actions not fully completed.
+
+## Delta Since 2026-07-02 (Verified 2026-07-10)
+
+| Area | Change | Status |
+|---|---|---|
+| Tenant login | Flutter uses `POST /api/v1/tenant-auth/login` | Integrated |
+| POS home / till / device | Unified-Commerce controllers merged on `POS_UI` | Integrated |
+| Close till + End Shift | Sidebar End Shift → close till → logout | Integrated |
+| Open Till layout | Full-screen tablet layout fix | Completed |
+| `GET /api/v1/pos/products` | Backend + Flutter list wiring | In Review (branch) |
+| Catalog mock fallback | `pos_catalog_fallback_data.dart` removed | Real data only |
+| Checkout / receipt APIs | Still absent in `E_POS.Api` | Blocked |
+
+See [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cashier_POS_Implementation_Map]] for
+the current active map.
 
 ## 2. Detailed Comparison Table
 
@@ -78,7 +93,7 @@ This is analysis/status only. No frontend/backend code changes are included.
 | Email receipt send | Email receipt action expected | UI present, send behavior incomplete | Missing from code | Medium | Implement send flow |
 | Returns/refunds | Full cashier flow documented | Placeholder | Missing from code | High | Prioritize implementation |
 | Cash drawer operations | Full cashier flow documented | Placeholder | Missing from code | High | Prioritize implementation |
-| Auth / tenant-login expectation | Some active notes say missing in Unified backend | Current `Pos Backend/Nytroz-POS-Backend` includes `POST /api/v1/auth/tenant-login` | Risk / unclear | High | Reconcile active backend source-of-truth |
+| Auth / tenant-login expectation | Some active notes say missing in Unified backend | Unified-Commerce implements `POST /api/v1/tenant-auth/login`; Flutter wired | Resolved 2026-07-10 | Low | Keep API_ENDPOINTS + limitations in sync |
 | Folder structure | Feature-first clean architecture expected | No major folder structure violations found | Matches docs | Low | Keep structure; focus on doc drift |
 
 ## 3. Extra Features Implemented but Not in Second Brain
@@ -87,7 +102,7 @@ This is analysis/status only. No frontend/backend code changes are included.
 2. Customer-in-cart propagation through checkout (`customerId` wired).
 3. Payment-success print popup behavior (same-screen dialog UX).
 4. Parked sale local persistence and restore in secure storage.
-5. Resilient fallback behavior for some API/network paths.
+5. Resilient checkout network fallback on payment screens (catalog mock removed).
 
 ## 4. Features Documented but Missing in Code
 

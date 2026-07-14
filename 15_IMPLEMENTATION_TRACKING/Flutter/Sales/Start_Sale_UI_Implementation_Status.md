@@ -1,7 +1,7 @@
 <!-- title: Start Sale UI Implementation Status -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-24 -->
+<!-- last_updated: 2026-07-11 -->
 
 
 # Start Sale UI Implementation Status
@@ -17,23 +17,45 @@
 | Completed Date | - |
 | Developer | POS team |
 | Reviewer | - |
-| PR / Commit | `pos-home-dashboard` branch |
-| Tests | Passed (`flutter test`) |
+| PR / Commit | `Sale_Screen` branch (uncommitted at audit) |
+| Tests | Passed (`flutter analyze`, targeted tests) |
 
 ## Feature Summary
 
-POS shell, home dashboard, and New Sale catalog/cart UI are implemented on branch
-`pos-home-dashboard`. Cash checkout is wired to backend checkout start-payment,
-and Print Receipt records backend print audit when a completed `saleId` exists.
-Barcode scan, customer/discount/park actions, physical printing, email sending,
-and card/QR/split payments remain partial or placeholder.
+POS shell, home dashboard, and New Sale catalog/cart UI are implemented.
+`GET /api/v1/pos/products` is wired for the product grid. **Mock catalog fallback
+was removed on 2026-07-10** — only real database products are shown.
+
+Checkout, receipt, and payment Flutter datasources exist but **Unified-Commerce
+does not yet expose** `POST /api/v1/pos/checkout/*` controllers. Cash checkout
+cannot complete end-to-end against the active backend until those APIs are
+implemented.
+
+## Permission Hardening (2026-07-11)
+
+| Area | Rule |
+|---|---|
+| New Sale route access | `pos.new_sale.view` or `sales.create` only |
+| Add Customer action | `customers.create` only |
+| Proceed to Payment | Requires checkout permission plus trusted device and open till session |
+| Till status chip | Visibility by `till.session.view`; label reads till session state instead of hardcoded text |
+
+## Catalog Data Status (2026-07-10)
+
+| Rule | Status |
+|---|---|
+| Mock `pos_catalog_fallback_data.dart` | Removed |
+| Empty API list | Shows "No products found" |
+| API failure | Shows "Unable to load products" |
+| Product seed in backend | Not added intentionally |
+| Real products | Tenant Admin / `POST /api/v1/products` + price list required |
 
 ## Payment And Receipt Status
 
 | Area | Status | Notes |
 |---|---|---|
-| Checkout summary | Wired | Calls `POST /api/v1/pos/checkout/summary`. |
-| Cash payment | Wired | Calls `POST /api/v1/pos/checkout/start-payment` with `cashReceived`. |
+| Checkout summary | UI wired | **Blocked** — no Unified-Commerce controller |
+| Cash payment | UI wired | **Blocked** — no Unified-Commerce controller |
 | Receipt preview | Partial | Uses checkout success state, including `receiptNumber` and `barcodeValue`. |
 | Receipt detail GET | Not wired | `GET /api/v1/pos/receipts/{saleId}` exists in backend/API endpoints but is not called by the print screen. |
 | Print audit | Wired | Calls `POST /api/v1/pos/receipts/{saleId}/print`. |
@@ -67,7 +89,7 @@ for the full implementation map.
 
 | Area | File |
 |---|---|
-| Implementation map | [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]] |
+| Implementation map | [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cashier_POS_Implementation_Map]] |
 | User journey (target) | [[../../03_USER_JOURNEYS/Cashier/04_Start_Sale_Flow]] |
 | Module overview | [[../../04_MODULE_KNOWLEDGE/Sales/01_Module_Overview]] |
 | Functional rules | [[../../04_MODULE_KNOWLEDGE/Sales/02_Functional_Rules]] |

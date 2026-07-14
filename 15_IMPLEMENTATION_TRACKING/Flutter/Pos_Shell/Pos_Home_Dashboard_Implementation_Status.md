@@ -1,7 +1,7 @@
 <!-- title: POS Home Dashboard Implementation Status -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- last_updated: 2026-07-10 -->
 
 
 # POS Home Dashboard Implementation Status
@@ -15,7 +15,7 @@
 | Feature | POS Home Dashboard |
 | Status | In Progress |
 | Completed Date | - |
-| PR / Commit | `pos-home-dashboard` branch |
+| PR / Commit | `POS_UI` merged; home API on `5c6ae7a` |
 | Tests | Pass (`test/widget_test.dart` home cases) |
 
 ## Feature Summary
@@ -33,7 +33,8 @@ route (`routeExists: false`).
 
 | Area | File |
 |---|---|
-| Implementation map | [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]] |
+| Implementation map | [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cashier_POS_Implementation_Map]] |
+| Backend status | [[../Backend/POSOperations/Pos_Home_Dashboard_Implementation_Status]] |
 | User journey | [[../../03_USER_JOURNEYS/Cashier/04_Start_Sale_Flow]] |
 
 ## Files Changed

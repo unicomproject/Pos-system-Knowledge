@@ -1,7 +1,7 @@
 <!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-24 -->
+<!-- last_updated: 2026-07-10 -->
 
 # Full Feature Status Index
 
@@ -56,13 +56,19 @@ PR/commit reference is recorded.
 
 | Platform | Module | Feature | Status | Completed Date | PR / Commit | Notes |
 |---|---|---|---|---|---|---|
-| Backend | Sales | Create Sale API | In Progress | - | `pos-home-dashboard` | API exists; Flutter not wired |
-| Flutter | POS Shell | POS Home Dashboard | In Progress | - | `pos-home-dashboard` | API dashboard + placeholders |
-| Flutter | Sales | Start Sale UI | In Progress | - | `pos-home-dashboard` | Catalog + local cart partial |
-| Flutter | Sales | Cashier POS Second Brain vs Code Comparison | Completed | 2026-07-02 | - | Documentation audit/status note added |
-| Angular | Tenant | Tenant List Page | In Progress | - | - | Code exists and is wired to `GET /api/v1/platform-admin/tenants`; current verification pending |
-| Flutter | Sales | Start Sale UI | Not Started | - | - | Example row |
-| Backend | Tenant / Outlet | Outlet Create | Completed | 2026-06-18 | dashboard_tenant | POST /api/v1/tenant-admin/outlets |
+| Backend | Auth | Tenant Login | Completed | 2026-07-01 | Tenant auth module | `POST /api/v1/tenant-auth/login` |
+| Backend | OutletTillDevice | Device Context | Completed | 2026-07-09 | `5c99b66` | `devices/current`, `devices/activate` |
+| Backend | OutletTillDevice | Till Session Open/Close | Completed | 2026-07-09 | `06048db` | current-session, open, close |
+| Backend | POSOperations | POS Home Dashboard API | Completed | 2026-07-08 | `5c6ae7a` | `GET /api/v1/pos/home` |
+| Backend | CatalogProduct | POS Products List | In Review | - | `Sale_Screen` branch | `GET /api/v1/pos/products`; unmerged |
+| Backend | Sales | POS Checkout / Cart APIs | Not Started | - | - | Documented in API_ENDPOINTS but no `E_POS.Api` controllers |
+| Flutter | POS Shell | POS Home Dashboard | In Progress | - | `POS_UI` | Home API integrated; several cards placeholder |
+| Flutter | Till | Open Till Layout | Completed | 2026-07-10 | `Sale_Screen` | Full-screen tablet layout |
+| Flutter | Sales | End Shift + Close Till | Completed | 2026-07-09 | `d04ecf0` | Close till API + logout |
+| Flutter | Sales | Start Sale UI | In Progress | - | `Sale_Screen` | Catalog API wired; no mock fallback; checkout blocked |
+| Flutter | Sales | Cashier POS Second Brain vs Code Comparison | Completed | 2026-07-02 | - | Audit note; see delta in same file |
+| Angular | Tenant | Tenant List Page | In Progress | - | - | Wired to platform-admin tenants API |
+| Backend | Tenant / Outlet | Outlet Create | Completed | 2026-06-18 | dashboard_tenant | `POST /api/v1/tenant-admin/outlets` |
 | Flutter | Tenant Admin / Outlet | Outlet Create UI | Completed | 2026-06-18 | tenant-dashboard | Add/Edit outlet screens |
 
 ## Update Process

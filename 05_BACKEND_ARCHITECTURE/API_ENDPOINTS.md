@@ -1,30 +1,23 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-03 -->
+<!-- last_updated: 2026-07-10 -->
 
 # Platform Subscription Plan API Endpoints
 
-## Tenant POS Login
+## Tenant POS Login (Unified Commerce)
 
-Base route: `/api/v1/auth`
+Base route: `/api/v1/tenant-auth`
 
 | Method | Route | Unified Commerce status |
 |---|---|---|
-| POST | `/api/v1/auth/tenant-login` | **Not implemented** (Flutter still calls this — returns 404 on port 5187) |
+| POST | `/api/v1/tenant-auth/login` | **Implemented** — Flutter `ApiEndpoints.tenantLogin` |
+| POST | `/api/v1/tenant-auth/logout` | **Implemented** |
 
-This is not the final full endpoint catalogue. Exact endpoint tables must be
-created module-by-module after module contracts are finalized.
+Obsolete route `POST /api/v1/auth/tenant-login` belonged to legacy `SCS.Api`.
+Do not use it for Unified-Commerce integration.
 
-Confirmed Release 1 implemented endpoints are documented in the sections below.
-Use those tables for active backend, Angular, and Flutter integration work.
-
-> **Active backend:** `Nytroz POS - Backend New/Unified-Commerce` · Platform Admin dev URL `http://localhost:5150`
->
-> **Obsolete:** port **5052**, `Nytroz-POS-Backend` / `SCS.Api` — see
-> [[../11_DEVELOPER_ONBOARDING/Unified_Commerce_Backend_Known_Limitations]]
-
-Request body (Flutter contract — pending backend implementation):
+Request body (Flutter contract):
 
 ```json
 {
@@ -34,9 +27,35 @@ Request body (Flutter contract — pending backend implementation):
 ```
 
 Tenant Code is not accepted from the POS login screen. Backend resolves tenant
-from the tenant user email. If the email exists in multiple tenants, the API
-returns `TENANT_SELECTION_REQUIRED` with: "Multiple tenants found for this
-email. Tenant selection is required."
+from the tenant user email.
+
+> **Active backend:** `POS Backend/Unified-Commerce` · `E_POS.Api`
+>
+> **Obsolete:** `Nytroz-POS-Backend` / `SCS.Api` — see
+> [[../11_DEVELOPER_ONBOARDING/Unified_Commerce_Backend_Known_Limitations]]
+
+## Unified Commerce Cashier Bootstrap APIs (Verified 2026-07-10)
+
+| Method | Route | Status | Flutter wired |
+|---|---|---|---|
+| POST | `/api/v1/tenant-auth/login` | Implemented | Yes |
+| GET | `/api/v1/devices/current` | Implemented | Yes |
+| POST | `/api/v1/devices/activate` | Implemented | Yes |
+| GET | `/api/v1/tills/current-session` | Implemented | Yes |
+| POST | `/api/v1/tills/open` | Implemented | Yes |
+| POST | `/api/v1/tills/close` | Implemented | Yes |
+| GET | `/api/v1/pos/home` | Implemented | Yes |
+| GET | `/api/v1/pos/products` | Implemented on `Sale_Screen` branch | Yes |
+
+Query notes:
+
+- `GET /api/v1/pos/home` and `GET /api/v1/pos/products` accept optional
+  `deviceId`, `tillId`, `outletId` where documented in implementation status
+  files.
+- `GET /api/v1/pos/products` requires `deviceId` and `products.view`.
+
+See [[../15_IMPLEMENTATION_TRACKING/Backend/POSOperations/Pos_Home_Dashboard_Implementation_Status]]
+and [[../15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/Pos_Products_List_Implementation_Status]].
 
 Base route: `/api/v1/platform/subscription-plans`
 
@@ -747,6 +766,12 @@ See [[../99_Archive/04_MODULE_KNOWLEDGE/Subscription/04_Subscription_Catalog_Mod
 
 # POS Payment And Receipt API Endpoints
 
+> **Unified-Commerce status (2026-07-10):** The routes below are the **target
+> contract** carried forward from legacy `SCS.Api` documentation. They are
+> **not implemented** in `E_POS.Api` yet. Flutter datasources still reference
+> these paths; checkout will fail until backend work is completed. See
+> [[../15_IMPLEMENTATION_TRACKING/Backend/Sales/Create_Sale_Implementation_Status]].
+
 Base routes: `/api/v1/pos/cart`, `/api/v1/pos/checkout`,
 `/api/v1/pos/sales`, `/api/v1/pos/payments`, `/api/v1/pos/receipts`.
 
@@ -772,10 +797,10 @@ those returned values instead of recalculating or defaulting locally. Sale detai
 and receipt detail responses also expose `cashReceived` and `changeDue` from the
 saved sale/payment outcome.
 
-Checkout/cart line requests use backend product variant IDs. `GET
-/api/v1/pos/products` exposes `variantId` for simple/non-variant products so
-Flutter can send `{ variantId, qty }` to checkout summary/start-payment without
-substituting product IDs.
+`GET /api/v1/pos/products` is **implemented** in Unified-Commerce on branch
+`Sale_Screen` (see implementation status file). It exposes `variantId` for
+simple/non-variant products so Flutter can send `{ variantId, qty }` to checkout
+summary/start-payment without substituting product IDs.
 
 `GET /api/v1/pos/products` product summaries expose variant search metadata for
 New Sale filtering. Product name remains the primary search key; variant terms
