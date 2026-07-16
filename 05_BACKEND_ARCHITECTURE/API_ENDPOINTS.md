@@ -127,7 +127,7 @@ All endpoints require platform JWT authentication.
 Verification on 2026-07-02:
 
 - Migration `20260618180000_SeedPlatformAdminPermissions` applied.
-- Login `posunique001@gmail.com` returned 31 platform permissions for `super_administrator`.
+- Historical verification on 2026-07-02: login `posunique001@gmail.com` returned 31 platform permissions for `super_administrator`. This is a point-in-time test observation, not the current catalogue size; the authoritative catalogue now contains 36 permission codes (see [[02_ACCESS_CONTROL/Permission_Code_List]]).
 - Dashboard GET returned 200 with valid JWT.
 
 ---
