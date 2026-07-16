@@ -14,7 +14,7 @@
 | Route permission | `platform.billing.view` |
 | Sidebar permission | `platform.billing.view` |
 | Billing models, mapper, API service, page, components, and tests | Present |
-| Frontend implementation status | In Progress — summary, invoice list, pagination, filters, and sorting completed |
+| Frontend implementation status | In Progress — Read-only Billing experience completed; mutation workflow pending |
 
 `/admin/billing` no longer uses `AdminSectionPage`. Runtime Billing data comes only
 from the real Platform Admin Billing API documented in
@@ -40,20 +40,33 @@ for phase-level progress and verification evidence.
 - Date validation
 - Server sorting
 - Loading, error, empty, and retry states
+- Invoice View action
+- Invoice detail drawer
+- Invoice metadata
+- Invoice lifecycle dates
+- Monetary summary
+- Invoice line items
+- Payment history
+- Detail loading/error/not-found/retry states
+- Payment loading/error/empty/retry states
+- Drawer responsiveness
+- Drawer keyboard accessibility
+- Stale detail-response protection
 
 ### Pending
 
-- Invoice detail
-- Invoice line items
-- Payment history
 - Issue Invoice
 - Mark Paid
-- Mutation permissions
-- Confirmation dialogs
+- `platform.billing.manage` controls
+- Mutation confirmation dialogs
 - Invalid-transition handling
 - Concurrency-conflict handling
+- Mutation success refresh
+- E2E and release verification
 
 ## Page Structure
+
+### Implemented read-only behaviour
 
 The implemented page uses focused components:
 
@@ -61,10 +74,12 @@ The implemented page uses focused components:
 2. Per-currency summary cards.
 3. Search/filter toolbar.
 4. Server-backed invoice table and pagination.
+5. Invoice detail drawer or side panel with payment history.
+
+### Pending mutation behaviour
 
 Target-state additions not yet implemented:
 
-5. Invoice detail drawer or side panel.
 6. Feature-owned confirmation dialog for mutations.
 7. Page-level success/error notification region for mutation outcomes.
 
@@ -79,7 +94,7 @@ Target-state additions not yet implemented:
   authoritative.
 
 The current page shows a read-only label and does not expose Issue or Mark Paid
-controls.
+controls. `platform.billing.manage` action visibility remains pending.
 
 ## Billing Summary
 
@@ -122,6 +137,7 @@ Implemented columns:
 - Total, paid, and balance due with currency formatting.
 - Display status.
 - Issued and due dates.
+- Read-only View action with an accessible invoice-specific label.
 
 Implemented behaviour:
 
@@ -135,6 +151,8 @@ Implemented behaviour:
 - Filters are retained while changing pages.
 - Loading skeleton, empty state, and independent invoice error/retry states are
   implemented.
+- View emits the selected invoice ID to the parent Billing page. The table does
+  not fetch invoice detail directly.
 
 Target-state columns and actions not yet implemented:
 
@@ -144,32 +162,61 @@ Target-state columns and actions not yet implemented:
 
 ## Invoice Detail Drawer Or Panel
 
-Target-state requirement. Not yet implemented.
+### Implemented read-only behaviour
 
-The detail view must show:
+The detail drawer is implemented as a right-side dialog on desktop and a
+full-width sheet on small screens.
 
-- Invoice, tenant, subscription, and plan identity.
-- Stored and display status.
-- Currency-aware totals.
-- Billing period and lifecycle timestamps.
-- Invoice line items with quantity, unit price, discounts, tax, and line total.
-- Recorded payment history including provider, reference, status, amount, fees,
-  net amount, and timestamps.
+It shows:
 
-Detail loading and error states are independent from the list. Empty payment
-history is valid and must not be presented as an error.
+- Invoice number, tenant name/code, display status, and currency.
+- Plan and subscription identity when returned by the API.
+- Invoice type, billing cycle, and billing-period dates.
+- Lifecycle timestamps: created, issued, due, paid, and updated.
+- Currency-aware monetary summary: subtotal, discount, tax, total, paid amount,
+  and balance due.
+- Invoice line items with quantity, unit price, discount, tax, and line total.
+- Recorded payment history from the separate payments endpoint.
+
+Behaviour:
+
+- The Billing page owns detail and payment-history API orchestration.
+- Detail and payment-history requests run independently and may complete out of
+  order.
+- Detail loading, invoice-not-found, general detail error, and detail retry are
+  implemented.
+- Payment loading, empty payment history, payment error, and payment retry are
+  implemented.
+- Payment-history failure does not hide successfully loaded invoice detail.
+- Empty payment history is valid and is not presented as an error.
+- Closing the drawer clears selected state and invalidates pending requests.
+- Opening or closing detail does not reload summary or the invoice list.
+- Search, filters, sorting, page number, and page size remain preserved.
+- Stale detail and payment responses cannot overwrite a newer selected invoice.
+- Escape closes the drawer. Focus moves into the drawer on open and is restored
+  to the View trigger where practical.
+
+### Pending mutation behaviour
+
+Issue Invoice and Mark Paid remain pending in the Angular UI.
 
 ## Confirmed Actions
 
+### Implemented read-only behaviour
+
+- View invoice opens the detail drawer. It requires only `platform.billing.view`.
+
+### Pending mutation behaviour
+
 Target-state mutation behaviour. Not yet implemented in the Angular UI.
 
-### Issue Invoice
+#### Issue Invoice
 
 Show only when the user has `platform.billing.manage` and `canIssue` is true.
 The confirmation names the invoice and explains the `DRAFT -> PENDING`
 transition. Submit the latest invoice `updatedAt` as `expectedUpdatedAt`.
 
-### Mark Paid
+#### Mark Paid
 
 Show only when the user has `platform.billing.manage` and `canMarkPaid` is true.
 The confirmation explains that the whole balance will be settled. It must not
@@ -188,11 +235,15 @@ Only one mutation may be in flight for an invoice. Disable repeat submission.
 | API error | Safe message and retry action for summary and invoices independently |
 | Permission denied | Existing Platform Admin permission-denied route/state |
 | Read-only mode | Full reads, no mutation controls, explanatory read-only label |
+| Detail loading | Drawer/panel loading state |
+| Detail not found | Distinct invoice-not-found state with close recovery |
+| Detail error | Safe message and detail retry for the selected invoice |
+| Payment loading | Payment-history section loading state |
+| Empty payment history | Clear empty message; not treated as an error |
+| Payment error | Safe message and payment retry without closing the drawer |
 
 | State | Target behaviour (not yet implemented) |
 |---|---|
-| Detail loading | Drawer/panel loading state |
-| Detail not found | Close/recover safely and offer list refresh |
 | Issue confirmation | Explicit transition and invoice identity |
 | Mark-paid confirmation | Explicit full-settlement warning |
 | Invalid transition | Handle HTTP 409 `platform_billing.invalid_transition`; reload data |
@@ -207,8 +258,10 @@ Only one mutation may be in flight for an invoice. Disable repeat submission.
 - Filters reflow to a vertical layout on narrow screens.
 - Tables may use horizontal scrolling or a compact row layout; monetary/status
   context must remain visible.
-- The detail panel becomes a full-width sheet on small screens.
-- Confirmation actions remain reachable without horizontal scrolling.
+- The detail panel is a right-side drawer on desktop and a full-width sheet on
+  small screens.
+- Confirmation actions remain reachable without horizontal scrolling once
+  mutation UI is added.
 
 ## Accessibility
 
@@ -217,14 +270,18 @@ Implemented:
 - Semantic headings, form labels, table headers, and buttons.
 - Sortable headers expose accessible current-direction state through `aria-sort`
   and screen-reader labels.
+- Detail drawer uses dialog semantics with an accessible name.
+- Close action has an accessible label.
+- Escape closes the detail drawer.
+- Focus moves into the drawer when opened and is restored on close where
+  practical.
+- Status badges remain visible as text and do not rely only on colour.
+- View action is keyboard accessible and labelled with the invoice number.
 
 Target-state additions:
 
-- Move focus into opened dialogs/panels and restore it on close.
 - Trap focus in modal confirmation dialogs and support Escape/cancel.
-- Announce loading, errors, conflicts, and success through appropriate live
-  regions without relying only on color.
-- Status badges and disabled actions require text explanations.
+- Announce conflicts and mutation success through appropriate live regions.
 
 ## Unsupported UI
 
