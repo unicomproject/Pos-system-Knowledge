@@ -7,9 +7,10 @@
 
 ## Purpose
 
-Defines the current implemented Platform Admin Billing read-only flow and
-preserves invoice detail, payment history, mutation, reminder, payment-link,
-activation, and suspension journeys as pending or planned future scope.
+Defines the current implemented Platform Admin Billing read-only flow, including
+invoice detail and payment history, and preserves mutation, reminder,
+payment-link, activation, and suspension journeys as pending or planned future
+scope.
 
 ## Actor
 
@@ -33,47 +34,53 @@ Platform Admin opens billing management.
 ```text
 Platform Admin
 → Open Billing
-→ Load per-currency summary
-→ Load invoice list
-→ Search/filter/sort invoices
-→ Change page or page size
-→ Refresh or retry failed requests
+→ View per-currency summary
+→ Search, filter and sort invoices
+→ Select View on an invoice
+→ Open invoice detail drawer
+→ Review invoice metadata
+→ Review invoice line items
+→ Review payment history
+→ Close the drawer
+→ Return to the preserved invoice list state
 ```
 
 | Step | Action | System Behavior |
 |---:|---|---|
 | 1 | Open Billing | Angular route `/admin/billing` requires `platform.billing.view` and lazy-loads `PlatformBillingPage`. |
-| 2 | Load summary | Backend returns filtered currency-grouped summary from `GET /api/v1/platform-admin/billing/summary`. Monetary totals remain separated by currency. |
+| 2 | View summary | Backend returns filtered currency-grouped summary from `GET /api/v1/platform-admin/billing/summary`. Monetary totals remain separated by currency. |
 | 3 | Load invoice list | Backend returns server-paged invoices from `GET /api/v1/platform-admin/billing/invoices`. |
-| 4 | Search invoices | 300ms debounced server-side search by invoice number, tenant name, or tenant code. Search input is trimmed before the API request. |
-| 5 | Filter invoices | Tenant and status options come from `GET /api/v1/platform-admin/billing/filter-options`. Supported statuses are `DRAFT`, `PENDING`, derived `OVERDUE`, and `PAID`. Date filters support `issuedAt` or `dueAt` with optional `dateFrom` and `dateTo`. |
-| 6 | Validate date range | Local validation blocks summary and invoice requests when `dateFrom > dateTo`. |
-| 7 | Sort invoices | Server-side sorting uses supported fields from the billing query contract. Sortable headers expose accessible `aria-sort` state. No client-side invoice sorting is performed. |
-| 8 | Change page or page size | Server pagination preserves the active filter and sort snapshot. Filter or sort changes reset page number to 1. |
-| 9 | Refresh or retry | Refresh reloads summary and invoices with the active query. Failed summary or invoice requests expose independent retry actions. Stale in-flight responses cannot overwrite newer data. |
+| 4 | Search, filter, and sort | Debounced search, tenant/status/date filters, and server-side sorting update summary and list from the same query snapshot. |
+| 5 | Select View | Accessible View action emits the selected invoice ID. The table does not fetch detail itself. |
+| 6 | Open invoice detail drawer | Billing page opens a dialog panel and loads `GET /api/v1/platform-admin/billing/invoices/{invoiceId}` and `GET /api/v1/platform-admin/billing/invoices/{invoiceId}/payments` independently. |
+| 7 | Review invoice metadata | Drawer shows invoice number, tenant, status, currency, plan/subscription identity, lifecycle dates, and currency-aware monetary totals. |
+| 8 | Review invoice line items | Drawer shows verified line-item fields, including decimal quantity support and an empty line-item state. |
+| 9 | Review payment history | Payment section shows recorded transactions, or a valid empty-history message when none exist. |
+| 10 | Close the drawer | Close button, backdrop click, or Escape closes the drawer, clears selected state, and invalidates pending requests. Summary, filters, sorting, and pagination remain preserved. |
+
+### Implemented detail and payment states
+
+| State | Behaviour |
+|---|---|
+| Detail loading | Detail skeleton while the invoice-detail request is in flight |
+| Detail not found | Distinct invoice-not-found recovery with close action |
+| Detail error and retry | Safe error message and retry that reloads only the selected invoice detail |
+| Payment loading | Payment-history section loading state |
+| Empty payment history | Clear empty message; not treated as an error |
+| Payment error and retry | Safe error message and retry that reloads only payment history; loaded invoice detail remains visible |
+| Escape and close | Escape and the accessible close control dismiss the drawer and restore focus where practical |
 
 The current page is read-only. It does not expose Issue Invoice or Mark Paid
 controls.
 
-## Pending Next-step Journeys
+## Pending Mutation Journeys
 
 These journeys are not yet available in the Angular UI:
 
 ```text
-Select invoice
-→ View invoice detail
-→ View payment history
+Issue draft invoice
+Mark pending invoice paid
 ```
-
-| Step | Action | System Behavior |
-|---:|---|---|
-| 1 | Select invoice | Open invoice detail from the list. |
-| 2 | View invoice detail | Load invoice metadata, line items, and currency-aware totals from `GET /api/v1/platform-admin/billing/invoices/{invoiceId}`. |
-| 3 | View payment history | Load recorded transactions from `GET /api/v1/platform-admin/billing/invoices/{invoiceId}/payments`. Empty payment history is valid. |
-
-## Pending Mutation Journeys
-
-These journeys are not yet available in the Angular UI:
 
 | Step | Action | System Behavior |
 |---:|---|---|
@@ -132,17 +139,19 @@ Current implemented UI:
 - Invalid local date range blocks summary and invoice requests.
 - Permission denied for users without `platform.billing.view`.
 - Safe API error messages with retry actions for summary and invoices.
+- Invoice-not-found for missing detail records.
+- Independent payment-history errors that do not erase loaded invoice detail.
 
 Pending mutation UI:
 
 - Invalid billing status transition
 - Stale `expectedUpdatedAt`
-- Invoice not found
 
 ## Outcome
 
-Platform Admin can review per-currency billing summary and search, filter, sort,
-and page through real invoice records in the current read-only Billing UI.
+Platform Admin can review per-currency billing summary, search, filter, sort, and
+page through real invoice records, and open a read-only invoice detail drawer
+with line items and payment history while preserving list state.
 
 ## Related Modules
 

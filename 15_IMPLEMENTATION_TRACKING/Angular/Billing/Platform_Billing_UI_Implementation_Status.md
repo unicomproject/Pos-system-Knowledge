@@ -11,7 +11,7 @@
 |---|---|
 | Platform | Angular Platform Admin |
 | Feature | Platform Billing Management UI |
-| Status | In Progress — Summary, invoice list, pagination, filters and sorting completed |
+| Status | In Progress — Read-only Billing experience completed; mutation workflow pending |
 | Route | `/admin/billing` |
 | Current component | Lazy-loaded `PlatformBillingPage` |
 | Backend | Ready for scoped frontend implementation |
@@ -20,8 +20,8 @@
 | Read permission | `platform.billing.view` |
 | Mutation permission | `platform.billing.manage` |
 | Angular production build | Passed |
-| Test files | 39 passed |
-| Tests passed | 294 |
+| Test files | 41 passed |
+| Tests passed | 329 |
 | Failed | 0 |
 | Skipped | 0 |
 | Baseline verified | 2026-07-16 |
@@ -126,13 +126,38 @@ Key Angular files:
 
 ### Phase 4 — Invoice detail and payment history
 
-**Status:** Not Started
+**Status:** Completed
 
-Pending scope:
+Delivered:
 
-- Invoice detail drawer or panel
-- Invoice line-item detail UI
-- Payment-history UI
+- Accessible invoice-table View action that emits the selected invoice ID
+- Billing page owns invoice-detail and payment-history API orchestration
+- Real invoice-detail API integration
+- Real payment-history API integration
+- Independent detail and payment loading states
+- Invoice metadata and lifecycle dates
+- Currency-aware monetary summary
+- Invoice line items, including empty and decimal-quantity handling
+- Payment provider, reference, status, amount, fee, and net amount
+- Empty payment history treated as a valid state
+- Payment-history failure does not hide loaded invoice detail
+- Invoice-not-found handling
+- Detail retry and payment-history retry
+- Stale detail and payment-response protection
+- Drawer close invalidates pending requests
+- Opening detail preserves summary, search, filters, sorting, and pagination
+- Escape close, focus into drawer, and focus restoration where practical
+- Responsive desktop side panel and mobile full-screen drawer
+- No Issue Invoice or Mark Paid actions
+
+Key Angular files:
+
+- `src/app/features/admin/components/platform-billing-invoice-detail/platform-billing-invoice-detail.ts`
+- `src/app/features/admin/components/platform-billing-invoice-detail/platform-billing-invoice-detail.spec.ts`
+- `src/app/features/admin/components/platform-billing-payment-history/platform-billing-payment-history.ts`
+- `src/app/features/admin/components/platform-billing-payment-history/platform-billing-payment-history.spec.ts`
+- Updated `platform-invoice-table.ts` / `.spec.ts`
+- Updated `platform-billing-page.ts` / `.spec.ts`
 
 ### Phase 5 — Issue Invoice and Mark Paid mutations
 
@@ -159,17 +184,17 @@ Pending scope:
 
 ## Next Phase
 
-**Phase 4 — Invoice detail and payment history**
+**Phase 5 — Issue Invoice and Mark Paid mutations**
 
 ## Verification Baseline
 
-Verified on 2026-07-16 against merged Angular `main`:
+Verified on 2026-07-16 against merged Angular `main` after Phase 4:
 
 | Check | Result |
 |---|---|
 | Production build | Passed |
-| Test files | 39 passed |
-| Tests passed | 294 |
+| Test files | 41 passed |
+| Tests passed | 329 |
 | Failed | 0 |
 | Skipped | 0 |
 
@@ -181,10 +206,11 @@ Verified on 2026-07-16 against merged Angular `main`:
 | Database migration created | No |
 | Mock Billing data added | No |
 | Unsupported statuses or actions added | No |
+| Partial-payment, cancellation, void, or overpayment UI added | No |
 
 ## Acceptance Criteria
 
-### Completed through Phase 3
+### Completed through Phase 4
 
 - `/admin/billing` no longer renders `AdminSectionPage`.
 - Runtime Billing data comes only from the real Platform Admin Billing API.
@@ -192,8 +218,11 @@ Verified on 2026-07-16 against merged Angular `main`:
 - Summary cards preserve separate monetary totals per currency.
 - Search, tenant/status/date filters, server sorting, and server pagination map
   to the documented query contract.
-- Loading, empty, error, retry, and read-only states are implemented for the
-  current read-only surface.
+- Invoice detail displays real line items and payment history.
+- Detail and payment-history loading, empty, error, retry, not-found, and
+  read-only states are implemented.
+- Opening detail preserves the active list query state.
+- Stale detail and payment responses are ignored.
 - Angular production build passes.
 - Angular tests pass with zero failures and zero skips.
 
@@ -201,15 +230,14 @@ Verified on 2026-07-16 against merged Angular `main`:
 
 - Users without `platform.billing.manage` must continue to have a read-only
   experience with no Issue or Mark Paid controls once mutation UI is added.
-- Invoice detail displays real line items and payment history.
 - Issue is offered only for `canIssue`; Mark Paid only for `canMarkPaid`.
 - Both mutations send the latest `updatedAt` as `expectedUpdatedAt`.
 - Invalid transitions and stale concurrency conflicts receive distinct HTTP 409
   UI states and reload current data.
 - The UI exposes no invoice-create, partial-payment, overpayment, cancel, void,
   payment-link, reminder, or automatic suspension action.
-- Detail-loading, confirmation, success, mutation-failure, conflict, and
-  no-action states are tested.
+- Confirmation, success, mutation-failure, conflict, and no-action states are
+  tested once mutation UI is added.
 - A browser smoke test verifies real backend summary, list, filtering, detail,
   permissions, Issue, Mark Paid, and concurrency handling.
 
