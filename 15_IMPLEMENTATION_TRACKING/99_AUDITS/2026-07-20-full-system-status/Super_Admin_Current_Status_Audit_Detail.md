@@ -29,16 +29,15 @@ Companion to [[Super_Admin_Current_Status_Audit]]. SA-P0-01: [[SA-P0-01_Tenant_W
 | Payment links | R1? | DATABASE_ONLY | none | none | `subscription_payment_links` | billing.manage reserved | — | API+UI or defer | SA-P1-02 |
 | Domain/SSL | R1 | DATABASE_ONLY | none | none | `tenant_domains` | — | — | API+UI | SA-P1-03 |
 | Audit logs | R1 | PARTIAL | audit page | audit-logs | login_audits | audit.view | specs | Business audit | SA-P1-05 |
-| Platform reports/alerts | R1 | STUB | `AdminSectionPage` | none | — | dashboard.view | — | Real API or hide | SA-P1-01 |
+| Platform reports/alerts | R1 | OUT_OF_SCOPE (nav) | removed from menu | none | — | — | — | Future platform product | Hidden until implemented |
 | Return policy templates | R1 | COMPLETE | list/create/detail pages + API service | return-policy-templates CRUD | templates | return_policy.* | ApiTests + Angular specs | — | — |
 | Modern `/platform-auth` | — | BACKEND_ONLY | unused | PlatformAuthController | — | — | ApiTests | Adopt or doc legacy-only | SA-P2-01 |
 
 \*Billing Phase docs claim RELEASE READY; payment-link/auto-suspend excluded — treat scoped COMPLETE, not full billing product.
 
-### Stub routes (`admin.routes.ts`)
+### Navigation cleanup (SA-P1-02)
 
-`/admin/outlets`, `tills-devices`, `products`, `alerts`, `reports`, and `tenant/:id/{outlets,tills,users,roles-permissions,settings}` → `AdminSectionPage` L14–17.
-
+Platform sidebar no longer lists Outlets, Tills, Products, Alerts, or Reports. Stub routes and tenant `AdminSectionPage` placeholders removed from `admin.routes.ts`. Direct unknown `/admin/*` paths redirect to dashboard. See [[SA-P1-02_Platform_Admin_Stub_Navigation_Cleanup]].
 ### Wizard FE→BE field persistence (SA-P0-01)
 
 | Field | Persist target | Notes |
