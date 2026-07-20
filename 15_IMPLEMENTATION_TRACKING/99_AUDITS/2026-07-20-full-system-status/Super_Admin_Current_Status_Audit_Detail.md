@@ -23,7 +23,7 @@ Companion to [[Super_Admin_Current_Status_Audit]]. SA-P0-01: [[SA-P0-01_Tenant_W
 | Subscription plans lifecycle | R1 | COMPLETE | list/create/detail | PlansController + reactivate | plans | subscription_plans.* | plan specs | — | — |
 | Modules catalog | R1 | COMPLETE (read) | modules page | GET catalog/modules | modules/features | modules.view | specs | Mutations N/A | — |
 | Platform users | R1 | PARTIAL | users page | users CRUD/roles | platform_users | users.* | user specs | Reset password; rich edit | SA-P1-06 |
-| Roles + perm assign | R1 | PARTIAL | catalog page | roles + permissions | roles/maps | roles.* | role specs | FE keys 31 vs 36 | SA-P0-03 |
+| Roles + perm assign | R1 | COMPLETE* | catalog page (API-driven 36) | roles + permissions | roles/maps | roles.* | role specs | *Return-policy FE UI deferred SA-P1-04; static FE keys remain guarded subset (31) | — |
 | Settings | R1 | COMPLETE | system settings | GET/PUT settings | platform_settings | settings.* | settings specs | — | — |
 | Billing issue/mark-paid | R1 | COMPLETE* | billing page | BillingController | invoices | billing.view/manage | billing suite | *within scoped ops | — |
 | Payment links | R1? | DATABASE_ONLY | none | none | `subscription_payment_links` | billing.manage reserved | — | API+UI or defer | SA-P1-02 |
@@ -85,7 +85,7 @@ See [[SA-P0-02_Dashboard_Attention_Count_Fix]].
 | Return policy | no endpoints | full CRUD | BACKEND_ONLY |
 | Payment links | none | entity only | DATABASE_ONLY |
 | Domains | none | table only | DATABASE_ONLY |
-| Perm keys | 31 codes | 36 codes | Guard/menu gap for return-policy |
+| Perm keys | guarded UI 31 | assignable 36 | Static FE keys are UI-guard subset; role form uses catalogue API — [[Platform_Admin_Permission_Catalogue_Alignment]] |
 | Plan reactivate | **wired** | POST reactivate | Prior gap doc stale |
 
 ---
@@ -95,7 +95,7 @@ See [[SA-P0-02_Dashboard_Attention_Count_Fix]].
 | File | Claim | Actual | Severity |
 |---|---|---|---|
 | `Platform_Billing_UI_Implementation_Status.md` | RELEASE READY | Issue/mark-paid only; links deferred | P1 |
-| `Permission_Code_List` / Role Mgmt | 36 codes | BE 36; FE keys 31 | P1 |
+| `Permission_Code_List` / Role Mgmt | 36 codes | BE 36 assignable; FE guarded UI 31; role UI loads 36 from API | Resolved — not a P0 |
 | `Full_Feature_Status_Index.md` | Angular tenant In Progress | Wired complete | P2 |
 | `ADR_006` | Ecommerce → R2 (empty Draft) | Out of SA; conflicts MVP scope | P1 (planning) |
 | `Platform_Admin_UI_Rules` | Wizard includes domain | No domain step/API | P2 |
@@ -108,5 +108,6 @@ See [[SA-P0-02_Dashboard_Attention_Count_Fix]].
 - [[Super_Admin_Current_Status_Audit]]
 - [[SA-P0-01_Tenant_Wizard_Field_Persistence_Fix]]
 - [[SA-P0-02_Dashboard_Attention_Count_Fix]]
+- [[Platform_Admin_Permission_Catalogue_Alignment]]
 - `PlatformPermissionCodes.cs`, `permission-keys.ts`
 - `PlatformDashboardRepository.cs`, `platform-tenant-create.mapper.ts`
