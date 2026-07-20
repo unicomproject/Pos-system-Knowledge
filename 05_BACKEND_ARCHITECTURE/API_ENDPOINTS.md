@@ -600,6 +600,27 @@ All endpoints require platform JWT authentication (`PlatformOnly` policy).
 | POST | `/api/v1/platform-admin/users` | `platform.users.create` | Create platform user invite |
 | PUT | `/api/v1/platform-admin/users/{userId}` | `platform.users.update` | Update platform user status |
 | PUT | `/api/v1/platform-admin/users/{userId}/roles` | `platform.users.roles.assign` | Replace assigned platform roles |
+| POST | `/api/v1/platform-admin/users/{userId}/password-reset` | `platform.users.update` | Initiate admin password reset; returns `resetUrl` (`admin_secure_link`) |
+
+## Initiate password reset response shape
+
+No request body. Legacy envelope wraps `InitiatePlatformPasswordResetResponse`:
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": "guid",
+    "email": "staff@nytroz.local",
+    "expiresAt": "2026-07-20T13:00:00Z",
+    "deliveryMode": "admin_secure_link",
+    "resetUrl": "https://admin.example/reset-password?token=...",
+    "message": "Copy this secure link and share it with the user through your approved channel."
+  }
+}
+```
+
+Eligible targets: `ACTIVE` or `LOCKED` with password set; not invite-pending, inactive, or deleted. Prior pending tokens revoked on new initiate. See [[../03_USER_JOURNEYS/Platform_Admin/17_Platform_User_Password_Reset_Flow]].
 
 ## List response shape
 
@@ -671,7 +692,55 @@ Role options for Angular create/edit must come from `GET /api/v1/platform-admin/
 |---|---|---|
 | `/admin/platform-users` | `platform.users.view` | `PlatformUsersPage` |
 
-Frontend tests (2026-07-03): `platform-users-page.spec.ts`, `platform-user-api.service.spec.ts`.
+Frontend tests (2026-07-03): `platform-users-page.spec.ts`, `platform-user-api.service.spec.ts`. Password reset UI/API tests added 2026-07-20 (SA-P1-06).
+
+---
+
+# Platform Auth Password Reset API Endpoints
+
+Controllers: `PlatformPasswordResetController` (canonical), `PlatformPasswordResetLegacyController` (legacy envelope under `/api/v1/auth`).
+
+Public endpoints — `[AllowAnonymous]` with auth login rate limiting.
+
+| Method | Route | Auth | Purpose |
+|---|---|---|---|
+| POST | `/api/v1/platform-auth/password-reset/validate` | Anonymous + rate limit | Validate one-time reset token; returns `{ isValid, status, expiresAt }` |
+| POST | `/api/v1/platform-auth/password-reset/complete` | Anonymous + rate limit | Set new password; revokes sessions on success |
+| POST | `/api/v1/auth/platform-password-reset/validate` | Anonymous + rate limit | Legacy alias (legacy API envelope) |
+| POST | `/api/v1/auth/platform-password-reset/complete` | Anonymous + rate limit | Legacy alias (legacy API envelope) |
+
+## Validate request / response
+
+```json
+{ "token": "raw-one-time-token" }
+```
+
+```json
+{ "isValid": true, "status": "PENDING", "expiresAt": "2026-07-20T13:00:00Z" }
+```
+
+Status values: `PENDING`, `USED`, `EXPIRED`, `REVOKED`, `INVALID`.
+
+## Complete request / response
+
+```json
+{
+  "token": "raw-one-time-token",
+  "newPassword": "NewPass123",
+  "confirmPassword": "NewPass123"
+}
+```
+
+```json
+{
+  "success": true,
+  "message": "Password has been reset successfully. Sign in with your new password."
+}
+```
+
+Token hash-only storage (HMAC via `ITokenHashService`); 1-hour TTL; prior pending tokens revoked on initiate. Audit: `PLATFORM_USER_PASSWORD_RESET_*`, `PLATFORM_USER_SESSIONS_REVOKED` on `platform_login_audits`.
+
+Evidence: [[../15_IMPLEMENTATION_TRACKING/Backend/Auth/SA-P1-06_Platform_Admin_User_Password_Reset_Implementation]].
 
 ---
 
