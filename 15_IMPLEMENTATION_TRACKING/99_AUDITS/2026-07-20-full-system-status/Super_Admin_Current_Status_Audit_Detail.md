@@ -1,0 +1,98 @@
+<!-- title: Super Admin Current Status Audit Detail -->
+<!-- status: Active -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-20 -->
+
+# Super Admin Audit Detail (Matrix, Gaps, SB)
+
+Companion to [[Super_Admin_Current_Status_Audit]]. Fix branch bases: FE `7eec3ad`, BE `f8cf0b3`. SA-P0-01 evidence: [[SA-P0-01_Tenant_Wizard_Field_Persistence_Fix]].
+
+## 2–7. Feature status matrix
+
+| Feature | Scope | Status | FE | BE | DB | Perm | Tests | Missing | Next |
+|---|---|---|---|---|---|---|---|---|---|
+| Platform login/refresh/logout | R1 | COMPLETE | `AuthApiService` `/auth/platform-*` | `PlatformAuthLegacyController` | sessions/tokens | PlatformOnly | auth specs + ApiTests | Forgot-password | — |
+| Guards / 401 refresh | R1 | COMPLETE | auth/permission guards; interceptor | JWT + session validator | sessions | codes on routes | guard specs | — | — |
+| Dashboard | R1 | PARTIAL / BROKEN metrics | `PlatformDashboardPage` | `GET …/dashboard` | real aggregates | `dashboard.view` | dashboard specs | Fix UNKNOWN + attention swap | SA-P0-02 |
+| Tenant list/filter/page | R1 | COMPLETE | list page + API | TenantsController | tenants | `tenants.view` | tenant specs | — | — |
+| Tenant detail/edit | R1 | COMPLETE | detail page | GET/PUT tenants | tenant/profile | view/update | specs | — | — |
+| Create tenant wizard | R1 | PARTIAL | 7 steps create page | wizard write txn; locale/mode/type/country mapped | `tenants.default_locale`/`operating_mode`; profile business type; address country | `tenants.create` | wizard + mapper + validator + repo tests | Optional outlet/till/domain steps; live migration apply | SA-P2-02 |
+| Activate/Suspend | R1 | COMPLETE | buttons + API | POST activate/suspend | status | activate/suspend | specs | — | — |
+| Soft-delete / status history | R1 | NOT_STARTED | none | none | — | — | — | Design + API | SA-P1-07 |
+| Entitlements update | R1 | COMPLETE | detail entitlements | PUT entitlements | `TenantFeatureEntitlement` | entitlements.update | specs | — | — |
+| Subscription plans lifecycle | R1 | COMPLETE | list/create/detail | PlansController + reactivate | plans | subscription_plans.* | plan specs | — | — |
+| Modules catalog | R1 | COMPLETE (read) | modules page | GET catalog/modules | modules/features | modules.view | specs | Mutations N/A | — |
+| Platform users | R1 | PARTIAL | users page | users CRUD/roles | platform_users | users.* | user specs | Reset password; rich edit | SA-P1-06 |
+| Roles + perm assign | R1 | PARTIAL | catalog page | roles + permissions | roles/maps | roles.* | role specs | FE keys 31 vs 36 | SA-P0-03 |
+| Settings | R1 | COMPLETE | system settings | GET/PUT settings | platform_settings | settings.* | settings specs | — | — |
+| Billing issue/mark-paid | R1 | COMPLETE* | billing page | BillingController | invoices | billing.view/manage | billing suite | *within scoped ops | — |
+| Payment links | R1? | DATABASE_ONLY | none | none | `subscription_payment_links` | billing.manage reserved | — | API+UI or defer | SA-P1-02 |
+| Domain/SSL | R1 | DATABASE_ONLY | none | none | `tenant_domains` | — | — | API+UI | SA-P1-03 |
+| Audit logs | R1 | PARTIAL | audit page | audit-logs | login_audits | audit.view | specs | Business audit | SA-P1-05 |
+| Platform reports/alerts | R1 | STUB | `AdminSectionPage` | none | — | dashboard.view | — | Real API or hide | SA-P1-01 |
+| Return policy templates | R1 | BACKEND_ONLY | none | return-policy-templates CRUD | templates | return_policy.* (BE) | ApiTests | FE + keys | SA-P1-04 |
+| Modern `/platform-auth` | — | BACKEND_ONLY | unused | PlatformAuthController | — | — | ApiTests | Adopt or doc legacy-only | SA-P2-01 |
+
+\*Billing Phase docs claim RELEASE READY; payment-link/auto-suspend excluded — treat scoped COMPLETE, not full billing product.
+
+### Stub routes (`admin.routes.ts`)
+
+`/admin/outlets`, `tills-devices`, `products`, `alerts`, `reports`, and `tenant/:id/{outlets,tills,users,roles-permissions,settings}` → `AdminSectionPage` L14–17.
+
+### Wizard FE→BE field persistence (SA-P0-01)
+
+| Field | Persist target | Notes |
+|---|---|---|
+| `defaultLocale` | `tenants.default_locale` | Nullable; catalogue-validated; returned on detail/list |
+| `operatingMode` | `tenants.operating_mode` | `unified_epos` / `pos_online_store` / `pos_only` |
+| `businessType` | `tenant_profiles.business_type_id` | Resolved from active `business_types.business_code` |
+| `countryCode` | `tenant_addresses.country_code` | Top-level and/or `address.countryCode`; no hardcoded country default |
+
+Update omits locale/mode when those properties are null so unrelated edits do not wipe values.
+
+**Local Development DB migration apply:** verified on `UnifiedCommerceDb` @ localhost (2026-07-20). **Production DB:** not applied in this task.
+
+Country write-path:
+
+- Matching top-level + address country → one primary address
+- Top-level country only → creates primary REGISTERED address
+- Conflicting codes → validation failure on both fields
+
+See [[SA-P0-01_Tenant_Wizard_Field_Persistence_Fix]].
+
+---
+
+## 8. API contract gaps
+
+| Gap | FE | BE | Issue |
+|---|---|---|---|
+| Dual auth | `/auth/platform-*` | also `/platform-auth/*` | FE legacy only |
+| Dead constant | `features: '/features'` | no controller | Unused |
+| Flat catalog | constant unused | GET `…/flat` exists | Unused FE |
+| Return policy | no endpoints | full CRUD | BACKEND_ONLY |
+| Payment links | none | entity only | DATABASE_ONLY |
+| Domains | none | table only | DATABASE_ONLY |
+| Perm keys | 31 codes | 36 codes | Guard/menu gap for return-policy |
+| Plan reactivate | **wired** | POST reactivate | Prior gap doc stale |
+
+---
+
+## 9. Second Brain conflicts
+
+| File | Claim | Actual | Severity |
+|---|---|---|---|
+| `Platform_Billing_UI_Implementation_Status.md` | RELEASE READY | Issue/mark-paid only; links deferred | P1 |
+| `Permission_Code_List` / Role Mgmt | 36 codes | BE 36; FE keys 31 | P1 |
+| `Full_Feature_Status_Index.md` | Angular tenant In Progress | Wired complete | P2 |
+| `ADR_006` | Ecommerce → R2 (empty Draft) | Out of SA; conflicts MVP scope | P1 (planning) |
+| `Platform_Admin_UI_Rules` | Wizard includes domain | No domain step/API | P2 |
+| Jul-20 `01_Super_Admin_Feature_Status` | Reports stub; domains NS | Matches | OK |
+
+---
+
+## Related Files
+
+- [[Super_Admin_Current_Status_Audit]]
+- [[SA-P0-01_Tenant_Wizard_Field_Persistence_Fix]]
+- `PlatformPermissionCodes.cs`, `permission-keys.ts`
+- `PlatformDashboardRepository.cs`, `platform-tenant-create.mapper.ts`

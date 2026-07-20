@@ -1,7 +1,7 @@
 <!-- title: Platform Tenant Create Wizard Alignment -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-03 -->
+<!-- last_updated: 2026-07-20 -->
 
 # Platform Tenant Create Wizard Alignment
 
@@ -9,7 +9,7 @@
 
 | Uploaded Super Admin step | Angular route step | Backend endpoint / tables |
 |---|---|---|
-| Business Information | 1 | `POST /tenants` basics + `tenant_profiles` + `tenant_addresses` |
+| Business Information | 1 | `POST /tenants` basics + `tenant_profiles` + `tenant_addresses` + `tenants.default_locale` / `operating_mode` |
 | Plan Selection | 2 | `subscriptionPlanId` → `tenant_subscriptions` |
 | Limits & Add-ons | 3 | `limits` overrides + `tenant_subscription_addons` |
 | Feature Entitlements | 4 | `enabledFeatureIds/Codes` → `tenant_feature_entitlements` |
@@ -35,10 +35,13 @@ Dropdowns bind to lookup `value` (API code), not `label` (display text).
 
 | UI field | Label example | Posted JSON value | DB column |
 |---|---|---|---|
-| Country | Sri Lanka | `countryCode: "LK"` | `tenant_profiles.country_code` char(2) |
+| Country | Sri Lanka | `countryCode: "LK"` | `tenant_addresses.country_code` char(2) |
 | Address country | Sri Lanka | `address.countryCode: "LK"` | `tenant_addresses.country_code` char(2) |
-| Currency | LKR - Sri Lankan Rupee | `baseCurrency: "LKR"` | `tenants.base_currency` char(3) |
-| Billing status | Pending | `billingStatus: "pending"` | `tenants.billing_status` |
+| Locale | English (United Kingdom) | `defaultLocale: "en-GB"` | `tenants.default_locale` varchar(20) |
+| Operating mode | POS Only | `operatingMode: "pos_only"` | `tenants.operating_mode` varchar(40) |
+| Business type | Retail | `businessType: "retail"` | `tenant_profiles.business_type_id` → `business_types` |
+| Currency | LKR - Sri Lankan Rupee | `baseCurrency: "LKR"` | `tenants.base_currency_code` char(3) |
+| Billing status | Pending | `billingStatus: "pending"` | billing fields on subscription / tenant billing status |
 | Subscription status | Trial | `subscription.subscriptionStatus: "trial"` | `tenant_subscriptions.subscription_status` |
 | Payment method | Manual | `subscription.paymentMethod: "manual"` | subscription billing fields |
 
@@ -118,34 +121,31 @@ Backend model: `ApplicationError.ValidationFailed` with `ApplicationFieldError(F
 | `countryCode` | business country |
 | `address.countryCode` | address country |
 | `baseCurrency` | currency |
-| `billingStatus` | billing status |
-| `subscription.subscriptionStatus` | subscription status |
-| `subscription.paymentMethod` | payment method |
-| `tenantAdmin.email` | tenant admin email |
+| `defaultLocale` | locale |
+| `operatingMode` | operating mode |
 
-Raw PostgreSQL/Npgsql messages must not be shown; `isRawDatabaseMessage` replaces them with a safe summary.
+## SA-P0-01 verification (2026-07-20)
 
-## Deferred (not fake in UI)
+See [[SA-P0-01_Tenant_Wizard_Field_Persistence_Fix]].
 
-- Real invite email delivery
-- Payment gateway / live payment links
-- Post-create outlet/till/product onboarding inside wizard
-- Generic audit log table (login audits only exist today)
+- Branches: BE/FE `fix/platform-admin-tenant-wizard-field-persistence`; docs `docs/platform-admin-tenant-wizard-persistence-verification`
+- Migration: `20260720053000_AddTenantLocaleOperatingModeColumns` applied to local Development `UnifiedCommerceDb` (nullable columns). Production not applied.
+- Country rules: equal codes OK; top-level-only creates primary address; conflicting codes rejected.
+- Runtime: create `en-GB` / `pos_only` / `retail` / `GB` → details + name-only update + reload preserved values; DB matched.
+- Status: **COMPLETE**
 
-## Source Files (implementation)
+## Source file anchors
 
 ### Backend (Unified-Commerce)
 
-- `src/E_POS.Api/Controllers/PlatformAdminTenantsController.cs`
-- `src/E_POS.Application/Modules/PlatformAdministration/Services/PlatformTenantService.Wizard.cs`
-- `src/E_POS.Application/Modules/PlatformAdministration/Validators/PlatformTenantCreateRequestValidator.cs`
-- `src/E_POS.Application/Modules/PlatformAdministration/Dtos/PlatformTenantCreateOptionsDtos.cs`
-- `src/E_POS.Application/Modules/PlatformAdministration/Dtos/PlatformTenantCreateWizardDtos.cs`
-- `src/E_POS.Application/Modules/PlatformAdministration/Dtos/PlatformTenantMutationDtos.cs`
-- `src/E_POS.Application/Common/Models/ApplicationError.cs`, `ApplicationFieldError.cs`
-- `src/E_POS.Infrastructure/Modules/PlatformAdministration/Repositories/PlatformTenantRepository.Wizard.cs`
+- `src/E_POS.Application/Modules/Platform/PlatformAdmin/Services/PlatformTenantService.Wizard.cs`
+- `src/E_POS.Application/Modules/Platform/PlatformAdmin/Validators/PlatformTenantCreateRequestValidator.cs`
+- `src/E_POS.Domain/Modules/Tenant/TenantFoundation/Entities/Tenant.cs`
+- `src/E_POS.Infrastructure/Modules/Tenant/TenantFoundation/Configurations/TenantConfiguration.cs`
+- `src/E_POS.Infrastructure/Persistence/Migrations/20260720053000_AddTenantLocaleOperatingModeColumns.cs`
 - `tests/E_POS.UnitTests/PlatformAdministration/PlatformTenantCreateRequestValidatorTests.cs`
 - `tests/E_POS.UnitTests/PlatformAdministration/PlatformTenantWizardServiceTests.cs`
+- `tests/E_POS.IntegrationTests/PlatformAdministration/PlatformTenantRepositoryTests.cs`
 
 ### Frontend (nytroz-pos-platform-admin)
 
@@ -155,15 +155,3 @@ Raw PostgreSQL/Npgsql messages must not be shown; `isRawDatabaseMessage` replace
 - `src/app/features/admin/validators/platform-tenant-create.validators.ts`
 - `src/app/core/services/api-error.service.ts`
 - `src/app/features/admin/services/platform-tenant-api.service.ts`
-
-## Branches (pre-commit)
-
-- Angular: `feat/platform-tenant-create-wizard-ui`
-- Backend: `feat/platform-tenant-create-wizard-support`
-- Docs: `docs/platform-tenant-create-wizard-alignment`
-
-## Verification (2026-07-03)
-
-- Backend `dotnet test`: **266/266 passed** (136 unit + 81 API + 49 integration)
-- Frontend `npm test -- --watch=false`: **158/158 passed**
-- Frontend `npm run build`: passed (style budget warnings only)

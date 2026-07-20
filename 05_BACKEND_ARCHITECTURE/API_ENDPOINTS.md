@@ -270,13 +270,29 @@ Wizard path is selected when the request includes wizard-only blocks (`tenantAdm
 
 | Field | Rule | Example valid | Example invalid |
 |---|---|---|---|
-| `countryCode` | Exactly 2 letters when present | `LK` | `Sri Lanka` |
-| `address.countryCode` | Exactly 2 letters when present | `LK` | `Sri Lanka` |
+| `countryCode` | Exactly 2 letters and in create-options catalogue when present | `LK` | `Sri Lanka`, unsupported ISO |
+| `address.countryCode` | Exactly 2 letters and in create-options catalogue when present | `LK` | `Sri Lanka` |
 | `baseCurrency` | Exactly 3 letters when present | `LKR` | `LK` |
+| `defaultLocale` | Create-options locale catalogue when present | `en-LK`, `en-GB` | `xx-YY` |
+| `operatingMode` | `unified_epos`, `pos_online_store`, `pos_only` when present | `pos_only` | `STANDARD` |
+| `businessType` | Active `business_types.business_code` when present (service resolve) | `retail` | unknown code |
 | `billingStatus` | One of allowed billing statuses | `pending` | `trial` |
 | `subscription.subscriptionStatus` | Valid subscription lifecycle value | `trial` | (empty when subscription block sent) |
 | `subscription.paymentMethod` | One of seeded payment methods | `manual`, `bank_transfer` | `pending` |
 | `tenantAdmin.email` | Required valid email when `tenantAdmin` block sent | `admin@tenant.com` | `not-an-email` |
+
+Persistence (wizard create):
+
+| Request field | Column / join |
+|---|---|
+| `defaultLocale` | `tenants.default_locale` |
+| `operatingMode` | `tenants.operating_mode` |
+| `businessType` | `tenant_profiles.business_type_id` → `business_types` |
+| `countryCode` / `address.countryCode` | `tenant_addresses.country_code` |
+
+Country consistency: when both top-level and `address.countryCode` are present they must match; top-level-only country creates a primary REGISTERED address so country is not silently dropped.
+
+`PUT /api/v1/platform-admin/tenants/{id}` validates `defaultLocale` / `operatingMode` when sent; omitted values are not cleared.
 
 Validation failure response shape:
 
