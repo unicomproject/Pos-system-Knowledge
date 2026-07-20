@@ -30,6 +30,7 @@ The deck labels the actor as `Super Admin`, but the Second Brain should use `Pla
 13. Platform User Management Flow.
 14. Audit Logs Flow.
 15. System Settings Flow.
+16. Return Policy Template Management Flow — [[SA-P1-04_Return_Policy_Template_UI_Implementation]].
 
 ## Scope Alignment
 
