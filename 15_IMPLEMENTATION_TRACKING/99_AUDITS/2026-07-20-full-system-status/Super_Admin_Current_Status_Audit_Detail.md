@@ -26,7 +26,7 @@ Companion to [[Super_Admin_Current_Status_Audit]]. SA-P0-01: [[SA-P0-01_Tenant_W
 | Roles + perm assign | R1 | COMPLETE | catalog page (API-driven 36) + return-policy static keys | roles + permissions | roles/maps | roles.* + return_policy.* | role + permission-keys specs | — | — |
 | Settings | R1 | COMPLETE | system settings | GET/PUT settings | platform_settings | settings.* | settings specs | — | — |
 | Billing issue/mark-paid | R1 | COMPLETE* | billing page | BillingController | invoices | billing.view/manage | billing suite | *within scoped ops | — |
-| Payment links | R1? | DATABASE_ONLY | none | none | `subscription_payment_links` | billing.manage reserved | — | API+UI or defer | SA-P1-02 |
+| Payment links | R2 (deferred) | DATABASE_ONLY | none | entity only | `subscription_payment_links` | billing.manage reserved | domain tests | Release 2 gateway/API/UI | [[SA-P1_Payment_Links_Scope_And_Readiness_Decision]] |
 | Domain/SSL | R1 | DATABASE_ONLY | none | none | `tenant_domains` | — | — | API+UI | SA-P1-03 |
 | Audit logs | R1 | PARTIAL | audit page | audit-logs | login_audits | audit.view | specs | Business audit | SA-P1-05 |
 | Platform reports/alerts | R1 | OUT_OF_SCOPE (nav) | removed from menu | none | — | — | — | Future platform product | Hidden until implemented |
