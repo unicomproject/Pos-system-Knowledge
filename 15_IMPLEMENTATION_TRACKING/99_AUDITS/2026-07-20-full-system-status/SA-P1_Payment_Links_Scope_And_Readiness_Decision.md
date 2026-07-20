@@ -1,13 +1,17 @@
 <!-- title: SA-P1 Payment Links Scope And Readiness Decision -->
-<!-- status: Active -->
+<!-- status: Superseded -->
+<!-- superseded_by: SA-P1_Payment_Links_Release_1_Scope_And_Sequencing -->
+<!-- superseded_date: 2026-07-20 -->
 <!-- system: TM-EPOS MVP -->
 <!-- last_updated: 2026-07-20 -->
 
 # SA-P1 — Platform Admin Payment Links Scope And Readiness Decision
 
-## Final decision
+> **SUPERSEDED (2026-07-20):** Release 2 deferral reversed. Payment Links are **Release 1 mandatory** but scheduled as the **final major Super Admin feature**. Current decision: [[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]]. Technical readiness findings below are preserved.
 
-**OPTION B — FORMALLY DEFER TO RELEASE 2**
+## Final decision (historical)
+
+**OPTION B — FORMALLY DEFER TO RELEASE 2** *(superseded)*
 
 Payment Links must **not** be implemented as a Release 1 MVP. The approved Release 1 Platform Admin billing journey is **Issue Invoice + Mark Paid** (operator-side settlement). Customer-facing payment-link collection is Release 2 pending gateway, webhook, and public-payment foundations.
 
@@ -197,10 +201,11 @@ Second Brain only — no frontend/backend application commits.
 
 ## Next recommended development item
 
-**Domain readiness (white-label / tenant domains)** or **Platform user password reset** — per open P1 list. Payment links implementation should wait for Release 2 gateway/product approval.
+**Domain readiness (white-label / tenant domains)** or **Platform user password reset** — per open P1 list. Payment links: **after** remaining non-payment P1 gaps — see [[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]].
 
 ## Related
 
+- [[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]] (current)
 - [[04_Platform_Billing_Functional_Specification]]
 - [[10_Billing_Flow]]
 - [[Platform_Billing_UI_Implementation_Status]]

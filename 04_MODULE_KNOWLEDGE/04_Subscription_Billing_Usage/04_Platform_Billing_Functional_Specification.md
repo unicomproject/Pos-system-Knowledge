@@ -126,7 +126,7 @@ The UI must not offer these actions.
 | Mark existing pending invoice fully paid | Current Implemented Scope |
 | New invoice creation | Unsupported in Current Platform Billing API |
 | Partial payment, overpayment, cancel, void | Unsupported in Current Platform Billing API |
-| Payment links, reminders, automated collections | Planned Future Scope |
+| Payment links, reminders, automated collections | Release 1 mandatory (links) — **not yet implemented**; reminders/collections later |
 | Subscription upgrade/downgrade/renewal/expiry | Planned Future Scope |
 | Billing-driven tenant suspension/activation workflow | Planned Future Scope |
 | Credit-note administration UI | Planned Future Scope |
@@ -139,4 +139,5 @@ implemented behaviour.
 - [[05_BACKEND_ARCHITECTURE/Platform_Billing_API_Contract]]
 - [[07_UI_UX_KNOWLEDGE/Platform_Admin_Billing_UI]]
 - [[15_IMPLEMENTATION_TRACKING/Angular/Billing/Platform_Billing_UI_Implementation_Status]]
-- [[03_Technical_Contract]]
+- [[15_IMPLEMENTATION_TRACKING/Angular/Billing/Payment_Links_Implementation_Readiness_Checklist]]
+- [[15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-07-20-full-system-status/SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]]

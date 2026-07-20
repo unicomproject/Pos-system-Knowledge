@@ -12,7 +12,7 @@
 
 1. Fix P0 data-loss and planning-doc blockers.
 2. Stand up e-commerce frontend against existing storefront APIs.
-3. Complete Super Admin billing collection gap **or** formally scope it out.
+3. Complete remaining Super Admin non-payment P1 gaps; then Payment Links (final major SA feature).
 4. Replace Super Admin stub reports / domain gaps.
 5. Close Cashier non-cash and Tenant inventory placeholders.
 
@@ -59,18 +59,17 @@
 | SB updates | E-commerce journeys; implementation tracking |
 | Excluded | Wishlist/reviews polish; delivery |
 
-## Work item 4 — Platform payment links (or explicit deferral)
+## Work item 4 — Platform payment links — **RELEASE 1 MANDATORY — PLANNED LAST**
 
 | Field | Value |
 |---|---|
-| Priority | P1 |
-| Branch | `feature/platform-billing-payment-links` **or** `docs/defer-payment-links` |
-| Scope | If in R1: Application service + controller + Angular actions. If not: SB OUT_OF_SCOPE note only |
-| Repos | Backend ± Platform Admin ± SB |
-| Dependencies | Existing `SubscriptionPaymentLink` entity |
-| Acceptance | Create/list/revoke link; or documented deferral with no UI affordance |
-| Tests | ApiTests + Angular service specs |
-| Excluded | Provider webhook automation, auto-suspend |
+| Priority | P1 (mandatory R1; implement last among Super Admin features) |
+| Branch | `docs/platform-payment-links-planned-last` (sequencing); implement: `feature/platform-billing-payment-links` |
+| Scope | PayHere gateway + webhook + public pay + Platform Admin API/UI |
+| Decision | [[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]] |
+| Prerequisite | Remaining non-payment Super Admin P1 gaps |
+| Current alternative | Issue Invoice + Mark Paid (Release Ready) |
+| Readiness | [[Payment_Links_Implementation_Readiness_Checklist]] |
 
 ## Work item 5 — Super Admin reports read API + UI
 
@@ -107,10 +106,9 @@
 
 ## Safe Super Admin-only order (if ecommerce owned elsewhere)
 
-1. Docs deferral/payment-links decision (item 4).  
-2. Platform reports (item 5).  
-3. Tenant reactivate/domain (item 6).  
-4. Remove or hide misleading `AdminSectionPage` nav items for outlets/products (ops live in Flutter).
+1. Close non-payment Super Admin P1 gaps (domains, password reset, audit, docs).  
+2. Platform reports (item 5) if still required.  
+3. **Payment Links** (item 4) — final major Super Admin feature.
 
 ## Related Files
 

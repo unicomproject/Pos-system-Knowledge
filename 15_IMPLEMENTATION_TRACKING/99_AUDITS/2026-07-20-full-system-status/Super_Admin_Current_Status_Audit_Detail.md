@@ -26,14 +26,14 @@ Companion to [[Super_Admin_Current_Status_Audit]]. SA-P0-01: [[SA-P0-01_Tenant_W
 | Roles + perm assign | R1 | COMPLETE | catalog page (API-driven 36) + return-policy static keys | roles + permissions | roles/maps | roles.* + return_policy.* | role + permission-keys specs | — | — |
 | Settings | R1 | COMPLETE | system settings | GET/PUT settings | platform_settings | settings.* | settings specs | — | — |
 | Billing issue/mark-paid | R1 | COMPLETE* | billing page | BillingController | invoices | billing.view/manage | billing suite | *within scoped ops | — |
-| Payment links | R2 (deferred) | DATABASE_ONLY | none | entity only | `subscription_payment_links` | billing.manage reserved | domain tests | Release 2 gateway/API/UI | [[SA-P1_Payment_Links_Scope_And_Readiness_Decision]] |
+| Payment links | R1 (mandatory) | DATABASE_ONLY | none | entity only | `subscription_payment_links` | billing.manage reserved | domain tests | PayHere API/UI/webhook/public page | [[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]] |
 | Domain/SSL | R1 | DATABASE_ONLY | none | none | `tenant_domains` | — | — | API+UI | SA-P1-03 |
 | Audit logs | R1 | PARTIAL | audit page | audit-logs | login_audits | audit.view | specs | Business audit | SA-P1-05 |
 | Platform reports/alerts | R1 | OUT_OF_SCOPE (nav) | removed from menu | none | — | — | — | Future platform product | Hidden until implemented |
 | Return policy templates | R1 | COMPLETE | list/create/detail pages + API service | return-policy-templates CRUD | templates | return_policy.* | ApiTests + Angular specs | — | — |
 | Modern `/platform-auth` | — | BACKEND_ONLY | unused | PlatformAuthController | — | — | ApiTests | Adopt or doc legacy-only | SA-P2-01 |
 
-\*Billing Phase docs claim RELEASE READY; payment-link/auto-suspend excluded — treat scoped COMPLETE, not full billing product.
+\*Billing Phase docs claim RELEASE READY for issue/mark-paid; payment links mandatory R1 but not started — treat billing issue/mark-paid as scoped COMPLETE.
 
 ### Navigation cleanup (SA-P1-02)
 
@@ -93,7 +93,7 @@ See [[SA-P0-02_Dashboard_Attention_Count_Fix]].
 
 | File | Claim | Actual | Severity |
 |---|---|---|---|
-| `Platform_Billing_UI_Implementation_Status.md` | RELEASE READY | Issue/mark-paid only; links deferred | P1 |
+| `Platform_Billing_UI_Implementation_Status.md` | RELEASE READY | Issue/mark-paid only; payment links R1 planned last | P1 |
 | `Permission_Code_List` / Role Mgmt | 36 codes | BE 36 assignable; FE guarded UI 31; role UI loads 36 from API | Resolved — not a P0 |
 | `Full_Feature_Status_Index.md` | Angular tenant In Progress | Wired complete | P2 |
 | `ADR_006` | Ecommerce → R2 (empty Draft) | Out of SA; conflicts MVP scope | P1 (planning) |

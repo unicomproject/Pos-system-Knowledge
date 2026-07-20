@@ -1,7 +1,7 @@
 <!-- title: Included Features -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-20 -->
 
 
 # Included Features
@@ -36,13 +36,15 @@ in other EPOS or e-commerce products.
 
 Included: platform admin login and dashboard, tenant creation/profile/address,
 subscription plan assignment, billing summary with issue-invoice and mark-paid
-(settlement), feature entitlement, tenant admin creation, initial
+(settlement), **Payment Links for eligible subscription invoices (PayHere —
+final major Super Admin feature)**, feature entitlement, tenant admin creation, initial
 outlet/till/user/role/product setup support, tenant activation/status control,
 and audit visibility.
 
-**Payment link customer collection** is **Release 2** schema preparation only
-until gateway and public-payment flow are approved. See
-[[SA-P1_Payment_Links_Scope_And_Readiness_Decision]].
+**Payment link customer collection** is **Release 1 mandatory** but
+**not yet implemented** — database schema prepared; Application/API/UI/PayHere/webhook
+pending after remaining non-payment Super Admin gaps. See
+[[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]].
 
 ## Business Admin
 
