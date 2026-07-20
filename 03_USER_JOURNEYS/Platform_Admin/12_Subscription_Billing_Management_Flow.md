@@ -1,7 +1,7 @@
 <!-- title: Subscription And Billing Management Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-17 -->
+<!-- last_updated: 2026-07-20 -->
 
 # Subscription And Billing Management Flow
 
@@ -129,8 +129,7 @@ Keep clearly separate from current Billing completion:
 - Void invoice
 - Overpayment
 - Refund
-- Payment gateway reconciliation
-- Payment links
+- Payment gateway reconciliation (beyond PayHere Payment Links MVP)
 - Automated reminders
 - Auto-suspension
 - Adjusting plan, add-ons, trial, demo, renewal, or expiry from Billing
@@ -158,7 +157,8 @@ part of Billing completion.
 
 - Subscription upgrade, downgrade, renewal, expiry, and history workflows.
 - Add-on and trial/demo lifecycle actions.
-- Payment links, reminders, automatic collection, and retry handling.
+- **Payment links (PayHere), public checkout, webhook settlement, revoke, history** — Release 1 mandatory; not yet implemented; final major Super Admin feature. [[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]]
+- Reminders, automatic collection, and retry handling.
 - Cancellation, voiding, credit notes, and partial-payment workflows after their
   backend contracts and audit requirements are approved.
 - Full Platform Admin invite / accept-invite / set-password product flow.

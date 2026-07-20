@@ -80,6 +80,8 @@ Purpose: Stores tenant core account data.
 | `status` | varchar(40) |  | NOT NULL | Original ERD domain: tenant_status |
 | `base_currency_code` | char(3) | FK | NOT NULL | References currencies(currency_code) |
 | `default_timezone` | varchar(80) |  | NOT NULL |  |
+| `default_locale` | varchar(20) |  | NULL | Wizard/create `defaultLocale`; nullable for legacy rows |
+| `operating_mode` | varchar(40) |  | NULL | Catalogue: `unified_epos`, `pos_online_store`, `pos_only` |
 | `data_region` | varchar(50) |  | NULL |  |
 | `activated_at` | timestamptz |  | NULL |  |
 | `suspended_at` | timestamptz |  | NULL |  |

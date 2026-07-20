@@ -1,16 +1,17 @@
 <!-- title: Billing Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-17 -->
+<!-- last_updated: 2026-07-20 -->
 
 # Billing Flow
 
 ## Purpose
 
 Defines the completed Platform Admin Billing journey for read, permission, Issue
-Invoice, and Mark Paid flows against the real Platform Admin Billing API, and
-keeps unsupported reminder, payment-link, activation, and suspension journeys as
-future scope.
+Invoice, and Mark Paid flows against the real Platform Admin Billing API.
+Payment Links are **Release 1 mandatory** but **not yet implemented** — scheduled
+as the final major Super Admin feature. See
+[[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]].
 
 ## Actor
 
@@ -223,7 +224,7 @@ The current UI must not expose these actions.
 
 ## Planned Future Scope
 
-- Payment-link generation and resend.
+- **Payment-link generation, public PayHere checkout, webhook settlement, revoke, and history** — Release 1 mandatory; database prepared; Application/API/UI not started. Final major Super Admin feature after non-payment gaps. Decision: [[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]].
 - Payment reminders and delivery tracking.
 - Failed-payment handling and retry workflows.
 - Policy-driven tenant activation, grace period, and suspension integration.

@@ -3,7 +3,7 @@
 <!-- system: TM-EPOS MVP -->
 <!-- module: CatalogProduct -->
 <!-- feature: Return Policy Templates / Return Policy CRUD -->
-<!-- last_updated: 2026-07-03 -->
+<!-- last_updated: 2026-07-20 -->
 
 # Return Policy Templates / Return Policy CRUD Implementation Status
 
@@ -13,11 +13,12 @@
 |---|---|
 | Feature | Return Policy Templates / Return Policy CRUD |
 | Module | CatalogProduct |
-| Platform | Backend |
+| Platform | Backend + Platform Admin UI |
 | Status | Completed |
-| Completed Date | 2026-07-03 |
+| Backend completed | 2026-07-03 |
+| Platform Admin UI completed | 2026-07-20 |
 | Tests | Passed |
-| PR / Commit | - |
+| Evidence | [[SA-P1-04_Return_Policy_Template_UI_Implementation]] |
 
 ## Implemented Scope
 
@@ -30,7 +31,7 @@
 - Platform permissions: `platform.return_policy_templates.view`, `platform.return_policy_templates.create`, `platform.return_policy_templates.update`, `platform.return_policy_templates.delete`, `platform.return_policy_templates.manage`.
 - Tenant permissions: `catalog.return_policies.view`, `catalog.return_policies.create`, `catalog.return_policies.update`, `catalog.return_policies.delete`, `catalog.return_policies.manage`.
 - Migration seeds platform permissions, tenant permissions, and development role assignments.
-
+- Platform Admin Angular journey: list, create, detail/edit, delete — [[SA-P1-04_Return_Policy_Template_UI_Implementation]].
 ## Not Included
 
 - Product-to-return-policy assignment.

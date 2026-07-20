@@ -67,7 +67,10 @@ Frontend must request permission context from backend.
 Do not duplicate permission definitions in static frontend-only lists except as
 typed constants for compile-time safety.
 
-Typed constants must match backend codes.
+Typed constants must match backend codes **for surfaces the frontend actually
+guards**. Platform Admin role assignment must consume the backend catalogue API
+rather than a static frontend list. Static keys now include return-policy template
+routes and actions (SA-P1-04).
 
 ## Menu Rule
 

@@ -1,7 +1,7 @@
 <!-- title: Platform Billing UI Implementation Status -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-17 -->
+<!-- last_updated: 2026-07-20 -->
 
 # Platform Billing UI Implementation Status
 
@@ -18,8 +18,13 @@ Release Status: Release Ready
 **Final verdict:**
 
 ```text
-BILLING PHASE 6 COMPLETED — RELEASE READY
+BILLING PHASE 6 COMPLETED — RELEASE READY (Issue Invoice + Mark Paid)
 ```
+
+**Release 1 scope note:** Payment Links are mandatory for Release 1 but not yet
+implemented — final major Super Admin feature. Current UI/API cover read, Issue,
+and Mark Paid only. See [[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]] and
+[[Payment_Links_Implementation_Readiness_Checklist]].
 
 ## Current Baseline
 
