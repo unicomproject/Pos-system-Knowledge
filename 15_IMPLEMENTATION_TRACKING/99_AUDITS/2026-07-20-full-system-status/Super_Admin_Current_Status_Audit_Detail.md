@@ -5,7 +5,7 @@
 
 # Super Admin Audit Detail (Matrix, Gaps, SB)
 
-Companion to [[Super_Admin_Current_Status_Audit]]. Fix branch bases: FE `7eec3ad`, BE `f8cf0b3`. SA-P0-01 evidence: [[SA-P0-01_Tenant_Wizard_Field_Persistence_Fix]].
+Companion to [[Super_Admin_Current_Status_Audit]]. SA-P0-01: [[SA-P0-01_Tenant_Wizard_Field_Persistence_Fix]]. SA-P0-02: [[SA-P0-02_Dashboard_Attention_Count_Fix]].
 
 ## 2–7. Feature status matrix
 
@@ -13,7 +13,7 @@ Companion to [[Super_Admin_Current_Status_Audit]]. Fix branch bases: FE `7eec3ad
 |---|---|---|---|---|---|---|---|---|---|
 | Platform login/refresh/logout | R1 | COMPLETE | `AuthApiService` `/auth/platform-*` | `PlatformAuthLegacyController` | sessions/tokens | PlatformOnly | auth specs + ApiTests | Forgot-password | — |
 | Guards / 401 refresh | R1 | COMPLETE | auth/permission guards; interceptor | JWT + session validator | sessions | codes on routes | guard specs | — | — |
-| Dashboard | R1 | PARTIAL / BROKEN metrics | `PlatformDashboardPage` | `GET …/dashboard` | real aggregates | `dashboard.view` | dashboard specs | Fix UNKNOWN + attention swap | SA-P0-02 |
+| Dashboard | R1 | COMPLETE | `PlatformDashboardPage` + attention RouterLinks | `GET …/dashboard` (counts unswapped) | real aggregates | `dashboard.view` | dashboard + repository swap tests | Browser UI pixel verify optional | — |
 | Tenant list/filter/page | R1 | COMPLETE | list page + API | TenantsController | tenants | `tenants.view` | tenant specs | — | — |
 | Tenant detail/edit | R1 | COMPLETE | detail page | GET/PUT tenants | tenant/profile | view/update | specs | — | — |
 | Create tenant wizard | R1 | PARTIAL | 7 steps create page | wizard write txn; locale/mode/type/country mapped | `tenants.default_locale`/`operating_mode`; profile business type; address country | `tenants.create` | wizard + mapper + validator + repo tests | Optional outlet/till/domain steps; live migration apply | SA-P2-02 |
@@ -60,6 +60,19 @@ Country write-path:
 
 See [[SA-P0-01_Tenant_Wizard_Field_Persistence_Fix]].
 
+### Dashboard attention metrics (SA-P0-02)
+
+| Type | Count definition | Card navigation |
+|---|---|---|
+| `suspended_tenants` | Tenant status `suspended` | `/admin/tenants?status=suspended` |
+| `setup_pending` | Tenant status `setup_pending` or `pending_payment` | `/admin/tenants?status=setup_pending` |
+| `past_due_subscriptions` | Subscription status `PAST_DUE` | `/admin/tenants?billingStatus=PAST_DUE` |
+| `pending_billing` | Invoices `PENDING` with `balance_due > 0` | `/admin/billing` |
+
+Root cause was crossed assignment of past-due vs pending-billing counts in `PlatformDashboardRepository`. Alleged dashboard `"UNKNOWN"` billing was unused dead code (removed). FE `itemsRequiringAttention` = sum of attention counts.
+
+See [[SA-P0-02_Dashboard_Attention_Count_Fix]].
+
 ---
 
 ## 8. API contract gaps
@@ -94,5 +107,6 @@ See [[SA-P0-01_Tenant_Wizard_Field_Persistence_Fix]].
 
 - [[Super_Admin_Current_Status_Audit]]
 - [[SA-P0-01_Tenant_Wizard_Field_Persistence_Fix]]
+- [[SA-P0-02_Dashboard_Attention_Count_Fix]]
 - `PlatformPermissionCodes.cs`, `permission-keys.ts`
 - `PlatformDashboardRepository.cs`, `platform-tenant-create.mapper.ts`

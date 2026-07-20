@@ -124,11 +124,28 @@ All endpoints require platform JWT authentication.
 |---|---|---|---|
 | GET | `/api/v1/platform-admin/dashboard` | `platform.dashboard.view` | Load platform dashboard KPIs and attention items |
 
+### Dashboard response contract (attention)
+
+Top-level counts include `totalTenants`, `activeTenants`, `suspendedTenants`, `trialTenants`, subscription totals, `pendingBillingCount`, outlet/till/user totals, `recentTenants`, `attentionItems`, `generatedAt`.
+
+`attentionItems[]` types (authoritative):
+
+| `type` | Count definition |
+|---|---|
+| `suspended_tenants` | Tenants with status `suspended` |
+| `setup_pending` | Tenants with status `setup_pending` or `pending_payment` |
+| `past_due_subscriptions` | Tenant subscriptions with status `PAST_DUE` |
+| `pending_billing` | Subscription invoices with status `PENDING` and `balance_due > 0` |
+
+`pendingBillingCount` must equal the `pending_billing` attention count. SA-P0-02 fixed a crossed assignment between `past_due_subscriptions` and `pending_billing` counts (2026-07-20).
+
 Verification on 2026-07-02:
 
 - Migration `20260618180000_SeedPlatformAdminPermissions` applied.
 - Historical verification on 2026-07-02: login `posunique001@gmail.com` returned 31 platform permissions for `super_administrator`. This is a point-in-time test observation, not the current catalogue size; the authoritative catalogue now contains 36 permission codes (see [[02_ACCESS_CONTROL/Permission_Code_List]]).
 - Dashboard GET returned 200 with valid JWT.
+
+Local re-verify 2026-07-20: dashboard attention counts agreed with PostgreSQL; see [[SA-P0-02_Dashboard_Attention_Count_Fix]].
 
 ---
 
