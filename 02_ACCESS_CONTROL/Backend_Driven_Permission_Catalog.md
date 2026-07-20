@@ -69,8 +69,8 @@ typed constants for compile-time safety.
 
 Typed constants must match backend codes **for surfaces the frontend actually
 guards**. Platform Admin role assignment must consume the backend catalogue API
-rather than a static frontend list. A smaller static key set is acceptable when
-backend-only features have no Angular routes yet (see return-policy templates).
+rather than a static frontend list. Static keys now include return-policy template
+routes and actions (SA-P1-04).
 
 ## Menu Rule
 

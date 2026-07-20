@@ -23,14 +23,14 @@ Companion to [[Super_Admin_Current_Status_Audit]]. SA-P0-01: [[SA-P0-01_Tenant_W
 | Subscription plans lifecycle | R1 | COMPLETE | list/create/detail | PlansController + reactivate | plans | subscription_plans.* | plan specs | — | — |
 | Modules catalog | R1 | COMPLETE (read) | modules page | GET catalog/modules | modules/features | modules.view | specs | Mutations N/A | — |
 | Platform users | R1 | PARTIAL | users page | users CRUD/roles | platform_users | users.* | user specs | Reset password; rich edit | SA-P1-06 |
-| Roles + perm assign | R1 | COMPLETE* | catalog page (API-driven 36) | roles + permissions | roles/maps | roles.* | role specs | *Return-policy FE UI deferred SA-P1-04; static FE keys remain guarded subset (31) | — |
+| Roles + perm assign | R1 | COMPLETE | catalog page (API-driven 36) + return-policy static keys | roles + permissions | roles/maps | roles.* + return_policy.* | role + permission-keys specs | — | — |
 | Settings | R1 | COMPLETE | system settings | GET/PUT settings | platform_settings | settings.* | settings specs | — | — |
 | Billing issue/mark-paid | R1 | COMPLETE* | billing page | BillingController | invoices | billing.view/manage | billing suite | *within scoped ops | — |
 | Payment links | R1? | DATABASE_ONLY | none | none | `subscription_payment_links` | billing.manage reserved | — | API+UI or defer | SA-P1-02 |
 | Domain/SSL | R1 | DATABASE_ONLY | none | none | `tenant_domains` | — | — | API+UI | SA-P1-03 |
 | Audit logs | R1 | PARTIAL | audit page | audit-logs | login_audits | audit.view | specs | Business audit | SA-P1-05 |
 | Platform reports/alerts | R1 | STUB | `AdminSectionPage` | none | — | dashboard.view | — | Real API or hide | SA-P1-01 |
-| Return policy templates | R1 | BACKEND_ONLY | none | return-policy-templates CRUD | templates | return_policy.* (BE) | ApiTests | FE + keys | SA-P1-04 |
+| Return policy templates | R1 | COMPLETE | list/create/detail pages + API service | return-policy-templates CRUD | templates | return_policy.* | ApiTests + Angular specs | — | — |
 | Modern `/platform-auth` | — | BACKEND_ONLY | unused | PlatformAuthController | — | — | ApiTests | Adopt or doc legacy-only | SA-P2-01 |
 
 \*Billing Phase docs claim RELEASE READY; payment-link/auto-suspend excluded — treat scoped COMPLETE, not full billing product.

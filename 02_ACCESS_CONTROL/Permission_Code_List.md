@@ -144,12 +144,10 @@ Development role `super_administrator` should receive all **36** codes exposed b
 `PlatformPermissionCodes.All` when the platform admin permission foundation is
 fully seeded, plus bootstrap `platform.admin.access` for login routing.
 
-Angular Platform Admin static `platformPermissions` currently lists **31** codes
-used by existing routes/menus/actions. The five `platform.return_policy_templates.*`
-codes are seeded, returned by the permission catalogue API, assignable in the
-role UI, and enforced by `ReturnPolicyTemplateService`, but have no Angular pages
-yet (BACKEND_ONLY / SA-P1-04). Do **not** treat `31 versus 36` as a catalogue or
-authorization defect. See [[Platform_Admin_Permission_Catalogue_Alignment]].
+Angular Platform Admin static `platformPermissions` lists **36** codes including
+all five `platform.return_policy_templates.*` codes guarded on routes, menus, and
+actions. See [[SA-P1-04_Return_Policy_Template_UI_Implementation]] and
+[[Platform_Admin_Permission_Catalogue_Alignment]].
 
 Do not generate C# enum classes for database status/type/check-value columns.
 Those Domain properties remain strings, while allowed values are enforced through

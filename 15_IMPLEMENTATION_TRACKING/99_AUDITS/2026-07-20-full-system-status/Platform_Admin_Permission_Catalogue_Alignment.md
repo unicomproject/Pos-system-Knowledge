@@ -47,7 +47,7 @@ The five codes present in backend/catalogue but absent from Angular static `plat
 | Seeded / ACTIVE | Yes |
 | Returned by catalogue API | Yes |
 | Visible / assignable in Role UI | Yes (catalogue-driven) |
-| Required by Angular route/menu/action | **No** — no return-policy Angular pages |
+| Required by Angular route/menu/action | **Yes** — SA-P1-04 list/create/detail routes + menu |
 | Required by backend API | Yes (`ReturnPolicyTemplateService`) |
 | Documented | Yes (`Permission_Code_List`) |
 
@@ -55,7 +55,7 @@ The five codes present in backend/catalogue but absent from Angular static `plat
 
 ## Classification of the five codes
 
-`VALID_BUT_FE_GUARD_MISSING` only in the sense that Angular has no return-policy surface yet — intentional **BACKEND_ONLY** / tracked as **SA-P1-04**, not a catalogue defect.
+**Status after SA-P1-04:** all five codes are in `permission-keys.ts` and guarded on Angular routes/menus/actions. See [[SA-P1-04_Return_Policy_Template_UI_Implementation]].
 
 ## Runtime evidence
 
