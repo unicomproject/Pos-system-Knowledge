@@ -1,7 +1,7 @@
 <!-- title: Device Activation Flow -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Device Activation Flow
 
@@ -37,7 +37,7 @@ coupon, AI, or accounting scope.
 |---:|---|---|
 | 1 | Open device activation screen | Activation input appears |
 | 2 | Enter activation code | Backend validates code hash |
-| 3 | Send device fingerprint/details | Pairing request/device record is stored |
+| 3 | Send device fingerprint/details | Backend resolves or creates the trusted device context |
 | 4 | Bind device to till/outlet | Device becomes trusted if valid |
 | 5 | Continue to till open | POS context is available |
 
@@ -73,8 +73,9 @@ flowchart TD
 
 | Area | References |
 |---|---|
-| API groups | `/api/v1/devices`, `/api/v1/tills` |
-| Tables | `till_activation_codes`, `device_pairing_requests`, `pos_devices`, `tills` |
+| API endpoints | `GET /api/v1/devices/current`, `POST /api/v1/devices/activate` |
+| Request context | Activation code, device fingerprint and device metadata |
+| Tables | `pos_devices`, `till_activation_codes`, `till_device_assignments`, `tills`, `outlets` |
 
 ## Edge Cases
 
@@ -85,7 +86,7 @@ flowchart TD
 ## Out of Scope
 
 - Kiosk activation is excluded.
-- Offline activation is excluded.
+- Offline device activation is not implemented.
 
 ## Completion Criteria
 
@@ -96,6 +97,6 @@ flowchart TD
 
 ## Related Files
 
-- [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
+- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
+- [[../../05_BACKEND_ARCHITECTURE/API_Standards]]

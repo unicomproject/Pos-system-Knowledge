@@ -1,7 +1,7 @@
 <!-- title: Park Recall Sale Flow -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Park Recall Sale Flow
 
@@ -22,7 +22,7 @@ coupon, AI, or accounting scope.
 | Actor | Responsibility |
 |---|---|
 | Cashier | Parks and recalls a sale |
-| Backend | Stores held sale state |
+| Backend | Exposes a held-sale API that is not currently called by Flutter |
 | POS App | Shows recall list |
 
 ## Preconditions
@@ -35,10 +35,10 @@ coupon, AI, or accounting scope.
 
 | Step | User/System Action | Expected Result |
 |---:|---|---|
-| 1 | Click Park Sale | Current cart is marked held/parked |
-| 2 | Enter reason if required | Park details are saved |
-| 3 | Open recall list | Parked sales for outlet/till are shown |
-| 4 | Select parked sale | Sale/cart is recalled |
+| 1 | Click Park Sale | Current Flutter cart is serialized to device secure storage |
+| 2 | Enter reference details | Device-local park details are saved |
+| 3 | Open recall dialog | Device-local parked sales are shown |
+| 4 | Select parked sale | Cart is restored and local parked record is removed |
 | 5 | Continue checkout | Cart returns to active sale flow |
 
 ## Journey Diagram
@@ -55,9 +55,11 @@ flowchart TD
 
 ## Business Rules
 
-- Parked sale must stay tenant/outlet scoped.
-- Recall must track user/time where supported.
-- Only eligible parked sales can be recalled.
+- Current Flutter parked records are device-local and are not cross-device
+  backend records.
+- Backend Holds provides tenant/outlet/till-scoped create/list/recall/cancel
+  operations, but Flutter does not currently call it.
+- Current local recall is not proof of backend release/expiry/cancel handling.
 - Cart totals must be recalculated after recall.
 
 ## Access-Control Rules
@@ -73,8 +75,13 @@ flowchart TD
 
 | Area | References |
 |---|---|
-| API groups | `/api/v1/pos/sales` |
-| Tables | `sales`, `sale_lines`, `till_sessions` |
+| Current Flutter authority | Secure-storage key `pos.parked_sales`; local save/list/recall/delete |
+| Existing backend API | `POST|GET /api/v1/pos/holds`, `POST .../{holdId}/recall`, `DELETE .../{holdId}` |
+| Backend table | `pos_order_holds` |
+
+Current classification is `PARTIALLY_IMPLEMENTED` and disconnected. Backend
+Holds controller/service/repository and tests exist, but the Flutter provider
+uses only local secure storage.
 
 ## Edge Cases
 
@@ -84,7 +91,8 @@ flowchart TD
 
 ## Out of Scope
 
-- Offline parked-sale sync is excluded.
+- Offline parked-sale operation is MVP scope, but backend sync and cross-device
+  recall are not implemented in the current Flutter flow.
 
 ## Completion Criteria
 
@@ -95,6 +103,6 @@ flowchart TD
 
 ## Related Files
 
-- [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
+- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
+- [[../../05_BACKEND_ARCHITECTURE/API_Standards]]

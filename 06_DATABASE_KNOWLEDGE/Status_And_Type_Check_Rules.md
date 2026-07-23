@@ -208,7 +208,8 @@ Do not use database enum datatypes.
 | 25 | `sales_returns` | `CHECK(total_return_amount >= 0)` |
 | 25 | `sales_returns` | `CHECK(total_refund_amount >= 0)` |
 | 25 | `sales_return_lines` | `CHECK(requested_quantity > 0)` |
-| 25 | `return_inspections` | `CHECK(inspected_quantity >= 0)` |
+| 25 | `return_inspections` | `CHECK(restock_quantity >= 0)` |
+| 25 | `return_inspections` | `CHECK(reject_quantity >= 0)` |
 | 25 | `sales_return_events` | `CHECK(sequence_number > 0)` |
 | 25 | `sales_exchanges` | `CHECK(additional_amount >= 0)` |
 | 25 | `sales_exchanges` | `CHECK(refund_amount >= 0)` |

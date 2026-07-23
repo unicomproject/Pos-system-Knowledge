@@ -1,7 +1,7 @@
 <!-- title: Customer Loyalty Flow -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Customer Loyalty Flow
 
@@ -38,8 +38,8 @@ coupon, AI, or accounting scope.
 | 1 | Tap Add Customer | Customer search screen opens |
 | 2 | Search by phone/email/name | Matching customer appears |
 | 3 | Select or create customer | Customer attaches to cart/sale |
-| 4 | View loyalty summary | Points/membership are shown |
-| 5 | Redeem if requested and permitted | Discount/value is applied and ledger prepared |
+| 4 | View customer detail or purchase history | Backend customer and order data are shown |
+| 5 | Continue the sale | Selected customer remains attached to the cart/checkout request |
 
 ## Journey Diagram
 
@@ -48,8 +48,8 @@ flowchart TD
     S1[Tap Add Customer]
     S1 --> S2[Search by phone/email/name]
     S2 --> S3[Select or create customer]
-    S3 --> S4[View loyalty summary]
-    S4 --> S5[Redeem if requested and permitted]
+    S3 --> S4[View customer detail or purchase history]
+    S4 --> S5[Continue sale with customer attached]
     S5 --> Done[Journey completed]
 ```
 
@@ -73,14 +73,18 @@ flowchart TD
 
 | Area | References |
 |---|---|
-| API groups | `/api/v1/customers`, `/api/v1/loyalty` |
-| Tables | `customers`, `customer_memberships`, `loyalty_programs`, `loyalty_transactions`, `sales` |
+| Implemented API group | `/api/v1/customers` for list, summary, detail, create and update |
+| Implemented sale behavior | Select and attach customer to the current cart/checkout request |
+| Tables used by current customer flow | `customers`, `sales_orders` and related customer/order records |
+
+Loyalty earn, redeem, loyalty-ledger and store-credit behavior remain documented
+MVP targets, but no complete Cashier Flutter → API → persistence → test chain was
+verified. They must not be presented as working cashier actions.
 
 ## Edge Cases
 
 - Customer not found allows create if permitted.
-- No loyalty membership disables redeem.
-- Insufficient points blocks redemption.
+- Loyalty actions remain unavailable until their backend-authoritative flow is implemented.
 
 ## Out of Scope
 
@@ -96,6 +100,6 @@ flowchart TD
 
 ## Related Files
 
-- [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
+- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
+- [[../../05_BACKEND_ARCHITECTURE/API_Standards]]

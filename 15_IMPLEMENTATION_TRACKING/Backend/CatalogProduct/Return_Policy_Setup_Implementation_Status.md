@@ -33,8 +33,12 @@
 
 ## Not Included
 
-- Product-to-return-policy assignment.
+- Full Tenant Admin product-to-return-policy assignment UI workflows beyond CRUD.
 - Product non-returnable flag/table.
-- Return request/refund workflow.
+- Return request/refund workflow (see Cashier Return flow docs).
 - Customer-facing return policy display API.
 - Import/export for return policies.
+
+## Development seed assignment (2026-07-18)
+
+Migration `20260718180000_AssignReturnPolicyToExistingPosProducts` creates tenant policy `DEV-14DAYS` (`dddd0001-0014-4000-8000-000000000001`) as default and sets `products.return_policy_id` for ACTIVE sellable `MER-%` products that had no policy. This unblocks POS Return Step 3 for seeded merchandise such as `MER-006-SIZE-8`.

@@ -53,6 +53,12 @@ Query notes:
   `deviceId`, `tillId`, `outletId` where documented in implementation status
   files.
 - `GET /api/v1/pos/products` requires `deviceId` and `products.view`.
+- `GET /api/v1/pos/products/by-barcode/{barcode}` requires `deviceId`, product
+  view/search permission, and an active trusted device assigned to an active
+  outlet. It performs exact, tenant-scoped active barcode equality and returns
+  the exact matched barcode, resolved variant, `quantityPerScan`, default active
+  price, and current-outlet stock. Product-level barcodes with multiple sellable
+  variants return `409 pos_barcode.ambiguous`.
 
 See [[../15_IMPLEMENTATION_TRACKING/Backend/POSOperations/Pos_Home_Dashboard_Implementation_Status]]
 and [[../15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/Pos_Products_List_Implementation_Status]].
@@ -817,3 +823,195 @@ lookup/search path.
 - `GET /api/v1/pos/payment-methods` and `GET /api/v1/pos/printer-settings` were
   not found in the current backend. Flutter payment methods come from checkout
   summary, and printer selection/config remains local or future scope.
+
+---
+
+# POS Returns — Step 1 Sale Search
+
+> **Unified-Commerce status (2026-07-17):** Implemented for Search Original Sale.
+
+Flutter route: `/pos/returns-refunds`
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/pos/returns/sales/search` | exact `returns.view` | Search/list original outlet-scoped completed sales |
+| GET | `/api/v1/pos/returns/sales/{saleId}/eligibility` | exact `returns.view` | Sale eligibility/detail for the current till outlet |
+| POST | `/api/v1/pos/returns/sales/{saleId}/eligibility-check` | exact `returns.view` | Selected-line eligibility check; same outlet isolation |
+
+### Step 3 — Select Items (2026-07-17)
+
+Flutter route: `/pos/returns-refunds/eligibility`
+
+- Open Step 3 with `GET .../eligibility?deviceId=`.
+- Continue is local only (`selectedReturnLines` → `/pos/returns-refunds/check-eligibility`).
+- Step 4 opens with `POST .../eligibility-check`.
+- Route view: `returns.view`. Selection/Continue mutation: `returns.view` + `returns.create`.
+- Line DTO includes `barcode` from `product_barcodes` (variant primary, then product-level).
+- Search matches name, SKU, barcode — not internal variant UUID.
+- Non-returnable lines (`isReturnable=false` or `availableReturnQty<=0`) cannot be selected.
+- POST rejects duplicate `saleLineId`, non-returnable lines (`pos_returns.line_not_returnable` → 409), and quantity above remaining.
+- Prior returned qty counts only `sales_returns.return_status = COMPLETED`.
+- Images prefer variant `product_images`, then product-level.
+- Migration: `20260717120000_HardenReturnEligibilityTenantConstraints` (tenant-composite return/image FKs, return-line uniqueness, quantity CHECKs).
+- Held POS sale lines use `line_status=ACTIVE` (not `PENDING`) to match `ck_sales_order_lines_line_status`.
+
+### Step 4 — Check Eligibility (2026-07-17)
+
+Flutter route: `/pos/returns-refunds/check-eligibility`
+
+- Opens with non-mutating `POST .../eligibility-check?deviceId=` using `selectedReturnLines` from Step 3.
+- Permission: exact `returns.view`. Continue to Step 5 requires `returns.view` + `returns.create` + `canContinue=true`.
+- Result is transient Flutter state and is recomputed on every Step 4 entry (no eligibility draft table).
+- No separate `/eligibility-result`, `/eligibility/continue`, or policy/receipt/payment APIs.
+
+#### Checklist contract (`policyChecks`)
+
+| Code | Evaluation |
+|---|---|
+| `RETURN_WINDOW` | Line eligibility vs receipt `issued_at` + resolved policy window |
+| `ORIGINAL_RECEIPT` | Uses `return_policies.requires_receipt`. Required + ISSUED SALE receipt for till outlet → `PASSED`. Required missing/invalid → `FAILED`. Not required → `NOT_APPLICABLE` (never claims verified when optional). |
+| `PAYMENT_VERIFICATION` | Persisted `sales_payments` with status `PAID` or `PARTIALLY_REFUNDED`, positive `paid_amount`, currency match. Does **not** use display `paymentMethod` text. |
+| `PRODUCT_RETURN_POLICY` | Product `return_policy_id` → ACTIVE policy, else tenant default ACTIVE policy. Categories have no return-policy attribute; code is not a fake category pass. |
+| `INSPECTION_REQUIRED` | Preliminary only. `ReturnPolicy` has no `requires_inspection`; Step 4 flag is false/`NOT_APPLICABLE` until Step 5 reason may require inspection. |
+| `MANAGER_APPROVAL_REQUIRED` | From `return_policies.requires_manager_approval` → `REQUIRES_REVIEW` (Continue still allowed). No approval record is created at Step 4. |
+
+Statuses: `PASSED` | `FAILED` | `REQUIRES_REVIEW` | `NOT_APPLICABLE`.
+
+Response also includes `requiresInspection`, `requiresManagerApproval`, `canContinue`, `overallStatus`, `overallMessage`, `policyNote`.
+
+`policyNote` comes from configured `return_policies.description`, else a neutral `Return window: {n} days` summary. No hardcoded packaging copy.
+
+Hard request conflicts remain HTTP **409** (`line_not_returnable`, `quantity_exceeds_available`). Unexpected eligibility failure maps to **500** (`eligibility_check_failed`).
+
+### Step 5 — Select Return / Exchange Reason (2026-07-17)
+
+Flutter route: `/pos/returns-refunds/return-reason`
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/pos/returns/reasons` | `returns.view` + `returns.create` | Load active tenant Return/BOTH reasons |
+| POST | `/api/v1/pos/returns/sales/{saleId}/reasons/validate` | `returns.view` + `returns.create` | Validation-only reason/note assignment |
+
+Rules:
+
+- Step 5 is intentionally **transient** (Flutter flow state only). Validate does **not** persist. Final `return_reason_id` / notes are written at Return completion into `sales_returns` / `sales_return_lines`.
+- No reason-draft save/restore API or table.
+- Reason catalog fields are database-driven from `return_reasons`: `description`, `requires_note`, `requires_inspection`, `requires_manager_approval`.
+- Notes max length is **1000** (backend + Flutter). Whitespace-only notes are treated as empty.
+- `applySameReasonToAll=true` shows one global reason/notes control; `false` shows per-line reason/notes controls. Every selected line is still validated individually.
+- Final flow flags: `requiresInspection = Step4 OR any reason.requiresInspection`; `requiresManagerApproval = Step4 OR any reason.requiresManagerApproval`.
+- Unexpected failures map to **500** (`reasons_load_failed`, `reasons_validate_failed`).
+- Migration: `20260717140000_HardenReturnReasonsConfigurableFlags` (adds configurable columns + restores `applies_to` / `sort_order` CHECKs).
+
+### Step 6 — Inspect Items (2026-07-17)
+
+Flutter route: `/pos/returns-refunds/inspect-items`
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/pos/returns/inspection/conditions` | `returns.view` + `returns.create` | Active tenant condition catalog |
+| GET | `/api/v1/pos/returns/sales/{saleId}/inspection/draft` | `returns.view` + `returns.create` | Load persisted draft (`version`, `expiresAt`) |
+| PUT | `/api/v1/pos/returns/sales/{saleId}/inspection/draft` | `returns.view` + `returns.create` | Save draft lines; optional `version` for optimistic concurrency |
+| POST | `/api/v1/pos/returns/sales/{saleId}/inspection/validate` | `returns.view` + `returns.create` | Validate persisted draft; marks `VALIDATED` when `canContinue` |
+| POST | `/api/v1/pos/returns/sales/{saleId}/inspection/media` | `returns.view` + `returns.create` | Multipart photo upload to staging |
+| DELETE | `/api/v1/pos/returns/inspection/media/{mediaId}` | `returns.view` + `returns.create` | Soft-delete staging row + remove file |
+| GET | `/api/v1/pos/returns/inspection/media/{mediaId}` | `returns.view` + `returns.create` | Authenticated photo bytes for preview |
+
+Rules:
+
+- All Step 6 routes require `deviceId`; outlet resolved from open till session (never from Flutter).
+- Sale scope enforced via till outlet + matching sale receipt outlet (`SaleBelongsToOutletAsync`).
+- Draft statuses: `DRAFT` / `VALIDATED` / `CONSUMED` / `CANCELLED`. Line or media changes reset to `DRAFT`.
+- Draft `version` optimistic concurrency: request `version` must match persisted value → **409** `pos_returns.inspection_draft_conflict`.
+- Draft and staging `expires_at` default 24h; refreshed on save/validate; expired → **409** `pos_returns.inspection_draft_expired`.
+- Staging media statuses: `STAGED` / `DELETED` / `EXPIRED` / `CONSUMED` (soft lifecycle; `CONSUMED` never deleted).
+- Validate merges Step 4 eligibility + Step 5 reason flags (DB re-read via `reasonRefs`) + Step 6 conditions — **OR**, never downgrade. Response includes `requiresInspection`, `requiresManagerApproval`, `requiresReview`, `version`, `expiresAt`, `status`.
+- No Step 6 Continue/finalize/approval APIs. Continue is local; `CompleteReturnAsync` atomically consumes a `VALIDATED` draft.
+- Photo limits: max 5 per line, 5 MiB, JPEG/PNG/WebP with magic-byte check → **413** / **415**.
+- Migration: `20260717150000_HardenReturnInspectionDraftMediaLifecycle`.
+- Local media storage (`ReturnInspectionMedia:StorageRoot`) acceptable with `LOCAL_SHARED_VOLUME_ACCEPTED` (single instance or shared volume); multi-instance without shared volume requires object storage.
+
+### Steps 7–10 — Resolution, Branches, and Completion (2026-07-17)
+
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/api/v1/pos/returns/sales/{saleId}/resolution` | `returns.view` + `returns.create` | Authoritative Step 7 hydration and branch availability |
+| PUT | `/api/v1/pos/returns/sales/{saleId}/resolution` | shared permissions + `refunds.create` or `exchanges.create` | Persist REFUND/EXCHANGE with `expectedVersion` |
+| GET/PUT | `/api/v1/pos/returns/sales/{saleId}/refund-method(s)` | `returns.view` + `returns.create` + `refunds.create` | Refund branch draft |
+| GET/PUT | `/api/v1/pos/returns/sales/{saleId}/exchange/replacement` | `returns.view` + `returns.create` + `exchanges.create` | Exchange replacement draft (`expectedVersion` on PUT; returns `version`, `expiresAt`) |
+| GET | `/api/v1/pos/returns/sales/{saleId}/exchange/products` | Exchange permissions | Name/SKU/barcode search with **current-outlet** sellable stock only |
+| POST | `/api/v1/pos/returns/sales/{saleId}/exchange-preview` | Exchange permissions | Authoritative exchange pricing/stock/difference (`canProceed`, tax/discount from return credit) |
+| POST | `/api/v1/pos/returns/sales/{saleId}/complete` | selected branch permissions | Idempotent Return/Refund or Return/Exchange completion |
+
+Resolution GET/PUT require `deviceId`, open till context, outlet-owned sale/draft,
+`VALIDATED`, unexpired, unconsumed draft. GET returns `draftId`, `version`,
+`draftStatus`, `expiresAt`, selection actor/time, `availableOptions`,
+`refundAllowed`, `exchangeAllowed`, durable inspection/approval flags, and
+`nextStep`. A user lacking a branch permission cannot resume or mutate that branch.
+
+PUT body is `{ resolutionType, expectedVersion }`. Unsupported values are rejected;
+version mismatch is 409 `inspection_draft_conflict`; selecting the same option at the
+latest version is idempotent. Branch changes and Step 6 re-edits transactionally remove
+incompatible downstream draft data.
+
+Completion body includes `reasonCode`, `settlementMethodCode`, `notes`, selected
+lines, `expectedVersion`, and `idempotencyKey`. The server recalculates all monetary
+and stock values. Refund completions persist `sales_returns.idempotency_key`
+(unique per tenant when not null); same-key replay returns the existing receipt.
+Exchange completions persist `sales_exchanges.idempotency_key` the same way.
+Exchange settlement direction is enforced:
+
+- even: `NO_SETTLEMENT`
+- customer pays: `CASH_PAYMENT` (real cash payment/till movement)
+- customer receives: `CASH_REFUND` or `CARD_REFUND`
+
+### Step 8B — Exchange replacement (2026-07-18)
+
+Canonical routes (no separate stock/price/Continue APIs):
+
+- `GET .../exchange/products` — trim/case-insensitive name + SKU; barcode via `product_barcodes`; current-outlet `AvailableQuantity` only (`InventoryBalances` ∩ sellable `InventoryLocations` for resolved outlet).
+- `GET|PUT .../exchange/replacement` — persist product/variant/quantity in `return_exchange_replacement_draft_lines`; PUT requires `expectedVersion`; version bump via `MarkExchangeReplacementChanged`; expired/consumed/wrong-resolution → conflict; stock over-qty rejected.
+- `POST .../exchange-preview` (hyphen, not `/exchange/preview`) — return credit from original sale lines; **replacement totals from shared `IPosSaleLinePricingCalculator`** (same price-list / quantity-tier / inclusive-exclusive / compound-tax pipeline as POS checkout). Returns `replacementSubtotal`, `replacementDiscount`, `replacementTax`, `replacementItemValue`, amounts due, `canProceed`, `requiresApproval`, `draftVersion`.
+- Completion re-runs the same calculator inside the transaction; mismatches → `exchange_price_changed` / `exchange_tax_changed` / `exchange_discount_changed` / `exchange_preview_stale`. Replacement `sales_order_lines` persist unit price, subtotal, discount, and tax (not hardcoded zeros). Outlet stock and price revalidated. `STORE_CREDIT` remains unsupported.
+
+`pos_returns.approval_required` is HTTP 409. The approval grant workflow is not
+implemented; therefore a durable approval requirement remains an intentional hard
+completion blocker.
+
+Search query parameters:
+
+- `deviceId` (required)
+- `searchType`: `invoice`, `receipt` (invoice alias), `sale`, `mobile`, `customer`, `recent`
+- `search` (required for non-`recent`)
+- optional filters: `fromDate`, `toDate`, `paymentMethodCode`, `minAmount`, `maxAmount`
+- `page`, `pageSize` (default 20, backend-capped)
+
+Search response:
+
+- `items`, `page`, `pageSize`, `totalCount`
+- optional `paymentMethods` filter options
+- each item includes safe `paymentMethod` and `maskedCard` (never raw provider/card references)
+
+Rules:
+
+- Outlet is resolved from trusted device + open till session; Flutter must not supply outlet ID.
+- Step 1 creates no return or return-draft row.
+- Continue into Step 2 is local navigation and requires `returns.view` + `returns.create`.
+- Primary tables: `sales_orders`, `sales_order_lines`, `receipts`, `customers`, `sales_payments`, `sales_payment_transactions`, `payment_methods`.
+
+### Masked payment projection (Search + Eligibility)
+
+Same rule for `GET .../sales/search` and `GET .../sales/{saleId}/eligibility`:
+
+- Successful payments only (`PAID`, `PARTIALLY_REFUNDED`), ordered by `paid_at`, then payment id.
+- Split tenders → `paymentMethod: "Multiple"`, `maskedCard: ""`.
+- Card last4 comes from sanitized `sales_payment_transactions.provider_response_json.cardLast4`
+  (or from `external_reference` only when it is exactly four digits).
+- Display mask: `•••• {last4}`. Never derive last4 by truncating provider tokens.
+- Cash/QR/non-card: no fabricated card mask.
+- Provider transaction ids remain server-side only.
+
+> **Checkout write path (2026-07-17):** Cash persists without card tips. Card production
+> authorization still requires provider integration (`pos_checkout.payment_provider_required`).
+> Domain factory `PosCompletedPaymentPersistence.CreateProviderCapture` maps successful
+> provider outcomes into the fields above when provider support is enabled.

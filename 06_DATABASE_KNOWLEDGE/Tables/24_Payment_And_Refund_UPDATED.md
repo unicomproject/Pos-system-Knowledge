@@ -87,7 +87,7 @@ Purpose: Stores payment headers for sales orders.
 | `paid_amount` | numeric(18,4) |  | NOT NULL DEFAULT 0 | Paid amount. |
 | `change_amount` | numeric(18,4) |  | NOT NULL DEFAULT 0 | Change amount. |
 | `refunded_amount` | numeric(18,4) |  | NOT NULL DEFAULT 0 | Refunded amount. |
-| `external_reference` | varchar(150) |  | NULL | External/manual reference. |
+| `external_reference` | varchar(150) |  | NULL | Provider/terminal transaction id for provider captures. Never full PAN. Not returned raw on Return APIs. |
 | `idempotency_key` | varchar(100) |  | NULL | Idempotency key. |
 | `payment_note` | text |  | NULL | Payment note. |
 | `initiated_at` | timestamptz |  | NOT NULL | Payment initiated timestamp. |
@@ -139,7 +139,7 @@ Purpose: Stores gateway/manual payment transaction attempts.
 | `currency_code` | char(3) |  | NOT NULL | Currency code. |
 | `external_transaction_reference` | varchar(180) |  | NULL | External provider transaction reference. |
 | `provider_name` | varchar(100) |  | NULL | Payment provider name. |
-| `provider_response_json` | jsonb |  | NULL | Provider response snapshot. |
+| `provider_response_json` | jsonb |  | NULL | Sanitized safe tip metadata only for card captures: `{ "cardBrand", "cardLast4" }`. Never store full PAN/CVV/PIN/raw gateway payloads. Cash leaves null. |
 | `idempotency_key` | varchar(100) |  | NULL | Idempotency key. |
 | `processed_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id). |
 | `processed_at` | timestamptz |  | NOT NULL | Processed timestamp. |
@@ -159,6 +159,8 @@ CHECK(transaction_type IN ('AUTHORIZE', 'CAPTURE', 'SALE', 'REFUND', 'VOID', 'RE
 CHECK(transaction_status IN ('PENDING', 'SUCCEEDED', 'FAILED', 'CANCELLED'))
 CHECK(amount > 0)
 Self-reference via parent_transaction_id.
+POS safe-card tip convention (no schema change): provider captures may store only
+cardBrand + cardLast4 (exactly 4 digits) inside provider_response_json.
 ```
 
 ## `sales_payment_events`

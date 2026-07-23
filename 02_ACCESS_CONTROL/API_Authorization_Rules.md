@@ -97,7 +97,7 @@ Do not use umbrella-only checks such as `platform.subscriptions.manage` where gr
 | Approve discount | Discount permission and manager PIN where required |
 | Take payment | Payment entitlement, permission, open till session |
 | Print receipt | Receipt entitlement, permission, device context |
-| Return/refund | POS entitlement, permission, original sale validation |
+| Return/refund | POS entitlement, exact `returns.view` for shared Step 1 search/eligibility load, open till/outlet isolation, original sale validation |
 | Exchange | POS entitlement, permission, exchange validation |
 | Cash in/out | Cash drawer entitlement, permission, open till |
 | Close till | Till permission, open till, cash count validation |
@@ -114,6 +114,9 @@ Verified current backend behavior:
 | `POST /api/v1/pos/sales` | `sales.checkout` | Creates draft sale only. |
 | `POST /api/v1/pos/sales/checkout` | `sales.checkout` | Alias for draft sale creation; not the full paid checkout flow. |
 | `GET /api/v1/pos/sales/{saleId}` | `sales.view` | Returns sale/receipt detail for same tenant scope. |
+| `GET /api/v1/pos/returns/sales/search` | exact `returns.view` | Outlet from open till session; supports date/payment/amount filters and pagination. |
+| `GET /api/v1/pos/returns/sales/{saleId}/eligibility` | exact `returns.view` | Same-outlet completed sale only; returns safe masked payment reference. |
+| `POST /api/v1/pos/returns/sales/{saleId}/eligibility-check` | exact `returns.view` | Selected-line eligibility; non-mutating; same outlet isolation as GET. Checklist evaluates receipt (`requires_receipt`), payment settlement, product return policy, preliminary inspection, and manager-approval review. |
 | `POST /api/v1/pos/payments` | Selected payment method permission | Records payment for existing draft sale; cash completion generates receipt. |
 | `GET /api/v1/pos/receipts/{saleId}` | `receipts.view` or `receipts.print` | Receipt preview/detail endpoint. |
 | `POST /api/v1/pos/receipts/{saleId}/print` | `receipts.print` | Updates print metadata and inserts `receipt_print_logs`. |
@@ -142,8 +145,9 @@ customer credit where required, and consistent stock/payment records.
 |---|---|
 | Missing/invalid token | 401 |
 | Authenticated but not allowed | 403 |
-| Validation error | 400 |
-| Not found inside tenant scope | 404 |
+| Validation error | 400 or 422 depending on endpoint convention |
+| Invalid return-search filters / search type | 422 |
+| Not found inside tenant/outlet scope | 404 |
 | Duplicate/conflict | 409 |
 | Unexpected server error | 500 |
 

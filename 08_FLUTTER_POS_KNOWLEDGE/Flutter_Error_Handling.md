@@ -59,6 +59,21 @@ ID, and device ID.
 
 Never log sensitive data.
 
+## Barcode Scanner Feedback
+
+Scanner UI feedback is derived from typed outcomes rather than exception text or
+raw backend payloads. Each completed queue item emits one event with a monotonic
+ID; New Sale consumes it once only while its route is current. Success messages
+may include product, variant, and quantity-per-scan metadata. Device, auth,
+permission, catalog, stock, network, and unexpected failures use concise safe
+cashier-facing messages. Consecutive results replace the current scanner
+snackbar and never block queue processing.
+
+Camera setup errors occur before a barcode enters the shared scan controller.
+Permission denied, unavailable camera, initialization failure, and unsupported
+platform use safe local snackbar messages; raw plugin exceptions are not shown.
+User cancellation is not treated as an error and does not mutate search/cart.
+
 ## Related Files
 
 - [[Flutter_API_Network]]

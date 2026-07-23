@@ -1,7 +1,7 @@
 <!-- title: POS Operations Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # POS Operations Module Overview
 
@@ -23,6 +23,7 @@ merchandising, attractions, and temporary retail locations.
 | Primary users | Cashier, Stall Operator, Store Manager |
 | Frontend surfaces | Mobile POS, Desktop POS, Park/recall sale, Receipt print/reprint, Till close summary |
 | API groups | `/api/v1/pos/home`, `/api/v1/pos/holds`, `/api/v1/pos/receipts`, `/api/v1/pos/till-summary`, `/api/v1/pos/events` |
+| Current implementation note | Flutter park/recall is device-local and does not call `/api/v1/pos/holds`; Cash In/Out has no mutation API |
 
 ## Main Tables
 
@@ -45,6 +46,8 @@ merchandising, attractions, and temporary retail locations.
 - Receipt print failure does not cancel a completed backend sale.
 - Parked/held sale must remain tenant, outlet, till, and user scoped.
 - Till summary uses completed sales, payments, refunds, and cash movements.
+- Backend Holds is implemented, but current Flutter held-sale authority is local
+  secure storage and therefore disconnected.
 - Customer display is future unless explicitly enabled.
 
 ## Access Summary
