@@ -1,34 +1,42 @@
 <!-- title: Subscription Billing, Payments & Usage Technical Contract -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-15 -->
 
 # Subscription Billing, Payments & Usage Technical Contract
+
+> [!IMPORTANT]
+> This document describes the broader target architecture for subscription
+> billing, payments, payment links, credit notes, and usage. Its generic
+> `/api/v1/billing/*` groups are target architecture and are **not** the current
+> Platform Admin Billing API contract. The verified implemented contract is
+> [[05_BACKEND_ARCHITECTURE/Platform_Billing_API_Contract]] under
+> `/api/v1/platform-admin/billing`.
 
 ## Purpose
 
 Defines the implementation contract for `Subscription_Billing_Usage`. This contract is based on
 new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
-## API Contract
+## Target Architecture API Contract
 
 | Area | Contract |
 |---|---|
-| API groups | `/api/v1/subscriptions`, `/api/v1/billing/invoices`, `/api/v1/billing/payment-links`, `/api/v1/billing/usage` |
+| Target API groups | `/api/v1/subscriptions`, `/api/v1/billing/invoices`, `/api/v1/billing/payment-links`, `/api/v1/billing/usage` |
 | Request format | Typed request DTOs; no raw map payloads in application layer |
 | Response format | Typed response DTOs with safe fields only |
 | Error format | Standard API error response |
 | Tenant context | Resolved server-side for tenant-owned records |
 | Auth | Staff/customer/platform auth boundary must match module surface |
 
-## API Groups
+## Target Architecture API Groups
 
 | API Group | Purpose |
 |---|---|
 | `/api/v1/subscriptions` | Module API group |
-| `/api/v1/billing/invoices` | Module API group |
-| `/api/v1/billing/payment-links` | Module API group |
-| `/api/v1/billing/usage` | Module API group |
+| `/api/v1/billing/invoices` | Future/general module API group; not the current Platform Admin route |
+| `/api/v1/billing/payment-links` | Future/general module API group; not the current Platform Admin route |
+| `/api/v1/billing/usage` | Future/general module API group; not the current Platform Admin route |
 
 ## Database Contract
 
@@ -110,3 +118,5 @@ Test coverage must include:
 
 - [[04_MODULE_KNOWLEDGE/04_Subscription_Billing_Usage/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/04_Subscription_Billing_Usage/02_Functional_Rules]]
+- [[04_Platform_Billing_Functional_Specification]]
+- [[05_BACKEND_ARCHITECTURE/Platform_Billing_API_Contract]]

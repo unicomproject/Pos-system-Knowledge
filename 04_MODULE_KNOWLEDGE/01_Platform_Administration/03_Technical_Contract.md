@@ -79,12 +79,16 @@ The service routes to the wizard path when `tenantAdmin`, `subscription`, `addon
 
 Validated fields:
 
-- Country codes (`countryCode`, `address.countryCode`): exactly 2 ISO letters (e.g. `LK`).
+- Country codes (`countryCode`, `address.countryCode`): exactly 2 ISO letters and in create-options catalogue (e.g. `LK`).
+- Locale (`defaultLocale`): create-options locale catalogue when present (e.g. `en-LK`).
+- Operating mode (`operatingMode`): `unified_epos`, `pos_online_store`, `pos_only` when present.
 - Currency (`baseCurrency`): exactly 3 ISO letters (e.g. `LKR`).
 - `billingStatus`: `pending`, `paid`, `overdue`, `failed`, `waived` only.
 - `subscription.subscriptionStatus`: `trial`, `active`, `past_due`, `cancelled`, `expired` when present.
 - `subscription.paymentMethod`: seeded values (`manual`, `bank_transfer`) when present.
 - `tenantAdmin.email`: required and must be a valid email when `tenantAdmin` block is sent.
+
+Persisted mapping: `defaultLocale`/`operatingMode` → `tenants`; `businessType` → `tenant_profiles.business_type_id`; country → `tenant_addresses.country_code`. Update validation uses `ValidateUpdate` and does not clear omitted locale/mode.
 
 Failures return `ApplicationError.ValidationFailed` (`errorCode: platform_tenants.validation_failed`) with `ApplicationFieldError` items; `PlatformAdminTenantsController` maps these to HTTP 400 with `errors[]` in the legacy API envelope.
 

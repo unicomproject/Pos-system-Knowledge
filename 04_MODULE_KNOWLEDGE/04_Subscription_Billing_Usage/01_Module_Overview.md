@@ -1,9 +1,15 @@
 <!-- title: Subscription Billing, Payments & Usage Module Overview -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-15 -->
 
 # Subscription Billing, Payments & Usage Module Overview
+
+> [!NOTE]
+> The generic `/api/v1/billing/*` groups below describe the broader target
+> module architecture. The current implemented Platform Admin Billing contract
+> uses `/api/v1/platform-admin/billing` and is documented in
+> [[05_BACKEND_ARCHITECTURE/Platform_Billing_API_Contract]].
 
 ## Purpose
 
@@ -22,7 +28,7 @@ merchandising, attractions, and temporary retail locations.
 | Module number | 04 |
 | Primary users | Platform Admin, Tenant Admin billing contact |
 | Frontend surfaces | Billing summary, Payment link page, Subscription status view, Usage counter review |
-| API groups | `/api/v1/subscriptions`, `/api/v1/billing/invoices`, `/api/v1/billing/payment-links`, `/api/v1/billing/usage` |
+| Target API groups | `/api/v1/subscriptions`, `/api/v1/billing/invoices`, `/api/v1/billing/payment-links`, `/api/v1/billing/usage` |
 
 ## Main Tables
 
@@ -75,3 +81,4 @@ merchandising, attractions, and temporary retail locations.
 
 - [[04_MODULE_KNOWLEDGE/04_Subscription_Billing_Usage/02_Functional_Rules]]
 - [[04_MODULE_KNOWLEDGE/04_Subscription_Billing_Usage/03_Technical_Contract]]
+- [[04_Platform_Billing_Functional_Specification]]

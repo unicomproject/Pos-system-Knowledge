@@ -28,14 +28,16 @@ Release 1 Platform Admin navigation includes:
 | Navigation Item | Purpose |
 |---|---|
 | Dashboard | Tenant/payment/status summary |
-| Tenant | Tenant list and tenant detail |
+| Tenants | Tenant list and tenant detail |
 | Subscription Plans | Plans and plan features |
 | Modules & Features | Platform module/feature catalog |
-| Pricing | Billing/price setup where supported |
+| Return Policy Templates | Platform return policy template catalog |
+| Platform Users / Roles | Platform user and permission management |
+| Billing | Platform billing operations (scoped) |
+| Platform Login Audit | Platform login security audit |
 | Platform Settings | Platform-level settings |
-| Audit Logs | Platform and tenant-sensitive event visibility |
 
-Do not add e-commerce admin navigation as active Release 1 behavior.
+Do not expose tenant POS operational modules (outlets, tills, products, alerts, platform reports) in Release 1 primary navigation. Tenant-context catalog/report routes may exist behind guards but are not platform sidebar items.
 
 ## Dashboard Rules
 

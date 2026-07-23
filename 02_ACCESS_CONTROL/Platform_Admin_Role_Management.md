@@ -1,7 +1,7 @@
 <!-- title: Platform Admin Role Management -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-02 -->
+<!-- last_updated: 2026-07-15 -->
 
 
 # Platform Admin Role Management
@@ -45,7 +45,7 @@ Rules:
 - Backend is the final authority for every protected platform endpoint.
 - Login currently returns permission codes only; role names are not yet exposed to the frontend.
 
-See [[Permission_Code_List]] for the full 31-code platform catalog.
+See [[Permission_Code_List]] for the authoritative 36-code platform catalog.
 
 ### Domain examples
 
@@ -65,8 +65,10 @@ Seed role code: `super_administrator`
 
 Expected grants after platform permission foundation migration:
 
-- All 31 platform permission codes listed in [[Permission_Code_List]].
-- Verified on 2026-07-02 against development database and live login API.
+- All 36 platform permission codes listed in [[Permission_Code_List]].
+- The 36-code count is the current authoritative catalog baseline. The earlier
+  31-code live-login verification from 2026-07-02 is retained in historical
+  verification records only and must not be used as the current catalog count.
 
 ## Tenant Feature Control
 

@@ -2,6 +2,7 @@
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
 <!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-15 -->
 
 # Permission Code List
 
@@ -103,9 +104,30 @@ reactivate permission code.
 | platform.settings.view | View platform settings |
 | platform.settings.update | Update platform settings |
 | platform.billing.view | View tenant billing |
-| platform.billing.manage | Manage billing and payment links |
+| platform.billing.manage | Manage current billing mutations; reserved for payment-link management when that capability is implemented |
 | platform.audit.view | View platform audit logs |
 | platform.integrations.manage | Manage platform integrations |
+
+#### Platform Billing page and action mapping
+
+This table describes the current implemented Platform Admin Billing surface.
+
+| Page or Action | Required Permission |
+|---|---|
+| View Billing menu | `platform.billing.view` |
+| Open Billing page | `platform.billing.view` |
+| View summary | `platform.billing.view` |
+| View invoices | `platform.billing.view` |
+| View invoice details | `platform.billing.view` |
+| View payment history | `platform.billing.view` |
+| Issue invoice | `platform.billing.manage` |
+| Mark invoice paid | `platform.billing.manage` |
+
+Angular menu, route, and action visibility are UX enforcement only. The backend
+must enforce the applicable permission on every Billing request.
+
+Exact current endpoints and lifecycle rules are documented in
+[[../05_BACKEND_ARCHITECTURE/Platform_Billing_API_Contract]].
 
 ### Deprecated platform codes (do not seed or use)
 
@@ -122,6 +144,11 @@ reactivate permission code.
 Development role `super_administrator` should receive all **36** codes exposed by
 `PlatformPermissionCodes.All` when the platform admin permission foundation is
 fully seeded, plus bootstrap `platform.admin.access` for login routing.
+
+Angular Platform Admin static `platformPermissions` lists **36** codes including
+all five `platform.return_policy_templates.*` codes guarded on routes, menus, and
+actions. See [[SA-P1-04_Return_Policy_Template_UI_Implementation]] and
+[[Platform_Admin_Permission_Catalogue_Alignment]].
 
 Do not generate C# enum classes for database status/type/check-value columns.
 Those Domain properties remain strings, while allowed values are enforced through
