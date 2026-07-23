@@ -1,7 +1,7 @@
 <!-- title: POS Operations -->
 <!-- status: Updated -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-04 -->
+<!-- last_updated: 2026-07-23 -->
 <!-- source: 21_POS Operations ERD image -->
 
 # 21. POS Operations
@@ -9,6 +9,11 @@
 ## Purpose
 
 This file documents POS hold, receipt, receipt template, till closing summary, till event, and cash movement tables.
+
+`pos_order_holds` and `till_cash_movements` are defined schema foundations.
+Current Flutter Park/Recall uses device-local secure storage rather than the
+backend Holds API, and no Cashier Cash In/Out mutation API was verified. Defined
+in migration source; live applied state not verified.
 
 ## Design Rules Applied
 

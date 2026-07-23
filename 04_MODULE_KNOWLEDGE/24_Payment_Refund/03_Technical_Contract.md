@@ -1,7 +1,7 @@
 <!-- title: Payment & Refund Technical Contract -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-17 -->
 
 # Payment & Refund Technical Contract
 
@@ -9,6 +9,17 @@
 
 Defines the implementation contract for `Payment_Refund`. This contract is based on
 new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
+
+## POS Safe Card Metadata Contract (2026-07-17)
+
+| Concern | Contract |
+|---|---|
+| Provider transaction id | `sales_payments.external_reference` + `sales_payment_transactions.external_transaction_reference` |
+| Card brand / last4 | Sanitized JSON only in `sales_payment_transactions.provider_response_json` |
+| UI mask | Backend builds `maskedCard` as `•••• {last4}`; Flutter must not invent masks |
+| Schema change | None — reuse existing columns |
+| Non-cash checkout | Blocked with `pos_checkout.payment_provider_required` until real provider adapter exists |
+| Domain write helper | `PosCompletedPaymentPersistence` (+ `SafePaymentDisplay`) |
 
 ## API Contract
 

@@ -77,6 +77,34 @@ Do not create a colorful consumer app style.
 | Toasts | Non-critical feedback |
 | Blocking panels | Permission denied, tenant suspended, device not trusted |
 
+## Flutter POS Primary Action Buttons
+
+The Flutter POS canonical primary action is
+`lib/shared/widgets/pos_action_buttons.dart`.
+
+| Token | Value |
+|---|---|
+| Gradient start | `#0E2748` (`TenantAdminColors.navySoft`) |
+| Gradient end | `#3F2BFF` (`TenantAdminColors.primary`) |
+| Direction | Horizontal, center-left to center-right |
+| Foreground | White |
+| Radius | 12 logical pixels |
+| Standard height | 56 logical pixels |
+| Compact height | 48 logical pixels |
+| Typography | Weight 800, single-line ellipsis |
+
+- Use `PosPrimaryActionButton` for the main forward/confirm action on screens,
+  dialogs, sheets, and recovery states.
+- Disabled actions use the neutral border background and muted foreground; the
+  active gradient must not remain visible.
+- Loading blocks duplicate taps and keeps the button dimensions stable.
+- Desktop hover, keyboard focus, pressed feedback, semantics labels, leading
+  and trailing icons, compact sizing, and full-width sizing are owned by the
+  shared component.
+- Back, Cancel, and Close remain outlined/neutral. Delete, Void, Reject, and
+  other destructive actions retain semantic red styling.
+- Feature code must not duplicate the navy-to-violet primary gradient.
+
 ## Form Rules
 
 Forms must show:

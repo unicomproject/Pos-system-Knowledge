@@ -416,3 +416,11 @@ Indexes / Constraints / Notes:
 - [[12_Product_Option_Templates_And_Variant_Configuration]]
 - [[14_Pricing_And_Tax_Management]]
 - [[16_Inventory_Foundation_Product_Tracking_And_Stock_Availability]]
+# Product barcode POS lookup note (2026-07-22)
+
+`product_barcodes` supports tenant-scoped exact POS lookup through the unique
+`(tenant_id, barcode)` constraint. The lookup preserves the barcode as a string,
+requires `ACTIVE` status, and returns `barcode_type`, `quantity_per_scan`, and
+the exact matched barcode. `product_variant_id` may be null: one active/sellable
+variant resolves successfully, multiple valid variants are ambiguous, and no
+valid variant is unavailable.

@@ -1,6 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 <!-- last_updated: 2026-07-15 -->
 
 # Permission Code List
@@ -358,19 +359,23 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `sales.cart.clear` | Clear cart |
 | `customers.view` | Customers nav / action visibility |
 | `customers.create` | Add customer button visibility |
-| `sales.discount.apply` | Apply discount button (stub) |
+| `customers.update` | Edit customer on POS Customer Management (`77777777-0338-4000-8000-000000000001`; Cashier seed assignment) |
+| `sales.discount.apply` | List/validate/apply a permitted POS discount |
 | `sales.discount.approve` | Approve/reject above-authority POS discounts; never assigned to cashier by default |
-| `sales.park.create` | Park sale button (stub) |
+| `sales.park.create` | Permit current Flutter device-local Park action; backend Hold integration remains disconnected |
 | `sales.checkout` | Proceed to Payment button |
 | `payments.cash.accept` | Cash in payment sheet |
-| `payments.card.accept` | Card in payment sheet |
-| `payments.qr.accept` | QR in payment sheet |
-| `payments.split.accept` | Split in payment sheet |
+| `payments.card.accept` | Show Card method when granted; current payment route is still a placeholder |
+| `payments.qr.accept` | Show QR method when granted; current payment route is still a placeholder |
+| `payments.split.accept` | Show Split method when granted; current payment route is still a placeholder |
 | `sales.view` | Completed payment sale summary and line items |
 | `receipts.view` | Payment success / email receipt access |
 | `receipts.print` | Print receipt screen and print action |
 | `orders.view` | Orders sidebar (no route yet) |
-| `returns.view` / `refunds.view` / `refunds.create` | Returns nav |
+| `returns.view` | Returns & Exchanges nav, Step 1 Search Original Sale, shared early Returns workflow |
+| `returns.create` | Continue from Step 1 into Step 2 Sale Summary and later shared create steps |
+| `refunds.view` / `exchanges.view` | Branch view only; do not unlock shared Step 1 search |
+| `refunds.create` / `exchanges.create` | Branch processing after resolution is selected |
 | `cash_drawer.view` / `cash_drawer.manage` | Cash drawer nav |
 | `notifications.view` | Notification bell |
 | `pos.till.open` | Till open flow (`canOpenPosTill`) |
@@ -385,6 +390,11 @@ POS permission alone is not enough; device and till-session checks still apply.
 Receipt printer selection/configuration is currently rendered under `receipts.print`.
 Dedicated `hardware.printer.select` / `hardware.printer.configure` permissions are
 not seeded until the backend hardware permission model is introduced.
+
+Permission visibility does not prove implementation. In particular,
+`cash_drawer.manage` currently gates Flutter surfaces without a verified
+cash-movement mutation API, and no dedicated verified Cashier hardware-test
+permission/API chain exists. Do not invent hardware permissions from UI labels.
 
 ## Seed Data Rule
 

@@ -1,7 +1,7 @@
 <!-- title: Cashier Login Flow -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Cashier Login Flow
 
@@ -38,7 +38,7 @@ coupon, AI, or accounting scope.
 | 1 | Open POS app | Login screen appears |
 | 2 | Enter username/email and password | Credentials are submitted |
 | 3 | Backend validates user and tenant | Access and refresh token are issued |
-| 4 | App loads allowed outlets/features | Permission-based home appears |
+| 4 | App stores the session securely and resolves device/till context | Cashier is routed to activation, till open, or POS home |
 
 ## Journey Diagram
 
@@ -71,16 +71,13 @@ flowchart TD
 
 | Area | References |
 |---|---|
-| API endpoint | `POST /api/v1/auth/tenant-login` |
+| API endpoints | `POST /api/v1/tenant-auth/login`, `POST /api/v1/tenant-auth/refresh`, `POST /api/v1/tenant-auth/logout` |
 | Request fields | `email`, `password` |
-| Tables | `users`, `auth_sessions`, `refresh_tokens`, `tenant_user_roles`, `outlet_user_roles` |
+| Session data | Tenant auth session and rotating refresh-token records defined by the current authentication module |
 
-Local development cashier credentials:
-
-```text
-Email: cashier001@gmail.com
-Password: 123456
-```
+Flutter stores the authenticated session through secure storage. Concurrent 401
+responses share one refresh operation; successful refresh retries each request
+once. A retried 401 is not refreshed repeatedly.
 
 ## Edge Cases
 
@@ -91,7 +88,9 @@ Password: 123456
 ## Out of Scope
 
 - Platform login is separate.
-- Offline login is excluded.
+- Offline login is not implemented. Controlled offline operation remains part of
+  the wider MVP scope, but it does not currently make authentication locally
+  authoritative.
 - Tenant Code is no longer entered on the POS login screen. Backend resolves the tenant from the tenant user email and returns a clear tenant-selection error if the email belongs to multiple tenants.
 
 ## Completion Criteria
@@ -103,6 +102,6 @@ Password: 123456
 
 ## Related Files
 
-- [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
+- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
+- [[../../05_BACKEND_ARCHITECTURE/API_Standards]]
