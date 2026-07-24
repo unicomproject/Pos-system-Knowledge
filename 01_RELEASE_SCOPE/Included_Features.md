@@ -39,7 +39,7 @@ subscription plan assignment, billing summary with issue-invoice and mark-paid
 (settlement), **Payment Links for eligible subscription invoices (PayHere —
 final major Super Admin feature)**, feature entitlement, tenant admin creation, initial
 outlet/till/user/role/product setup support, tenant activation/status control,
-**admin-initiated platform user password reset** (one-time token, public `/reset-password` page, session revocation; automated email deferred),
+**admin-initiated platform user password reset** (one-time token, ACS Email delivery with `deliveryMode=email` / `resetUrl=null`, public `/reset-password` page, session revocation; Platform Admin self-service Forgot Password and tenant resets remain out of scope),
 and audit visibility.
 
 **Payment link customer collection** is **Release 1 mandatory** but

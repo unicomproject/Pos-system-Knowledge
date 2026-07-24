@@ -40,7 +40,7 @@ Platform Admin opens **Platform Users** (`/admin/platform-users`).
 | 7 | Edit user | Row click loads `GET /api/v1/platform-admin/users/{userId}` into the slide-over editor. |
 | 8 | Update status | When caller has `platform.users.update`, status is saved via `PUT /api/v1/platform-admin/users/{userId}` with `{ status }`. |
 | 9 | Assign roles | When caller has `platform.users.roles.assign`, selected role IDs are saved via `PUT /api/v1/platform-admin/users/{userId}/roles` with `{ roleIds }`. Permissions are inherited from assigned roles; there is no per-user permission picker on this screen. |
-| 10 | Send password reset | When caller has `platform.users.update`, admin confirms **Send Password Reset** on user detail; `POST /api/v1/platform-admin/users/{userId}/password-reset` returns `resetUrl` (`admin_secure_link`). User completes reset on public `/reset-password?token=`. See [[17_Platform_User_Password_Reset_Flow]]. |
+| 10 | Send password reset | When caller has `platform.users.update`, admin confirms **Send Password Reset** on user detail; `POST /api/v1/platform-admin/users/{userId}/password-reset` sends ACS Email and returns `deliveryMode: email` with `resetUrl: null` (Dev may fall back to `admin_secure_link`). User completes reset from the emailed `/reset-password?token=` link. See [[17_Platform_User_Password_Reset_Flow]]. |
 
 ## Permissions
 

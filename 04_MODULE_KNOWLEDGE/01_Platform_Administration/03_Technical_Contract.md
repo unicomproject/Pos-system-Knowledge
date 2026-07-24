@@ -117,6 +117,8 @@ Public password reset (no platform JWT; rate-limited):
 
 See [[03_USER_JOURNEYS/Platform_Admin/17_Platform_User_Password_Reset_Flow]] and [[15_IMPLEMENTATION_TRACKING/Backend/Auth/SA-P1-06_Platform_Admin_User_Password_Reset_Implementation]].
 
+Password reset delivery: ACS Email when configured (`deliveryMode=email`, `resetUrl=null`); Dev may fall back to `admin_secure_link`. Self-service Forgot Password and tenant resets remain out of scope.
+
 Implementation notes:
 
 - `PlatformUserApiService` owns HTTP calls; the page component does not call APIs directly except through services.

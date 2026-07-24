@@ -600,19 +600,37 @@ All endpoints require platform JWT authentication (`PlatformOnly` policy).
 | POST | `/api/v1/platform-admin/users` | `platform.users.create` | Create platform user invite |
 | PUT | `/api/v1/platform-admin/users/{userId}` | `platform.users.update` | Update platform user status |
 | PUT | `/api/v1/platform-admin/users/{userId}/roles` | `platform.users.roles.assign` | Replace assigned platform roles |
-| POST | `/api/v1/platform-admin/users/{userId}/password-reset` | `platform.users.update` | Initiate admin password reset; returns `resetUrl` (`admin_secure_link`) |
+| POST | `/api/v1/platform-admin/users/{userId}/password-reset` | `platform.users.update` | Initiate admin password reset; ACS Email when configured (`deliveryMode: email`, `resetUrl: null`); Dev fallback may return `admin_secure_link` |
 
 ## Initiate password reset response shape
 
-No request body. Legacy envelope wraps `InitiatePlatformPasswordResetResponse`:
+No request body. Legacy envelope wraps `InitiatePlatformPasswordResetResponse`.
+
+**Email mode (ACS configured — production default):**
 
 ```json
 {
   "success": true,
   "data": {
     "userId": "guid",
-    "email": "staff@nytroz.local",
-    "expiresAt": "2026-07-20T13:00:00Z",
+    "email": "staff@example.local",
+    "expiresAt": "2026-07-24T13:00:00Z",
+    "deliveryMode": "email",
+    "resetUrl": null,
+    "message": "A password reset email has been sent to the user."
+  }
+}
+```
+
+**Development fallback (ACS unset and `AllowAdminSecureLinkFallback: true`):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": "guid",
+    "email": "staff@example.local",
+    "expiresAt": "2026-07-24T13:00:00Z",
     "deliveryMode": "admin_secure_link",
     "resetUrl": "https://admin.example/reset-password?token=...",
     "message": "Copy this secure link and share it with the user through your approved channel."
@@ -620,7 +638,7 @@ No request body. Legacy envelope wraps `InitiatePlatformPasswordResetResponse`:
 }
 ```
 
-Eligible targets: `ACTIVE` or `LOCKED` with password set; not invite-pending, inactive, or deleted. Prior pending tokens revoked on new initiate. See [[../03_USER_JOURNEYS/Platform_Admin/17_Platform_User_Password_Reset_Flow]].
+Email provider failures map to HTTP 502. Eligible targets: `ACTIVE` or `LOCKED` with password set; not invite-pending, inactive, or deleted. Prior pending tokens revoked on new initiate. See [[../03_USER_JOURNEYS/Platform_Admin/17_Platform_User_Password_Reset_Flow]].
 
 ## List response shape
 
