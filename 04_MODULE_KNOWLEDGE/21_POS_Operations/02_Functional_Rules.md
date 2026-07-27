@@ -1,7 +1,7 @@
 <!-- title: POS Operations Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # POS Operations Functional Rules
 
@@ -17,6 +17,12 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Receipt print failure does not cancel a completed backend sale.
 - Parked/held sale must remain tenant, outlet, till, and user scoped.
 - Till summary uses completed sales, payments, refunds, and cash movements.
+- Current Flutter parked sales are device-local; do not describe them as
+  backend-held or cross-device.
+- `pos_order_holds` and `/api/v1/pos/holds` are backend foundations not yet wired
+  to the Flutter parked-sale provider.
+- Cash movement schema is not a successful cashier movement without a mutation
+  API and persistence result.
 - Customer display is future unless explicitly enabled.
 
 ## User Rules

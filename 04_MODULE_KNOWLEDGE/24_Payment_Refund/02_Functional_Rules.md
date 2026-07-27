@@ -1,7 +1,7 @@
 <!-- title: Payment & Refund Functional Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-17 -->
 
 # Payment & Refund Functional Rules
 
@@ -18,6 +18,39 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Payment event history records provider and device outcomes safely.
 - Refund amount cannot exceed allowed refundable amount.
 - Offline mode cannot finalize card/QR payment or refund approval.
+
+## POS checkout payment persistence (safe card tips)
+
+Verified Unified-Commerce rules (2026-07-17):
+
+- Cash completions use `PosCompletedPaymentPersistence.CreateCash`. Do not fabricate
+  `cardBrand`, `cardLast4`, or masked references for cash.
+- Successful provider/terminal captures use
+  `PosCompletedPaymentPersistence.CreateProviderCapture` only after authorization
+  succeeds. Do not mark payment `PAID` when provider authorization failed.
+- Field separation:
+  - `sales_payments.external_reference` → provider/terminal transaction id (not for UI display)
+  - `sales_payment_transactions.external_transaction_reference` → same provider transaction id
+  - `sales_payment_transactions.provider_response_json` → **sanitized only**
+    `{"cardBrand":"...","cardLast4":"####"}` (exactly four numeric digits for last4)
+- No migration / no new columns: existing attributes are reused.
+- Prohibited persistence: full PAN, CVV/PIN, track/EMV raw payloads, provider secrets,
+  access tokens, raw unfiltered provider responses in application logs or
+  `provider_response_json`.
+- Production checkout currently blocks non-cash with `pos_checkout.payment_provider_required`
+  until a real provider adapter is integrated. Persistence mapping is ready for real
+  successful provider outcomes; tests use domain factories/fakes only.
+
+## Return Step 1 / Step 2 masked payment display
+
+- Search and eligibility both project via the same `LoadPaymentDisplaysAsync` rule.
+- Card mask format: `•••• {last4}` when a verified last4 exists.
+- Payment method label prefers normalized brand (Visa/Mastercard/Amex) when present.
+- Never truncate a long provider token to invent last4.
+- Cash / non-card: `maskedCard` is empty; show method name only.
+- Split payments: deterministic `paymentMethod = Multiple`, `maskedCard` empty.
+- Only `PAID` / `PARTIALLY_REFUNDED` payments are considered; order by `PaidAt`, then `Id`.
+- Flutter renders backend `paymentMethod` + `maskedCard` only; never build masks from raw references.
 
 ## User Rules
 

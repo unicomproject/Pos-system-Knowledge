@@ -1,7 +1,7 @@
 <!-- title: Start Sale Flow -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-18 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Start Sale Flow
 
@@ -101,17 +101,36 @@ flowchart TD
 | Journey step | Implemented? | Notes |
 |---|---|---|
 | Tap Start Sale | Yes | `/pos/home` → `/pos/new-sale` when permitted |
-| Search product | Partial | Client-side filter; `products.search` gates top bar |
-| Scan barcode | No | Hint text only; no lookup API |
-| Select variant | Yes | `PosProductVariantSheet` |
-| Add to cart | Yes | Local `posNewSaleCartProvider` only |
-| Proceed payment / park / customer | No / stub | Payment sheet UI only; action bar disabled |
+| Search product | Yes | Manual query uses the existing 350 ms catalog debounce; scanner completion clears/invalidate scanner-generated search without suppressing manual input |
+| Scan barcode | Partial | HID framing, exact Flutter API, FIFO direct cart add, one-time visual feedback, and search cleanup are implemented; physical TB-00D validation remains pending |
 
-Full code map: [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]].
+Chunk 5 feedback and search cleanup are implemented and verified by integrated
+New Sale widget tests. Focused scanner text/query clearing, pending debounce
+cancellation, general partial-search suppression, failed-lookup cleanup,
+feedback replay prevention, next-scan readiness, and manual search all pass.
+Overall scanner E2E remains partial pending physical hardware validation.
+
+Chunk 7 camera Scanner button integration is implemented and automated-tested.
+A one-shot camera result enters the same exact lookup, resolved-variant cart,
+feedback, and search-cleanup pipeline. Cancellation is silent and unsupported
+Windows/Linux execution falls back safely to USB HID guidance. Physical Android
+camera validation remains pending.
+| Select variant | Yes | `PosProductVariantSheet` |
+| Add to cart | Yes | Reusable resolved-variant action; variant-key increment, requested quantity and central known-stock limit supported |
+| Proceed payment / park / customer | Partial | Cash checkout and customer/discount entry are API-backed; Card/QR/Split are placeholders; park/recall is device-local secure storage |
+
+Exact barcode and exact SKU matches resolve the backend variant and add that
+variant directly to cart without reopening the variant picker. Product-only or
+ambiguous product search continues to use product detail/variant selection.
+Current cart presentation places the newest added line first. Offline catalogue
+and offline cash-sale/outbox operation remain MVP scope but are not implemented
+end to end.
+
+Full code map: [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cashier_POS_Implementation_Map]].
 
 ## Related Files
 
-- [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../05_BACKEND_ARCHITECTURE/API_Standards]]
-- [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]]
+- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
+- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
+- [[../../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cashier_POS_Implementation_Map]]

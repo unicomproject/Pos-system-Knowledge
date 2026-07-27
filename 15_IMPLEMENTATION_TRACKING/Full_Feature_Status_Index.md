@@ -1,7 +1,7 @@
 <!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-07-10 -->
+<!-- last_updated: 2026-07-23 -->
 
 # Full Feature Status Index
 
@@ -60,8 +60,8 @@ PR/commit reference is recorded.
 | Backend | OutletTillDevice | Device Context | Completed | 2026-07-09 | `5c99b66` | `devices/current`, `devices/activate` |
 | Backend | OutletTillDevice | Till Session Open/Close | Completed | 2026-07-09 | `06048db` | current-session, open, close |
 | Backend | POSOperations | POS Home Dashboard API | Completed | 2026-07-08 | `5c6ae7a` | `GET /api/v1/pos/home` |
-| Backend | CatalogProduct | POS Products List | In Review | - | `Sale_Screen` branch | `GET /api/v1/pos/products`; unmerged |
-| Backend | Sales | POS Checkout / Cart APIs | Not Started | - | - | Documented in API_ENDPOINTS but no `E_POS.Api` controllers |
+| Backend | CatalogProduct | POS Products List | Completed | 2026-07-23 | Current `main` audit | `GET /api/v1/pos/products`, categories, detail and exact barcode lookup exist |
+| Backend | Sales | POS Checkout / Cash Payment APIs | Testing | - | Current working tree | Checkout summary/start-payment controllers and persistence exist; working tree has local checkout changes |
 | Flutter | POS Shell | POS Home Dashboard | In Progress | - | `POS_UI` | Home API integrated; several cards placeholder |
 | Flutter | Till | Open Till Layout | Completed | 2026-07-10 | `Sale_Screen` | Full-screen tablet layout |
 | Flutter | Sales | End Shift + Close Till | Completed | 2026-07-09 | `d04ecf0` | Close till API + logout |
@@ -70,6 +70,27 @@ PR/commit reference is recorded.
 | Angular | Tenant | Tenant List Page | In Progress | - | - | Wired to platform-admin tenants API |
 | Backend | Tenant / Outlet | Outlet Create | Completed | 2026-06-18 | dashboard_tenant | `POST /api/v1/tenant-admin/outlets` |
 | Flutter | Tenant Admin / Outlet | Outlet Create UI | Completed | 2026-06-18 | tenant-dashboard | Add/Edit outlet screens |
+| Flutter | Sales | Discount | Testing | - | `scanner_inte` | API-backed list/validate/apply flow; manager approval is permission-dependent |
+| Flutter | Sales | Customer Management | Testing | - | `scanner_inte` | List/create/update/select/attach implemented; loyalty is separate and incomplete |
+| Flutter | Sales | Loyalty Earn / Redeem | Not Started | - | - | No verified cashier Flutter-to-backend loyalty flow |
+| Flutter | Sales | Cash Checkout | Testing | - | `scanner_inte` | Summary, tender, change, start-payment and success flow implemented |
+| Flutter | Sales | Card Payment | Not Started | - | - | Current route renders payment placeholder |
+| Flutter | Sales | QR Payment | Not Started | - | - | Current route renders payment placeholder |
+| Flutter | Sales | Split Payment | Not Started | - | - | Current route renders payment placeholder |
+| Flutter | Sales | Receipt Preview | Testing | - | `scanner_inte` | Receipt preview UI exists |
+| Flutter | Hardware | Physical Receipt Printing | Testing | - | `scanner_inte` | Printer facade/ESC-POS/network transport exist; physical matrix not verified |
+| Flutter | Sales | Email Receipt | In Progress | - | `scanner_inte` | Form/UI exists; delivery API completion not verified |
+| Flutter | Sales | Return / Refund | Testing | - | `scanner_inte` + backend `main` | Full authoritative workflow and broad automated coverage exist |
+| Flutter | Sales | Exchange | Testing | - | `scanner_inte` + backend `main` | Implemented as Return resolution branch with preview/completion |
+| Flutter | Cash Drawer | Cash In / Cash Out | In Progress | - | `scanner_inte` | Flutter forms exist; backend mutation wiring is absent |
+| Flutter | Sales | Park / Recall | In Progress | - | `scanner_inte` | Device-local secure storage; backend Holds API is disconnected |
+| Flutter | Hardware | HID / Camera Barcode Scanner | Testing | - | `24b4271` | Automated source coverage exists; TB-00D and physical Android tests pending |
+| Flutter | Hardware | Hardware Testing Workflow | Not Started | - | - | No complete screen/API/service/test-log flow |
+| Flutter | Sales | Offline Cash Sale / Outbox | Not Started | - | - | Included MVP scope; no verified end-to-end cashier implementation |
+
+The `Completed` row for the 2026-07-02 Cashier comparison is historical. The
+comparison document itself is now `In Progress — Re-audit Required` until its
+remaining findings and documentation updates are closed.
 
 ## Update Process
 

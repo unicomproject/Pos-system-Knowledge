@@ -1,7 +1,7 @@
 <!-- title: Flutter Cashier POS Implementation Map -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-10 -->
+<!-- last_updated: 2026-07-23 -->
 
 
 # Flutter Cashier POS Implementation Map
@@ -22,6 +22,7 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 | Open till | `/pos/till/open` | `POST /api/v1/tills/open` | Integrated |
 | POS home | `/pos/home` | `GET /api/v1/pos/home` | Integrated |
 | New Sale catalog | `/pos/new-sale` | `GET /api/v1/pos/products` | Partially integrated |
+| Search Original Sale | `/pos/returns-refunds` | `GET /api/v1/pos/returns/sales/search` | Integrated |
 | Close till | `/pos/cash-drawer/close-till` | `POST /api/v1/tills/close` | Integrated |
 | End Shift | sidebar action | close till + session clear | Integrated |
 
@@ -34,7 +35,7 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 | Product detail / variants | UI expects API | Not implemented | Blocked |
 | Category chips API | Datasource exists | Not implemented | UI uses static chips |
 | Local cart | In-memory Riverpod | N/A | UI only |
-| Checkout summary | Wired | Not in Unified-Commerce | Blocked |
+| Checkout summary | Wired | `POST /api/v1/pos/checkout/summary` | Integrated for current online cash flow |
 | Cash payment | Wired | Not in Unified-Commerce | Blocked |
 | Receipt print audit | Wired in Flutter | Not in Unified-Commerce | Blocked |
 
@@ -43,11 +44,20 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 | Card | Metrics from `pos/home` | Destination API | Status |
 |---|---|---|---|
 | Start New Sale | Enabled rules | products + checkout | Partial |
-| Returns & Refunds | Count | returns APIs | Missing backend |
-| Add Customer | Count | customers APIs | Missing backend |
-| Parked Sales | Count | park APIs | Missing backend |
+| Returns & Exchanges | Count | `GET /api/v1/pos/returns/sales/search` | Step 1 integrated; exact `returns.view` |
+| Add Customer | Count | customers APIs | Wired (`/pos/customers`) |
+| Parked Sales | Device-local count/dialog | Backend `/api/v1/pos/holds` exists but is not called by Flutter | Partial/disconnected |
 | Cash Drawer | Balance | drawer detail API | Partial (balance only) |
 | Online Orders | Placeholder | none | UI only |
+
+## Returns Step 1 Notes (2026-07-17)
+
+- Route `/pos/returns-refunds` requires exact `returns.view`.
+- Continue into `/pos/returns-refunds/summary` requires `returns.view` + `returns.create` and selected-sale context.
+- Recent tab = backend newest outlet-scoped eligible sales.
+- Recent-search chips = ephemeral in-memory query history only; not persisted.
+- Filters, pagination, and stale-response sequencing are wired to the search API.
+- No Step 1 draft API.
 
 ## Data Rules (2026-07-10)
 

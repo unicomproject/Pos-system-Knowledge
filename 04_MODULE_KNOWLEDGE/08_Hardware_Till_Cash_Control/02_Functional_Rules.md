@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Hardware Operations, Till Session & Cash Control Functional Rules
 
@@ -16,7 +16,9 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Till session is required for POS sale, payment, receipt, and cash movements.
 - Cash movement amount is positive and uses a movement type.
 - Cash reconciliation records expected cash, counted cash, and variance.
-- Hardware tests are logged but physical communication is handled by app/local service.
+- Physical communication is handled by Flutter/local device code. A hardware
+  test must not be reported as logged because no complete Cashier test-log API
+  chain is currently implemented.
 - Cash drawer open requires permission, till context, and audit.
 
 ## User Rules
@@ -34,6 +36,9 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Show this module only when the tenant plan, feature entitlement, and user permission allow it.
 - Use loading, empty, error, permission-denied, feature-disabled, offline, and conflict states where relevant.
 - Do not hardcode role names such as cashier, manager, or administrator as authorization logic.
+- Cash In/Cash Drop forms are currently frontend-only and must not show a
+  persisted-success outcome until a backend mutation succeeds.
+- Scanner/printer package or adapter presence is not physical verification.
 - Do not show fake data, fake counts, fake success states, or hardcoded module rows.
 - Mobile, tablet, iPad, laptop, and desktop layouts must keep the same business rules.
 

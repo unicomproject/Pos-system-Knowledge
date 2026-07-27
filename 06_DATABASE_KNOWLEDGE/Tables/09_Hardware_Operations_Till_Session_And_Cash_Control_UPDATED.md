@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-06 -->
+<!-- last_updated: 2026-07-23 -->
 <!-- source: Updated from uploaded ERD image: 09_Hardware Operations, Till Session & Cash Control.png -->
 
 # 09. Hardware Operations, Till Session & Cash Control
@@ -9,6 +9,11 @@
 ## Purpose
 
 This file documents the database tables, attributes, keys, nullability, indexes, constraints, and external reference entities for this module. It is aligned to the uploaded ERD image.
+
+These tables are defined in schema/migration source. No complete Cashier
+cash-movement mutation API or hardware-test logging workflow was verified.
+Schema presence therefore does not make either journey operational. Live applied
+database state was not verified.
 
 ## ERD Update Rule
 

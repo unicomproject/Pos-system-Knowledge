@@ -1,7 +1,7 @@
 <!-- title: POS Operations Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # POS Operations Technical Contract
 
@@ -54,6 +54,10 @@ history/ledger behavior where applicable.
 
 - Use feature-owned folders and typed services/providers.
 - Widgets/components must not call HTTP APIs directly.
+- `PosParkedSaleNotifier` persists `pos.parked_sales` in secure storage and does
+  not call `PosHoldsController`.
+- Cash Drawer/Cash In/Cash Drop routes and forms exist, but no backend
+  cash-movement datasource is wired.
 - Use DTOs in data layer, domain/view models in UI layer.
 - Permission and entitlement checks are UX helpers only; backend remains final authority.
 - Browser online store and Flutter business app must share backend rules but keep separate user/auth surfaces.
@@ -88,6 +92,10 @@ Test coverage must include:
 - Safe error display.
 - Audit/event/history creation where required.
 - Offline/cache behavior where this module touches POS, checkout, order, inventory, payment, or sync.
+- Add Flutter-to-backend Hold contract tests before describing Park/Recall as
+  backend persisted.
+- Add Cash In/Out controller, repository and integration tests before enabling a
+  persisted-success state.
 
 ## Implementation Sequence
 

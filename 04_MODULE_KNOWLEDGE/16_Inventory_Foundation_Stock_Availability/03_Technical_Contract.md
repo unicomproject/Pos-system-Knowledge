@@ -55,6 +55,16 @@ history/ledger behavior where applicable.
 - Use DTOs in data layer, domain/view models in UI layer.
 - Permission and entitlement checks are UX helpers only; backend remains final authority.
 - Browser online store and Flutter business app must share backend rules but keep separate user/auth surfaces.
+- Flutter POS product badges consume the backend `stockStatus` field. Unknown, missing, or unsupported status values use the unavailable state, never `In Stock`.
+- Variant selection is enabled only for variants whose authoritative available quantity is positive; Add to Cart remains disabled until a valid in-stock variant is selected.
+
+## POS Product Stock Projection
+
+- `GET /api/v1/pos/products` resolves the requesting device to its outlet, loads all active/sellable variants in batches, and performs a grouped inventory-balance lookup for active sellable locations at that outlet.
+- Product `availableQuantity` is the sum of the current-outlet availability of its active/sellable variants. Product `stockStatus` is `out_of_stock` when that sum is zero or negative, `low_stock` when the existing reorder threshold applies, and `in_stock` otherwise.
+- `GET /api/v1/pos/products/{productId}` returns the same product-level `stockStatus` and `availableQuantity`, plus outlet-scoped `stockQty` and `stockStatus` for each returned variant.
+- Queries are batched/grouped; no inventory query is issued per product or per variant.
+- Cart mutation and checkout/start-payment paths must re-read and validate current-outlet inventory and preserve existing concurrency/overselling protections.
 
 ## Backend Contract
 

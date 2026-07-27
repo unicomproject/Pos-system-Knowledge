@@ -1,13 +1,13 @@
 <!-- title: Exchange Flow -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Exchange Flow
 
 ## Purpose
 
-Defines cashier exchange using returned value/customer credit difference handling.
+Defines the Exchange branch inside the cashier Return and Refund workflow.
 
 ## Source Basis
 
@@ -27,7 +27,7 @@ coupon, AI, or accounting scope.
 
 ## Preconditions
 
-- Return/customer credit context exists.
+- Original sale, selected return lines and a validated inspection draft exist.
 - Exchange feature is enabled.
 - Cashier has exchange permission.
 
@@ -35,30 +35,34 @@ coupon, AI, or accounting scope.
 
 | Step | User/System Action | Expected Result |
 |---:|---|---|
-| 1 | Start exchange from return/credit | Exchange cart opens |
-| 2 | Select new item | New item price is calculated |
-| 3 | Compare old and new values | Difference direction is shown |
-| 4 | Collect/refund/store difference | Payment/refund/credit is allocated |
-| 5 | Complete exchange | Exchange and stock/payment records are stored |
+| 1 | Select Exchange as the persisted Return resolution | Backend validates branch access and draft version |
+| 2 | Search and select replacement product/variant | Current-outlet stock and replacement details are loaded |
+| 3 | Save replacement quantity and load preview | Backend calculates return credit, replacement totals and difference |
+| 4 | Select the permitted settlement | Cash payment, cash/card refund, or no settlement follows the authoritative direction |
+| 5 | Review and complete exchange | Exchange, stock, payment/refund and receipt records are committed |
 
 ## Journey Diagram
 
 ```mermaid
 flowchart TD
-    S1[Start exchange from return/credit]
-    S1 --> S2[Select new item]
-    S2 --> S3[Compare old and new values]
-    S3 --> S4[Collect/refund/store difference]
-    S4 --> S5[Complete exchange]
+    S1[Persist Exchange resolution]
+    S1 --> S2[Select replacement variant and quantity]
+    S2 --> S3[Load authoritative exchange preview]
+    S3 --> S4[Select permitted settlement]
+    S4 --> S5[Review and complete exchange]
     S5 --> Done[Journey completed]
 ```
 
 ## Business Rules
 
-- Exchange records old value, new value, difference total, and direction.
-- Higher value collects payment.
-- Lower value refunds or stores customer credit as allowed.
-- Stock movements must be consistent.
+- Exchange requires a non-expired `VALIDATED` inspection draft and persisted
+  `EXCHANGE` resolution.
+- Preview and completion recalculate price, tax, discount, stock and difference
+  on the backend.
+- Higher replacement value requires customer payment; lower value permits the
+  backend-approved refund method; equal value uses no settlement.
+- Store credit is not supported by the current completion flow.
+- Completion uses expected draft version and idempotency key.
 
 ## Access-Control Rules
 
@@ -73,19 +77,22 @@ flowchart TD
 
 | Area | References |
 |---|---|
-| API groups | `/api/v1/pos/exchanges`, `/api/v1/pos/payments`, `/api/v1/pos/refunds` |
-| Tables | `exchanges`, `exchange_lines`, `exchange_payment_allocations`, `exchange_refund_allocations`, `customer_credits`, `stock_movements` |
+| Resolution | `GET|PUT /api/v1/pos/returns/sales/{saleId}/resolution` |
+| Replacement | `GET /api/v1/pos/returns/sales/{saleId}/exchange/products`, `GET|PUT .../exchange/replacement` |
+| Preview/completion | `POST .../exchange-preview`, `POST .../complete` |
+| Tables | `sales_exchanges`, `sales_exchange_lines`, `sales_exchange_events`, `return_exchange_replacement_draft_lines`, `return_inspection_drafts`, `stock_movements`, payment/refund and receipt tables |
 
 ## Edge Cases
 
-- Invalid credit/return context blocks exchange.
+- Missing, expired, consumed or stale inspection draft blocks exchange.
 - Insufficient stock blocks new item.
-- Unbalanced difference blocks completion.
+- Stale price/tax/discount preview or unbalanced settlement blocks completion.
 
 ## Out of Scope
 
 - E-commerce exchange is excluded.
 - Advanced promotion exchange rules are excluded.
+- Store-credit settlement is not implemented.
 
 ## Completion Criteria
 
@@ -96,6 +103,6 @@ flowchart TD
 
 ## Related Files
 
-- [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
+- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
+- [[../../05_BACKEND_ARCHITECTURE/API_Standards]]

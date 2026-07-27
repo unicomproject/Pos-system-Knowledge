@@ -18,6 +18,12 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Serial numbers apply only when product tracking requires them.
 - Channel allocation can reserve stock for POS, online store, or click and collect.
 - Final stock authority is backend, not device cache.
+- POS product and variant availability is scoped to the outlet assigned to the requesting POS device and to active, sellable inventory locations only.
+- The canonical balance availability is `on_hand_quantity - reserved_quantity - damaged_quantity - quarantine_quantity`.
+- A POS variant is out of stock when its current-outlet available quantity is zero or negative. A missing balance for an otherwise active/sellable variant at that outlet represents zero available stock.
+- A variable product is in stock only when at least one active and sellable variant has positive current-outlet availability. Inactive, deleted, and non-sellable variants must not affect product availability.
+- Missing or unrecognized API stock status must render as unavailable/unknown in clients and must never default to a positive stock state.
+- Product list and detail responses must use the same outlet-scoped aggregation. Cart and checkout validation remain backend-authoritative regardless of UI badges or disabled controls.
 
 ## User Rules
 

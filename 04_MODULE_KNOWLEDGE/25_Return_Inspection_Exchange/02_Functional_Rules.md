@@ -1,7 +1,7 @@
 <!-- title: Return, Inspection & Exchange Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Return, Inspection & Exchange Functional Rules
 
@@ -17,6 +17,11 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Returned quantity cannot exceed sold and not-yet-returned quantity.
 - Inspection records condition and disposition before restock, scrap, or reject decisions.
 - Exchange records old value, new value, and difference direction.
+- Return/Exchange completion requires a validated, unexpired inspection draft,
+  persisted resolution, expected version and idempotency key.
+- Exchange price, tax, discount, stock and settlement direction are
+  backend-authoritative.
+- Store credit must not be offered by the current Cashier flow.
 - Online return request is allowed only if the business policy enables it; supplier return is separate.
 
 ## User Rules

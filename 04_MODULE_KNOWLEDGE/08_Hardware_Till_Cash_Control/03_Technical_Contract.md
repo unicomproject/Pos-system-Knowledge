@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Hardware Operations, Till Session & Cash Control Technical Contract
 
@@ -14,7 +14,7 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
 | Area | Contract |
 |---|---|
-| API groups | `/api/v1/hardware`, `/api/v1/tills/sessions`, `/api/v1/cash-movements`, `/api/v1/hardware-tests` |
+| API groups | `/api/v1/tills/current-session`, `/api/v1/tills/open`, `/api/v1/tills/close` |
 | Request format | Typed request DTOs; no raw map payloads in application layer |
 | Response format | Typed response DTOs with safe fields only |
 | Error format | Standard API error response |
@@ -25,10 +25,10 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
 | API Group | Purpose |
 |---|---|
-| `/api/v1/hardware` | Module API group |
-| `/api/v1/tills/sessions` | Module API group |
-| `/api/v1/cash-movements` | Module API group |
-| `/api/v1/hardware-tests` | Module API group |
+| `/api/v1/tills/current-session` | Resolve the assigned open till session |
+| `/api/v1/tills/open` | Open the assigned till with opening float |
+| `/api/v1/tills/close` | Close the open session with counted cash and variance reason |
+| Cash movement / hardware test | No verified Cashier mutation API currently exists |
 
 ## Database Contract
 
@@ -38,8 +38,7 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 | `hardware_device_assignments` | Used by this module |
 | `hardware_test_logs` | Used by this module |
 | `till_sessions` | Used by this module |
-| `cash_movement_types` | Used by this module |
-| `cash_movements` | Used by this module |
+| `till_cash_movements` | Defined in schema source; live application and Cashier API use not verified |
 | `cash_reconciliations` | Used by this module |
 | `cash_count_denominations` | Used by this module |
 

@@ -45,9 +45,11 @@ Response fields used by Flutter: `id`, `variantId`, `name`, `description`,
 | Layer | Status | Notes |
 |---|---|---|
 | Backend route | Implemented | `PosProductsController` |
+| Exact barcode route | Implemented | `GET /api/v1/pos/products/by-barcode/{barcode}` on `scanner_inte`; exact active tenant barcode only |
 | Database read | Implemented | `products`, `product_variants`, `price_list_items`, categories, images |
 | Flutter datasource | Wired | `pos_catalog_remote_datasource.dart` |
 | Flutter provider | Wired | Real API only; mock fallback removed 2026-07-10 |
+| Flutter scanner capture | Not implemented | USB HID listener and camera scanner remain pending |
 | End-to-end sale | Blocked | Checkout APIs not in Unified-Commerce yet |
 
 ## Files Changed

@@ -1,7 +1,7 @@
 <!-- title: Till Close Flow -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Till Close Flow
 
@@ -36,7 +36,7 @@ coupon, AI, or accounting scope.
 | Step | User/System Action | Expected Result |
 |---:|---|---|
 | 1 | Tap logout or close till | Close till screen appears |
-| 2 | Enter counted cash/denominations | Amounts are calculated |
+| 2 | Enter counted cash | Difference from backend expected cash is calculated |
 | 3 | Review expected cash and variance | Variance is shown |
 | 4 | Confirm close till | Session is closed |
 | 5 | Logout if requested | Auth session ends after close flow |
@@ -73,18 +73,24 @@ flowchart TD
 
 | Area | References |
 |---|---|
-| API groups | `/api/v1/tills`, `/api/v1/auth` |
-| Tables | `till_sessions`, `cash_count_denominations`, `cash_movements`, `auth_sessions`, `audit_logs` |
+| API endpoints | `POST /api/v1/tills/close`, followed by tenant logout when End Shift requests logout |
+| Close request | Trusted device context, counted cash and mismatch reason when variance exists |
+| Tables | `till_sessions`, `till_session_summaries`, `till_session_payment_summaries`, `till_session_events`, `till_cash_movements` |
+
+The current screen supports total counted cash and requires a mismatch reason
+when variance exists. A complete denomination-entry workflow was not verified.
+Close API/form/repository tests exist, but one full device-to-close-to-logout E2E
+test and logout-failure recovery evidence remain gaps.
 
 ## Edge Cases
 
-- Variance may require manager review.
+- Variance requires a mismatch reason in the current Flutter flow.
 - Already closed session returns conflict.
 - Logout with open till should route to close till.
 
 ## Out of Scope
 
-- Offline till close is excluded.
+- Offline final till close is not implemented and remains backend-authoritative.
 - Accounting close day is excluded.
 
 ## Completion Criteria
@@ -96,6 +102,6 @@ flowchart TD
 
 ## Related Files
 
-- [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
+- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
+- [[../../05_BACKEND_ARCHITECTURE/API_Standards]]

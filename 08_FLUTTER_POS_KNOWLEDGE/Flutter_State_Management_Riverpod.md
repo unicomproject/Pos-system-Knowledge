@@ -69,6 +69,16 @@ Offline sync providers should expose:
 - Using providers as permanent storage.
 - Allowing UI state to become final business truth.
 
+## Scanner and Search Coordination
+
+New Sale keeps scanner processing state, one-time feedback events, and manual
+search state separate. A completed HID scan clears the search query through a
+coordinator and increments a cancellation generation watched by the catalog
+provider. This disposes any pending 350 ms scanner-generated debounce before a
+general product-search request can start. The top bar retains private ownership
+of its text controller and synchronizes it from provider state; focus is not
+forced or removed.
+
 ## Related Files
 
 - [[Flutter_API_Integration]]

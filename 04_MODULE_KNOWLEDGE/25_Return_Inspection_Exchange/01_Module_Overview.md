@@ -1,7 +1,7 @@
 <!-- title: Return, Inspection & Exchange Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Return, Inspection & Exchange Module Overview
 
@@ -22,7 +22,7 @@ merchandising, attractions, and temporary retail locations.
 | Module number | 25 |
 | Primary users | Cashier, Store Manager, Customer |
 | Frontend surfaces | Return search, Return item selection, Inspection capture, Exchange flow |
-| API groups | `/api/v1/returns`, `/api/v1/returns/{id}/inspection`, `/api/v1/exchanges`, `/api/v1/pos/returns`, `/api/v1/pos/exchanges` |
+| API groups | `/api/v1/pos/returns` for Return, Refund and Exchange resolution branches |
 
 ## Main Tables
 
@@ -43,6 +43,9 @@ merchandising, attractions, and temporary retail locations.
 - Returned quantity cannot exceed sold and not-yet-returned quantity.
 - Inspection records condition and disposition before restock, scrap, or reject decisions.
 - Exchange records old value, new value, and difference direction.
+- Exchange is not a standalone Cashier API; it is selected and persisted as a
+  resolution against a validated inspection draft.
+- Store-credit settlement is unsupported by the current completion flow.
 - Online return request is allowed only if the business policy enables it; supplier return is separate.
 
 ## Access Summary

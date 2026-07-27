@@ -6,6 +6,14 @@
 
 # Start Sale UI Implementation Status
 
+## Product and Variant Stock Status (2026-07-18)
+
+- New Sale product and variant stock badges are backend-authoritative.
+- Product list and detail models consume `stockStatus` and `availableQuantity` from the current-outlet POS APIs.
+- Missing/unrecognized stock status renders `Unavailable`; it does not default to green `In Stock`.
+- Variable-product tiles show `Out of Stock` when every active/sellable variant has zero availability, and the tile cannot start an add-to-cart flow in that state.
+- Zero-stock variant chips remain disabled. Add to Cart requires a fully selected in-stock variant and respects its available-quantity limit.
+
 ## Summary
 
 | Item | Value |
@@ -25,6 +33,48 @@
 POS shell, home dashboard, and New Sale catalog/cart UI are implemented.
 `GET /api/v1/pos/products` is wired for the product grid. **Mock catalog fallback
 was removed on 2026-07-10** — only real database products are shown.
+
+The backend exact barcode endpoint
+`GET /api/v1/pos/products/by-barcode/{barcode}` is implemented on `scanner_inte`.
+Flutter USB HID capture, scanner lifecycle, exact scanner-to-cart processing,
+typed visual feedback, and scanner-owned search cleanup are implemented. Camera
+scanning and physical TURBOGEAR TB-00D validation are not implemented.
+
+## Resolved Variant Cart Action (2026-07-22)
+
+- `PosResolvedSaleItem` provides a source-agnostic manual/barcode/camera input.
+- `PosResolvedVariantCartAction.add` adds an already resolved item without a
+  variant selector and accepts requested quantities greater than one.
+- Variant ID remains the cart-line identity: the same variant increments and a
+  different variant creates a separate line.
+- `PosNewSaleCartNotifier.addToCart` now centrally rejects invalid quantity,
+  unavailable/out-of-stock products, missing price, and known stock overflow.
+- New cart lines retain insertion order; the existing reversed cart rendering
+  continues to show the newest line at the top.
+- Flutter USB HID framing is implemented at the New Sale root using
+  `PosBarcodeScannerListener`. It supports printable key-down buffering,
+  Enter/numpad Enter completion, leading zeroes, minimum-length/custom
+  validation, inactivity reset, enabled-state reset, and safe handler disposal.
+- Exact barcode Flutter API integration, response mapping, FIFO scan queue,
+  processing state/lock, exact variant direct cart add, controller disposal
+  guard, and New Sale modal-route enablement are implemented.
+- Scanner success/error feedback uses monotonic event IDs and safe typed outcome
+  mappings. The current snackbar is replaced for consecutive scan results.
+- Completed scanner input clears the search query/text immediately, invalidates
+  the pending 350 ms debounce, restores the unfiltered catalog, and preserves
+  focus. Manual search remains unchanged.
+- Physical TB-00D validation and camera scanning remain unimplemented; full
+  scanner E2E remains partial pending Chunk 6.
+- Chunk 5 feedback/search cleanup is implemented and verified. Integrated tests
+  cover focused TextField clearing, query clearing, debounce cancellation,
+  general-search suppression, exact lookup, failed-lookup cleanup, next scan,
+  feedback replay prevention, and manual-search regression.
+- Chunk 7 camera Scanner button integration is implemented with
+  `mobile_scanner 7.4.0`. Android/iOS configuration, one-shot frame locking,
+  rear-camera dialog, torch, cancellation, safe errors, Windows fallback, and
+  reuse of the existing exact queue/cart/feedback/search pipeline are covered.
+  Automated tests and Android debug APK build pass; physical Android camera
+  validation remains pending.
 
 Checkout, receipt, and payment Flutter datasources exist but **Unified-Commerce
 does not yet expose** `POST /api/v1/pos/checkout/*` controllers. Cash checkout

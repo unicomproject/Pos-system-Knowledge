@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Hardware Operations, Till Session & Cash Control Module Overview
 
@@ -22,7 +22,7 @@ merchandising, attractions, and temporary retail locations.
 | Module number | 08 |
 | Primary users | Cashier, Store Manager, Tenant Admin |
 | Frontend surfaces | Till open/close, Cash in/out, Hardware testing, Printer/scanner/drawer/card reader status |
-| API groups | `/api/v1/hardware`, `/api/v1/tills/sessions`, `/api/v1/cash-movements`, `/api/v1/hardware-tests` |
+| API groups | Verified Cashier APIs: `/api/v1/tills/current-session`, `/api/v1/tills/open`, `/api/v1/tills/close`; hardware/cash-movement test APIs are not implemented |
 
 ## Main Tables
 
@@ -32,8 +32,7 @@ merchandising, attractions, and temporary retail locations.
 | `hardware_device_assignments` | Used by this module |
 | `hardware_test_logs` | Used by this module |
 | `till_sessions` | Used by this module |
-| `cash_movement_types` | Used by this module |
-| `cash_movements` | Used by this module |
+| `till_cash_movements` | Schema foundation exists; cashier mutation API is not wired |
 | `cash_reconciliations` | Used by this module |
 | `cash_count_denominations` | Used by this module |
 
@@ -44,6 +43,8 @@ merchandising, attractions, and temporary retail locations.
 - Cash reconciliation records expected cash, counted cash, and variance.
 - Hardware tests are logged but physical communication is handled by app/local service.
 - Cash drawer open requires permission, till context, and audit.
+- Current hardware-test logging and cashier Cash In/Out are not end-to-end
+  implemented; schema presence is not operational API behavior.
 
 ## Access Summary
 

@@ -82,3 +82,11 @@ PIN values.
 - [[Flutter_API_Integration]]
 - [[Flutter_Error_Handling]]
 - [[Flutter_Offline_Operation_Sync]]
+
+## Exact POS barcode lookup (2026-07-22)
+
+Flutter calls the dedicated exact endpoint through `PosBarcodeRemoteDatasource`:
+`GET /api/v1/pos/products/by-barcode/{encodedBarcode}?deviceId={deviceId}`.
+Barcodes remain strings and path segments are encoded. The response maps through
+`PosBarcodeLookupResult` into `PosResolvedSaleItem`; it is not routed through the
+debounced general catalog search.

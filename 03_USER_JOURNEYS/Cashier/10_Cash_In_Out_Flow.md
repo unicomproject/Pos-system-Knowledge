@@ -1,7 +1,7 @@
 <!-- title: Cash In Out Flow -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Cash In Out Flow
 
@@ -38,8 +38,8 @@ coupon, AI, or accounting scope.
 | 1 | Open cash drawer/cash movement | Cash movement form appears |
 | 2 | Select movement type and reason | Cash in/out category is chosen |
 | 3 | Enter amount and note | Amount is validated |
-| 4 | Submit movement | Cash movement is stored |
-| 5 | Receipt/audit is saved where required | Till expected cash updates |
+| 4 | Submit movement | Target behavior is backend validation and persistence |
+| 5 | Refresh drawer summary | Target behavior is authoritative expected-cash update |
 
 ## Journey Diagram
 
@@ -73,19 +73,27 @@ flowchart TD
 
 | Area | References |
 |---|---|
-| API groups | `/api/v1/pos/payments` or cash movement group |
-| Tables | `cash_movement_types`, `cash_movements`, `till_sessions`, `audit_logs` |
+| Current Flutter | Cash Drawer, Cash In and Cash Drop screens/forms/providers exist |
+| Current API | No cashier cash-movement mutation endpoint was verified |
+| Schema | `till_cash_movements` and related till-session schema are defined in source |
+
+Current classification is `FRONTEND_ONLY`. Form state is not proof of a stored
+movement, audit record or expected-cash update. The schema is approved data
+foundation, but operational controller/service/repository wiring remains absent.
+Defined in migration source; live applied state not verified.
 
 ## Edge Cases
 
 - No open till blocks action.
-- Invalid amount returns validation error.
+- Invalid amount is blocked by current Flutter form validation.
 - No permission returns 403.
 
 ## Out of Scope
 
 - Accounting ledger is excluded.
 - Bank deposit workflow is excluded.
+- Cash movement must not be treated as completed until backend mutation and
+  persistence are wired and tested.
 
 ## Completion Criteria
 
@@ -96,6 +104,6 @@ flowchart TD
 
 ## Related Files
 
-- [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
+- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
+- [[../../05_BACKEND_ARCHITECTURE/API_Standards]]

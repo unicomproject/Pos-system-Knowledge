@@ -1,7 +1,7 @@
 <!-- title: Discount Flow -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Discount Flow
 
@@ -73,8 +73,13 @@ flowchart TD
 
 | Area | References |
 |---|---|
-| API groups | `/api/v1/discounts`, `/api/v1/pos/sales` |
-| Tables | `discount_policies`, `pos_discount_applications`, `discount_types`, `discount_scopes`, `sales`, `sale_lines` |
+| API endpoints | `GET /api/v1/pos/discounts`, `POST /api/v1/pos/discounts/validate`, `POST /api/v1/pos/discounts/apply` |
+| Approval/cancel | `POST /api/v1/pos/discounts/{applicationId}/approve`, `POST /api/v1/pos/discounts/{applicationId}/cancel` |
+| Tables | `discount_policies`, `pos_discount_applications`, `pos_discount_application_events`, `pos_discount_authority_limits`, `sales_orders`, `sales_order_lines` |
+
+Manual order and item discounts support percentage and fixed values. Backend
+policy and authority checks are final. An above-authority discount is not
+complete until an authorised manager decision succeeds.
 
 ## Edge Cases
 
@@ -96,6 +101,6 @@ flowchart TD
 
 ## Related Files
 
-- [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
+- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
+- [[../../05_BACKEND_ARCHITECTURE/API_Standards]]

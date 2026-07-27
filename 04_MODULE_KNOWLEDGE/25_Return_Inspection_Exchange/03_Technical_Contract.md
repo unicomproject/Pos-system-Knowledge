@@ -1,7 +1,7 @@
 <!-- title: Return, Inspection & Exchange Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Return, Inspection & Exchange Technical Contract
 
@@ -14,7 +14,7 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
 | Area | Contract |
 |---|---|
-| API groups | `/api/v1/returns`, `/api/v1/returns/{id}/inspection`, `/api/v1/exchanges`, `/api/v1/pos/returns`, `/api/v1/pos/exchanges` |
+| API groups | `/api/v1/pos/returns` |
 | Request format | Typed request DTOs; no raw map payloads in application layer |
 | Response format | Typed response DTOs with safe fields only |
 | Error format | Standard API error response |
@@ -25,11 +25,11 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
 | API Group | Purpose |
 |---|---|
-| `/api/v1/returns` | Module API group |
-| `/api/v1/returns/{id}/inspection` | Module API group |
-| `/api/v1/exchanges` | Module API group |
-| `/api/v1/pos/returns` | Module API group |
-| `/api/v1/pos/exchanges` | Module API group |
+| `/api/v1/pos/returns/sales/search` | Original-sale search |
+| `/api/v1/pos/returns/sales/{saleId}/inspection/*` | Draft, media and validation lifecycle |
+| `/api/v1/pos/returns/sales/{saleId}/resolution` | Persist Refund or Exchange branch |
+| `/api/v1/pos/returns/sales/{saleId}/exchange/*` | Replacement selection and preview |
+| `/api/v1/pos/returns/sales/{saleId}/complete` | Idempotent completion |
 
 ## Database Contract
 

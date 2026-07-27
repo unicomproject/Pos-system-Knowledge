@@ -1,7 +1,7 @@
 <!-- title: Cashier POS Second Brain vs Code Comparison Status -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-10 -->
+<!-- last_updated: 2026-07-23 -->
 
 
 # Cashier POS Second Brain vs Code Comparison
@@ -28,12 +28,77 @@ This is analysis/status only. No frontend/backend code changes are included.
 | Platform | Flutter + Backend (comparison audit) |
 | Module | Cashier POS (Home, New Sale, Customer, Discount, Parked Sale, Payment, Receipt) |
 | Feature | Second Brain vs Code comparison |
-| Status | Completed |
+| Status | In Progress — Re-audit Required |
 | Completed Date | 2026-07-02 |
 | Developer | AI assistant |
 | Reviewer | - |
 | PR / Commit | - |
-| Tests | N/A (documentation audit) |
+| Tests | Current automated test inventory re-audited; physical hardware verification remains pending |
+
+The comparison below contains the original 2026-07-02 snapshot and its
+2026-07-10 delta. It is retained as audit history, but it is no longer the
+current implementation truth. Use **Current Re-audit — 2026-07-23** for current
+Cashier POS status.
+
+## Current Re-audit — 2026-07-23
+
+### Repository Evidence
+
+| Repository | Branch | Commit | Working tree at audit |
+|---|---|---|---|
+| Second Brain | `return_search_sale` | `146ce48` | Existing documentation changes present and preserved |
+| Flutter POS | `scanner_inte` | `24b4271` | Clean |
+| Unified Commerce backend | `main` | `09ccbeb` | Local checkout service/repository/test changes present |
+
+### Current Journey Summary
+
+| Journey | Current code status | Current documentation finding |
+|---|---|---|
+| Cashier login | End-to-end implemented | Login endpoint and auth-table wording require correction |
+| Device activation | End-to-end implemented | Current/activate endpoints and device context require correction |
+| Till opening | End-to-end implemented | Exact current-session/open contract requires correction |
+| Start New Sale | Partially implemented | Product/SKU/barcode, HID/camera scanning, cart and cash-checkout entry are implemented; offline sale is not |
+| Discount | Partially implemented | Real list/validate/apply/approve/cancel APIs exist; manager approval remains permission-dependent |
+| Customer and loyalty | Partially implemented | Customer CRUD/select/attach exists; loyalty earn/redeem is not implemented |
+| Payment and checkout | Partially implemented | Cash is transactional; Card, QR and Split routes are placeholders |
+| Return and refund | End-to-end implemented | Current ten-step journey is substantially aligned |
+| Exchange | End-to-end implemented | Implemented as a Return resolution branch, not a standalone Exchange API |
+| Cash In / Cash Out | Frontend only | Forms exist; no cashier cash-movement mutation API is wired |
+| Till close / End Shift | Partially implemented | Real close API exists; denomination and full close-to-logout E2E evidence remain incomplete |
+| Park / Recall | Partially implemented/disconnected | Flutter uses local secure storage; backend Holds API exists but is not called by Flutter |
+| Hardware testing | Runtime verification required | Scanner/printer source exists; physical and hardware-test-log workflow verification is incomplete |
+
+### Current Payment Method Status
+
+| Method | Status | Evidence |
+|---|---|---|
+| Cash | Implemented | Flutter checkout summary/start-payment flow and backend `POST /api/v1/pos/checkout/summary` plus `start-payment` |
+| Card | UI placeholder | `/pos/new-sale/payment/card` resolves to `PosPaymentPlaceholderScreen` |
+| QR | UI placeholder | `/pos/new-sale/payment/qr` resolves to `PosPaymentPlaceholderScreen` |
+| Split | UI placeholder | `/pos/new-sale/payment/split` resolves to `PosPaymentPlaceholderScreen` |
+
+### Corrections To The Original Snapshot
+
+| Old snapshot claim | Current verified truth |
+|---|---|
+| Checkout APIs are absent | Checkout summary and start-payment controller/service/repository chains exist |
+| Returns/refunds are a placeholder | Full Return/Refund workflow, persistence, completion and automated tests exist |
+| Exchange is missing | Exchange is implemented inside the persisted Return resolution workflow |
+| Actual printing is only an audit snackbar | A local receipt-printer facade, ESC/POS generator and network transport exist; physical hardware remains unverified |
+| Scanner camera support is pending | Android/iOS camera source and automated coverage exist; physical Android verification remains pending |
+| Parked sale is backend-aware | Current Flutter park/recall is device-local secure storage; backend Holds is disconnected |
+| Cash drawer operations are a placeholder only | Cash Drawer/Cash In/Cash Drop UI exists, but cash mutation remains frontend-only |
+
+### Remaining High-Risk Gaps
+
+- Card, QR and Split payment completion.
+- Backend persistence for cashier Cash In / Cash Out.
+- Flutter integration with backend POS Holds.
+- Loyalty earn/redeem.
+- Email receipt delivery.
+- Offline cash-sale outbox and sync.
+- Physical scanner, printer, drawer and card-terminal acceptance evidence.
+- Hardware-test screen/API/service/logging workflow.
 
 ## 1. Summary
 

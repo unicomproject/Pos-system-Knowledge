@@ -1,7 +1,7 @@
 <!-- title: Till Open Flow -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-23 -->
 
 # Till Open Flow
 
@@ -75,18 +75,19 @@ flowchart TD
 
 | Area | References |
 |---|---|
-| API groups | `/api/v1/tills`, `/api/v1/pos/sales` |
-| Tables | `till_sessions`, `cash_count_denominations`, `pos_devices`, `tills` |
+| API endpoints | `GET /api/v1/tills/current-session`, `POST /api/v1/tills/open` |
+| Open request | Trusted `deviceId`, non-negative opening float and optional opening note |
+| Tables | `till_sessions`, `till_session_events`, `pos_devices`, `till_device_assignments`, `tills`, `outlets` |
 
 ## Edge Cases
 
 - Already open till returns conflict.
-- Wrong outlet/device returns 403.
+- Untrusted, unassigned or cross-tenant device/till context is rejected.
 - Invalid amount returns validation error.
 
 ## Out of Scope
 
-- Offline till opening is excluded.
+- Offline till opening is not implemented; backend remains final authority.
 - Customer display is excluded.
 
 ## Completion Criteria
@@ -98,6 +99,6 @@ flowchart TD
 
 ## Related Files
 
-- [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
+- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
+- [[../../05_BACKEND_ARCHITECTURE/API_Standards]]
