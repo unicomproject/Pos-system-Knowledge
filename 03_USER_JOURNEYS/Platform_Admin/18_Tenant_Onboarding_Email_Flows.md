@@ -40,12 +40,13 @@ Current code may write billing values into `tenants.status` and block `CanActiva
 4. Email contains: plan, amount, currency, billing frequency, due date, **payment link**.
 5. Email does **not** contain password or set-password link.
 6. Tenant pays via payment link.
-7. Super Admin **manually verifies** payment (Release 1).
-8. Super Admin **manually activates** the tenant (Release 1). Paid activation **requires verified payment**.
-9. Tenant lifecycle status → **`ACTIVE`**.
-10. System sends **`tenant.paid_activated`** / set-password email (`tenant_activated_set_password`).
-11. Activation email contains: Tenant Admin username/email, tenant login URL, single-use set-password link, expiry.
-12. Tenant Admin sets password and logs in.
+7. Super Admin **manually verifies** payment (Release 1), or records an approved payment waiver.
+8. After verification/waiver and before activation, tenant lifecycle status → **`PENDING_ACTIVATION`**.
+9. Super Admin **manually activates** the tenant (Release 1). Paid activation **requires verified payment or approved waiver**.
+10. Tenant lifecycle status → **`ACTIVE`**.
+11. System sends **`tenant.paid_activated`** / set-password email (`tenant_activated_set_password`).
+12. Activation email contains: Tenant Admin username/email, tenant login URL, single-use set-password link, expiry.
+13. Tenant Admin sets password and logs in.
 
 **Deferred R1:** separate Payment Received email (`tenant.payment_received`).
 
@@ -62,7 +63,7 @@ Current code may write billing values into `tenants.status` and block `CanActiva
    - Demo → `tenant.demo_created`
 4. Created email contains: trial/demo type, start date, expiry date, next-step information — **no** set-password link.
 5. Tenant is **automatically activated** after successful create/provisioning.
-6. Created and activated **audit events remain separate**.
+6. Created and activated **audit events remain separate** (`TENANT_CREATED`, then `TENANT_ACTIVATED`) even when one orchestration performs both.
 7. System sends **Activated / Ready to Use** email (`tenant.trial_activated` or `tenant.demo_activated`) with set-password link.
 8. Therefore Trial/Demo receives **two distinct emails**:
    1. Tenant Created
@@ -86,10 +87,21 @@ Current code may write billing values into `tenants.status` and block `CanActiva
 
 | Mode | Payment | Verification | Activation |
 |---|---|---|---|
-| Paid | Payment link **required** | **Manual** Super Admin verify | **Manual** activate after verified payment |
+| Paid | Payment link **required** | **Manual** Super Admin verify, or approved waiver record | **Manual** activate after verified payment / waiver |
 | Trial / Demo | Not required | N/A | **Automatic** after successful create/provisioning |
 
 Payment-link Application/API/UI/email are currently **missing** even though R1 mandates payment links for paid collection.
+
+## Lifecycle alignment implementation status
+
+| Item | Status |
+|---|---|
+| APPROVED: lifecycle model and mappings | **APPROVED** |
+| Backend lifecycle correction | **NOT IMPLEMENTED** |
+| Data cleanup migration | **NOT IMPLEMENTED** |
+| `tenants.status` CHECK constraint | **NOT IMPLEMENTED** |
+| `lifecycleStatus` API transition | **NOT IMPLEMENTED** |
+| Frontend badge/filter alignment | **NOT IMPLEMENTED** |
 
 ---
 

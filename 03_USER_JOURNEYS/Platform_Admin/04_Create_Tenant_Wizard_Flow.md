@@ -43,6 +43,15 @@ Platform Admin
 
 Subscription type (`PAID`/`TRIAL`/`DEMO`), billing cycle, subscription status, and payment status stay on subscription/billing models — **not** in `tenants.status`.
 
+### Approved lifecycle orchestration details
+
+- **Paid:** create tenant record, record `TENANT_CREATED`, final create lifecycle = `PENDING_PAYMENT`.
+- **Paid activation prerequisite:** payment verification recorded **or** approved payment waiver recorded.
+- **Paid post-verification state:** `PENDING_ACTIVATION` until manual Release 1 activation.
+- **Trial/Demo:** create tenant record, record `TENANT_CREATED`, automatically activate in the same orchestration, record `TENANT_ACTIVATED`, final lifecycle = `ACTIVE`.
+- Trial/Demo create and activate remain **separate domain/audit events** even when one orchestration performs both.
+- `billingStatus` must **never** be passed to `Tenant.Create()` as the lifecycle status.
+
 ## API Flow (current + target)
 
 1. `GET /api/v1/platform-admin/tenants/create-options`
@@ -65,9 +74,15 @@ Subscription type (`PAID`/`TRIAL`/`DEMO`), billing cycle, subscription status, a
 | Topic | Approved | Current code (defect / gap) |
 |---|---|---|
 | `tenants.status` | Lifecycle only (`PENDING_PAYMENT`, etc.) | May write **billing** values into `status` — **defect** |
+| Paid verification / waiver -> `PENDING_ACTIVATION` | Required | **NOT IMPLEMENTED** |
 | Paid create email | Required | **NOT IMPLEMENTED** |
 | Payment link | Required for paid | **NOT IMPLEMENTED** |
 | Trial/Demo auto-activate + two emails | Required | **NOT IMPLEMENTED** (activate often manual; no emails) |
+| Backend lifecycle correction | Approved | **NOT IMPLEMENTED** |
+| Data cleanup migration | Approved | **NOT IMPLEMENTED** |
+| `tenants.status` CHECK constraint | Approved | **NOT IMPLEMENTED** |
+| `lifecycleStatus` API transition | Approved | **NOT IMPLEMENTED** |
+| Frontend lifecycle badge/filter alignment | Approved | **NOT IMPLEMENTED** |
 | Wizard FE hint “email not wired” | Temporary until emails ship | Matches current code; superseded as product SOT by [[18_Tenant_Onboarding_Email_Flows]] |
 
 ### Decision history — superseded statements

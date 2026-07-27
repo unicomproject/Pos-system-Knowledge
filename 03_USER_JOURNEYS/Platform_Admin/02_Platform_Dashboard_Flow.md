@@ -37,7 +37,7 @@ Login succeeds and redirects to dashboard.
 | 4 | Show attention items | Four attention rows from API `attentionItems` (not invented metrics). |
 | 5 | Open attention card | Navigates with the correct filter (see metric definitions). |
 | 6 | Show recent tenant activity | Latest five tenants by `createdAt` (name + tenant status). |
-| 7 | Show tenant status snapshot | Active / Trial / Suspended / Inactive derived counts. |
+| 7 | Show tenant status snapshot | Lifecycle counts derived from canonical tenant lifecycle values. |
 | 8 | Select target module | Quick link to tenant list and other permitted modules. |
 
 ## Attention metric definitions (authoritative)
@@ -45,7 +45,7 @@ Login succeeds and redirects to dashboard.
 | Type | Included | Excluded / notes |
 |---|---|---|
 | `suspended_tenants` | Tenant status `suspended` | Case-insensitive match |
-| `setup_pending` | Tenant status `setup_pending` **or** `pending_payment` | Other statuses excluded |
+| `pending_activation` | Tenant lifecycle status `PENDING_ACTIVATION` | Other lifecycle states excluded |
 | `past_due_subscriptions` | Subscription status `PAST_DUE` | Not invoice overdue; not tenant billing enum |
 | `pending_billing` | Invoices with status `PENDING` and `balance_due > 0` | Draft/paid invoices excluded |
 | Soft-deleted tenants | Tenants table has no soft-delete filter on dashboard | Outlets/tills/users exclude `DELETED` |
@@ -60,7 +60,7 @@ Metrics **not** in the current API contract (do not invent): expiring subscripti
 | Attention type | Destination |
 |---|---|
 | `suspended_tenants` | `/admin/tenants?status=suspended` |
-| `setup_pending` | `/admin/tenants?status=setup_pending` |
+| `pending_activation` | `/admin/tenants?status=PENDING_ACTIVATION` |
 | `past_due_subscriptions` | `/admin/tenants?billingStatus=PAST_DUE` (list BillingStatus = subscription status) |
 | `pending_billing` | `/admin/billing` |
 

@@ -12,6 +12,8 @@ Approved create/activation emails and lifecycle statuses: [[18_Tenant_Onboarding
 - Never email `temporaryPassword` (field may exist historically — **must not** be used to send plaintext passwords).
 - `sendInvite: true` means persist invite / setup for later email — delivery follows activation rules when implemented.
 - `tenants.status` must be lifecycle-only; billing values in `status` are an **implementation defect**.
+- `billingStatus` is a billing concern only; it must **never** be passed to `Tenant.Create()` as the lifecycle status.
+- Canonical tenant response field is `lifecycleStatus`; `billingStatus` remains the billing concern field. Any temporary lifecycle compatibility alias must be marked deprecated and removed later.
 
 ## Uploaded UI vs Implemented Contract
 
@@ -49,7 +51,7 @@ Dropdowns bind to lookup `value` (API code), not `label` (display text).
 | Operating mode | POS Only | `operatingMode: "pos_only"` | `tenants.operating_mode` varchar(40) |
 | Business type | Retail | `businessType: "retail"` | `tenant_profiles.business_type_id` → `business_types` |
 | Currency | LKR - Sri Lankan Rupee | `baseCurrency: "LKR"` | `tenants.base_currency_code` char(3) |
-| Billing status | Pending | `billingStatus: "pending"` | billing fields on subscription / tenant billing status |
+| Billing status | Pending | `billingStatus: "pending"` | billing fields on subscription / invoice domain only |
 | Subscription status | Trial | `subscription.subscriptionStatus: "trial"` | `tenant_subscriptions.subscription_status` |
 | Payment method | Manual | `subscription.paymentMethod: "manual"` | subscription billing fields |
 
@@ -64,6 +66,12 @@ Dropdowns bind to lookup `value` (API code), not `label` (display text).
 | Payment method | `subscription.paymentMethod` | From create-options `paymentMethods` (`manual`, `bank_transfer`) |
 
 `trial` is a subscription status, not a billing status.
+
+Lifecycle create rule:
+
+- Paid create -> `lifecycleStatus = PENDING_PAYMENT`
+- After verification or waiver and before manual activation -> `lifecycleStatus = PENDING_ACTIVATION`
+- Trial/Demo create orchestration ends with `lifecycleStatus = ACTIVE`
 
 ## Create Request Shape (camelCase JSON)
 
@@ -141,6 +149,17 @@ See [[SA-P0-01_Tenant_Wizard_Field_Persistence_Fix]].
 - Country rules: equal codes OK; top-level-only creates primary address; conflicting codes rejected.
 - Runtime: create `en-GB` / `pos_only` / `retail` / `GB` → details + name-only update + reload preserved values; DB matched.
 - Status: **COMPLETE**
+
+## Lifecycle alignment implementation status (2026-07-27)
+
+| Topic | Status |
+|---|---|
+| APPROVED: lifecycle model and mappings | **APPROVED** |
+| Backend lifecycle correction | **NOT IMPLEMENTED** |
+| Data cleanup migration | **NOT IMPLEMENTED** |
+| `tenants.status` CHECK constraint | **NOT IMPLEMENTED** |
+| `lifecycleStatus` API transition | **NOT IMPLEMENTED** |
+| Frontend badge/filter alignment | **NOT IMPLEMENTED** |
 
 ## Source file anchors
 
