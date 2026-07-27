@@ -37,7 +37,7 @@ Platform Admin creates tenant and selects subscription type: `PAID`, `TRIAL`, or
 **Two distinct emails** (not one combined Ready email):
 
 1. Tenant Created
-2. Tenant Activated + Set Password  
+2. Tenant Activated + Set Password
 
 Only email 2 contains the set-password link.
 
