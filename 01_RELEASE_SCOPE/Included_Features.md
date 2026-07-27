@@ -1,7 +1,7 @@
 <!-- title: Included Features -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-20 -->
+<!-- last_updated: 2026-07-27 -->
 
 
 # Included Features
@@ -44,8 +44,11 @@ and audit visibility.
 
 **Payment link customer collection** is **Release 1 mandatory** but
 **not yet implemented** — database schema prepared; Application/API/UI/PayHere/webhook
-pending after remaining non-payment Super Admin gaps. See
-[[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]].
+**and paid-tenant payment-link email** pending. See
+[[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]] and
+[[../12_INTEGRATIONS/Email_Event_And_Template_Catalog]].
+
+**Tenant onboarding emails (approved, not implemented):** paid create → payment-required email with payment link; manual payment verify + manual activate → set-password email; trial/demo → created email then auto-activate → separate set-password email. See [[../03_USER_JOURNEYS/Platform_Admin/18_Tenant_Onboarding_Email_Flows]]. Payment Received email is **deferred** for R1.
 
 ## Business Admin
 

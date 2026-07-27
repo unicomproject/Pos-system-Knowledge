@@ -1,7 +1,7 @@
 <!-- title: Platform Administration Technical Contract -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-07-20 -->
+<!-- last_updated: 2026-07-27 -->
 
 # Platform Administration Technical Contract
 
@@ -9,6 +9,15 @@
 
 Defines the implementation contract for `Platform_Administration`. This contract is based on
 new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
+
+## Email and tenant lifecycle (approved 2026-07-27)
+
+- Email architecture: [[../../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]]
+- Event catalog: [[../../12_INTEGRATIONS/Email_Event_And_Template_Catalog]]
+- Onboarding journeys: [[../../03_USER_JOURNEYS/Platform_Admin/18_Tenant_Onboarding_Email_Flows]]
+- `tenants.status` = lifecycle only (`DRAFT`, `PENDING_PAYMENT`, `PENDING_ACTIVATION`, `ACTIVE`, `SUSPENDED`, `CANCELLED`)
+- Never email plaintext/temporary passwords
+- Platform password reset ACS: **IMPLEMENTED**; tenant onboarding emails: **NOT IMPLEMENTED**
 
 ## API Contract
 

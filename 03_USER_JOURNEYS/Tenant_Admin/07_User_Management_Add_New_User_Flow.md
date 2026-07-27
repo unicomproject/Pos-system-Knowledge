@@ -1,13 +1,15 @@
 <!-- title: Tenant Admin User Management Add New User Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-07-27 -->
 
 # Tenant Admin User Management Add New User Flow
 
 ## Purpose
 
 Defines how Tenant Admin creates users and sends invites for account activation.
+
+Invite email event: `tenant.user_invited` — **APPROVED / NOT IMPLEMENTED** (see [[../../12_INTEGRATIONS/Email_Event_And_Template_Catalog]]). Never email plaintext passwords.
 
 ## Actor
 

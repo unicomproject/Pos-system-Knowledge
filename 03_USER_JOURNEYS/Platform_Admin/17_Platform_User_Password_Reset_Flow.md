@@ -142,6 +142,9 @@ An authorized Platform Admin can securely reset another platform user's password
 ## Related Files
 
 - [[13_Platform_User_Management_Flow]]
+- [[19_Authentication_Email_Flows]]
+- [[../../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]]
+- [[../../12_INTEGRATIONS/ACS_Email_Operations_And_Deployment_Runbook]]
 - [[15_IMPLEMENTATION_TRACKING/Backend/Auth/SA-P1-06_Platform_Admin_User_Password_Reset_Implementation]]
 - [[04_MODULE_KNOWLEDGE/01_Platform_Administration/03_Technical_Contract]]
 - [[05_BACKEND_ARCHITECTURE/API_ENDPOINTS]]

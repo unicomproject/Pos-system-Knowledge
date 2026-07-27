@@ -1,85 +1,76 @@
 <!-- title: Tenant Activation Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- system: TM-EPOS MVP / OneVerz -->
+<!-- last_updated: 2026-07-27 -->
+<!-- decision_date: 2026-07-27 -->
 
 # Tenant Activation Flow
 
 ## Purpose
 
-Defines how Platform Admin validates tenant readiness and activates the tenant account.
+Defines how a tenant becomes `ACTIVE` and when the Tenant Activated + Set Password email is sent.
+
+Canonical email journey: [[18_Tenant_Onboarding_Email_Flows]]
 
 ## Actor
 
-Platform Admin
-
-## Source
-
-Derived from `Slide 7 - Tenant Activation Flow` in `SYSTEM_USER_JOURNEY.pptx` and aligned to TM-EPOS MVP Second Brain scope.
-
-## Trigger
-
-Platform Admin opens tenant activation readiness.
+Platform Admin (manual paid activation); system (automatic trial/demo activation after create provisioning)
 
 ## Preconditions
 
-- Tenant exists.
-- Tenant is pending activation or ready for activation.
-- Platform Admin has activation permission.
+- Tenant exists with valid profile and Tenant Admin identity.
+- Subscription assigned.
+- **Paid:** payment verified (Release 1: manual Super Admin verification).
+- **Trial/Demo:** payment not required.
 
-## Main Flow
+## Approved main flow
 
-| Step | Action | System Behavior |
+### Paid
+
+| Step | Action | System behavior |
 |---:|---|---|
-| 1 | Open tenant detail | Platform Admin opens tenant record. |
-| 2 | Review setup readiness | System opens readiness/activation checklist. |
-| 3 | Check business and admin details | System confirms business info and tenant admin are available. |
-| 4 | Check plan and billing status | System verifies paid, trial, or demo status. |
-| 5 | Validate module and feature entitlements | System confirms required features are enabled. |
-| 6 | Review optional setup completion | Platform Admin checks outlet, till, users, products, and online store setup if applicable. |
-| 7 | Click activate tenant | Platform Admin starts activation. |
-| 8 | Confirm activation | System requests confirmation before status change. |
-| 9 | Send invite and enable access | System sends tenant admin invite/password setup email and marks tenant active. |
+| 1 | Open tenant detail | Status expected `PENDING_PAYMENT` (or equivalent pending lifecycle) until paid |
+| 2 | Confirm payment verified | Manual Mark Paid / verify payment (R1) |
+| 3 | Click Activate Tenant | Requires verified payment |
+| 4 | Confirm | Lifecycle → `ACTIVE` |
+| 5 | Send activation email | `tenant.paid_activated` — username/email, login URL, single-use set-password link, expiry |
+| 6 | Tenant Admin sets password | Completes setup; can log in |
 
-## Data Used Or Captured
+### Trial / Demo
 
-- Business info
-- Tenant admin details
-- Plan/billing status
-- Feature entitlements
-- Optional setup checklist
-- Tenant status
+| Step | Action | System behavior |
+|---:|---|---|
+| 1 | Create succeeds | `tenant.trial_created` or `tenant.demo_created` already sent (no set-password link) |
+| 2 | Auto-activate | After successful provisioning; audit event separate from create |
+| 3 | Send activation email | `tenant.trial_activated` / `tenant.demo_activated` with set-password link |
+| 4 | Tenant Admin sets password | Completes setup |
 
-## Access And Security Rules
+## Rules
 
-- Platform Admin must be authenticated.
-- Platform Admin role/permission must allow the requested action.
-- Platform-level actions must not use frontend-provided tenant_id as trusted authority.
-- Every create/update/status action must be audit logged.
-- Mandatory checks must pass before activation.
-- Optional setup can be completed later when activation mode allows it.
+- Never email a plain password.
+- Set-password link **only** on activation email.
+- `tenants.status` uses lifecycle values only — see [[../../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]].
 
-## Validation And Error Cases
+## Implementation status
 
-- Missing business info
-- Missing tenant admin
-- Invalid billing mode
-- Required entitlement missing
-- Tenant already active/suspended
+| Item | Status |
+|---|---|
+| Manual activate API/UI | Exists |
+| Paid verified-payment gate | Partial / needs alignment |
+| Auto-activate trial/demo | **NOT IMPLEMENTED** |
+| Activation emails | **NOT IMPLEMENTED** |
+| Status defect (billing in `tenants.status`) | **Defect** — may block `CanActivate` |
 
-## Outcome
+## Decision history — superseded
 
-Tenant becomes active/ready and tenant users can access enabled platform features.
+> ~~System sends tenant admin invite/password setup email and marks tenant active~~ as a single vague step without distinguishing paid vs trial/demo and without payment verification.
 
-## Related Modules
+> ~~Trial/Demo use one combined setup email only~~ — superseded by two emails: Created + Activated.
 
-- 02_Tenant_Foundation
-- 03_Subscription_Catalog_Entitlements
-- 04_Subscription_Billing_Usage
-- 05_Tenant_User_Permission_Access
-- 06_Auth_Tokens_Security_Audit
+## Related
 
-## Related Files
-
-- 06_DATABASE_KNOWLEDGE/Tables/02_Tenant_Foundation.md
-- 06_DATABASE_KNOWLEDGE/Tables/07_Invitations_Authentication_Tokens_And_Security_Audit.md
+- [[18_Tenant_Onboarding_Email_Flows]]
+- [[04_Create_Tenant_Wizard_Flow]]
+- [[../Tenant_Admin/01_Pre_Login_Payment_Trial_Demo_Flow]]
+- [[../Tenant_Admin/02_First_Login_Flow]]
+- [[10_Billing_Flow]]

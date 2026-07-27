@@ -1,7 +1,7 @@
 <!-- title: Billing Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-20 -->
+<!-- last_updated: 2026-07-27 -->
 
 # Billing Flow
 
@@ -10,7 +10,11 @@
 Defines the completed Platform Admin Billing journey for read, permission, Issue
 Invoice, and Mark Paid flows against the real Platform Admin Billing API.
 Payment Links are **Release 1 mandatory** but **not yet implemented** — scheduled
-as the final major Super Admin feature. See
+as the final major Super Admin feature. Paid-tenant onboarding requires a
+**payment link in the create email** once links exist — see
+[[18_Tenant_Onboarding_Email_Flows]] and [[../../12_INTEGRATIONS/Email_Event_And_Template_Catalog]].
+Release 1 payment verification remains **manual** (Mark Paid / verify); Payment
+Received email is **deferred**. See
 [[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]].
 
 ## Actor
@@ -215,12 +219,12 @@ Ineligible lifecycle state
 - Enter a partial payment or overpayment.
 - Cancel or void an invoice.
 - Manually set failed or overdue status.
-- Generate or resend a payment link.
+- Generate or resend a payment link. (**Approved R1 product needs this** for paid onboarding email — see [[18_Tenant_Onboarding_Email_Flows]]; still **NOT IMPLEMENTED**.)
 - Send reminders.
 - Activate or suspend a tenant through the Billing endpoint.
 - Refund or payment gateway reconciliation.
 
-The current UI must not expose these actions.
+The current UI must not expose unimplemented actions. Manual **Mark Paid** remains the R1 payment verification path until PayHere/webhook ships.
 
 ## Planned Future Scope
 

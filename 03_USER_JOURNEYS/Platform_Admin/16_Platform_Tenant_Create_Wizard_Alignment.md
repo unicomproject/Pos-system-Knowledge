@@ -1,9 +1,17 @@
 <!-- title: Platform Tenant Create Wizard Alignment -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-20 -->
+<!-- system: TM-EPOS MVP / OneVerz -->
+<!-- last_updated: 2026-07-27 -->
 
 # Platform Tenant Create Wizard Alignment
+
+## Email and lifecycle alignment (2026-07-27)
+
+Approved create/activation emails and lifecycle statuses: [[18_Tenant_Onboarding_Email_Flows]] · [[../../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]].
+
+- Never email `temporaryPassword` (field may exist historically — **must not** be used to send plaintext passwords).
+- `sendInvite: true` means persist invite / setup for later email — delivery follows activation rules when implemented.
+- `tenants.status` must be lifecycle-only; billing values in `status` are an **implementation defect**.
 
 ## Uploaded UI vs Implemented Contract
 

@@ -38,7 +38,7 @@ Platform Admin opens tenant user management.
 | 5 | Assign outlet access | Platform Admin assigns one or more outlets or collection points. |
 | 6 | Confirm feature permissions | Platform Admin reviews feature permissions inherited from role/scope. |
 | 7 | Review and save | System validates and saves tenant user. |
-| 8 | Send invite | System sends invitation email when tenant activation allows it. |
+| 8 | Send invite | System sends invitation email when tenant activation allows it (`tenant.user_invited`). **Approved; NOT IMPLEMENTED** — see [[../../12_INTEGRATIONS/Email_Event_And_Template_Catalog]]. |
 | 9 | Set user status | System marks user ready or pending invite. |
 
 ## Data Used Or Captured

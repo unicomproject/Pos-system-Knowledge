@@ -277,7 +277,11 @@ Lookup items use `{ value, label }` except `countryCodes[]`, which uses `{ code,
 - tenant admin user + TENANT_ADMIN role + permissions + invite row
 - optional draft subscription invoice
 
-Tenant admin invite is persisted as `INVITED` with pending password hash; email is not sent in this slice.
+Tenant admin invite is persisted as `INVITED` with pending password hash.
+
+**Approved product (2026-07-27):** onboarding emails and payment-link send are required per [[../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]] and [[../03_USER_JOURNEYS/Platform_Admin/18_Tenant_Onboarding_Email_Flows]]. **`tenants.status` must be lifecycle-only** (`PENDING_PAYMENT`, `ACTIVE`, …) — not billing values.
+
+**Current implementation:** tenant onboarding emails and payment-link API/UI are **NOT IMPLEMENTED**. Create may still write billing values into `tenants.status` (**defect**). Do not treat the old “email is not sent in this slice” wording as the product end state.
 
 ### CreateTenant validation contract (before SaveChanges)
 
