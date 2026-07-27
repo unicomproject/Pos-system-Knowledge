@@ -31,7 +31,7 @@ Parent architecture: [[Email_Architecture_And_Provider_Decisions]].
 |---|---|---|---|---|---|---|
 | `platform.password_reset_requested` | Platform Admin initiates password reset | Platform user email | `platform_password_reset` | Open set-password / reset page | APPROVED | **IMPLEMENTED** (ACS E2E PASSED) |
 | `tenant.paid_created` | Paid tenant created → `PENDING_PAYMENT` | Tenant Admin email | `tenant_paid_created_payment_required` | Pay via payment link | APPROVED | **NOT IMPLEMENTED** (BLOCKED on payment-link API/UI) |
-| `tenant.paid_activated` | Paid tenant manually activated after verified payment → `ACTIVE` | Tenant Admin email | `tenant_activated_set_password` | Set password | APPROVED | **NOT IMPLEMENTED** |
+| `tenant.paid_activated` | Paid tenant manually activated after verified payment or approved waiver → `ACTIVE` | Tenant Admin email | `tenant_activated_set_password` | Set password | APPROVED | **NOT IMPLEMENTED** |
 | `tenant.trial_created` | Trial tenant created | Tenant Admin email | `tenant_trial_created` | Read next steps | APPROVED | **NOT IMPLEMENTED** |
 | `tenant.trial_activated` | Trial auto-activated after provisioning | Tenant Admin email | `tenant_activated_set_password` | Set password | APPROVED | **NOT IMPLEMENTED** |
 | `tenant.demo_created` | Demo tenant created | Tenant Admin email | `tenant_demo_created` | Read next steps | APPROVED | **NOT IMPLEMENTED** |
@@ -79,7 +79,7 @@ Parent architecture: [[Email_Architecture_And_Provider_Decisions]].
 
 | Field | Value |
 |---|---|
-| Trigger | Tenant becomes `ACTIVE` (manual for paid after verified payment; automatic for trial/demo after create provisioning) |
+| Trigger | Tenant becomes `ACTIVE` (manual for paid after verified payment or approved waiver; automatic for trial/demo after create provisioning) |
 | Recipients | Tenant Admin email |
 | Required data | Username/email, tenant login URL, single-use set-password link, expiry |
 | Template | `tenant_activated_set_password` |

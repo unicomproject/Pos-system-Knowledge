@@ -28,6 +28,14 @@ This file documents the entity tables, attributes, keys, nullability, constraint
 
 Purpose: Stores tenant subscription lifecycle.
 
+Approved separation:
+
+- tenant lifecycle lives on `tenants.status`
+- subscription lifecycle lives on `tenant_subscriptions.status`
+- billing cycle lives on `tenant_subscriptions.billing_cycle`
+- payment and invoice state live on invoice / payment-link / transaction tables
+- these concerns must never be overloaded into `tenants.status`
+
 | Attribute | Type | Key | Null | Reference / Note |
 |---|---|---|---|---|
 | `id` | uuid | PK | NOT NULL | Primary key |
@@ -135,6 +143,8 @@ Relationships:
 
 Purpose: Stores subscription invoice headers.
 
+Invoice status is a billing concern only. It must not be treated as the tenant lifecycle status or as a substitute for `lifecycleStatus` in tenant APIs.
+
 | Attribute | Type | Key | Null | Reference / Note |
 |---|---|---|---|---|
 | `id` | uuid | PK | NOT NULL | Primary key |
@@ -215,6 +225,8 @@ Relationships:
 
 Purpose: Stores secure payment links for subscription invoices.
 
+Payment-link rows support paid-tenant collection and verification flows, but payment-link state must remain separate from `tenants.status`.
+
 | Attribute | Type | Key | Null | Reference / Note |
 |---|---|---|---|---|
 | `id` | uuid | PK | NOT NULL | Primary key |
@@ -251,6 +263,8 @@ Relationships:
 ## `subscription_payment_transactions`
 
 Purpose: Stores payment transaction attempts for subscription invoices.
+
+Transaction status is payment evidence, not tenant lifecycle. Payment verification or approved waiver may move a paid tenant from `PENDING_PAYMENT` to `PENDING_ACTIVATION`, but the payment transaction status itself is never stored in `tenants.status`.
 
 | Attribute | Type | Key | Null | Reference / Note |
 |---|---|---|---|---|

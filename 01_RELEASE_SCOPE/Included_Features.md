@@ -50,6 +50,16 @@ and audit visibility.
 
 **Tenant onboarding emails (approved, not implemented):** paid create → payment-required email with payment link; manual payment verify + manual activate → set-password email; trial/demo → created email then auto-activate → separate set-password email. See [[../03_USER_JOURNEYS/Platform_Admin/18_Tenant_Onboarding_Email_Flows]]. Payment Received email is **deferred** for R1.
 
+**Tenant lifecycle status alignment (approved, not implemented):**
+
+- `tenants.status` stores lifecycle only: `DRAFT`, `PENDING_PAYMENT`, `PENDING_ACTIVATION`, `ACTIVE`, `SUSPENDED`, `CANCELLED`
+- Paid create -> `PENDING_PAYMENT`
+- Paid verification or approved waiver -> `PENDING_ACTIVATION`
+- Trial/Demo create orchestration ends at `ACTIVE`
+- ordered migrations required: `RepairTenantLifecycleStatusData`, then `AddTenantLifecycleStatusCheckConstraint`
+- `lifecycleStatus` API transition and frontend badge/filter alignment are approved but **NOT IMPLEMENTED**
+- cancel endpoint remains deferred and is **not** part of this alignment task
+
 ## Business Admin
 
 Included: business setup, outlet/till management, device and hardware profile

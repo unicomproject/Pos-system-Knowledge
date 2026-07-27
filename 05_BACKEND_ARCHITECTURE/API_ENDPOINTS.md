@@ -139,7 +139,7 @@ Top-level counts include `totalTenants`, `activeTenants`, `suspendedTenants`, `t
 | `type` | Count definition |
 |---|---|
 | `suspended_tenants` | Tenants with status `suspended` |
-| `setup_pending` | Tenants with status `setup_pending` or `pending_payment` |
+| `pending_activation` | Tenants with lifecycle status `PENDING_ACTIVATION` |
 | `past_due_subscriptions` | Tenant subscriptions with status `PAST_DUE` |
 | `pending_billing` | Subscription invoices with status `PENDING` and `balance_due > 0` |
 
@@ -285,9 +285,11 @@ Lookup items use `{ value, label }` except `countryCodes[]`, which uses `{ code,
 
 Tenant admin invite is persisted as `INVITED` with pending password hash.
 
-**Approved product (2026-07-27):** onboarding emails and payment-link send are required per [[../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]] and [[../03_USER_JOURNEYS/Platform_Admin/18_Tenant_Onboarding_Email_Flows]]. **`tenants.status` must be lifecycle-only** (`PENDING_PAYMENT`, `ACTIVE`, …) — not billing values.
+**Approved product (2026-07-27):** onboarding emails and payment-link send are required per [[../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]] and [[../03_USER_JOURNEYS/Platform_Admin/18_Tenant_Onboarding_Email_Flows]]. **`tenants.status` must be lifecycle-only** (`DRAFT`, `PENDING_PAYMENT`, `PENDING_ACTIVATION`, `ACTIVE`, `SUSPENDED`, `CANCELLED`) — never billing values.
 
 **Current implementation:** tenant onboarding emails and payment-link API/UI are **NOT IMPLEMENTED**. Create may still write billing values into `tenants.status` (**defect**). Do not treat the old “email is not sent in this slice” wording as the product end state.
+
+**Approved lifecycle rules:** paid create -> `PENDING_PAYMENT`; paid verification or approved waiver recorded -> `PENDING_ACTIVATION`; manual paid activation -> `ACTIVE`; Trial/Demo create orchestration ends at `ACTIVE` with separate `TENANT_CREATED` and `TENANT_ACTIVATED` events.
 
 ### CreateTenant validation contract (before SaveChanges)
 
@@ -308,6 +310,8 @@ Wizard path is selected when the request includes wizard-only blocks (`tenantAdm
 | `subscription.paymentMethod` | One of seeded payment methods | `manual`, `bank_transfer` | `pending` |
 | `tenantAdmin.email` | Required valid email when `tenantAdmin` block sent | `admin@tenant.com` | `not-an-email` |
 
+`billingStatus` is a billing concern only. It must **never** populate `tenants.status`.
+
 Persistence (wizard create):
 
 | Request field | Column / join |
@@ -320,6 +324,21 @@ Persistence (wizard create):
 Country consistency: when both top-level and `address.countryCode` are present they must match; top-level-only country creates a primary REGISTERED address so country is not silently dropped.
 
 `PUT /api/v1/platform-admin/tenants/{id}` validates `defaultLocale` / `operatingMode` when sent; omitted values are not cleared.
+
+### Tenant lifecycle response transition (approved, not implemented)
+
+Canonical tenant lifecycle response field: `lifecycleStatus`.
+
+Billing concern field: `billingStatus`.
+
+Controlled compatibility transition:
+
+- add `lifecycleStatus` to tenant create/list/detail responses
+- keep any temporary lifecycle compatibility alias only as a **deprecated** field during Angular migration
+- update Angular to consume `lifecycleStatus`
+- remove the deprecated lifecycle alias in a later cleanup release
+
+`billingStatus` and `lifecycleStatus` must not be treated as aliases in the final contract.
 
 Validation failure response shape:
 

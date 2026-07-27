@@ -16,6 +16,8 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 - Event catalog: [[../../12_INTEGRATIONS/Email_Event_And_Template_Catalog]]
 - Onboarding journeys: [[../../03_USER_JOURNEYS/Platform_Admin/18_Tenant_Onboarding_Email_Flows]]
 - `tenants.status` = lifecycle only (`DRAFT`, `PENDING_PAYMENT`, `PENDING_ACTIVATION`, `ACTIVE`, `SUSPENDED`, `CANCELLED`)
+- Paid verification or approved waiver recorded -> `PENDING_ACTIVATION`; manual Release 1 paid activation -> `ACTIVE`
+- Trial/Demo create orchestration records separate `TENANT_CREATED` and `TENANT_ACTIVATED` events and ends with `ACTIVE`
 - Never email plaintext/temporary passwords
 - Platform password reset ACS: **IMPLEMENTED**; tenant onboarding emails: **NOT IMPLEMENTED**
 
@@ -29,6 +31,12 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 | Error format | Standard API error response |
 | Tenant context | Resolved server-side for tenant-owned records |
 | Auth | Staff/customer/platform auth boundary must match module surface |
+
+Tenant API lifecycle transition:
+
+- authoritative response field = `lifecycleStatus`
+- billing concern field = `billingStatus`
+- temporary lifecycle compatibility aliases, if retained, must be marked **deprecated**
 
 ## API Groups
 
@@ -70,6 +78,9 @@ history/ledger behavior where applicable.
 - Use DTOs in data layer, domain/view models in UI layer.
 - Permission and entitlement checks are UX helpers only; backend remains final authority.
 - Browser online store and Flutter business app must share backend rules but keep separate user/auth surfaces.
+- Platform Admin tenant badges and filters must support `DRAFT`, `PENDING_PAYMENT`, `PENDING_ACTIVATION`, `ACTIVE`, `SUSPENDED`, and `CANCELLED`.
+- Pending Activation KPI counts `PENDING_ACTIVATION` only.
+- Billing-cycle API values: Monthly -> `monthly`, Annual -> `yearly`, Both/All -> omit the filter parameter (never send literal `both`).
 
 ## Backend Contract
 
@@ -98,6 +109,8 @@ Validated fields:
 - `tenantAdmin.email`: required and must be a valid email when `tenantAdmin` block is sent.
 
 Persisted mapping: `defaultLocale`/`operatingMode` → `tenants`; `businessType` → `tenant_profiles.business_type_id`; country → `tenant_addresses.country_code`. Update validation uses `ValidateUpdate` and does not clear omitted locale/mode.
+
+`billingStatus` validation is independent from tenant lifecycle. It must never be persisted into `tenants.status`.
 
 Failures return `ApplicationError.ValidationFailed` (`errorCode: platform_tenants.validation_failed`) with `ApplicationFieldError` items; `PlatformAdminTenantsController` maps these to HTTP 400 with `errors[]` in the legacy API envelope.
 
@@ -237,6 +250,16 @@ Test coverage must include:
 - Safe error display.
 - Audit/event/history creation where required.
 - Offline/cache behavior where this module touches POS, checkout, order, inventory, payment, or sync.
+
+Tenant lifecycle alignment minimum future tests:
+
+- Paid create -> `PENDING_PAYMENT`
+- Paid cannot activate before payment verification or approved waiver
+- Paid verification / waiver -> `PENDING_ACTIVATION`
+- Trial create -> create + auto-activate -> `ACTIVE`
+- Demo create -> create + auto-activate -> `ACTIVE`
+- Billing cycle / subscription type / payment status never write into `tenants.status`
+- Invalid lifecycle value rejected before or at DB constraint
 
 ## Implementation Sequence
 

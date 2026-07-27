@@ -17,6 +17,13 @@ Release 1 payment verification remains **manual** (Mark Paid / verify); Payment
 Received email is **deferred**. See
 [[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]].
 
+Tenant lifecycle alignment decision:
+
+- invoice/payment outcomes remain billing concerns
+- `tenants.status` remains lifecycle-only
+- paid tenant activation requires recorded payment verification or an approved payment waiver
+- `billingStatus` and `lifecycleStatus` are not aliases in the final contract
+
 ## Actor
 
 Platform Admin
@@ -184,13 +191,27 @@ PENDING or eligible OVERDUE
 | 1 | Offer Mark Paid | Requires `platform.billing.manage` and backend `canMarkPaid=true`. |
 | 2 | Confirm | Dialog shows invoice, tenant, outstanding amount, currency, and full-settlement explanation. |
 | 3 | Submit | `POST .../invoices/{id}/mark-paid` with `{ expectedUpdatedAt }` only by default. |
-| 4 | Result | Invoice becomes `PAID`. Summary, list, detail, and payment history refresh. |
+| 4 | Result | Invoice becomes `PAID`. Summary, list, detail, and payment history refresh. This satisfies the Release 1 manual payment-verification path for paid tenant activation. |
 
 State clearly:
 
 - Mark Paid may leave payment history empty.
 - This is valid current product behaviour.
 - UI must not fabricate a payment transaction.
+- Approved business rule: verified payment **or** an approved payment waiver may satisfy paid activation.
+- Current implementation: payment waiver persistence and payment waiver API/UI are **NOT IMPLEMENTED**.
+- Implementation must **not** accept an unpersisted request flag or arbitrary boolean as a payment waiver.
+
+## Tenant lifecycle alignment status
+
+| Topic | Status |
+|---|---|
+| APPROVED: lifecycle model and legacy mappings | **APPROVED** |
+| Backend lifecycle correction | **NOT IMPLEMENTED** |
+| Data cleanup migration | **NOT IMPLEMENTED** |
+| `tenants.status` CHECK constraint | **NOT IMPLEMENTED** |
+| `lifecycleStatus` API transition | **NOT IMPLEMENTED** |
+| Frontend badge/filter alignment | **NOT IMPLEMENTED** |
 
 ## Conflict Flow
 

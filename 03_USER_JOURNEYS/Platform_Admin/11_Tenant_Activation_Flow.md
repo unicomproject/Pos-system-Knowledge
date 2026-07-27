@@ -20,7 +20,7 @@ Platform Admin (manual paid activation); system (automatic trial/demo activation
 
 - Tenant exists with valid profile and Tenant Admin identity.
 - Subscription assigned.
-- **Paid:** payment verified (Release 1: manual Super Admin verification).
+- **Paid:** payment verification recorded **or** approved payment waiver recorded (Release 1 verification remains manual).
 - **Trial/Demo:** payment not required.
 
 ## Approved main flow
@@ -29,19 +29,20 @@ Platform Admin (manual paid activation); system (automatic trial/demo activation
 
 | Step | Action | System behavior |
 |---:|---|---|
-| 1 | Open tenant detail | Status expected `PENDING_PAYMENT` (or equivalent pending lifecycle) until paid |
-| 2 | Confirm payment verified | Manual Mark Paid / verify payment (R1) |
-| 3 | Click Activate Tenant | Requires verified payment |
-| 4 | Confirm | Lifecycle → `ACTIVE` |
-| 5 | Send activation email | `tenant.paid_activated` — username/email, login URL, single-use set-password link, expiry |
-| 6 | Tenant Admin sets password | Completes setup; can log in |
+| 1 | Open tenant detail | Status expected `PENDING_PAYMENT` until payment is resolved |
+| 2 | Confirm payment resolved | Manual Mark Paid / verify payment (R1) or approved payment waiver recorded |
+| 3 | Prepare for activation | Lifecycle → `PENDING_ACTIVATION` |
+| 4 | Click Activate Tenant | Requires verified payment or approved waiver |
+| 5 | Confirm | Lifecycle → `ACTIVE` |
+| 6 | Send activation email | `tenant.paid_activated` — username/email, login URL, single-use set-password link, expiry |
+| 7 | Tenant Admin sets password | Completes setup; can log in |
 
 ### Trial / Demo
 
 | Step | Action | System behavior |
 |---:|---|---|
 | 1 | Create succeeds | `tenant.trial_created` or `tenant.demo_created` already sent (no set-password link) |
-| 2 | Auto-activate | After successful provisioning; audit event separate from create |
+| 2 | Auto-activate | After successful provisioning; `TENANT_ACTIVATED` event remains separate from `TENANT_CREATED` |
 | 3 | Send activation email | `tenant.trial_activated` / `tenant.demo_activated` with set-password link |
 | 4 | Tenant Admin sets password | Completes setup |
 
@@ -56,10 +57,16 @@ Platform Admin (manual paid activation); system (automatic trial/demo activation
 | Item | Status |
 |---|---|
 | Manual activate API/UI | Exists |
-| Paid verified-payment gate | Partial / needs alignment |
+| Paid verified-payment / waiver gate | Partial / needs alignment |
+| `PENDING_ACTIVATION` intermediate lifecycle | **NOT IMPLEMENTED** |
 | Auto-activate trial/demo | **NOT IMPLEMENTED** |
 | Activation emails | **NOT IMPLEMENTED** |
 | Status defect (billing in `tenants.status`) | **Defect** — may block `CanActivate` |
+| Backend lifecycle correction | **NOT IMPLEMENTED** |
+| Data cleanup migration | **NOT IMPLEMENTED** |
+| `tenants.status` CHECK constraint | **NOT IMPLEMENTED** |
+| `lifecycleStatus` API transition | **NOT IMPLEMENTED** |
+| Frontend lifecycle badge/filter alignment | **NOT IMPLEMENTED** |
 
 ## Decision history — superseded
 
