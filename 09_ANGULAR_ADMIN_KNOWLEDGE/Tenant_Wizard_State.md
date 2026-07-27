@@ -1,10 +1,22 @@
 <!-- title: Tenant Wizard State -->
-<!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
-
+<!-- status: Historical / Superseded -->
+<!-- system: SCS-TIX EPOS Release 1 (historical) -->
+<!-- last_updated: 2026-07-27 -->
+<!-- superseded: true -->
 
 # Tenant Wizard State
+
+> **HISTORICAL / SUPERSEDED — DO NOT USE AS SOURCE OF TRUTH**
+>
+> This document describes an older SCS-TIX Angular wizard model and must **not** drive OneVerz implementation.
+>
+> Current sources of truth:
+>
+> - [[../03_USER_JOURNEYS/Platform_Admin/04_Create_Tenant_Wizard_Flow]]
+> - [[../03_USER_JOURNEYS/Platform_Admin/18_Tenant_Onboarding_Email_Flows]]
+> - [[../12_INTEGRATIONS/Email_Event_And_Template_Catalog]]
+>
+> Related: [[../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]]
 
 ## Purpose
 

@@ -1,7 +1,7 @@
 <!-- title: Routing And Guards -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-07-03 -->
+<!-- last_updated: 2026-07-20 -->
 
 
 # Routing And Guards
@@ -18,6 +18,7 @@ Routes improve UX but backend remains authoritative.
 | Route | Feature | Mode | Guards |
 |---|---|---|---|
 | `/login` | auth | Public | Guest only |
+| `/reset-password` | auth | Public | Guest only (one-time platform user password reset token from query `?token=`) |
 | `/admin/dashboard` | admin | Platform | auth, permission |
 | `/admin/tenants` | admin | Platform | auth, permission |
 | `/admin/tenants/create` | admin | Platform | auth, permission |
@@ -90,6 +91,20 @@ Rules:
 - Component: `PlatformModulesCatalogPage` · expose loading, empty, error, and search-no-results states.
 
 See [[../04_MODULE_KNOWLEDGE/01_Platform_Administration/03_Technical_Contract]] and [[../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]].
+
+## Platform User Password Reset (2026-07-20)
+
+Public reset page at `/reset-password` (component `ResetPasswordPage`).
+
+Rules:
+
+- Guest route — no `auth.guard`; token read from query param `token`.
+- On load, call `POST /api/v1/auth/platform-password-reset/validate` (legacy path used by Angular `auth-api.service`).
+- Submit calls `POST /api/v1/auth/platform-password-reset/complete` with `{ token, newPassword, confirmPassword }`.
+- Admin initiation lives on `/admin/platform-users` detail slide-over — `POST /api/v1/platform-admin/users/{userId}/password-reset` requires `platform.users.update`; displays returned `resetUrl` for admin secure link handoff (R1 email not wired).
+- Do not expose raw tokens in logs or persistent client storage beyond the URL query param for the reset session.
+
+See [[../03_USER_JOURNEYS/Platform_Admin/17_Platform_User_Password_Reset_Flow]] and [[../15_IMPLEMENTATION_TRACKING/Backend/Auth/SA-P1-06_Platform_Admin_User_Password_Reset_Implementation]].
 
 ## Related Files
 

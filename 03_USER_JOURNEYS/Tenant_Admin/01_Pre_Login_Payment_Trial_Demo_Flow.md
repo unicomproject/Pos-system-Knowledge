@@ -1,83 +1,70 @@
 <!-- title: Tenant Admin Pre-Login Payment Trial Demo Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- system: TM-EPOS MVP / OneVerz -->
+<!-- last_updated: 2026-07-27 -->
+<!-- decision_date: 2026-07-27 -->
 
 # Tenant Admin Pre-Login Payment Trial Demo Flow
 
 ## Purpose
 
-Defines how a tenant reaches first access depending on payment now, trial, or demo setup selected by Platform Admin.
+Defines how a Tenant Admin reaches first access for **Paid** vs **Trial/Demo**, aligned to approved onboarding emails.
+
+Canonical: [[../Platform_Admin/18_Tenant_Onboarding_Email_Flows]]
 
 ## Actor
 
-Tenant Admin
-
-## Source
-
-Derived from `Slide 1 - Tenant Admin Pre-Login Payment / Trial / Demo Flow` in `tenant-full-journey.pptx` and aligned to TM-EPOS MVP Second Brain scope.
+Tenant Admin (recipient); Platform Admin (initiator)
 
 ## Trigger
 
-Platform Admin creates tenant and selects billing mode.
+Platform Admin creates tenant and selects subscription type: `PAID`, `TRIAL`, or `DEMO`.
 
-## Preconditions
+## Approved main flow
 
-- Tenant has been created by Platform Admin.
-- Billing mode is selected.
-
-## Main Flow
-
-| Step | Action | System Behavior |
+| Step | Paid | Trial / Demo |
 |---:|---|---|
-| 1 | Platform Admin creates tenant | System creates tenant record. |
-| 2 | Check billing option | System branches by Payment Now, Trial, or Demo. |
-| 3 | Payment Now selected | System sends payment link email to Tenant Admin. |
-| 4 | Tenant Admin opens payment link | System shows billing summary. |
-| 5 | Enter payment details and pay | Payment provider/backend validates payment. |
-| 6 | Payment successful | System activates tenant and sends setup email. |
-| 7 | Payment failed | System shows failure and allows retry. |
-| 8 | Trial or Demo selected | System sends setup email only. |
-| 9 | Tenant Admin sets password | System activates login path. |
-| 10 | Login to system | Tenant Admin reaches dashboard when allowed. |
+| 1 | Tenant created → `PENDING_PAYMENT` | Tenant created |
+| 2 | Email `tenant.paid_created` with plan/amount/currency/frequency/due date/**payment link** (no set-password) | Email `tenant.trial_created` or `tenant.demo_created` (type, start, expiry, next steps; no set-password) |
+| 3 | Tenant pays via payment link | Payment skipped |
+| 4 | Super Admin **manually verifies** payment (R1) | — |
+| 5 | Super Admin **manually activates** | System **auto-activates** after provisioning |
+| 6 | Email activated + set-password | Email activated + set-password (second email) |
+| 7 | Set password → login | Set password → login |
 
-## Data Used Or Captured
+### Trial/Demo email count
 
-- Tenant billing mode
-- Payment link
-- Billing summary
-- Payment status
-- Setup email
-- Tenant activation status
+**Two distinct emails** (not one combined Ready email):
 
-## Access And Security Rules
+1. Tenant Created
+2. Tenant Activated + Set Password
 
-- Tenant Admin must be authenticated unless the flow is a setup/payment link flow before first login.
-- Tenant status, feature entitlement, permission, and outlet access must be enforced where applicable.
-- Tenant-owned data must be isolated by tenant context resolved server-side.
-- All create/update/status actions should be audit logged.
-- Payment result must be backend/provider validated.
-- Payment link and setup link must not expose raw tokens.
+Only email 2 contains the set-password link.
 
-## Validation And Error Cases
+### Deferred
 
-- Payment failed
-- Payment retry required
-- Expired payment link
-- Expired setup link
-- Tenant not activated
+- Payment Received acknowledgement email (R1 deferred).
 
-## Outcome
+## Security
 
-Tenant Admin receives setup/login access according to billing mode.
+- Payment link and setup link must not expose raw tokens in logs or APIs beyond intended delivery.
+- Never email plain/temporary passwords.
 
-## Related Modules
+## Implementation status
 
-- 02_Tenant_Foundation
-- 04_Subscription_Billing_Usage
-- 06_Auth_Tokens_Security_Audit
+Approved journeys **NOT IMPLEMENTED** for tenant emails and payment-link send. Platform password-reset ACS is unrelated and already complete.
 
-## Related Files
+## Decision history — superseded
 
-- 03_USER_JOURNEYS/Platform_Admin/04_Create_Tenant_Wizard_Flow.md
-- 06_DATABASE_KNOWLEDGE/Tables/05_Subscription_Billing_Payments_And_Usage.md
+| Obsolete claim | Replacement |
+|---|---|
+| Payment success auto-activates tenant and sends setup email | R1: **manual** verify + **manual** activate for paid |
+| Trial/Demo sends setup email only (single email) | **Two** emails: created + activated |
+| Payment provider always validates without Super Admin | R1 verification is **manual** Super Admin |
+
+## Related
+
+- [[../Platform_Admin/18_Tenant_Onboarding_Email_Flows]]
+- [[../Platform_Admin/11_Tenant_Activation_Flow]]
+- [[02_First_Login_Flow]]
+- [[../../12_INTEGRATIONS/Email_Event_And_Template_Catalog]]
