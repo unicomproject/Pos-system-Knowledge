@@ -151,11 +151,13 @@ Do not describe unsupported future capabilities as implemented.
 | Topic | Status |
 |---|---|
 | APPROVED: lifecycle model and legacy mappings | **APPROVED** |
-| Backend lifecycle correction | **NOT IMPLEMENTED** |
-| Data cleanup migration | **NOT IMPLEMENTED** |
-| `tenants.status` CHECK constraint | **NOT IMPLEMENTED** |
-| `lifecycleStatus` API transition | **NOT IMPLEMENTED** |
-| Frontend badge/filter alignment | **NOT IMPLEMENTED** |
+| Backend lifecycle correction | **IMPLEMENTED** |
+| Data cleanup migration | **IMPLEMENTED** |
+| `tenants.status` CHECK constraint | **IMPLEMENTED** |
+| `lifecycleStatus` API transition | **IMPLEMENTED** |
+| Frontend badge/filter alignment | **IMPLEMENTED** |
+| Payment waiver persistence/API/UI | **NOT IMPLEMENTED** (deferred) |
+| Post-merge smoke verification | **PASSED** — [[../../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Post_Merge_Smoke_Verification]] |
 
 ## Platform Admin Invite Flow
 

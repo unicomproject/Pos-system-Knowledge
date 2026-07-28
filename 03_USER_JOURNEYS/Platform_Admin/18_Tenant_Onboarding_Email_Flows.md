@@ -71,7 +71,7 @@ Current code may write billing values into `tenants.status` and block `CanActiva
 9. Only the activation email contains the single-use set-password link.
 10. Tenant Admin sets password and logs in.
 
-**Current gaps:** auto-activation after create and both emails **NOT IMPLEMENTED** (create may leave lifecycle/billing mismatch; activate today is manual).
+**Current gaps:** Trial/Demo auto-activation is **IMPLEMENTED**. Onboarding emails remain **NOT IMPLEMENTED** (deferred).
 
 ---
 
@@ -97,11 +97,13 @@ Payment-link Application/API/UI/email are currently **missing** even though R1 m
 | Item | Status |
 |---|---|
 | APPROVED: lifecycle model and mappings | **APPROVED** |
-| Backend lifecycle correction | **NOT IMPLEMENTED** |
-| Data cleanup migration | **NOT IMPLEMENTED** |
-| `tenants.status` CHECK constraint | **NOT IMPLEMENTED** |
-| `lifecycleStatus` API transition | **NOT IMPLEMENTED** |
-| Frontend badge/filter alignment | **NOT IMPLEMENTED** |
+| Backend lifecycle correction | **IMPLEMENTED** |
+| Data cleanup migration | **IMPLEMENTED** |
+| `tenants.status` CHECK constraint | **IMPLEMENTED** |
+| `lifecycleStatus` API transition | **IMPLEMENTED** |
+| Frontend badge/filter alignment | **IMPLEMENTED** |
+| Onboarding emails / payment links | **NOT IMPLEMENTED** (deferred) |
+| Post-merge smoke verification | **PASSED** — [[../../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Post_Merge_Smoke_Verification]] |
 
 ---
 

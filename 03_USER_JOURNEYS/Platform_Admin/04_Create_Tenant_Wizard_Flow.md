@@ -71,19 +71,22 @@ Subscription type (`PAID`/`TRIAL`/`DEMO`), billing cycle, subscription status, a
 
 ## Implementation status vs approved model
 
-| Topic | Approved | Current code (defect / gap) |
+| Topic | Approved | Current status |
 |---|---|---|
-| `tenants.status` | Lifecycle only (`PENDING_PAYMENT`, etc.) | May write **billing** values into `status` — **defect** |
-| Paid verification / waiver -> `PENDING_ACTIVATION` | Required | **NOT IMPLEMENTED** |
-| Paid create email | Required | **NOT IMPLEMENTED** |
-| Payment link | Required for paid | **NOT IMPLEMENTED** |
-| Trial/Demo auto-activate + two emails | Required | **NOT IMPLEMENTED** (activate often manual; no emails) |
-| Backend lifecycle correction | Approved | **NOT IMPLEMENTED** |
-| Data cleanup migration | Approved | **NOT IMPLEMENTED** |
-| `tenants.status` CHECK constraint | Approved | **NOT IMPLEMENTED** |
-| `lifecycleStatus` API transition | Approved | **NOT IMPLEMENTED** |
-| Frontend lifecycle badge/filter alignment | Approved | **NOT IMPLEMENTED** |
+| `tenants.status` | Lifecycle only (`PENDING_PAYMENT`, etc.) | **IMPLEMENTED** — lifecycle-only values |
+| Paid verification -> `PENDING_ACTIVATION` | Required | **IMPLEMENTED** (Mark Paid path) |
+| Paid waiver -> `PENDING_ACTIVATION` | Required | **NOT IMPLEMENTED** (deferred) |
+| Paid create email | Required | **NOT IMPLEMENTED** (deferred) |
+| Payment link | Required for paid | **NOT IMPLEMENTED** (deferred) |
+| Trial/Demo auto-activate | Required | **IMPLEMENTED** |
+| Trial/Demo onboarding emails | Required | **NOT IMPLEMENTED** (deferred) |
+| Backend lifecycle correction | Approved | **IMPLEMENTED** |
+| Data cleanup migration | Approved | **IMPLEMENTED** |
+| `tenants.status` CHECK constraint | Approved | **IMPLEMENTED** |
+| `lifecycleStatus` API transition | Approved | **IMPLEMENTED** (compat aliases **DEPRECATED**) |
+| Frontend lifecycle badge/filter alignment | Approved | **IMPLEMENTED** |
 | Wizard FE hint “email not wired” | Temporary until emails ship | Matches current code; superseded as product SOT by [[18_Tenant_Onboarding_Email_Flows]] |
+| Post-merge smoke verification | Required | **PASSED** — [[../../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Post_Merge_Smoke_Verification]] |
 
 ### Decision history — superseded statements
 

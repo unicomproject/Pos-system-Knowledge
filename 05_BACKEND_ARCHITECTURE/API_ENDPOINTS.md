@@ -287,7 +287,7 @@ Tenant admin invite is persisted as `INVITED` with pending password hash.
 
 **Approved product (2026-07-27):** onboarding emails and payment-link send are required per [[../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]] and [[../03_USER_JOURNEYS/Platform_Admin/18_Tenant_Onboarding_Email_Flows]]. **`tenants.status` must be lifecycle-only** (`DRAFT`, `PENDING_PAYMENT`, `PENDING_ACTIVATION`, `ACTIVE`, `SUSPENDED`, `CANCELLED`) — never billing values.
 
-**Current implementation:** tenant onboarding emails and payment-link API/UI are **NOT IMPLEMENTED**. Create may still write billing values into `tenants.status` (**defect**). Do not treat the old “email is not sent in this slice” wording as the product end state.
+**Current implementation:** tenant onboarding emails and payment-link API/UI remain **NOT IMPLEMENTED** (deferred). Lifecycle alignment is **IMPLEMENTED**: create writes lifecycle-only `tenants.status`, responses expose `lifecycleStatus`, and Mark Paid / activation rules follow the approved Paid / Trial / Demo orchestration. Do not treat the old “email is not sent in this slice” wording as the product end state.
 
 **Approved lifecycle rules:** paid create -> `PENDING_PAYMENT`; paid verification or approved waiver recorded -> `PENDING_ACTIVATION`; manual paid activation -> `ACTIVE`; Trial/Demo create orchestration ends at `ACTIVE` with separate `TENANT_CREATED` and `TENANT_ACTIVATED` events.
 
@@ -325,18 +325,18 @@ Country consistency: when both top-level and `address.countryCode` are present t
 
 `PUT /api/v1/platform-admin/tenants/{id}` validates `defaultLocale` / `operatingMode` when sent; omitted values are not cleared.
 
-### Tenant lifecycle response transition (approved, not implemented)
+### Tenant lifecycle response transition (IMPLEMENTED)
 
 Canonical tenant lifecycle response field: `lifecycleStatus`.
 
 Billing concern field: `billingStatus`.
 
-Controlled compatibility transition:
+Controlled compatibility transition (temporary aliases **DEPRECATED**; removal deferred):
 
 - add `lifecycleStatus` to tenant create/list/detail responses
-- keep any temporary lifecycle compatibility alias only as a **deprecated** field during Angular migration
+- keep temporary deprecated lifecycle aliases only while older clients remain
 - update Angular to consume `lifecycleStatus`
-- remove the deprecated lifecycle alias in a later cleanup release
+- remove deprecated lifecycle alias in a later cleanup release
 
 `billingStatus` and `lifecycleStatus` must not be treated as aliases in the final contract.
 
