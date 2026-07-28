@@ -93,11 +93,11 @@ Keep separate:
 | Subscription status | `tenant_subscriptions` status |
 | Payment / billing status | invoices, payment links, billing fields — **not** `tenants.status` |
 
-### Implementation defect (current code)
+### Lifecycle alignment (resolved)
 
-**Defect:** Tenant create currently writes **billing** values (e.g. `pending`, `paid`) into `tenants.status`, while `CanActivate` only allows lifecycle statuses (`setup_pending`, `pending_payment`, `pending_activation`, `inactive`, `draft`). This can block activation and mixes payment state into lifecycle.
+**Resolved (2026-07-28):** Tenant create no longer writes billing values into `tenants.status`. Lifecycle-only values, repair migration, CHECK constraint, and verified-payment activation gate are **IMPLEMENTED** on merged Backend/Frontend main. Historical defect notes remain superseded by [[../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Status_Alignment_Implementation_Status]].
 
-**Required correction:** Map create/activate to the lifecycle set above; keep billing/payment on their own fields/tables. Track via an approved implementation task — do not “paper over” in journeys.
+Billing/payment remain on their own fields/tables. Onboarding emails and payment links remain **NOT IMPLEMENTED** (deferred).
 
 ## Current implementation status
 

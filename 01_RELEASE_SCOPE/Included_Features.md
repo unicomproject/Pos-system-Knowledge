@@ -57,8 +57,9 @@ and audit visibility.
 - Paid verification or approved waiver -> `PENDING_ACTIVATION`
 - Trial/Demo create orchestration ends at `ACTIVE`
 - ordered migrations required: `RepairTenantLifecycleStatusData`, then `AddTenantLifecycleStatusCheckConstraint`
-- `lifecycleStatus` API transition and frontend badge/filter alignment are approved but **NOT IMPLEMENTED**
+- `lifecycleStatus` API transition and frontend badge/filter alignment are **IMPLEMENTED** (verified on merged main, 2026-07-28)
 - cancel endpoint remains deferred and is **not** part of this alignment task
+- deferred remaining gaps: onboarding emails, payment links, payment waiver persistence/API/UI, email outbox/retry, deprecated alias removal
 
 ## Business Admin
 

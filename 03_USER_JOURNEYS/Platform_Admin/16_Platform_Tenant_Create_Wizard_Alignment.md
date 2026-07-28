@@ -150,16 +150,18 @@ See [[SA-P0-01_Tenant_Wizard_Field_Persistence_Fix]].
 - Runtime: create `en-GB` / `pos_only` / `retail` / `GB` → details + name-only update + reload preserved values; DB matched.
 - Status: **COMPLETE**
 
-## Lifecycle alignment implementation status (2026-07-27)
+## Lifecycle alignment implementation status (2026-07-28)
 
 | Topic | Status |
 |---|---|
 | APPROVED: lifecycle model and mappings | **APPROVED** |
-| Backend lifecycle correction | **NOT IMPLEMENTED** |
-| Data cleanup migration | **NOT IMPLEMENTED** |
-| `tenants.status` CHECK constraint | **NOT IMPLEMENTED** |
-| `lifecycleStatus` API transition | **NOT IMPLEMENTED** |
-| Frontend badge/filter alignment | **NOT IMPLEMENTED** |
+| Backend lifecycle correction | **IMPLEMENTED** |
+| Data cleanup migration | **IMPLEMENTED** |
+| `tenants.status` CHECK constraint | **IMPLEMENTED** |
+| `lifecycleStatus` API transition | **IMPLEMENTED** |
+| Frontend badge/filter alignment | **IMPLEMENTED** |
+| Explicit `subscriptionType` create contract | **IMPLEMENTED** |
+| Post-merge smoke verification | **PASSED** — [[../../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Post_Merge_Smoke_Verification]] |
 
 ## Source file anchors
 

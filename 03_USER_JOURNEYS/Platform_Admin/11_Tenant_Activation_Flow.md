@@ -56,17 +56,19 @@ Platform Admin (manual paid activation); system (automatic trial/demo activation
 
 | Item | Status |
 |---|---|
-| Manual activate API/UI | Exists |
-| Paid verified-payment / waiver gate | Partial / needs alignment |
-| `PENDING_ACTIVATION` intermediate lifecycle | **NOT IMPLEMENTED** |
-| Auto-activate trial/demo | **NOT IMPLEMENTED** |
-| Activation emails | **NOT IMPLEMENTED** |
-| Status defect (billing in `tenants.status`) | **Defect** — may block `CanActivate` |
-| Backend lifecycle correction | **NOT IMPLEMENTED** |
-| Data cleanup migration | **NOT IMPLEMENTED** |
-| `tenants.status` CHECK constraint | **NOT IMPLEMENTED** |
-| `lifecycleStatus` API transition | **NOT IMPLEMENTED** |
-| Frontend lifecycle badge/filter alignment | **NOT IMPLEMENTED** |
+| Manual activate API/UI | **IMPLEMENTED** |
+| Paid verified-payment gate (Mark Paid) | **IMPLEMENTED** |
+| Paid waiver gate | **NOT IMPLEMENTED** (deferred) |
+| `PENDING_ACTIVATION` intermediate lifecycle | **IMPLEMENTED** |
+| Auto-activate trial/demo | **IMPLEMENTED** |
+| Activation emails | **NOT IMPLEMENTED** (deferred) |
+| Status defect (billing in `tenants.status`) | **FIXED** |
+| Backend lifecycle correction | **IMPLEMENTED** |
+| Data cleanup migration | **IMPLEMENTED** |
+| `tenants.status` CHECK constraint | **IMPLEMENTED** |
+| `lifecycleStatus` API transition | **IMPLEMENTED** |
+| Frontend lifecycle badge/filter alignment | **IMPLEMENTED** |
+| Post-merge smoke verification | **PASSED** — [[../../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Post_Merge_Smoke_Verification]] |
 
 ## Decision history — superseded
 
