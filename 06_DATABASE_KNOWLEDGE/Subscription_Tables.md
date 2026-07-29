@@ -37,6 +37,12 @@ documents them once in a combined module file.
 Subscription, invoice, entitlement, payment, and feature flag statuses must be
 varchar/text fields controlled by CHECK constraints.
 
+Tenant lifecycle is a separate concern:
+
+- `tenants.status` stores lifecycle only
+- billing cycle, subscription status, invoice status, and payment status must never be written into `tenants.status`
+- ordered tenant lifecycle migrations: `RepairTenantLifecycleStatusData`, then `AddTenantLifecycleStatusCheckConstraint`
+
 ## Related Files
 
 - [[Tables/03_04_Catalog_And_Subscription_Catalog_Plans_Addons_And_Entitlements]]

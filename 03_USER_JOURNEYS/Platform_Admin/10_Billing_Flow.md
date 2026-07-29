@@ -1,7 +1,7 @@
 <!-- title: Billing Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-20 -->
+<!-- last_updated: 2026-07-27 -->
 
 # Billing Flow
 
@@ -10,8 +10,19 @@
 Defines the completed Platform Admin Billing journey for read, permission, Issue
 Invoice, and Mark Paid flows against the real Platform Admin Billing API.
 Payment Links are **Release 1 mandatory** but **not yet implemented** — scheduled
-as the final major Super Admin feature. See
+as the final major Super Admin feature. Paid-tenant onboarding requires a
+**payment link in the create email** once links exist — see
+[[18_Tenant_Onboarding_Email_Flows]] and [[../../12_INTEGRATIONS/Email_Event_And_Template_Catalog]].
+Release 1 payment verification remains **manual** (Mark Paid / verify); Payment
+Received email is **deferred**. See
 [[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]].
+
+Tenant lifecycle alignment decision:
+
+- invoice/payment outcomes remain billing concerns
+- `tenants.status` remains lifecycle-only
+- paid tenant activation requires recorded payment verification or an approved payment waiver
+- `billingStatus` and `lifecycleStatus` are not aliases in the final contract
 
 ## Actor
 
@@ -180,13 +191,29 @@ PENDING or eligible OVERDUE
 | 1 | Offer Mark Paid | Requires `platform.billing.manage` and backend `canMarkPaid=true`. |
 | 2 | Confirm | Dialog shows invoice, tenant, outstanding amount, currency, and full-settlement explanation. |
 | 3 | Submit | `POST .../invoices/{id}/mark-paid` with `{ expectedUpdatedAt }` only by default. |
-| 4 | Result | Invoice becomes `PAID`. Summary, list, detail, and payment history refresh. |
+| 4 | Result | Invoice becomes `PAID`. Summary, list, detail, and payment history refresh. This satisfies the Release 1 manual payment-verification path for paid tenant activation. |
 
 State clearly:
 
 - Mark Paid may leave payment history empty.
 - This is valid current product behaviour.
 - UI must not fabricate a payment transaction.
+- Approved business rule: verified payment **or** an approved payment waiver may satisfy paid activation.
+- Current implementation: payment waiver persistence and payment waiver API/UI are **NOT IMPLEMENTED**.
+- Implementation must **not** accept an unpersisted request flag or arbitrary boolean as a payment waiver.
+
+## Tenant lifecycle alignment status
+
+| Topic | Status |
+|---|---|
+| APPROVED: lifecycle model and legacy mappings | **APPROVED** |
+| Backend lifecycle correction | **IMPLEMENTED** |
+| Data cleanup migration | **IMPLEMENTED** |
+| `tenants.status` CHECK constraint | **IMPLEMENTED** |
+| `lifecycleStatus` API transition | **IMPLEMENTED** |
+| Frontend badge/filter alignment | **IMPLEMENTED** |
+| Payment waiver persistence/API/UI | **NOT IMPLEMENTED** (deferred) |
+| Post-merge smoke verification | **PASSED** — [[../../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Post_Merge_Smoke_Verification]] |
 
 ## Conflict Flow
 
@@ -215,12 +242,12 @@ Ineligible lifecycle state
 - Enter a partial payment or overpayment.
 - Cancel or void an invoice.
 - Manually set failed or overdue status.
-- Generate or resend a payment link.
+- Generate or resend a payment link. (**Approved R1 product needs this** for paid onboarding email — see [[18_Tenant_Onboarding_Email_Flows]]; still **NOT IMPLEMENTED**.)
 - Send reminders.
 - Activate or suspend a tenant through the Billing endpoint.
 - Refund or payment gateway reconciliation.
 
-The current UI must not expose these actions.
+The current UI must not expose unimplemented actions. Manual **Mark Paid** remains the R1 payment verification path until PayHere/webhook ships.
 
 ## Planned Future Scope
 

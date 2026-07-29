@@ -77,7 +77,7 @@ Purpose: Stores tenant core account data.
 | `tenant_code` | varchar(60) |  | NOT NULL |  |
 | `tenant_slug` | varchar(100) |  | NOT NULL |  |
 | `display_name` | varchar(200) |  | NOT NULL |  |
-| `status` | varchar(40) |  | NOT NULL | Original ERD domain: tenant_status |
+| `status` | varchar(40) |  | NOT NULL | Original ERD domain: tenant_status; lifecycle-only (`DRAFT`, `PENDING_PAYMENT`, `PENDING_ACTIVATION`, `ACTIVE`, `SUSPENDED`, `CANCELLED`) |
 | `base_currency_code` | char(3) | FK | NOT NULL | References currencies(currency_code) |
 | `default_timezone` | varchar(80) |  | NOT NULL |  |
 | `default_locale` | varchar(20) |  | NULL | Wizard/create `defaultLocale`; nullable for legacy rows |
@@ -96,7 +96,23 @@ Constraints / Notes:
 ```text
 UNIQUE(tenant_code)
 UNIQUE(tenant_slug)
+Approved lifecycle-only values: DRAFT, PENDING_PAYMENT, PENDING_ACTIVATION, ACTIVE, SUSPENDED, CANCELLED
+Do not store billing-cycle, subscription-type, subscription-status, or payment-status values in tenants.status
+Migration order: 1) RepairTenantLifecycleStatusData 2) AddTenantLifecycleStatusCheckConstraint
 ```
+
+DATA MIGRATION RULES (approved mapping for `RepairTenantLifecycleStatusData` only — not future workflow states):
+
+- valid lifecycle values remain unchanged
+- `pending` / `unpaid` / `overdue` / `failed` -> `PENDING_PAYMENT`
+- `paid` / `verified` / `waived` and not activated -> `PENDING_ACTIVATION`
+- `setup_pending` -> `ACTIVE` (`setup_pending` is **not** an approved lifecycle value)
+- `inactive` with previous activation evidence -> `SUSPENDED` (`inactive` is **not** an approved lifecycle value)
+- `inactive` without previous activation evidence -> `DRAFT`
+- explicit cancelled -> `CANCELLED`
+- explicit suspended -> `SUSPENDED`
+- authoritative activation evidence such as `activated_at` or `is_active` takes priority over billing labels, except explicit suspended/cancelled state
+- unknown values must fail safely or be reported for manual correction; never silently default
 
 Relationships:
 

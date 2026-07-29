@@ -1,7 +1,7 @@
 <!-- title: Platform Administration Technical Contract -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-07-03 -->
+<!-- last_updated: 2026-07-27 -->
 
 # Platform Administration Technical Contract
 
@@ -10,16 +10,33 @@
 Defines the implementation contract for `Platform_Administration`. This contract is based on
 new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
+## Email and tenant lifecycle (approved 2026-07-27)
+
+- Email architecture: [[../../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]]
+- Event catalog: [[../../12_INTEGRATIONS/Email_Event_And_Template_Catalog]]
+- Onboarding journeys: [[../../03_USER_JOURNEYS/Platform_Admin/18_Tenant_Onboarding_Email_Flows]]
+- `tenants.status` = lifecycle only (`DRAFT`, `PENDING_PAYMENT`, `PENDING_ACTIVATION`, `ACTIVE`, `SUSPENDED`, `CANCELLED`)
+- Paid verification or approved waiver recorded -> `PENDING_ACTIVATION`; manual Release 1 paid activation -> `ACTIVE`
+- Trial/Demo create orchestration records separate `TENANT_CREATED` and `TENANT_ACTIVATED` events and ends with `ACTIVE`
+- Never email plaintext/temporary passwords
+- Platform password reset ACS: **IMPLEMENTED**; tenant onboarding emails: **NOT IMPLEMENTED**
+
 ## API Contract
 
 | Area | Contract |
 |---|---|
-| API groups | `/api/v1/platform-admin/users`, `/api/v1/platform-admin/roles`, `/api/v1/platform-admin/permissions`, `/api/v1/platform-admin/settings`, `/api/v1/platform-admin/audit-logs`, `/api/v1/platform-admin/tenants`, `/api/v1/platform-admin/catalog` |
+| API groups | `/api/v1/platform-admin/users`, `/api/v1/platform-admin/roles`, `/api/v1/platform-admin/permissions`, `/api/v1/platform-admin/settings`, `/api/v1/platform-admin/audit-logs`, `/api/v1/platform-admin/tenants`, `/api/v1/platform-admin/catalog`, `/api/v1/platform-auth/password-reset` (public validate/complete; legacy alias under `/api/v1/auth/platform-password-reset`) |
 | Request format | Typed request DTOs; no raw map payloads in application layer |
 | Response format | Typed response DTOs with safe fields only |
 | Error format | Standard API error response |
 | Tenant context | Resolved server-side for tenant-owned records |
 | Auth | Staff/customer/platform auth boundary must match module surface |
+
+Tenant API lifecycle transition:
+
+- authoritative response field = `lifecycleStatus`
+- billing concern field = `billingStatus`
+- temporary lifecycle compatibility aliases, if retained, must be marked **deprecated**
 
 ## API Groups
 
@@ -61,6 +78,9 @@ history/ledger behavior where applicable.
 - Use DTOs in data layer, domain/view models in UI layer.
 - Permission and entitlement checks are UX helpers only; backend remains final authority.
 - Browser online store and Flutter business app must share backend rules but keep separate user/auth surfaces.
+- Platform Admin tenant badges and filters must support `DRAFT`, `PENDING_PAYMENT`, `PENDING_ACTIVATION`, `ACTIVE`, `SUSPENDED`, and `CANCELLED`.
+- Pending Activation KPI counts `PENDING_ACTIVATION` only.
+- Billing-cycle API values: Monthly -> `monthly`, Annual -> `yearly`, Both/All -> omit the filter parameter (never send literal `both`).
 
 ## Backend Contract
 
@@ -90,6 +110,8 @@ Validated fields:
 
 Persisted mapping: `defaultLocale`/`operatingMode` → `tenants`; `businessType` → `tenant_profiles.business_type_id`; country → `tenant_addresses.country_code`. Update validation uses `ValidateUpdate` and does not clear omitted locale/mode.
 
+`billingStatus` validation is independent from tenant lifecycle. It must never be persisted into `tenants.status`.
+
 Failures return `ApplicationError.ValidationFailed` (`errorCode: platform_tenants.validation_failed`) with `ApplicationFieldError` items; `PlatformAdminTenantsController` maps these to HTTP 400 with `errors[]` in the legacy API envelope.
 
 Angular wizard mirrors ISO/billing rules client-side via `platform-tenant-create.validators.ts` but backend remains authoritative.
@@ -105,7 +127,19 @@ Controller: `PlatformAdminUsersController` · Angular route `/admin/platform-use
 | Create user | `POST /api/v1/platform-admin/users` | `platform.users.create` |
 | Save status | `PUT /api/v1/platform-admin/users/{userId}` | `platform.users.update` |
 | Save roles | `PUT /api/v1/platform-admin/users/{userId}/roles` | `platform.users.roles.assign` |
+| Send password reset | `POST /api/v1/platform-admin/users/{userId}/password-reset` | `platform.users.update` |
 | Role checkbox options | `GET /api/v1/platform-admin/roles` | `platform.roles.view` |
+
+Public password reset (no platform JWT; rate-limited):
+
+| Action | API |
+|---|---|
+| Validate token | `POST /api/v1/platform-auth/password-reset/validate` (legacy: `/api/v1/auth/platform-password-reset/validate`) |
+| Complete reset | `POST /api/v1/platform-auth/password-reset/complete` (legacy: `/api/v1/auth/platform-password-reset/complete`) |
+
+See [[03_USER_JOURNEYS/Platform_Admin/17_Platform_User_Password_Reset_Flow]] and [[15_IMPLEMENTATION_TRACKING/Backend/Auth/SA-P1-06_Platform_Admin_User_Password_Reset_Implementation]].
+
+Password reset delivery: ACS Email when configured (`deliveryMode=email`, `resetUrl=null`); Dev may fall back to `admin_secure_link`. Self-service Forgot Password and tenant resets remain out of scope.
 
 Implementation notes:
 
@@ -216,6 +250,16 @@ Test coverage must include:
 - Safe error display.
 - Audit/event/history creation where required.
 - Offline/cache behavior where this module touches POS, checkout, order, inventory, payment, or sync.
+
+Tenant lifecycle alignment minimum future tests:
+
+- Paid create -> `PENDING_PAYMENT`
+- Paid cannot activate before payment verification or approved waiver
+- Paid verification / waiver -> `PENDING_ACTIVATION`
+- Trial create -> create + auto-activate -> `ACTIVE`
+- Demo create -> create + auto-activate -> `ACTIVE`
+- Billing cycle / subscription type / payment status never write into `tenants.status`
+- Invalid lifecycle value rejected before or at DB constraint
 
 ## Implementation Sequence
 

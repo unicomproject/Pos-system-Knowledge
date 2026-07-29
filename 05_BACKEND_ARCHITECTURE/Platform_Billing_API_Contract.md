@@ -15,6 +15,12 @@ paid.
 It does not define the broader target billing platform described in
 [[04_MODULE_KNOWLEDGE/04_Subscription_Billing_Usage/03_Technical_Contract]].
 
+Tenant lifecycle alignment note:
+
+- invoice/payment statuses remain billing concerns only
+- paid-tenant activation may proceed only after recorded payment verification or approved payment waiver
+- `billingStatus` and `lifecycleStatus` are separate concerns in the final API contract
+
 ## Verification Baseline
 
 Verified on 2026-07-15 against the Unified Commerce backend controller, service,
@@ -192,6 +198,8 @@ DRAFT -> PENDING -> PAID
   `balanceDue = 0`.
 - Mark Paid settles the whole invoice; no amount is accepted from the client.
 
+Mark Paid is the current Release 1 manual verification path for paid-tenant activation. Approved business rule: verified payment or an approved payment waiver may satisfy activation. Current implementation: waiver persistence and waiver API/UI are **NOT IMPLEMENTED** in this billing API scope. Do not accept an unpersisted request flag or arbitrary boolean as a waiver.
+
 ## Concurrency
 
 The repository first compares `expectedUpdatedAt` with the stored `UpdatedAt`.
@@ -235,6 +243,7 @@ These are current scope limitations and do not block the scoped Billing UI:
 - No partial-payment mutation is exposed.
 - No cancellation or void mutation is exposed.
 - No overpayment action is exposed.
+- No payment-waiver mutation is exposed.
 - Mark Paid may not create a payment-history transaction.
 - Unknown status values can produce an empty result instead of validation error.
 - `paidAt` lacks strong lifecycle/future-date domain validation.

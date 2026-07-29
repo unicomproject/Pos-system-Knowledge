@@ -1,7 +1,7 @@
 <!-- title: Platform Admin User Flow Analysis -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-07-27 -->
 
 # Platform Admin User Flow Analysis
 
@@ -31,6 +31,9 @@ The deck labels the actor as `Super Admin`, but the Second Brain should use `Pla
 14. Audit Logs Flow.
 15. System Settings Flow.
 16. Return Policy Template Management Flow — [[SA-P1-04_Return_Policy_Template_UI_Implementation]].
+17. Platform User Password Reset Flow — [[17_Platform_User_Password_Reset_Flow]] · [[SA-P1-06_Platform_Admin_User_Password_Reset_Implementation]].
+18. Tenant Onboarding Email Flows — [[18_Tenant_Onboarding_Email_Flows]] · [[../../12_INTEGRATIONS/Email_Event_And_Template_Catalog]].
+19. Authentication Email Flows — [[19_Authentication_Email_Flows]].
 
 ## Scope Alignment
 

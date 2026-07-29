@@ -1,7 +1,7 @@
 <!-- title: Platform User Management Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-03 -->
+<!-- last_updated: 2026-07-20 -->
 
 # Platform User Management Flow
 
@@ -40,6 +40,7 @@ Platform Admin opens **Platform Users** (`/admin/platform-users`).
 | 7 | Edit user | Row click loads `GET /api/v1/platform-admin/users/{userId}` into the slide-over editor. |
 | 8 | Update status | When caller has `platform.users.update`, status is saved via `PUT /api/v1/platform-admin/users/{userId}` with `{ status }`. |
 | 9 | Assign roles | When caller has `platform.users.roles.assign`, selected role IDs are saved via `PUT /api/v1/platform-admin/users/{userId}/roles` with `{ roleIds }`. Permissions are inherited from assigned roles; there is no per-user permission picker on this screen. |
+| 10 | Send password reset | When caller has `platform.users.update`, admin confirms **Send Password Reset** on user detail; `POST /api/v1/platform-admin/users/{userId}/password-reset` sends ACS Email and returns `deliveryMode: email` with `resetUrl: null` (Dev may fall back to `admin_secure_link`). User completes reset from the emailed `/reset-password?token=` link. See [[17_Platform_User_Password_Reset_Flow]]. |
 
 ## Permissions
 
@@ -48,6 +49,7 @@ Platform Admin opens **Platform Users** (`/admin/platform-users`).
 | View list / open editor | `platform.users.view` |
 | Create user | `platform.users.create` |
 | Update status | `platform.users.update` |
+| Initiate password reset | `platform.users.update` |
 | Replace assigned roles | `platform.users.roles.assign` |
 
 Role options for create/edit come from `GET /api/v1/platform-admin/roles` (`platform.roles.view`). The users screen does not maintain a static role list.
@@ -88,7 +90,7 @@ Not in current API contract: phone, job title, manual per-user permission select
 |---|---|
 | Route | `/admin/platform-users` — `admin.routes.ts`, `requiredPermission: platform.users.view` |
 | Page | `platform-users-page.ts` — list, search, loading/empty/error states, slide-over create/edit |
-| API service | `platform-user-api.service.ts` — list, detail, create, update, assign roles |
+| API service | `platform-user-api.service.ts` — list, detail, create, update, assign roles, initiate password reset |
 | Role source | `platform-role-management-api.service.ts` — `getRoles()` for checkbox options |
 | Models / mappers | `platform-user.model.ts`, `platform-user.mapper.ts` |
 

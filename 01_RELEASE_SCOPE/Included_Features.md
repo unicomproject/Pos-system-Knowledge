@@ -1,7 +1,7 @@
 <!-- title: Included Features -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-20 -->
+<!-- last_updated: 2026-07-27 -->
 
 
 # Included Features
@@ -39,12 +39,27 @@ subscription plan assignment, billing summary with issue-invoice and mark-paid
 (settlement), **Payment Links for eligible subscription invoices (PayHere —
 final major Super Admin feature)**, feature entitlement, tenant admin creation, initial
 outlet/till/user/role/product setup support, tenant activation/status control,
+**admin-initiated platform user password reset** (one-time token, ACS Email delivery with `deliveryMode=email` / `resetUrl=null`, public `/reset-password` page, session revocation; Platform Admin self-service Forgot Password and tenant resets remain out of scope),
 and audit visibility.
 
 **Payment link customer collection** is **Release 1 mandatory** but
 **not yet implemented** — database schema prepared; Application/API/UI/PayHere/webhook
-pending after remaining non-payment Super Admin gaps. See
-[[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]].
+**and paid-tenant payment-link email** pending. See
+[[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]] and
+[[../12_INTEGRATIONS/Email_Event_And_Template_Catalog]].
+
+**Tenant onboarding emails (approved, not implemented):** paid create → payment-required email with payment link; manual payment verify + manual activate → set-password email; trial/demo → created email then auto-activate → separate set-password email. See [[../03_USER_JOURNEYS/Platform_Admin/18_Tenant_Onboarding_Email_Flows]]. Payment Received email is **deferred** for R1.
+
+**Tenant lifecycle status alignment (approved, not implemented):**
+
+- `tenants.status` stores lifecycle only: `DRAFT`, `PENDING_PAYMENT`, `PENDING_ACTIVATION`, `ACTIVE`, `SUSPENDED`, `CANCELLED`
+- Paid create -> `PENDING_PAYMENT`
+- Paid verification or approved waiver -> `PENDING_ACTIVATION`
+- Trial/Demo create orchestration ends at `ACTIVE`
+- ordered migrations required: `RepairTenantLifecycleStatusData`, then `AddTenantLifecycleStatusCheckConstraint`
+- `lifecycleStatus` API transition and frontend badge/filter alignment are **IMPLEMENTED** (verified on merged main, 2026-07-28)
+- cancel endpoint remains deferred and is **not** part of this alignment task
+- deferred remaining gaps: onboarding emails, payment links, payment waiver persistence/API/UI, email outbox/retry, deprecated alias removal
 
 ## Business Admin
 

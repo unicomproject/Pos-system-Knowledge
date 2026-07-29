@@ -1,138 +1,84 @@
 <!-- title: Tenant Admin UI Rules -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: TM-EPOS MVP / OneVerz POS -->
+<!-- last_updated: 2026-07-29 -->
 
 # Tenant Admin UI Rules
 
 ## Purpose
 
-This file defines Tenant Admin UI rules for SCS-TIX Release 1.
+Tenant Admin UI rules for OneVerz POS / TM-EPOS MVP.
 
-Tenant Admin works inside the same Flutter POS app, but uses a separate
-operational admin layout.
+Tenant Admin works inside the same Flutter POS app, but uses a separate operational admin layout.
 
-## Layout Decision
+## Layout Decision (Updated 2026-07-29)
 
-Tenant Admin UI must be changed from cashier POS layout.
+Tenant Admin uses one shared reusable shell for all pages:
 
-It should look like a dark-blue and white operational control panel inside the
-Flutter app.
-
-It is not a separate Tenant Admin web application in Release 1.
-
-## Sidebar / Navigation
-
-Tenant Admin navigation should be permission-based.
-
-Confirmed Release 1 tenant areas include:
-
-| Navigation Item | Purpose |
-|---|---|
-| Dashboard | Operational overview |
-| Outlet | Outlet list/create/update |
-| Till | Till setup and activation code |
-| Users | Staff/user management |
-| Roles & Permission | Role and permission assignment |
-| Products | Product onboarding and management |
-| Inventory | Stock, batch, expiry, adjustment, stocktake |
-| Discounts | Product/POS/expiry discount setup |
-| Loyalty | Basic loyalty setup |
-| Reports | Report view/export if permitted |
-
-Do not show Release 2 modules as active menu items.
-
-## Dashboard Rules
-
-Tenant dashboard may show outlet count, till count, user count, inventory alerts,
-product/stock summary, expiry alerts, and sales summary where reports feature is
-enabled.
-
-Dashboard cards must be tenant-scoped.
-
-## Outlet Screen Rules
-
-Outlet screens must support:
-
-- Outlet list.
-- Create/edit outlet.
-- Outlet contact details.
-- Outlet address.
-- Status.
-- Empty state when no outlet exists.
-
-Outlet setup must not become stock-transfer or delivery setup.
-
-## Till Screen Rules
-
-Till screens must support:
-
-- Till list.
-- Create/edit till.
-- Outlet assignment.
-- Status.
-- Opening cash required flag.
-- Hardware profile link where relevant.
-- Activation code generation/view.
-
-Activation code must be shown as sensitive and short-lived.
-
-## Device and Hardware Admin
-
-Tenant Admin or permitted admin user can manage POS device trust/block status,
-hardware profiles, hardware devices, printer/scanner/cash drawer/card reader
-details, and hardware test results.
-
-Cashier must not freely configure system hardware.
-
-## Product and Inventory Rules
-
-Product onboarding must support manual or CSV import as confirmed.
-
-Inventory UI must show:
-
-- Stock by outlet/product/variant.
-- Batches and expiry.
-- Low stock and expiry alerts.
-- Stock adjustment.
-- Stocktake.
-
-Supplier management and stock transfer are excluded from Release 1.
-
-## Role Permission UI
-
-Role/permission UI must make it clear that access is controlled by:
-
-1. Tenant feature entitlement.
-2. Role feature assignment.
-3. Role permission.
-4. User or outlet assignment.
-
-Do not hardcode cashier/manager/admin access in UI.
-
-## Tenant Admin Flow Diagram
-
-```mermaid
-flowchart TD
-    A[Setup/Login] --> B[Dashboard]
-    B --> C[Outlet Setup]
-    C --> D[Till and Device Setup]
-    D --> E[Users and Roles]
-    E --> F[Products and Inventory]
-    F --> G[Discount Loyalty Reports]
+```text
+TenantAdminSharedShell
+├── Shared Fixed Black Header
+├── Shared White Tenant Admin Sidebar
+├── Responsive Dynamic Content Area
+└── Shared Fixed Black Footer Navigation
 ```
+
+Canonical: [[Tenant_Admin_Settings_Shared_Layout_Architecture]]
+
+### Superseded visual statement
+
+Older text in this file said Tenant Admin should look like a **dark-blue and white** operational control panel.
+
+For the **shared sidebar**, that dark-blue full sidebar guidance is **superseded**.
+
+**Final approved sidebar:** white / very light background, dark text, muted outline icons, light purple active background, purple active icon/text, rounded active container.
+
+See [[Tenant_Admin_Sidebar_Navigation]].
+
+## Sidebar / Navigation (Approved Order)
+
+| # | Item |
+|---|---|
+| 1 | Dashboard |
+| 2 | Outlets |
+| 3 | Tills |
+| 4 | Users |
+| 5 | Online Store |
+| 6 | Roles & Access |
+| 7 | Hardware |
+| 8 | Inventory |
+| 9 | Products (expandable) |
+| 10 | Settings (final item) |
+
+Products children: Product List, Add Product, Categories, Brands, Inventory, Import.
+
+Do not place Settings inside Products. Do not place Inventory under Hardware.
+
+Older Release 1 menu lists in this note (Discounts, Loyalty, Reports as primary peers, etc.) may conflict — prefer the approved order above for the shared OneVerz Tenant Admin sidebar.
+
+## Shared Header / Footer
+
+- Shared fixed black header on all Tenant Admin pages
+- Shared fixed black footer: Home, New Sale, Orders, Customers, Settings
+- On Settings screens: sidebar Settings + footer Settings both active
+
+## Permission Rules
+
+Navigation is permission + feature-entitlement based. Do not hardcode cashier/manager/admin access in UI. Do not invent permission keys.
+
+## Inventory Dual Context
+
+Top-level Inventory ≠ Products → Inventory. See [[Tenant_Admin_Inventory_Navigation]].
 
 ## Out of Scope
 
-- Separate Tenant Admin web app is excluded.
-- E-commerce storefront management is excluded.
-- Supplier and stock transfer management is excluded.
-- AI onboarding is excluded.
+- Separate Tenant Admin web app
+- Customer-facing storefront UI as POS chrome
 
 ## Related Files
 
 - [[Design_System]]
 - [[Permission_Based_UI_Rules]]
-- [[../03_USER_JOURNEYS/Tenant_Admin/03_Outlet_Management_Flow]]
-- [[../03_USER_JOURNEYS/Tenant_Admin/04_Till_Management_Flow]]
-- [[../06_DATABASE_KNOWLEDGE/Database_Overview]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Settings_Shared_Layout_Architecture]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Sidebar_Navigation]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Tenant_Admin_Layout]]

@@ -139,7 +139,7 @@ Top-level counts include `totalTenants`, `activeTenants`, `suspendedTenants`, `t
 | `type` | Count definition |
 |---|---|
 | `suspended_tenants` | Tenants with status `suspended` |
-| `setup_pending` | Tenants with status `setup_pending` or `pending_payment` |
+| `pending_activation` | Tenants with lifecycle status `PENDING_ACTIVATION` |
 | `past_due_subscriptions` | Tenant subscriptions with status `PAST_DUE` |
 | `pending_billing` | Subscription invoices with status `PENDING` and `balance_due > 0` |
 
@@ -283,7 +283,13 @@ Lookup items use `{ value, label }` except `countryCodes[]`, which uses `{ code,
 - tenant admin user + TENANT_ADMIN role + permissions + invite row
 - optional draft subscription invoice
 
-Tenant admin invite is persisted as `INVITED` with pending password hash; email is not sent in this slice.
+Tenant admin invite is persisted as `INVITED` with pending password hash.
+
+**Approved product (2026-07-27):** onboarding emails and payment-link send are required per [[../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]] and [[../03_USER_JOURNEYS/Platform_Admin/18_Tenant_Onboarding_Email_Flows]]. **`tenants.status` must be lifecycle-only** (`DRAFT`, `PENDING_PAYMENT`, `PENDING_ACTIVATION`, `ACTIVE`, `SUSPENDED`, `CANCELLED`) — never billing values.
+
+**Current implementation:** tenant onboarding emails and payment-link API/UI remain **NOT IMPLEMENTED** (deferred). Lifecycle alignment is **IMPLEMENTED**: create writes lifecycle-only `tenants.status`, responses expose `lifecycleStatus`, and Mark Paid / activation rules follow the approved Paid / Trial / Demo orchestration. Do not treat the old “email is not sent in this slice” wording as the product end state.
+
+**Approved lifecycle rules:** paid create -> `PENDING_PAYMENT`; paid verification or approved waiver recorded -> `PENDING_ACTIVATION`; manual paid activation -> `ACTIVE`; Trial/Demo create orchestration ends at `ACTIVE` with separate `TENANT_CREATED` and `TENANT_ACTIVATED` events.
 
 ### CreateTenant validation contract (before SaveChanges)
 
@@ -304,6 +310,8 @@ Wizard path is selected when the request includes wizard-only blocks (`tenantAdm
 | `subscription.paymentMethod` | One of seeded payment methods | `manual`, `bank_transfer` | `pending` |
 | `tenantAdmin.email` | Required valid email when `tenantAdmin` block sent | `admin@tenant.com` | `not-an-email` |
 
+`billingStatus` is a billing concern only. It must **never** populate `tenants.status`.
+
 Persistence (wizard create):
 
 | Request field | Column / join |
@@ -316,6 +324,21 @@ Persistence (wizard create):
 Country consistency: when both top-level and `address.countryCode` are present they must match; top-level-only country creates a primary REGISTERED address so country is not silently dropped.
 
 `PUT /api/v1/platform-admin/tenants/{id}` validates `defaultLocale` / `operatingMode` when sent; omitted values are not cleared.
+
+### Tenant lifecycle response transition (IMPLEMENTED)
+
+Canonical tenant lifecycle response field: `lifecycleStatus`.
+
+Billing concern field: `billingStatus`.
+
+Controlled compatibility transition (temporary aliases **DEPRECATED**; removal deferred):
+
+- add `lifecycleStatus` to tenant create/list/detail responses
+- keep temporary deprecated lifecycle aliases only while older clients remain
+- update Angular to consume `lifecycleStatus`
+- remove deprecated lifecycle alias in a later cleanup release
+
+`billingStatus` and `lifecycleStatus` must not be treated as aliases in the final contract.
 
 Validation failure response shape:
 
@@ -606,6 +629,45 @@ All endpoints require platform JWT authentication (`PlatformOnly` policy).
 | POST | `/api/v1/platform-admin/users` | `platform.users.create` | Create platform user invite |
 | PUT | `/api/v1/platform-admin/users/{userId}` | `platform.users.update` | Update platform user status |
 | PUT | `/api/v1/platform-admin/users/{userId}/roles` | `platform.users.roles.assign` | Replace assigned platform roles |
+| POST | `/api/v1/platform-admin/users/{userId}/password-reset` | `platform.users.update` | Initiate admin password reset; ACS Email when configured (`deliveryMode: email`, `resetUrl: null`); Dev fallback may return `admin_secure_link` |
+
+## Initiate password reset response shape
+
+No request body. Legacy envelope wraps `InitiatePlatformPasswordResetResponse`.
+
+**Email mode (ACS configured — production default):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": "guid",
+    "email": "staff@example.local",
+    "expiresAt": "2026-07-24T13:00:00Z",
+    "deliveryMode": "email",
+    "resetUrl": null,
+    "message": "A password reset email has been sent to the user."
+  }
+}
+```
+
+**Development fallback (ACS unset and `AllowAdminSecureLinkFallback: true`):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": "guid",
+    "email": "staff@example.local",
+    "expiresAt": "2026-07-24T13:00:00Z",
+    "deliveryMode": "admin_secure_link",
+    "resetUrl": "https://admin.example/reset-password?token=...",
+    "message": "Copy this secure link and share it with the user through your approved channel."
+  }
+}
+```
+
+Email provider failures map to HTTP 502. Eligible targets: `ACTIVE` or `LOCKED` with password set; not invite-pending, inactive, or deleted. Prior pending tokens revoked on new initiate. See [[../03_USER_JOURNEYS/Platform_Admin/17_Platform_User_Password_Reset_Flow]].
 
 ## List response shape
 
@@ -677,7 +739,55 @@ Role options for Angular create/edit must come from `GET /api/v1/platform-admin/
 |---|---|---|
 | `/admin/platform-users` | `platform.users.view` | `PlatformUsersPage` |
 
-Frontend tests (2026-07-03): `platform-users-page.spec.ts`, `platform-user-api.service.spec.ts`.
+Frontend tests (2026-07-03): `platform-users-page.spec.ts`, `platform-user-api.service.spec.ts`. Password reset UI/API tests added 2026-07-20 (SA-P1-06).
+
+---
+
+# Platform Auth Password Reset API Endpoints
+
+Controllers: `PlatformPasswordResetController` (canonical), `PlatformPasswordResetLegacyController` (legacy envelope under `/api/v1/auth`).
+
+Public endpoints — `[AllowAnonymous]` with auth login rate limiting.
+
+| Method | Route | Auth | Purpose |
+|---|---|---|---|
+| POST | `/api/v1/platform-auth/password-reset/validate` | Anonymous + rate limit | Validate one-time reset token; returns `{ isValid, status, expiresAt }` |
+| POST | `/api/v1/platform-auth/password-reset/complete` | Anonymous + rate limit | Set new password; revokes sessions on success |
+| POST | `/api/v1/auth/platform-password-reset/validate` | Anonymous + rate limit | Legacy alias (legacy API envelope) |
+| POST | `/api/v1/auth/platform-password-reset/complete` | Anonymous + rate limit | Legacy alias (legacy API envelope) |
+
+## Validate request / response
+
+```json
+{ "token": "raw-one-time-token" }
+```
+
+```json
+{ "isValid": true, "status": "PENDING", "expiresAt": "2026-07-20T13:00:00Z" }
+```
+
+Status values: `PENDING`, `USED`, `EXPIRED`, `REVOKED`, `INVALID`.
+
+## Complete request / response
+
+```json
+{
+  "token": "raw-one-time-token",
+  "newPassword": "NewPass123",
+  "confirmPassword": "NewPass123"
+}
+```
+
+```json
+{
+  "success": true,
+  "message": "Password has been reset successfully. Sign in with your new password."
+}
+```
+
+Token hash-only storage (HMAC via `ITokenHashService`); 1-hour TTL; prior pending tokens revoked on initiate. Audit: `PLATFORM_USER_PASSWORD_RESET_*`, `PLATFORM_USER_SESSIONS_REVOKED` on `platform_login_audits`.
+
+Evidence: [[../15_IMPLEMENTATION_TRACKING/Backend/Auth/SA-P1-06_Platform_Admin_User_Password_Reset_Implementation]].
 
 ---
 

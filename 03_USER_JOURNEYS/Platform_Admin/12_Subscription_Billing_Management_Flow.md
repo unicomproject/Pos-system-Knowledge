@@ -57,6 +57,13 @@ Supported today:
 - Data refresh
 - Responsive/accessibility behaviour
 
+Lifecycle alignment approved for the next implementation:
+
+- `tenants.status` remains lifecycle-only
+- paid tenant activation requires payment verification or approved waiver
+- Trial/Demo activation remains outside Billing and should be automatic after create provisioning
+- `billingStatus` and `lifecycleStatus` are separate API concerns
+
 ## Current Implemented Management Flow
 
 | Step | Action | System Behavior |
@@ -90,6 +97,8 @@ Supported today:
 
 Mark Paid may leave payment history empty. That is valid current product
 behaviour. The UI must not fabricate a payment transaction.
+
+Mark Paid is the current Release 1 manual verification path for paid-tenant activation. Approved business rule: verified payment or an approved payment waiver may satisfy activation. Current implementation: waiver persistence and waiver API/UI are **NOT IMPLEMENTED**. Do not accept an unpersisted request flag or arbitrary boolean as a waiver.
 
 ## Permission Journeys
 
@@ -136,6 +145,19 @@ Keep clearly separate from current Billing completion:
 - Upgrade or downgrade from Billing
 
 Do not describe unsupported future capabilities as implemented.
+
+## Tenant lifecycle alignment status
+
+| Topic | Status |
+|---|---|
+| APPROVED: lifecycle model and legacy mappings | **APPROVED** |
+| Backend lifecycle correction | **IMPLEMENTED** |
+| Data cleanup migration | **IMPLEMENTED** |
+| `tenants.status` CHECK constraint | **IMPLEMENTED** |
+| `lifecycleStatus` API transition | **IMPLEMENTED** |
+| Frontend badge/filter alignment | **IMPLEMENTED** |
+| Payment waiver persistence/API/UI | **NOT IMPLEMENTED** (deferred) |
+| Post-merge smoke verification | **PASSED** — [[../../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Post_Merge_Smoke_Verification]] |
 
 ## Platform Admin Invite Flow
 
