@@ -1,7 +1,7 @@
 <!-- title: Flutter Cashier POS Implementation Map -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 
 
 # Flutter Cashier POS Implementation Map
@@ -36,8 +36,8 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 | Category chips API | Datasource exists | Not implemented | UI uses static chips |
 | Local cart | In-memory Riverpod | N/A | UI only |
 | Checkout summary | Wired | `POST /api/v1/pos/checkout/summary` | Integrated for current online cash flow |
-| Cash payment | Wired | Not in Unified-Commerce | Blocked |
-| Receipt print audit | Wired in Flutter | Not in Unified-Commerce | Blocked |
+| Cash payment | Wired | Checkout summary/start-payment | Testing |
+| Receipt print audit | Wired | `POST /api/v1/pos/receipts/{saleId}/print` | Testing |
 
 ## POS Home Card Status
 
@@ -49,6 +49,29 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 | Parked Sales | Device-local count/dialog | Backend `/api/v1/pos/holds` exists but is not called by Flutter | Partial/disconnected |
 | Cash Drawer | Balance | drawer detail API | Partial (balance only) |
 | Online Orders | Placeholder | none | UI only |
+
+### Dashboard implementation update (2026-07-24)
+
+The home screen now uses a responsive cashier-profile + 3x2 action grid and an
+API-backed current-till-session summary. Tenant branding, cashier role, device
+state, fixed outlet/till context and summary metrics come from the additive
+`GET /api/v1/pos/home` contract. End Shift uses the real close-till route.
+Online Orders and Resume Held Sales remain visibly disabled when exposed because
+their production Flutter destinations are unavailable.
+
+All six approved action illustrations are now available as transparent RGBA
+assets under `assets/images`. The shared action card still keeps code-icon
+fallbacks for asset-load failure. Dashboard presentation is physically
+modularized under `presentation/widgets/home`: the main composition file is 96
+lines, while header, branding, session status, operational context, cashier
+profile, action configuration/grid/card, dot painter, summary panel/card and
+bottom navigation are separate files. No provider, route, access rule or API
+contract was duplicated during the refactor.
+
+The five current-session summary cards retain API values and formatting while
+using metric-specific Material icon styling: orange Total Sales, green
+Transactions, purple Returns, amber Discounts and blue Net Sales. Each icon uses
+a 56 logical-pixel pastel circular container and a 30 logical-pixel glyph.
 
 ## Returns Step 1 Notes (2026-07-17)
 
@@ -65,9 +88,46 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 - Products must exist via Tenant Admin / `POST /api/v1/products` and price list.
 - Empty catalog shows **No products found**, not demo items.
 
+## Payment And Receipt Map (2026-07-29)
+
+| Area | Active ownership | Status |
+|---|---|---|
+| Authoritative receipt | Backend completion + `receipt_data_json` | Implemented |
+| Completed-sale orchestration | `completed_sale_print_provider.dart` | Implemented; physical matrix incomplete |
+| Receipt History reprint | `features/receipts` + same printer service | Implemented; physical reprint unverified |
+| Local Agent transport | adapter/client under `hardware/receipt_printer` | Implemented |
+| Durable recovery | encrypted operation store + operation lookup | Implemented |
+| Card | provider-neutral backend gateway | Externally blocked |
+| Split | typed contract groundwork only | Not implemented end to end |
+
+### Hardware Chunk 2C receipt-history map
+
+| Area | Active ownership | Status |
+|---|---|---|
+| Sale historical reprint | Completed-sale print controller | Implemented; physical pending |
+| Refund/Return historical reprint | Receipt History → historical mapper → non-sale orchestrator | Implemented; physical pending |
+| Exchange historical reprint | Same typed non-sale path | Implemented; physical pending |
+| Non-sale copies | Device printer policy + deterministic copy identity | Implemented; physical pending |
+| Copy audit recovery | Per-copy pending audit, audit-only retry | Implemented |
+
 ## Related Files
 
 - [[../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Start_Sale_UI_Implementation_Status]]
 - [[../15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/Pos_Products_List_Implementation_Status]]
 - [[../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]]
 - [[../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Cashier_POS_Second_Brain_vs_Code_Comparison_Implementation_Status]]
+
+### Hardware Chunk 3 scanner map
+
+```text
+New Sale -> scanner listener -> HID service -> FIFO scan controller
+-> exact product API -> existing resolved-variant cart action
+```
+
+```text
+Hardware Testing -> scanner-test controller -> backend registration
+-> isolated HID/camera execution -> result finalization -> history
+```
+
+The camera dialog observes app lifecycle, stops while inactive/backgrounded,
+resumes only on its active dialog and gates the first valid frame.

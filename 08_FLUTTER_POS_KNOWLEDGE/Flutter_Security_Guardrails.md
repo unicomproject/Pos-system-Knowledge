@@ -1,7 +1,7 @@
 <!-- title: Flutter Security Guardrails -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-29 -->
 
 
 # Flutter Security Guardrails
@@ -45,6 +45,14 @@ POS device trust is required for device-bound POS/offline actions.
 
 A trusted device does not replace user authentication or permission checks.
 
+Hardware configuration is tenant/outlet/device scoped, versioned and revocable.
+Device revocation blocks hardware actions.
+
+Local Agent keys use secure storage and never enter widget/provider state,
+recovery records, diagnostics or logs. Production requires private CIDR/firewall
+restriction, local authentication and trusted HTTPS; debug HTTP is not
+production security.
+
 ## Offline Security Rule
 
 Offline mode must restrict protected actions that require backend validation.
@@ -55,6 +63,10 @@ loyalty/store credit, till final close, or final stock.
 ## Debug Rule
 
 Debug logs in development must not be copied into production behavior.
+
+Never log receipt/API-key secrets, provider credentials, PAN, CVV, PIN,
+track/EMV data, reusable tokens or unsanitized provider responses. Only masked
+card display and safe provider references may reach UI/receipt state.
 
 ## Related Files
 

@@ -1,7 +1,7 @@
 <!-- title: Offline Operation & Sync Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-29 -->
 
 # Offline Operation & Sync Technical Contract
 
@@ -53,6 +53,9 @@ history/ledger behavior where applicable.
 - Widgets/components must not call HTTP APIs directly.
 - Use DTOs in data layer, domain/view models in UI layer.
 - Permission and entitlement checks are UX helpers only; backend remains final authority.
+- Persist hardware operation identity before irreversible I/O.
+- Recovery queues distinguish pending physical action, unknown outcome,
+  physical success/pending audit, and completed sync.
 - Browser online store and Flutter business app must share backend rules but keep separate user/auth surfaces.
 
 ## Backend Contract
@@ -85,6 +88,8 @@ Test coverage must include:
 - Safe error display.
 - Audit/event/history creation where required.
 - Offline/cache behavior where this module touches POS, checkout, order, inventory, payment, or sync.
+- Restart/network-loss tests must prove no duplicate print, drawer pulse or
+  provider capture.
 
 ## Implementation Sequence
 

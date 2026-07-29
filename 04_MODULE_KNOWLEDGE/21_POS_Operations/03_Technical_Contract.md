@@ -1,7 +1,7 @@
 <!-- title: POS Operations Technical Contract -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 
 # POS Operations Technical Contract
 
@@ -54,6 +54,10 @@ history/ledger behavior where applicable.
 
 - Use feature-owned folders and typed services/providers.
 - Widgets/components must not call HTTP APIs directly.
+- Completed-sale and Receipt History flows map the backend receipt snapshot into
+  a typed domain receipt before invoking printer orchestration.
+- Durable print-operation state is persisted before the external print side
+  effect. Local Agent transport must not fall back to direct TCP.
 - `PosParkedSaleNotifier` persists `pos.parked_sales` in secure storage and does
   not call `PosHoldsController`.
 - Cash Drawer/Cash In/Cash Drop routes and forms exist, but no backend
@@ -70,6 +74,10 @@ history/ledger behavior where applicable.
 - Repository interfaces stay in application layer; EF implementations stay in infrastructure layer.
 - Audit/event rows are written for sensitive state changes.
 - Idempotency keys are required for retryable commands that can create duplicates.
+- `POST /api/v1/pos/receipts/{saleId}/print` records an authorized result using
+  `printRequestId`, copy type/index, reason, operator and device context.
+- Receipt detail/reprint reads `receipts.receipt_data_json`; no normalized
+  tender/tax/copy receipt tables were introduced for this slice.
 
 ## Permission And Entitlement Contract
 
@@ -91,6 +99,8 @@ Test coverage must include:
 - Duplicate/conflict behavior.
 - Safe error display.
 - Audit/event/history creation where required.
+- Original/reprint idempotency, duplicate audit, physical-success/audit-failure,
+  and unknown-outcome recovery behavior.
 - Offline/cache behavior where this module touches POS, checkout, order, inventory, payment, or sync.
 - Add Flutter-to-backend Hold contract tests before describing Park/Recall as
   backend persisted.
@@ -115,7 +125,29 @@ Test coverage must include:
 - Subscription invoice payment links
 - Warehouse stock transfer approval
 
+## Hardware Chunk 2C receipt-history contract (2026-07-29)
+
+- Receipt detail exposes the persisted historical snapshot for typed
+  non-sale mapping; current product, tax, discount and payment configuration are
+  never queried to rebuild a reprint.
+- Reprint authorization stays as an immutable pending authorization audit.
+  Each physical customer/merchant copy is a separate child print log linked by
+  `reprint_operation_id`.
+- `(tenant_id, receipt_id, print_request_id)` remains the physical/audit
+  idempotency boundary. Reprint operation indexing is non-unique because one
+  authorized operation may contain multiple independently audited copies.
+- Reprint copy types distinguish duplicate customer and merchant output.
+
 ## Related Files
 
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/02_Functional_Rules]]
+
+## Hardware Chunk 3 barcode contract (2026-07-29)
+
+Exact lookup remains
+`GET /api/v1/pos/products/by-barcode/{barcode}?deviceId={activatedDeviceId}`.
+Barcode identity remains a string. Tenant uniqueness prevents random
+selection; zero matches are not-found, multiple matches ambiguous, and
+inactive product/variant or unavailable price is rejected. Only a successful
+authoritative response reaches existing cart rules.

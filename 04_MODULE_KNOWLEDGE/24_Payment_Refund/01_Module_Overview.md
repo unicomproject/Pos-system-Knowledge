@@ -1,7 +1,7 @@
 <!-- title: Payment & Refund Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-29 -->
 
 # Payment & Refund Module Overview
 
@@ -43,6 +43,10 @@ merchandising, attractions, and temporary retail locations.
 - Payment event history records provider and device outcomes safely.
 - Refund amount cannot exceed allowed refundable amount.
 - Offline mode cannot finalize card/QR payment or refund approval.
+- Card is an approved method but current production execution is blocked by the
+  missing provider; it must never be persisted through the cash path.
+- Split is an approved method but current checkout does not atomically persist
+  multiple tender allocations.
 
 ## Access Summary
 

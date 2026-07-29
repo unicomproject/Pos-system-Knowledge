@@ -134,3 +134,16 @@ Full code map: [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cashier_POS_Implementati
 - [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
 - [[../../05_BACKEND_ARCHITECTURE/API_Standards]]
 - [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cashier_POS_Implementation_Map]]
+
+## Hardware Chunk 3 scanner update (2026-07-29)
+
+New Sale loads the activated device's authoritative `barcodeScanner`
+configuration. USB HID input is buffered by a dedicated service; configured
+inter-character timeout and barcode length limits apply, leading zeroes remain
+strings, and Enter completes one event. The existing FIFO lookup controller
+remains authoritative for product lookup and cart mutation.
+
+Camera scanning is available only when device configuration enables camera
+mode. Unknown, inactive, ambiguous, unavailable or failed lookups do not create
+a cart line. Hardware Testing uses a separate controller and cannot mutate this
+sale flow. Automated scanner tests pass; physical acceptance remains pending.

@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Functional Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 
 # Hardware Operations, Till Session & Cash Control Functional Rules
 
@@ -20,6 +20,11 @@ responsive online store screens, Angular/admin screens, tests, or database chang
   test must not be reported as logged because no complete Cashier test-log API
   chain is currently implemented.
 - Cash drawer open requires permission, till context, and audit.
+- Local printer access must be device-configured, API-key authenticated, CIDR
+  allow-listed, and limited to the trusted private LAN.
+- A timeout after print submission is an unknown outcome. Do not silently resend.
+- Manual printer tests must be labelled non-sale and must not create a sale,
+  payment, receipt record, or completed-sale print audit.
 
 ## User Rules
 
@@ -39,6 +44,8 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Cash In/Cash Drop forms are currently frontend-only and must not show a
   persisted-success outcome until a backend mutation succeeds.
 - Scanner/printer package or adapter presence is not physical verification.
+- Hardware Testing must show Local Agent unreachable, unauthorized, incompatible
+  contract, printer unavailable, and ready states without exposing the API key.
 - Do not show fake data, fake counts, fake success states, or hardcoded module rows.
 - Mobile, tablet, iPad, laptop, and desktop layouts must keep the same business rules.
 

@@ -1,7 +1,7 @@
 <!-- title: Return Refund Flow -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-07-23 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-29 -->
 
 # Return Refund Flow
 
@@ -341,6 +341,11 @@ flowchart TD
 - Refund amount must not exceed refundable value.
 - Customer credit is separate from refund payment.
 - Split payments display as deterministic `Multiple` without inventing a card mask.
+- Refund receipts use authoritative completion values; Flutter does not
+  recalculate settlement. Print failure does not roll back a completed refund.
+- Cash-refund drawer behavior requires approved policy, permission, open till
+  and audit. Non-cash refund does not pulse the drawer by default.
+- Refund receipt/drawer physical acceptance remains incomplete.
 
 ## Access-Control Rules
 
@@ -384,3 +389,19 @@ flowchart TD
 - [[../../01_RELEASE_SCOPE/Release_1_Scope]]
 - [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
 - [[../../05_BACKEND_ARCHITECTURE/API_Standards]]
+
+## Hardware Chunk 2C receipt update (2026-07-29)
+
+The persisted `REFUND` receipt snapshot is the historical document for the
+completed Return + Refund branch; the system does not create a second
+standalone Return document. Receipt History now maps that persisted snapshot
+into the typed non-sale print contract and performs a backend-authorized,
+reasoned reprint without repeating return, refund, stock, till or provider
+actions. Return number, original receipt reference, historical items,
+discount/tax reversal and settlement values remain snapshot-owned.
+
+Original completion and controlled reprint resolve the activated device copy
+policy. Each customer/merchant copy has a deterministic request ID and separate
+print audit. A failed/unknown copy does not repeat successful copies; audit-only
+retry performs no physical print. Automated code acceptance passed; POS80 paper
+acceptance remains pending.
