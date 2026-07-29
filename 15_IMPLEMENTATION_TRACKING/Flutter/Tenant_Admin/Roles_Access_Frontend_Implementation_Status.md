@@ -1,95 +1,38 @@
-<!-- title: Tenant Admin Role Permission Management Flow -->
-<!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-30 -->
+﻿## Implementation Status
 
-# Tenant Admin Role Permission Management Flow
+| Item | Value |
+|---|---|
+| Feature | Roles & Access |
+| Module | Tenant |
+| Platform | Flutter Frontend |
+| Status | Completed |
+| Name | Codex |
+| Completed Date | 2026-07-22 |
+| Tests | Passed |
+| PR / Commit | - |
 
-## Purpose
+## Implementation Summary
 
-Defines how Tenant Admin creates roles and assigns feature/outlet permissions.
+- Canonical route is `/tenant-admin/roles-permissions`.
+- Compatibility redirects retained: `/tenant-admin/roles-access` and `/tenant-admin/roles` redirect to `/tenant-admin/roles-permissions`.
+- Implemented backend-driven role list, role details, create/edit role wizard, permission matrix, assigned users summary and save confirmation.
+- Six-step flow implemented: Role Details, Select Modules, Configure Permissions, Assign Users, Review & Save, Confirmation.
+- Role list uses `GET /api/v1/tenant-admin/roles` as primary source instead of Tenant Admin context role fallback.
+- Permission catalog is loaded from `GET /api/v1/tenant-admin/permission-catalog` and modules/actions are derived from backend data.
+- Assigned users are loaded from `GET /api/v1/tenant-admin/roles/{roleId}/users`; create/edit assignment selection uses the existing tenant user list API.
+- Create, update, status update, duplicate and delete APIs are wired through the existing `role_permissions` feature architecture.
 
-## Actor
+## Validation
 
-Tenant Admin
+- `flutter analyze` passed with no issues.
+- Focused role/permission tests passed.
+- Full `flutter test` passed: 554 tests.
 
-## Source
+## Remaining Notes
 
-Derived from `Slide 6 - Role & Permission Management Flow` in `tenant-full-journey.pptx` and aligned to TM-EPOS MVP Second Brain scope.
-
-## Trigger
-
-Tenant Admin opens role and permissions management.
-
-## Preconditions
-
-- Tenant Admin has role/permission permission.
-- Tenant entitlements are loaded.
-
-## Main Flow
-
-| Step | Action | System Behavior |
-|---:|---|---|
-| 1 | Open roles and permissions | System opens role management. |
-| 2 | View role list | System displays roles. |
-| 3 | Click add role | Tenant Admin starts role creation. |
-| 4 | Enter role name | Tenant Admin names the role. |
-| 5 | Select modules | Tenant Admin selects enabled modules for role. |
-| 6 | Assign feature permissions | Tenant Admin assigns permitted actions. |
-| 7 | Set outlet scope if needed | Tenant Admin restricts access to outlets/locations. |
-| 8 | Validate permissions | System checks entitlements and required constraints. |
-| 9 | Save role | System saves role. |
-| 10 | Role ready for user assignment | Role can be assigned to tenant users. |
-
-## Data Used Or Captured
-
-- Role name
-- Modules
-- Permission codes
-- Outlet scope
-- Role status
-
-## Access And Security Rules
-
-- Tenant Admin must be authenticated unless the flow is a setup/payment link flow before first login.
-- Tenant status, feature entitlement, permission, and outlet access must be enforced where applicable.
-- Tenant-owned data must be isolated by tenant context resolved server-side.
-- All create/update/status actions should be audit logged.
-- Permissions must be feature-based, not hardcoded by role name.
-- Role cannot grant features tenant is not entitled to use.
-
-## Validation And Error Cases
-
-- Permission selection invalid
-- Entitlement missing
-- Duplicate role name
-- Cannot remove required admin access
-
-## Outcome
-
-Role is ready for tenant user assignment.
-
-## Related Modules
-
-- 05_Tenant_User_Permission_Access
-- 03_Subscription_Catalog_Entitlements
-
-## Related Files
-
-- 02_ACCESS_CONTROL/Permission_Code_List.md
-- 02_ACCESS_CONTROL/Feature_Entitlement_Matrix.md
-
-## Flutter Implementation Update — 2026-07-22
-
-- Tenant Admin Roles & Access frontend now uses `/tenant-admin/roles-permissions` as the canonical root route.
-- Compatibility redirects remain from `/tenant-admin/roles-access` and `/tenant-admin/roles` to the canonical route.
-- Implemented six-step frontend flow: Role Details, Select Modules, Configure Permissions, Assign Users, Review & Save, Confirmation.
-- Role list, details, create, edit, status, duplicate, delete, permission catalog, permission replacement and assigned-user APIs are wired through the existing Flutter `role_permissions` feature.
-- Role list no longer depends on Tenant Admin context roles as the primary data source.
-- Permission matrix rows/actions are derived from backend permission catalog data.
-- Assigned user summaries come from the backend role-user API; user selection reuses the existing Tenant Admin users API.
-- Validation/result: `flutter analyze` passed and full `flutter test` passed with 554 tests.
-- Remaining gap: manual browser/API verification was not performed; Advanced Rules are intentionally not implemented until a backend contract exists.
+- Browser DevTools/manual API verification was not performed in this Codex run.
+- Advanced Rules were not implemented because no confirmed backend contract exists.
+- `dart format` timed out in the local environment, but analyzer and tests passed.
 
 ## Integration Stabilization Update — 2026-07-22
 

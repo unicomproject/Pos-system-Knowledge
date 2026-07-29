@@ -111,3 +111,15 @@ Test coverage must include:
 
 - [[04_MODULE_KNOWLEDGE/05_Tenant_User_Permission_Access/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/05_Tenant_User_Permission_Access/02_Functional_Rules]]
+
+## Flutter Implementation Update — 2026-07-22
+
+- Tenant Admin Roles & Access frontend now uses `/tenant-admin/roles-permissions` as the canonical root route.
+- Compatibility redirects remain from `/tenant-admin/roles-access` and `/tenant-admin/roles` to the canonical route.
+- Implemented six-step frontend flow: Role Details, Select Modules, Configure Permissions, Assign Users, Review & Save, Confirmation.
+- Role list, details, create, edit, status, duplicate, delete, permission catalog, permission replacement and assigned-user APIs are wired through the existing Flutter `role_permissions` feature.
+- Role list no longer depends on Tenant Admin context roles as the primary data source.
+- Permission matrix rows/actions are derived from backend permission catalog data.
+- Assigned user summaries come from the backend role-user API; user selection reuses the existing Tenant Admin users API.
+- Validation/result: `flutter analyze` passed and full `flutter test` passed with 554 tests.
+- Remaining gap: manual browser/API verification was not performed; Advanced Rules are intentionally not implemented until a backend contract exists.

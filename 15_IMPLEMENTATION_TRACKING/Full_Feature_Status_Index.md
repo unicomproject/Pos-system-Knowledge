@@ -133,3 +133,5 @@ table file, architecture file, and PR/commit reference where available.
 - [[../04_MODULE_KNOWLEDGE]]
 - [[../03_USER_JOURNEYS]]
 - [[../11_DEVELOPER_ONBOARDING/Code_Review_Checklist]]
+
+| Tenant Roles & Access | Flutter Frontend | Completed | 2026-07-22 | `15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin/Roles_Access_Frontend_Implementation_Status.md` |

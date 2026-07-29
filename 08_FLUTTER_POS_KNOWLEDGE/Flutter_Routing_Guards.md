@@ -76,3 +76,10 @@ When route access is denied, show clear message:
 - [[Flutter_Permission_Based_UI_Rendering]]
 - [[Flutter_Offline_Operation_Sync]]
 - [[Flutter_Security_Guardrails]]
+
+
+## Tenant Admin Settings Footer Navigation (2026-07-28)
+
+Approved Tenant Admin Settings layout includes a shared fixed black footer (Home, New Sale, Orders, Customers, Settings). See [[Tenant_Admin_Settings_Shared_Layout_Architecture]].
+
+Footer destinations must use current GoRouter paths and existing guards. Do not invent routes. Known paths: `/pos/home`, `/pos/new-sale`, `/pos/customers`. Orders and POS Settings destinations currently lack implemented routes — use approved unavailable/disabled behaviour until product confirms paths. Tenant Admin settings content remains under `/tenant-admin/...` with Settings footer item active on those screens.
