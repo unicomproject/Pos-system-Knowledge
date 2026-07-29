@@ -1,7 +1,7 @@
 <!-- title: Till Open Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 
 # Till Open Flow
 
@@ -60,6 +60,9 @@ flowchart TD
 - Opening cash must be non-negative.
 - Till open requires trusted device and outlet access.
 - Till session is required for checkout/cash operations.
+- Peripheral health may be shown before opening, but unavailable hardware must
+  not fabricate a ready result or bypass till authorization.
+- Session audit should retain assigned hardware/configuration identity.
 
 ## Access-Control Rules
 
@@ -84,6 +87,8 @@ flowchart TD
 - Already open till returns conflict.
 - Untrusted, unassigned or cross-tenant device/till context is rejected.
 - Invalid amount returns validation error.
+- Printer/drawer unavailability follows configured business policy and is shown
+  explicitly; it is not treated as successful hardware testing.
 
 ## Out of Scope
 

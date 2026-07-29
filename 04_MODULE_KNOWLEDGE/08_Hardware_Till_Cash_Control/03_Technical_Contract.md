@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Technical Contract -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 
 # Hardware Operations, Till Session & Cash Control Technical Contract
 
@@ -50,6 +50,10 @@ history/ledger behavior where applicable.
 
 - Use feature-owned folders and typed services/providers.
 - Widgets/components must not call HTTP APIs directly.
+- Flutter stores printer configuration per activated device; the Local Agent
+  URL and timeout are configuration, while its API key uses secure storage.
+- Local Agent HTTP belongs in the printer client/adapter, not widgets or sale
+  business logic.
 - Use DTOs in data layer, domain/view models in UI layer.
 - Permission and entitlement checks are UX helpers only; backend remains final authority.
 - Browser online store and Flutter business app must share backend rules but keep separate user/auth surfaces.
@@ -62,6 +66,11 @@ history/ledger behavior where applicable.
 - Repository interfaces stay in application layer; EF implementations stay in infrastructure layer.
 - Audit/event rows are written for sensitive state changes.
 - Idempotency keys are required for retryable commands that can create duplicates.
+- `E_POS.LocalPrintAgent` is a separate Windows service boundary, not an
+  `E_POS.Api` controller. It validates LAN source, API key, contract, request,
+  and idempotency identity before writing RAW bytes to the Windows spooler.
+- Local Agent operation state must survive restart and distinguish completed,
+  failed-confirmed, and unknown outcomes.
 
 ## Permission And Entitlement Contract
 
@@ -84,6 +93,8 @@ Test coverage must include:
 - Safe error display.
 - Audit/event/history creation where required.
 - Offline/cache behavior where this module touches POS, checkout, order, inventory, payment, or sync.
+- Byte-order tests must prove footer → feed → optional cut and no printable
+  content after cut for 58 mm and 80 mm.
 
 ## Implementation Sequence
 
@@ -107,3 +118,14 @@ Test coverage must include:
 
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/02_Functional_Rules]]
+
+## Barcode scanner device contract (2026-07-29)
+
+`hardware_devices.config_json` remains authoritative device-scoped storage.
+Scanner settings cover enabled state, `usbHid` or `camera` mode, Enter/newline
+suffix, 20-1000 ms timeout, 1-512 character range, rapid-scan policy,
+camera-enabled flag and enabled formats. Existing version, assignment,
+trusted-device, outlet/till and active-session audit rules apply.
+
+Scanner tests reuse `hardware_test_logs`; `result_payload_json` stores only
+privacy-safe typed evidence and `(tenant_id, request_id)` remains idempotent.

@@ -59,10 +59,11 @@ PR/commit reference is recorded.
 | Backend | Auth | Tenant Login | Completed | 2026-07-01 | Tenant auth module | `POST /api/v1/tenant-auth/login` |
 | Backend | OutletTillDevice | Device Context | Completed | 2026-07-09 | `5c99b66` | `devices/current`, `devices/activate` |
 | Backend | OutletTillDevice | Till Session Open/Close | Completed | 2026-07-09 | `06048db` | current-session, open, close |
-| Backend | POSOperations | POS Home Dashboard API | Completed | 2026-07-08 | `5c6ae7a` | `GET /api/v1/pos/home` |
+| Backend | POSOperations | POS Home Dashboard API | Testing | 2026-07-08 | Current working tree | Branding + explicit current-session sales/refund/discount/net metrics added; focused API/repository tests pass |
 | Backend | CatalogProduct | POS Products List | Completed | 2026-07-23 | Current `main` audit | `GET /api/v1/pos/products`, categories, detail and exact barcode lookup exist |
-| Backend | Sales | POS Checkout / Cash Payment APIs | Testing | - | Current working tree | Checkout summary/start-payment controllers and persistence exist; working tree has local checkout changes |
-| Flutter | POS Shell | POS Home Dashboard | In Progress | - | `POS_UI` | Home API integrated; several cards placeholder |
+| Backend | Sales | POS Checkout / Cash Payment APIs | Testing | - | Current working tree | Cash complete; Card safe unavailable-by-default; QR/Split incomplete |
+| Backend | POSOperations | Windows Local Print Agent | Testing | - | Current working tree | [[Backend/POSOperations/Receipt_Printer_Local_Agent_Implementation_Status]] |
+| Flutter | POS Shell | POS Home Dashboard | Testing | - | Current working tree | Responsive profile + 3x2 actions + session summary; six PNG workspace files and two production destinations remain open |
 | Flutter | Till | Open Till Layout | Completed | 2026-07-10 | `Sale_Screen` | Full-screen tablet layout |
 | Flutter | Sales | End Shift + Close Till | Completed | 2026-07-09 | `d04ecf0` | Close till API + logout |
 | Flutter | Sales | Start Sale UI | In Progress | - | `Sale_Screen` | Catalog API wired; no mock fallback; checkout blocked |
@@ -74,18 +75,20 @@ PR/commit reference is recorded.
 | Flutter | Sales | Customer Management | Testing | - | `scanner_inte` | List/create/update/select/attach implemented; loyalty is separate and incomplete |
 | Flutter | Sales | Loyalty Earn / Redeem | Not Started | - | - | No verified cashier Flutter-to-backend loyalty flow |
 | Flutter | Sales | Cash Checkout | Testing | - | `scanner_inte` | Summary, tender, change, start-payment and success flow implemented |
-| Flutter | Sales | Card Payment | Not Started | - | - | Current route renders payment placeholder |
+| Flutter | Sales | Card Payment | Blocked | - | Current working tree | Provider-neutral backend safety exists; real provider/terminal absent |
 | Flutter | Sales | QR Payment | Not Started | - | - | Current route renders payment placeholder |
 | Flutter | Sales | Split Payment | Not Started | - | - | Current route renders payment placeholder |
-| Flutter | Sales | Receipt Preview | Testing | - | `scanner_inte` | Receipt preview UI exists |
-| Flutter | Hardware | Physical Receipt Printing | Testing | - | `scanner_inte` | Printer facade/ESC-POS/network transport exist; physical matrix not verified |
+| Flutter | Sales | Payment Receipt Contract | Testing | - | Current working tree | [[Flutter/Sales/Payment_Receipt_Contract_Implementation_Status]] |
+| Flutter | Sales | Receipt Preview | Testing | - | Current working tree | Authoritative contract v2 preview/mapping exists |
+| Flutter | Hardware | Physical Receipt Printing | Testing | - | Current working tree | Chunk 2 code/automation implemented including non-sale history/copies; POS80 physical matrix pending |
+| Cross-platform | Hardware | POS Hardware Production Readiness | Testing | - | Current working tree | Chunk 1 receipt-printer config/test-audit foundation implemented; physical/scanner/full regression pending. [[Flutter/Hardware/POS_Hardware_Production_Readiness_Implementation_Status]] |
 | Flutter | Sales | Email Receipt | In Progress | - | `scanner_inte` | Form/UI exists; delivery API completion not verified |
 | Flutter | Sales | Return / Refund | Testing | - | `scanner_inte` + backend `main` | Full authoritative workflow and broad automated coverage exist |
 | Flutter | Sales | Exchange | Testing | - | `scanner_inte` + backend `main` | Implemented as Return resolution branch with preview/completion |
 | Flutter | Cash Drawer | Cash In / Cash Out | In Progress | - | `scanner_inte` | Flutter forms exist; backend mutation wiring is absent |
 | Flutter | Sales | Park / Recall | In Progress | - | `scanner_inte` | Device-local secure storage; backend Holds API is disconnected |
-| Flutter | Hardware | HID / Camera Barcode Scanner | Testing | - | `24b4271` | Automated source coverage exists; TB-00D and physical Android tests pending |
-| Flutter | Hardware | Hardware Testing Workflow | Not Started | - | - | No complete screen/API/service/test-log flow |
+| Flutter | Hardware | HID / Camera Barcode Scanner | Testing | - | Current working tree | Chunk 3 code and automation implemented; TB-00D/camera/POS80 physical matrix pending |
+| Flutter | Hardware | Hardware Testing Workflow | Testing | - | Current working tree | Authoritative versioned printer config and backend test-log lifecycle wired; scanner screen and physical matrix pending |
 | Flutter | Sales | Offline Cash Sale / Outbox | Not Started | - | - | Included MVP scope; no verified end-to-end cashier implementation |
 
 | Backend | ECommerce / CustomerAuth | Storefront Customer Authentication | Testing | - | - | Implementation tracking added; latest regression and commit evidence pending. See [[Backend/ECommerce/Customer_Auth_Implementation_Status]] |

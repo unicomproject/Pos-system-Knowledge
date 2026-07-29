@@ -147,6 +147,22 @@ Do not put tenant ID in environment configuration.
 
 Tenant context must come from authenticated context and selected tenant flow.
 
+## Windows Local Print Agent
+
+The production Local Print Agent key is supplied as service-specific protected
+configuration:
+
+```text
+PrintAgent__LocalApiKey=<long-random-secret>
+```
+
+It must not appear in repository JSON, install command arguments, Flutter
+dart-defines, logs, screenshots, or Markdown. Non-secret settings use the
+`PrintAgent` section, including printer name, paper/cut settings, explicit LAN
+CIDRs, request limit, operation directory and rolling-log retention. Flutter
+stores the matching device-specific key in secure storage through the permitted
+Hardware Settings flow.
+
 ## Secret Review Checklist
 
 | Check | Required |

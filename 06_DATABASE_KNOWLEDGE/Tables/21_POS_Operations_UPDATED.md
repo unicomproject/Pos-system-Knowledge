@@ -147,6 +147,9 @@ CHECK(change_amount >= 0)
 | `error_code` | varchar(80) |  | NULL | Error code. |
 | `error_message` | text |  | NULL | Error message. |
 | `print_result_json` | jsonb |  | NULL | Print result payload. |
+| `print_request_id` | uuid | UNIQUE (partial) | NULL | Stable physical print request identity. |
+| `reprint_operation_id` | uuid | UNIQUE (partial) | NULL | Authorized controlled-reprint identity. |
+| `client_correlation_id` | varchar(160) | INDEX | NULL | Safe client/audit reconciliation identity. |
 | `created_at` | timestamptz |  | NOT NULL | Creation timestamp. |
 
 Constraints:
@@ -158,6 +161,9 @@ FK(receipt_id) REFERENCES receipts(id)
 FK(printer_device_id) REFERENCES hardware_devices(id)
 FK(operator_tenant_user_id) REFERENCES tenant_users(id)
 UNIQUE(tenant_id, receipt_id, attempt_number)
+UNIQUE(tenant_id, receipt_id, print_request_id) WHERE print_request_id IS NOT NULL
+UNIQUE(tenant_id, reprint_operation_id) WHERE reprint_operation_id IS NOT NULL
+INDEX(tenant_id, client_correlation_id) WHERE client_correlation_id IS NOT NULL
 CHECK(attempt_number > 0)
 CHECK(printed_copy_type IN ('CUSTOMER_COPY', 'MERCHANT_COPY', 'DUPLICATE_COPY'))
 CHECK(print_status IN ('PENDING', 'PRINTED', 'FAILED', 'CANCELLED'))

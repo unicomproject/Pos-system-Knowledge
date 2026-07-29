@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 <!-- last_updated: 2026-07-15 -->
 
 # Permission Code List
@@ -371,15 +371,18 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `sales.view` | Completed payment sale summary and line items |
 | `receipts.view` | Payment success / email receipt access |
 | `receipts.print` | Print receipt screen and print action |
+| `receipts.reprint` | Authorized Receipt History reprint with reason/audit |
 | `orders.view` | Orders sidebar (no route yet) |
 | `returns.view` | Returns & Exchanges nav, Step 1 Search Original Sale, shared early Returns workflow |
 | `returns.create` | Continue from Step 1 into Step 2 Sale Summary and later shared create steps |
 | `refunds.view` / `exchanges.view` | Branch view only; do not unlock shared Step 1 search |
 | `refunds.create` / `exchanges.create` | Branch processing after resolution is selected |
 | `cash_drawer.view` / `cash_drawer.manage` | Cash drawer nav |
+| `cash_drawer.movement.create` | Create authorized Cash In/Out movement when backend flow exists |
 | `notifications.view` | Notification bell |
 | `pos.till.open` | Till open flow (`canOpenPosTill`) |
 | `pos.till.close` | End Shift / close currently assigned open till session |
+| `pos.hardware.settings` | Configure/test Local Print Agent for the activated POS device |
 | `tenant.till.manage` | Device activation gate (`canActivatePosDevice`) |
 | `till.session.view` | Home header till status chip |
 
@@ -387,14 +390,15 @@ Implementation map: [[../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sa
 
 POS permission alone is not enough; device and till-session checks still apply.
 
-Receipt printer selection/configuration is currently rendered under `receipts.print`.
-Dedicated `hardware.printer.select` / `hardware.printer.configure` permissions are
-not seeded until the backend hardware permission model is introduced.
+Receipt printing and hardware configuration are separate:
+`receipts.print` protects printing, while `pos.hardware.settings` protects the
+activated-device Local Print Agent settings/testing surface.
 
 Permission visibility does not prove implementation. In particular,
-`cash_drawer.manage` currently gates Flutter surfaces without a verified
-cash-movement mutation API, and no dedicated verified Cashier hardware-test
-permission/API chain exists. Do not invent hardware permissions from UI labels.
+`cash_drawer.manage` currently gates Flutter surfaces without verified drawer
+pulse execution. `pos.hardware.settings` exists, but backend hardware-test-log
+persistence is not wired. No distinct merchant-copy or sensitive-reprint
+permission is approved; do not invent one.
 
 ## Seed Data Rule
 

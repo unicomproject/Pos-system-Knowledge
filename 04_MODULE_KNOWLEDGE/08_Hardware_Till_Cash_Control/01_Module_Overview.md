@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Module Overview -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 
 # Hardware Operations, Till Session & Cash Control Module Overview
 
@@ -43,6 +43,10 @@ merchandising, attractions, and temporary retail locations.
 - Cash reconciliation records expected cash, counted cash, and variance.
 - Hardware tests are logged but physical communication is handled by app/local service.
 - Cash drawer open requires permission, till context, and audit.
+- A physical Android POS may reach a laptop USB printer through the separate
+  Windows Local Print Agent on an explicitly allowed private LAN.
+- Printer process health, printer readiness, and paper completion are separate
+  states; spooler acceptance does not prove that paper printed successfully.
 - Current hardware-test logging and cashier Cash In/Out are not end-to-end
   implemented; schema presence is not operational API behavior.
 

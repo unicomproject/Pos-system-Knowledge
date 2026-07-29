@@ -1,7 +1,7 @@
 <!-- title: Payment Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 
 # Payment Flow
 
@@ -36,7 +36,7 @@ coupon, AI, or accounting scope.
 | Step | User/System Action | Expected Result |
 |---:|---|---|
 | 1 | Open payment screen | Totals and payment methods appear |
-| 2 | Select an available method | Cash continues to the implemented tender flow; Card/QR/Split show unavailable placeholders |
+| 2 | Select an available method | Cash continues; Card requires a configured provider; QR/Split remain unavailable |
 | 3 | Enter cash tendered amount | Backend validates payable total and sufficient tender |
 | 4 | Confirm cash payment | Order, payment, stock and receipt are committed by backend |
 | 5 | Show success and receipt actions | Authoritative sale/payment/receipt values are displayed |
@@ -59,6 +59,12 @@ flowchart TD
 - Split allocation must be valid.
 - Card payment should use real reader/provider integration where configured.
 - Sensitive card data must not be stored.
+- A completed backend sale is not rolled back by printer failure.
+- Receipt values and copy intent come from the authoritative completion snapshot.
+- Cash drawer auto-open, when implemented, occurs only after a successful
+  payment containing Cash. Card-only/QR-only, reprint and test receipt never
+  pulse the drawer.
+- Printer failure is post-payment and never rolls back completed payment.
 
 ## Access-Control Rules
 
@@ -80,18 +86,21 @@ flowchart TD
 | Method | Current implementation |
 |---|---|
 | Cash | Transactional Flutter and backend flow implemented; runtime database application still requires environment verification |
-| Card | UI placeholder; no verified provider capture flow |
+| Card | Provider-neutral backend boundary exists; production provider unavailable |
 | QR | UI placeholder; no verified provider flow |
 | Split | UI placeholder; no verified allocation flow |
 
-Receipt preview exists. Local printing must succeed before the print-audit API is
-called. Network printer transport source exists; USB/Bluetooth and the physical
-printer matrix remain runtime verification requirements. Email receipt UI exists,
-but delivery completion is not verified.
+Receipt preview, Local Print Agent completed-sale printing, durable recovery and
+print audit orchestration exist. Each intended copy is printed once and audited
+once. Unknown timeout outcome is queried/reviewed, not silently retried. Direct
+USB/Bluetooth remain unsupported/fail-safe and direct TCP is a separate path.
+Email delivery remains unverified.
 
 ## Edge Cases
 
 - Payment failure keeps sale unpaid/pending.
+- Card timeout/unknown requires provider reconciliation; no fake success, Cash
+  fallback, or blind capture retry is permitted.
 - Overpayment calculates change for cash.
 - Repeated cash submission and backend conflicts must not create duplicate sale,
   payment, stock or receipt records.
@@ -113,3 +122,24 @@ but delivery completion is not verified.
 - [[../../01_RELEASE_SCOPE/Release_1_Scope]]
 - [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
 - [[../../05_BACKEND_ARCHITECTURE/API_Standards]]
+
+## Chunk 1B Payment/Receipt Integrity Update (2026-07-29)
+
+- POS card checkout now crosses a provider-neutral `ICardPaymentGateway` boundary.
+- The production default is explicitly unavailable and blocks sale completion with
+  `card_provider_not_configured`; it never converts card to cash.
+- A completed provider result uses provider-capture persistence and stores only
+  safe provider reference, brand and last four digits.
+- Declined, cancelled, pending, failed, unknown and unavailable results do not
+  create the sale, payment, stock movement or receipt.
+- Real terminal/provider integration remains external and unverified.
+- Split tender DTO groundwork exists, but multi-tender checkout persistence and
+  Flutter split UI remain pending; Split is not production-complete.
+- Sale-completion receipt JSON owns historical tax code/name/effective rate,
+  taxable amount and tax amount snapshots where tax configuration exists.
+- Receipt copy orchestration uses per-copy type/index and stable Local Print
+  Agent request identity. Default policy remains one customer copy and no
+  merchant copy. Persisted admin-configurable copy policy remains pending.
+
+Status: `PARTIALLY COMPLETE` — card safety and receipt integrity are implemented;
+real card provider and real split-payment completion are pending.

@@ -1,7 +1,7 @@
 <!-- title: Outlet, Till & POS Device Foundation Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-29 -->
 
 # Outlet, Till & POS Device Foundation Functional Rules
 
@@ -17,6 +17,9 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Till belongs to an outlet and is used for POS sessions.
 - Trusted POS device must match tenant, outlet, and assigned till policy.
 - One device assignment cannot silently bypass permissions.
+- Revoked or cross-tenant devices cannot load or operate hardware configuration.
+- Configuration changes require actor, device, old/new version and timestamp audit.
+- A cashier cannot silently change the shift printer, drawer or terminal.
 - Business hours can guide online store and pickup availability but do not replace backend validation.
 
 ## User Rules
@@ -65,7 +68,7 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 ## Out Of Scope
 
-- Hardware test result storage
+- Hardware test execution/result persistence is owned by Module 08.
 - Cash reconciliation
 - Order fulfilment events
 - Customer device/browser identity

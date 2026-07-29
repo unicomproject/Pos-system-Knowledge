@@ -1,59 +1,139 @@
 <!-- title: Card Reader Integration -->
 <!-- status: Draft -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 
 # Card Reader Integration
 
 ## Purpose
 
-Define the secure provider/terminal boundary for Cashier card payments.
+Define the provider-neutral terminal boundary and safe production requirements.
 
-## Current Implementation Status
+## Scope
 
-The Card payment route is a UI placeholder. No verified provider capture or
-physical terminal flow is implemented.
+Terminal assignment/pairing, capture outcomes, reconciliation, safe display,
+terminal slips, POS receipts, recovery and physical certification.
+
+## Production Architecture
+
+Flutter checkout → backend payment command → `ICardPaymentGateway` → approved
+provider adapter/terminal → provider result → backend atomic sale/payment →
+authoritative POS receipt. Flutter never manufactures provider success.
+
+## Component Responsibilities
+
+Backend owns credentials, capture/reconciliation, persistence and safe response.
+Flutter owns cashier state and typed handoff. Terminal owns its customer/merchant
+slip; POS receipt is a separate backend-owned document.
 
 ## Supported Platforms And Transports
 
-No card-reader brand, SDK, transport or platform is approved by current code evidence.
+No provider, terminal model, SDK or transport is approved. Production support is
+Blocked By External Dependency.
+
+## Runtime Flow
+
+Approved completes provider capture before sale commit. Declined, Cancelled,
+Failed and Unavailable create no paid sale. Pending/Timeout/Unknown require
+provider lookup/reconciliation before retry or completion.
 
 ## Configuration
 
-Provider secrets must remain in secure backend/provider configuration, never Flutter source.
+Terminal is assigned to tenant/outlet/activated POS device/till. Pairing state,
+provider configuration version, active status and shift changes are auditable.
 
-## Flutter Integration
+## API Contract
 
-`/pos/new-sale/payment/card` currently renders `PosPaymentPlaceholderScreen`.
+`ICardPaymentGateway` accepts operation/sale context and exposes provider-neutral
+capture, terminal-status, payment-status, cancel, void and refund boundaries.
+Results use typed terminal/payment states and safe references where valid.
+Current production implementation returns `card_provider_unavailable` and never
+fabricates approval or references.
 
-## Backend And API
+## Database And Audit Contract
 
-Checkout blocks non-cash completion until a real provider adapter is available.
+Existing `sales_payments` and transaction/event tables store safe provider
+reference/status/amount/currency/reconciliation. Never persist PAN, CVV, PIN,
+track/EMV data, reusable token, credentials or raw response.
 
-## Database And Audit
+## Permission And Business Rules
 
-Payment/transaction schema can store safe provider references and sanitized
-brand/last4 only; it does not prove terminal capture.
+Existing permission is `payments.card.accept`. Backend authorization, activated
+device, assigned/open till and enabled method are required. Card must never be
+stored as Cash and no fake fallback is allowed.
 
 ## Security Rules
 
-Never store PAN, CVV, raw track data or reusable payment tokens.
+Provider credentials are protected server-side. Use idempotency, verified
+callbacks/status lookup, masked display and sanitized structured logs.
 
-## Error Handling
+## Idempotency
 
-Failed/unknown provider state must not mark a sale paid.
+Stable card operation identity crosses request, provider and persistence.
+Unknown state is reconciled; blind capture retry is prohibited.
 
-## Testing And Physical Verification
+## Failure And Recovery Rules
 
-No card-terminal physical verification exists.
+Cashier receives outcome-specific safe guidance. Reconciliation mismatch blocks
+completion and requires operational review. No sensitive provider payload is shown.
+
+## Offline Behavior
+
+Card capture/finalization is online-only.
+
+## Automated Testing
+
+Current tests prove provider-unavailable capture/status, unsupported refund/void,
+safe disabled terminal configuration and test-only checkout outcomes. They do
+not prove a production provider.
+
+## Physical Verification
+
+Not Run. No terminal/provider sandbox or physical certification evidence exists.
+
+## Production Definition Of Done
+
+Provider approval, terminal assignment, all outcomes, reconciliation, security,
+receipts/slips, automated tests and physical certification must pass.
+
+## Current Implementation Status
+
+Partially Implemented — Blocked By External Dependency.
 
 ## Known Gaps
 
-- Provider selection and SDK.
-- Terminal handoff/callback.
-- Idempotent capture/recovery tests.
+Provider/terminal decision, real adapter, provider-backed pairing/status,
+persisted operation lifecycle, callback/status reconciliation, slips,
+operational support and physical certification.
+
+## Implementation Sequence
+
+Hardware Chunk 5 follows device/test-audit foundation and approved provider.
+
+## Hardware Chunk 5 Result — 2026-07-29
+
+The provider-neutral contract now distinguishes initiated, awaiting-card,
+processing, pending, authorized, completed, declined, cancelled, failed,
+unknown, provider-unavailable, terminal-unavailable and expired outcomes.
+Terminal status distinguishes not-configured, provider-unavailable,
+pairing-required, offline, busy, ready and unknown.
+
+Device-scoped terminal configuration contains only non-secret references,
+connection mode, optional local-service URL, pairing status, bounded timeout/
+poll interval, currency and slip ownership. With no installed provider, only a
+disabled unpaired configuration can be persisted; enabling or claiming pairing
+is blocked.
+
+Flutter Card Payment shows an explicit unavailable state and states that no
+charge was initiated. Hardware Testing remains blocked and never charges.
+
+Status:
+
+`HARDWARE CHUNK 5 PARTIALLY IMPLEMENTED — REAL PROVIDER/TERMINAL BLOCKED`.
 
 ## Related Files
 
 - [[Payment_Gateway_Integration]]
 - [[../03_USER_JOURNEYS/Cashier/07_Payment_Flow]]
+- [[../10_TESTING_QA/POS_Hardware_Production_Acceptance_Matrix]]
+- [[../13_DECISIONS_AND_CHANGES/Open_Questions]]
