@@ -1,7 +1,7 @@
 <!-- title: 22. Cart & Checkout -->
 <!-- status: ERD aligned -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-05 -->
+<!-- last_updated: 2026-07-17 -->
 <!-- source: 22_Cart & Checkout ERD(3).png -->
 
 # 22. Cart & Checkout
@@ -148,35 +148,37 @@ CHECK(sort_order IS NULL OR sort_order >= 0)
 
 Purpose: Stores checkout attempts and calculated checkout totals.
 
-| Attribute                  | Type          | Key | Null     | Reference / Note                           |
-| -------------------------- | ------------- | --- | -------- | ------------------------------------------ |
-| `id`                       | uuid          | PK  | NOT NULL | Primary key.                               |
-| `tenant_id`                | uuid          | FK  | NOT NULL | References tenants(id).                    |
-| `sales_channel_id`         | uuid          | FK  | NULL     | References sales_channels(id).             |
-| `cart_id`                  | uuid          | FK  | NOT NULL | References shopping_carts(id).             |
-| `customer_id`              | uuid          | FK  | NULL     | References customers(id).                  |
-| `anonymous_session_id`     | varchar(120)  |     | NULL     | Anonymous browser/session identifier.      |
-| `checkout_number`          | varchar(60)   |     | NOT NULL | Tenant-scoped checkout number.             |
-| `checkout_status`          | varchar(30)   |     | NOT NULL | Checkout lifecycle status.                 |
-| `sales_channel`            | varchar(40)   |     | NOT NULL | Sales channel code/snapshot.               |
-| `fulfillment_method_code`  | varchar(40)   |     | NULL     | Selected fulfillment method code snapshot. |
-| `selected_outlet_id`       | uuid          | FK  | NULL     | References outlets(id).                    |
-| `selected_pickup_slot_id`  | uuid          |     | NULL     | Selected pickup slot reference/snapshot.   |
-| `pickup_contact_name`      | varchar(150)  |     | NULL     | Pickup contact name.                       |
-| `pickup_contact_phone`     | varchar(50)   |     | NULL     | Pickup contact phone.                      |
-| `pickup_contact_email`     | varchar(255)  |     | NULL     | Pickup contact email.                      |
-| `currency_code`            | char(3)       | FK  | NOT NULL | References currencies(currency_code).      |
-| `subtotal_amount`          | numeric(18,4) |     | NOT NULL | Checkout subtotal.                         |
-| `discount_amount`          | numeric(18,4) |     | NOT NULL | Checkout discount amount.                  |
-| `tax_amount`               | numeric(18,4) |     | NOT NULL | Checkout tax amount.                       |
-| `charge_amount`            | numeric(18,4) |     | NOT NULL | Checkout charge amount.                    |
-| `total_amount`             | numeric(18,4) |     | NOT NULL | Checkout total amount.                     |
-| `inventory_reservation_id` | uuid          |     | NULL     | Inventory reservation reference/snapshot.  |
-| `converted_order_id`       | uuid          | FK  | NULL     | References sales_orders(id).               |
-| `completed_at`             | timestamptz   |     | NULL     | Checkout completion timestamp.             |
-| `expired_at`               | timestamptz   |     | NULL     | Checkout expiry timestamp.                 |
-| `created_at`               | timestamptz   |     | NOT NULL | Creation timestamp.                        |
-| `updated_at`               | timestamptz   |     | NULL     | Last update timestamp.                     |
+| Attribute | Type | Key | Null | Reference / Note |
+| --- | --- | --- | --- | --- |
+| `id` | uuid | PK | NOT NULL | Primary key. |
+| `tenant_id` | uuid | FK | NOT NULL | References tenants(id). |
+| `sales_channel_id` | uuid | FK | NULL | References sales_channels(id). |
+| `cart_id` | uuid | FK | NOT NULL | References shopping_carts(id). |
+| `customer_id` | uuid | FK | NULL | References customers(id). |
+| `anonymous_session_id` | varchar(120) |  | NULL | Anonymous browser/session identifier. |
+| `checkout_number` | varchar(60) |  | NOT NULL | Tenant-scoped checkout number. |
+| `checkout_status` | varchar(30) |  | NOT NULL | Checkout lifecycle status. |
+| `sales_channel` | varchar(40) |  | NOT NULL | Sales channel code/snapshot. |
+| `fulfillment_method_code` | varchar(40) |  | NULL | Selected fulfillment method code snapshot. |
+| `selected_outlet_id` | uuid | FK | NULL | References outlets(id). |
+| `requested_collection_at` | timestamptz |  | NULL | Requested collection window start in UTC. |
+| `requested_collection_end_at` | timestamptz |  | NULL | Requested collection window end in UTC. |
+| `collection_timezone_snapshot` | varchar(80) |  | NULL | Outlet timezone used when the customer selected the collection window. |
+| `pickup_contact_name` | varchar(150) |  | NULL | Pickup contact name. |
+| `pickup_contact_phone` | varchar(50) |  | NULL | Pickup contact phone. |
+| `pickup_contact_email` | varchar(255) |  | NULL | Pickup contact email. |
+| `currency_code` | char(3) | FK | NOT NULL | References currencies(currency_code). |
+| `subtotal_amount` | numeric(18,4) |  | NOT NULL | Checkout subtotal. |
+| `discount_amount` | numeric(18,4) |  | NOT NULL | Checkout discount amount. |
+| `tax_amount` | numeric(18,4) |  | NOT NULL | Checkout tax amount. |
+| `charge_amount` | numeric(18,4) |  | NOT NULL | Checkout charge amount. |
+| `total_amount` | numeric(18,4) |  | NOT NULL | Checkout total amount. |
+| `inventory_reservation_id` | uuid |  | NULL | Inventory reservation reference/snapshot. |
+| `converted_order_id` | uuid | FK | NULL | References sales_orders(id). |
+| `completed_at` | timestamptz |  | NULL | Checkout completion timestamp. |
+| `expired_at` | timestamptz |  | NULL | Checkout expiry timestamp. |
+| `created_at` | timestamptz |  | NOT NULL | Creation timestamp. |
+| `updated_at` | timestamptz |  | NULL | Last update timestamp. |
 
 Indexes / Constraints / Notes:
 
@@ -197,6 +199,8 @@ CHECK(tax_amount >= 0)
 CHECK(charge_amount >= 0)
 CHECK(total_amount >= 0)
 ```
+
+Click-and-collect checkout stores the customer's requested collection window directly on the checkout session. This release does not book pickup-slot capacity. Migration `20260717053528_AddStorefrontRequestedCollectionWindow` backfills existing selected pickup-slot sessions into the requested start/end/timezone columns, then removes `selected_pickup_slot_id`.
 
 ## `checkout_session_lines`
 

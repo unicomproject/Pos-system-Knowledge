@@ -59,19 +59,20 @@ CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 
 Purpose: Stores tenant departments used to group categories.
 
-| Attribute | Type | Key | Null | Reference / Note |
-| --- | --- | --- | --- | --- |
-| `id` | uuid | PK | NOT NULL | Primary key |
-| `tenant_id` | uuid | FK | NOT NULL | References tenants(id) |
-| `department_code` | varchar(80) |  | NOT NULL | Tenant-scoped department code |
-| `department_name` | varchar(150) |  | NOT NULL | Display name |
-| `description` | text |  | NULL | Optional description |
-| `sort_order` | int |  | NOT NULL DEFAULT 0 | Display order |
-| `status` | varchar(40) |  | NOT NULL | Record status |
-| `created_at` | timestamptz |  | NOT NULL | Created timestamp |
-| `created_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
-| `updated_at` | timestamptz |  | NOT NULL | Updated timestamp |
-| `updated_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+| Attribute                   | Type         | Key | Null               | Reference / Note              |     |     |
+| --------------------------- | ------------ | --- | ------------------ | ----------------------------- | --- | --- |
+| `id`                        | uuid         | PK  | NOT NULL           | Primary key                   |     |     |
+| `tenant_id`                 | uuid         | FK  | NOT NULL           | References tenants(id)        |     |     |
+| `department_code`           | varchar(80)  |     | NOT NULL           | Tenant-scoped department code |     |     |
+| `department_name`           | varchar(150) |     | NOT NULL           | Display name                  |     |     |
+| `description`               | text         |     | NULL               | Optional description          |     |     |
+| `sort_order`                | int          |     | NOT NULL DEFAULT 0 | Display order                 |     |     |
+| `status`                    | varchar(40)  |     | NOT NULL           | Record status                 |     |     |
+| `created_at`                | timestamptz  |     | NOT NULL           | Created timestamp             |     |     |
+| `created_by_tenant_user_id` | uuid         | FK  | NULL               | References tenant_users(id)   |     |     |
+| `updated_at`                | timestamptz  |     | NOT NULL           | Updated timestamp             |     |     |
+| `updated_by_tenant_user_id` | uuid         | FK  | NULL               | References tenant_users(id)   |     |     |
+|                             |              |     |                    |                               |     |     |
 
 Indexes / Constraints / Notes:
 
@@ -267,27 +268,27 @@ One active default policy per tenant.
 
 Purpose: Stores tenant product master records.
 
-| Attribute | Type | Key | Null | Reference / Note |
-| --- | --- | --- | --- | --- |
-| `id` | uuid | PK | NOT NULL | Primary key |
-| `tenant_id` | uuid | FK | NOT NULL | References tenants(id) |
-| `product_code` | varchar(80) |  | NOT NULL | Tenant-scoped product code |
-| `product_name` | varchar(200) |  | NOT NULL | Product name |
-| `product_slug` | varchar(220) |  | NOT NULL | URL/display slug |
-| `product_type` | varchar(40) |  | NOT NULL | Product type |
-| `product_structure` | varchar(40) |  | NOT NULL | Product structure |
-| `business_type_id` | uuid | FK | NULL | References business_types(id) |
-| `brand_id` | uuid | FK | NULL | References brands(id) |
-| `return_policy_id` | uuid | FK | NULL | References return_policies(id) |
-| `short_description` | text |  | NULL | Short description |
-| `long_description` | text |  | NULL | Long description |
-| `is_sellable` | boolean |  | NOT NULL DEFAULT true | Sellable flag |
-| `is_taxable` | boolean |  | NOT NULL DEFAULT true | Taxable flag |
-| `status` | varchar(40) |  | NOT NULL | Product status |
-| `created_at` | timestamptz |  | NOT NULL | Created timestamp |
-| `created_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
-| `updated_at` | timestamptz |  | NOT NULL | Updated timestamp |
-| `updated_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+| Attribute                   | Type         | Key | Null                  | Reference / Note               |
+| --------------------------- | ------------ | --- | --------------------- | ------------------------------ |
+| `id`                        | uuid         | PK  | NOT NULL              | Primary key                    |
+| `tenant_id`                 | uuid         | FK  | NOT NULL              | References tenants(id)         |
+| `product_code`              | varchar(80)  |     | NOT NULL              | Tenant-scoped product code     |
+| `product_name`              | varchar(200) |     | NOT NULL              | Product name                   |
+| `product_slug`              | varchar(220) |     | NOT NULL              | URL/display slug               |
+| `product_type`              | varchar(40)  |     | NOT NULL              | Product type                   |
+| `product_structure`         | varchar(40)  |     | NOT NULL              | Product structure              |
+| `business_type_id`          | uuid         | FK  | NULL                  | References business_types(id)  |
+| `brand_id`                  | uuid         | FK  | NULL                  | References brands(id)          |
+| `return_policy_id`          | uuid         | FK  | NULL                  | References return_policies(id) |
+| `short_description`         | text         |     | NULL                  | Short description              |
+| `long_description`          | text         |     | NULL                  | Long description               |
+| `is_sellable`               | boolean      |     | NOT NULL DEFAULT true | Sellable flag                  |
+| `is_taxable`                | boolean      |     | NOT NULL DEFAULT true | Taxable flag                   |
+| `status`                    | varchar(40)  |     | NOT NULL              | Product status                 |
+| `created_at`                | timestamptz  |     | NOT NULL              | Created timestamp              |
+| `created_by_tenant_user_id` | uuid         | FK  | NULL                  | References tenant_users(id)    |
+| `updated_at`                | timestamptz  |     | NOT NULL              | Updated timestamp              |
+| `updated_by_tenant_user_id` | uuid         | FK  | NULL                  | References tenant_users(id)    |
 
 Indexes / Constraints / Notes:
 

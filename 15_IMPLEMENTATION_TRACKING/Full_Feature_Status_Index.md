@@ -1,7 +1,7 @@
-<!-- title: Full Feature Status Index -->
+﻿<!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 
 # Full Feature Status Index
 
@@ -88,8 +88,17 @@ PR/commit reference is recorded.
 | Flutter | Hardware | Hardware Testing Workflow | Not Started | - | - | No complete screen/API/service/test-log flow |
 | Flutter | Sales | Offline Cash Sale / Outbox | Not Started | - | - | Included MVP scope; no verified end-to-end cashier implementation |
 
+| Backend | ECommerce / CustomerAuth | Storefront Customer Authentication | Testing | - | - | Implementation tracking added; latest regression and commit evidence pending. See [[Backend/ECommerce/Customer_Auth_Implementation_Status]] |
+| Backend | ECommerce / Storefront | Public Storefront Browse APIs | Testing | - | - | Implementation tracking added; search/category-by-slug focused evidence pending. See [[Backend/ECommerce/Storefront_Browse_Implementation_Status]] |
+| Backend | ECommerce / Storefront | Storefront Fulfillment Store And Collection Options | Testing | - | - | Implementation tracking added; relational repository and entitlement evidence pending. See [[Backend/ECommerce/Storefront_Fulfillment_Implementation_Status]] |
+| Backend | CatalogProduct / Shared Media | Catalog Media Image Upload And Projection | Testing | - | - | Implementation tracking added; Azure/manual and legacy-column evidence pending. See [[Backend/ECommerce/Catalog_Media_Image_Implementation_Status]] |
+| Backend | ECommerce / CartCheckout | Storefront Cart Management | Testing | - | - | Cart test matrix and backend status added; latest regression pending. See [[Backend/ECommerce/Storefront_Cart_Implementation_Status]] |
+| Backend | ECommerce / CustomerWishlist | Customer Wishlist APIs | Testing | - | - | Implementation tracking added; current regression/exception evidence pending. See [[Backend/ECommerce/Customer_Wishlist_Implementation_Status]] |
+| Backend | ECommerce / ProductReviews | Product Reviews APIs | Testing | - | - | Implementation tracking added; current regression/commit evidence pending. See [[Backend/ECommerce/Product_Review_Implementation_Status]] |
+| Backend | ECommerce / Customer | POS Customer Profile And Attach To Sale | Testing | - | - | Implementation tracking added; latest regression and entitlement review pending. See [[Backend/ECommerce/Customer_Profile_Pos_Customer_Implementation_Status]] |
+| Full Stack | E-Commerce | Web Storefront & Tracking | Testing | - | e-commerce | Core flows are tracked across auth, browse, media, cart, checkout, wishlist, reviews, orders, fulfillment, and POS customer docs. See [[Online_Store/01_ECommerce_Implementation_Status]] |
 The `Completed` row for the 2026-07-02 Cashier comparison is historical. The
-comparison document itself is now `In Progress — Re-audit Required` until its
+comparison document itself is now `In Progress â€” Re-audit Required` until its
 remaining findings and documentation updates are closed.
 
 ## Update Process

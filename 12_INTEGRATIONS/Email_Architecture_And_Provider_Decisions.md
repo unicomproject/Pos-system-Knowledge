@@ -1,4 +1,4 @@
-<!-- title: Email Architecture and Provider Decisions -->
+﻿<!-- title: Email Architecture and Provider Decisions -->
 <!-- status: APPROVED -->
 <!-- system: TM-EPOS MVP / OneVerz -->
 <!-- owner: Platform Architecture / Product (OneVerz) -->
@@ -88,10 +88,10 @@ Keep separate:
 
 | Concern | Home |
 |---|---|
-| Subscription type | `PAID` / `TRIAL` / `DEMO` (subscription / plan model — not `tenants.status`) |
+| Subscription type | `PAID` / `TRIAL` / `DEMO` (subscription / plan model â€” not `tenants.status`) |
 | Billing cycle | `MONTHLY` / `ANNUAL` (and catalog equivalents) |
 | Subscription status | `tenant_subscriptions` status |
-| Payment / billing status | invoices, payment links, billing fields — **not** `tenants.status` |
+| Payment / billing status | invoices, payment links, billing fields â€” **not** `tenants.status` |
 
 ### Lifecycle alignment (resolved)
 
@@ -105,6 +105,7 @@ Billing/payment remain on their own fields/tables. Onboarding emails and payment
 |---|---|
 | ACS Email provider infrastructure | **COMPLETE** |
 | Platform Admin password-reset email | **COMPLETE** |
+| E-Commerce verification OTP and password-reset email | **IMPLEMENTED / TESTING** |
 | Real Azure E2E password-reset verification | **PASSED** |
 | Paid tenant onboarding emails | **NOT IMPLEMENTED** |
 | Trial/Demo emails | **NOT IMPLEMENTED** |
@@ -126,4 +127,12 @@ Billing/payment remain on their own fields/tables. Onboarding emails and payment
 - 02_Tenant_Foundation
 - 04_Subscription_Billing_Usage
 - 06_Auth_Tokens_Security_Audit
-- 26_Notification (ops alerts — not SaaS onboarding catalog)
+- 26_Notification (ops alerts â€” not SaaS onboarding catalog)
+
+## E-Commerce customer authentication email
+
+- Registration and resend verification send a short-lived six-digit OTP through the provider-neutral email sender.
+- Forgot password sends a time-limited reset link; raw OTPs and reset tokens must never be stored or logged.
+- Customer authentication email remains in Testing until focused API/integration evidence is recorded.
+- Related tracking: [[../15_IMPLEMENTATION_TRACKING/Backend/ECommerce/Customer_Auth_Implementation_Status]]
+- Related tests: [[../10_TESTING_QA/Test_Case/22_ECommerce/Customer_Auth_Test_Cases]]
