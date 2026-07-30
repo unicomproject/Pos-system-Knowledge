@@ -1,8 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-29 -->
-<!-- last_updated: 2026-07-15 -->
+<!-- last_updated: 2026-07-30 -->
 
 # Permission Code List
 
@@ -48,6 +47,32 @@ code references.
 | platform.tenants.activate | Activate tenant |
 | platform.tenants.suspend | Suspend tenant |
 | platform.tenants.entitlements.update | Assign or update tenant feature entitlements |
+| platform.tenant_subscriptions.view | View tenant subscriptions (subscription lifecycle + dashboard subscription widgets) |
+
+#### Platform Dashboard page vs widget permissions
+
+Page access and widget data/destination access are separate.
+
+| Surface | Required permission | Notes |
+|---|---|---|
+| Open `/admin/dashboard` / call dashboard API / R1 basic System Health summary | `platform.dashboard.view` | Broad category: Platform User; actor: Platform Admin. Roles do not bypass this code. |
+| Tenant metrics / attention / Recent Tenants data and navigation | `platform.tenants.view` | Without it: non-sensitive summary only if allowed; **disable** navigation (no dead-end 403). |
+| MRR, Pending Billing, Past Due commercial values; open Billing | `platform.billing.view` | Without it: **hide** sensitive commercial widgets/values and links. |
+| Platform Users footprint count / nav | `platform.users.view` | Distinct from tenant-user count (`totalUsers`). |
+| Tenant subscription metric widgets (Active Paid / Trial / Past Due / trend / subscription navigation) | `platform.tenant_subscriptions.view` | Subscription lifecycle + subscription summary widgets and subscription-aware navigation are protected by this permission. MRR additionally requires `platform.billing.view` (§14). |
+
+Default role assignment for `platform.tenant_subscriptions.view` (approved; **Partially Implemented** — Super Administrator seed/migration present; FE gating incomplete):
+
+| Platform Role | Default Assignment |
+|---|---|
+| Super Administrator (`super_administrator`) | Grant (by default once seeded) |
+| Billing Admin | Explicit assignment only |
+| Support Admin | Explicit assignment only |
+| Custom platform roles | Explicit assignment only |
+
+Runtime authorization remains permission-based, not role-name-based. Do not mark SA-DASH-GAP-13 Completed and Verified until Frontend gating, omit/hide semantics, and E2E tests pass.
+
+Full matrix and gaps: [[03_USER_JOURNEYS/Platform_Admin/02_Platform_Dashboard_Flow]] §14 / SA-DASH-GAP-13. Audit: [[15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-07-29-platform-dashboard/Platform_Dashboard_Second_Brain_Gap_Completion_Audit]].
 
 ### Platform subscription plans (granular — implemented)
 

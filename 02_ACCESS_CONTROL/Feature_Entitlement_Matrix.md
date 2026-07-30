@@ -21,25 +21,25 @@ A permission cannot activate a disabled feature.
 
 ## MVP Entitlement Groups
 
-| Feature Group | MVP Status | Notes |
-|---|---|---|
-| platform_admin | Included | Platform setup and tenant control |
-| tenant_admin | Included | Business operations setup |
-| mobile_pos | Included | Phone/tablet POS selling |
-| desktop_epos | Included | Laptop/desktop EPOS/admin use |
-| product_management | Included | Products, variants, attributes, barcodes |
-| inventory_management | Included | Stock, adjustments, alerts, movement history |
-| online_store | Included | Customer website and catalogue |
-| cart_checkout | Included | Shopping cart and checkout sessions |
-| click_collect | Included | Pickup method, slots, pickup order handling |
-| order_management | Included | Unified in-store and online order management |
-| payment_refund | Included | Sales payments, transactions, refunds |
-| return_exchange | Included | Return, inspection, refund, exchange |
-| offline_operation_sync | Included | Offline client, sync outbox, conflict handling |
-| reporting_analytics | Included | Dashboard and operational reports |
-| device_hardware | Included | POS device and peripheral integration |
-| notification | Included | Email/SMS/WhatsApp/push/in-app records where configured |
-| integration_core | Included | Provider/integration records and webhook logs |
+| Feature Group          | MVP Status | Notes                                                   |
+| ---------------------- | ---------- | ------------------------------------------------------- |
+| platform_admin         | Included   | Platform setup and tenant control                       |
+| tenant_admin           | Included   | Business operations setup                               |
+| mobile_pos             | Included   | Phone/tablet POS selling                                |
+| desktop_epos           | Included   | Laptop/desktop EPOS/admin use                           |
+| product_management     | Included   | Products, variants, attributes, barcodes                |
+| inventory_management   | Included   | Stock, adjustments, alerts, movement history            |
+| online_store           | Included   | Customer website and catalogue                          |
+| cart_checkout          | Included   | Shopping cart and checkout sessions                     |
+| click_collect          | Included   | Pickup method, slots, pickup order handling             |
+| order_management       | Included   | Unified in-store and online order management            |
+| payment_refund         | Included   | Sales payments, transactions, refunds                   |
+| return_exchange        | Included   | Return, inspection, refund, exchange                    |
+| offline_operation_sync | Included   | Offline client, sync outbox, conflict handling          |
+| reporting_analytics    | Included   | Dashboard and operational reports                       |
+| device_hardware        | Included   | POS device and peripheral integration                   |
+| notification           | Included   | Email/SMS/WhatsApp/push/in-app records where configured |
+| integration_core       | Included   | Provider/integration records and webhook logs           |
 
 ## POS Entitlements
 

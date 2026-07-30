@@ -88,6 +88,8 @@ new payment-history transaction, so the UI must not fabricate a transaction row.
 - Never combine LKR, USD, or other currency amounts into one monetary total.
 - A combined invoice count is allowed because it is non-monetary.
 - Amount formatting must retain the associated currency code.
+- Monetary rounding/precision for each currency uses the central backend currency metadata minor-unit precision (`currencies.decimal_places` for each ISO `currencies.currency_code`).
+- Platform Dashboard MRR (Release 1 target): if any eligible ACTIVE subscription currency lacks valid central metadata, the entire Dashboard Revenue/MRR section is UNAVAILABLE (do not silently omit, default precision, or present partial MRR as complete). See [[../../03_USER_JOURNEYS/Platform_Admin/02_Platform_Dashboard_Flow]] §11 / closed SA-DASH-DECISION-PENDING-01.
 
 ## Permission Rules
 

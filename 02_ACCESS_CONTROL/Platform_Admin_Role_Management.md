@@ -1,7 +1,7 @@
 <!-- title: Platform Admin Role Management -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-15 -->
+<!-- last_updated: 2026-07-29 -->
 
 
 # Platform Admin Role Management
@@ -52,6 +52,16 @@ See [[Permission_Code_List]] for the authoritative 36-code platform catalog.
 | Domain | Example codes |
 |---|---|
 | Dashboard | `platform.dashboard.view` |
+
+Dashboard page permission is not sufficient for all widgets:
+
+- Tenant metrics / attention navigation → `platform.tenants.view`
+- MRR / pending billing / past-due commercial values → `platform.billing.view`
+- Platform Users count → `platform.users.view`
+- R1 basic System Health summary → `platform.dashboard.view`
+- Dedicated tenant-subscription view code → `platform.tenant_subscriptions.view` (approved; **Partially Implemented** — seeded for Super Administrator; FE gating incomplete)
+
+See [[../03_USER_JOURNEYS/Platform_Admin/02_Platform_Dashboard_Flow]] §14.
 | Tenants | `platform.tenants.view`, `.create`, `.update`, `.activate`, `.suspend`, `.entitlements.update` |
 | Subscription plans | `platform.subscription_plans.view`, `.create`, `.edit`, `.duplicate`, `.archive`, `.delete` |
 | Catalog | `platform.permissions.view`, `platform.modules.view`, `platform.features.view` |
@@ -66,6 +76,7 @@ Seed role code: `super_administrator`
 Expected grants after platform permission foundation migration:
 
 - All 36 platform permission codes listed in [[Permission_Code_List]].
+- The documentation-approved permission `platform.tenant_subscriptions.view` is included in the platform permission catalogue (seed/migration present) and therefore granted by default to the `super_administrator` role under the "all platform permission codes" rule. Billing Admin, Support Admin, and custom platform roles do **not** receive this permission by default; they require explicit assignment. Runtime authorization remains permission-based, not role-name-based. Frontend Dashboard widget/nav gating and omit/hide semantics remain open (SA-DASH-GAP-13 Partially Implemented).
 - The 36-code count is the current authoritative catalog baseline. The earlier
   31-code live-login verification from 2026-07-02 is retained in historical
   verification records only and must not be used as the current catalog count.

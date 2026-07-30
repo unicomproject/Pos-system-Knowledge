@@ -43,6 +43,7 @@ Platform Admin opens system settings.
 
 - Global settings
 - Currency and region
+- Default timezone for Platform Dashboard trend boundaries: `general.default_timezone` (DTO field `DefaultTimezone`). Trend boundaries/grouping follow this timezone, while persisted timestamps remain UTC.
 - Payment gateway
 - Email templates
 - Notifications
