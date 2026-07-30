@@ -160,3 +160,14 @@ flowchart TD
 - [[Permission_Based_UI_Rules]]
 - [[Empty_Error_Loading_States]]
 - [[../01_RELEASE_SCOPE/Release_1_Scope]]
+
+
+## OneVerz Tenant Admin sidebar exception (2026-07-29)
+
+For the **Tenant Admin shared sidebar**, the final approved visual is **white / very light** with light-purple active states — not a dark-blue full sidebar.
+
+"Dark blue and white POS/admin layout" elsewhere in this design system remains historical guidance for broader POS surfaces, but is **superseded for the Tenant Admin shared sidebar** by:
+
+- [[../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Sidebar_Navigation]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Settings_Shared_Layout_Architecture]]
+- [[Tenant_Admin_UI_Rules]]

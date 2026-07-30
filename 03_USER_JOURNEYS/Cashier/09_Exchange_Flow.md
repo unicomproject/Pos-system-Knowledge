@@ -1,7 +1,7 @@
 <!-- title: Exchange Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 
 # Exchange Flow
 
@@ -63,6 +63,11 @@ flowchart TD
   backend-approved refund method; equal value uses no settlement.
 - Store credit is not supported by the current completion flow.
 - Completion uses expected draft version and idempotency key.
+- Exchange receipts use authoritative replacement/settlement snapshots; print
+  failure does not roll back completion.
+- Drawer pulse follows only an implemented Cash settlement policy. Card-only,
+  no-balance and reprint paths do not open it.
+- Exchange receipt/drawer physical acceptance remains incomplete.
 
 ## Access-Control Rules
 
@@ -106,3 +111,16 @@ flowchart TD
 - [[../../01_RELEASE_SCOPE/Release_1_Scope]]
 - [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
 - [[../../05_BACKEND_ARCHITECTURE/API_Standards]]
+
+## Hardware Chunk 2C receipt update (2026-07-29)
+
+Receipt History exchange reprint now uses the persisted `EXCHANGE`
+`receipt_data_json` snapshot: returned/replacement items, their authoritative
+values, difference direction/amount and settlement method. Backend reprint
+authorization and reason are reused; no exchange, stock mutation or settlement
+is repeated. Agent paper is marked `EXCHANGE REPRINT` and every configured
+customer/merchant copy has independent deterministic identity and audit.
+
+Positive, zero and negative settlement directions are displayed from the
+snapshot and are not recalculated in Flutter or the Agent. Automated acceptance
+passed; physical POS80 exchange/reprint evidence remains pending.

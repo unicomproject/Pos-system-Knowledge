@@ -1,7 +1,7 @@
 <!-- title: Outlet, Till & POS Device Foundation Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-29 -->
 
 # Outlet, Till & POS Device Foundation Technical Contract
 
@@ -42,6 +42,10 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 | `till_device_assignments` | Used by this module |
 | `hardware_profiles` | Used by this module |
 
+Hardware assignment records must identify tenant, outlet, POS device, hardware
+device/type, active range, configuration version and change actor/time. Existing
+schema gaps remain implementation work; do not invent a second configuration table.
+
 Entity mappings must preserve exact table names, column names, tenant foreign keys,
 unique constraints, CHECK constraints, hash-only token rules, and append-only
 history/ledger behavior where applicable.
@@ -52,6 +56,8 @@ history/ledger behavior where applicable.
 - Widgets/components must not call HTTP APIs directly.
 - Use DTOs in data layer, domain/view models in UI layer.
 - Permission and entitlement checks are UX helpers only; backend remains final authority.
+- Secure device-local secrets are references to activated-device configuration;
+  revocation must invalidate hardware access.
 - Browser online store and Flutter business app must share backend rules but keep separate user/auth surfaces.
 
 ## Backend Contract
@@ -98,7 +104,7 @@ Test coverage must include:
 
 ## Out Of Scope
 
-- Hardware test result storage
+- Hardware test execution/result persistence is owned by Module 08.
 - Cash reconciliation
 - Order fulfilment events
 - Customer device/browser identity

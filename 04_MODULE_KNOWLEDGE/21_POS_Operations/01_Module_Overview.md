@@ -1,7 +1,7 @@
 <!-- title: POS Operations Module Overview -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 
 # POS Operations Module Overview
 
@@ -44,6 +44,10 @@ merchandising, attractions, and temporary retail locations.
 
 - Portable POS uses the same POS rules as fixed POS.
 - Receipt print failure does not cancel a completed backend sale.
+- Backend receipt JSON is the immutable print/reprint snapshot for authoritative
+  line, tender, discount, tax, and copy-policy values available at completion.
+- Original and reprint operations use stable request identity and separate
+  authorized print-audit records; reprint never creates another sale/payment.
 - Parked/held sale must remain tenant, outlet, till, and user scoped.
 - Till summary uses completed sales, payments, refunds, and cash movements.
 - Backend Holds is implemented, but current Flutter held-sale authority is local

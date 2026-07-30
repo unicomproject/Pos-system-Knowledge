@@ -105,6 +105,15 @@ Test coverage must include:
 - Delivery pickup return logistics
 - Accounting journal posting
 
+## Hardware Chunk 2C historical document contract (2026-07-29)
+
+Completed Return + Refund uses the issued `REFUND` document; completed Exchange
+uses the issued `EXCHANGE` document. Historical reprint maps only their stored
+snapshots. A new authorization ID namespaces the controlled reprint, while
+copy type/index produce deterministic physical request IDs. Reprint performs no
+inspection, return, exchange, inventory or settlement command. Partial copy
+failure retains successful-copy outcomes and requires explicit operator action.
+
 ## Related Files
 
 - [[04_MODULE_KNOWLEDGE/25_Return_Inspection_Exchange/01_Module_Overview]]

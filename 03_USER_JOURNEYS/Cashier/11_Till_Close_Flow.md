@@ -1,7 +1,7 @@
 <!-- title: Till Close Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 
 # Till Close Flow
 
@@ -59,6 +59,11 @@ flowchart TD
 - Counted cash must be non-negative.
 - Variance must be stored.
 - Close till is tied to user and device.
+- Counted cash, expected cash, variance and denominations remain authoritative
+  and auditable.
+- Till-close report printing is post-close; failure must not reopen/corrupt a
+  successfully closed session.
+- Hardware changes during the session must be visible in audit/report data.
 
 ## Access-Control Rules
 
@@ -91,6 +96,7 @@ test and logout-failure recovery evidence remain gaps.
 ## Out of Scope
 
 - Offline final till close is not implemented and remains backend-authoritative.
+- Till-close report printing and physical acceptance are not end-to-end complete.
 - Accounting close day is excluded.
 
 ## Completion Criteria

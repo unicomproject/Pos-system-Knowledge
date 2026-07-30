@@ -1,7 +1,7 @@
 <!-- title: Outlet, Till & POS Device Foundation Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-29 -->
 
 # Outlet, Till & POS Device Foundation Module Overview
 
@@ -42,6 +42,10 @@ merchandising, attractions, and temporary retail locations.
 - Till belongs to an outlet and is used for POS sessions.
 - Trusted POS device must match tenant, outlet, and assigned till policy.
 - One device assignment cannot silently bypass permissions.
+- Hardware configuration and assignment are device-specific, tenant/outlet
+  scoped, versioned, revocable, and auditable.
+- The active shift must retain the hardware identity/configuration version used;
+  printer/drawer changes during a shift require an approved policy and audit.
 - Business hours can guide online store and pickup availability but do not replace backend validation.
 
 ## Access Summary
@@ -63,7 +67,7 @@ merchandising, attractions, and temporary retail locations.
 
 ## Out Of Scope
 
-- Hardware test result storage
+- Hardware execution and test-result storage are owned by Module 08.
 - Cash reconciliation
 - Order fulfilment events
 - Customer device/browser identity

@@ -1,7 +1,7 @@
 <!-- title: Offline Operation & Sync Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-29 -->
 
 # Offline Operation & Sync Functional Rules
 
@@ -18,6 +18,10 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Sync items require idempotency keys and local IDs.
 - Backend resolves or rejects conflicts; device must not overwrite backend truth silently.
 - Card/QR final payment, refund approval, final stock, and till final close require backend validation.
+- Network loss during a hardware POST produces an unknown outcome until the
+  durable operation is reconciled; automatic replay is prohibited.
+- App/Agent restart recovery must preserve stable operation identity.
+- Offline cash receipt printing must not claim backend print audit until sync.
 
 ## User Rules
 

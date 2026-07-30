@@ -1,7 +1,7 @@
 <!-- title: Offline Operation & Sync Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-29 -->
 
 # Offline Operation & Sync Module Overview
 
@@ -43,6 +43,9 @@ merchandising, attractions, and temporary retail locations.
 - Sync items require idempotency keys and local IDs.
 - Backend resolves or rejects conflicts; device must not overwrite backend truth silently.
 - Card/QR final payment, refund approval, final stock, and till final close require backend validation.
+- Offline hardware use is limited to authoritative offline-safe cash receipts
+  whose operation identity and later sync/audit behavior are persisted.
+- Card terminal, final refund/exchange, and final till close remain online-only.
 
 ## Access Summary
 

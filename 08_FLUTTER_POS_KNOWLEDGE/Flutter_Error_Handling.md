@@ -1,7 +1,7 @@
 <!-- title: Flutter Error Handling -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-29 -->
 
 
 # Flutter Error Handling
@@ -52,6 +52,10 @@ Payment errors must never expose card data or provider secrets.
 
 Only suggest retry when operation is safe to retry or idempotency exists.
 
+Hardware timeout after irreversible submission is `unknown`, not failed.
+Reconcile stable operation identity first. Audit-only retry never resends a
+receipt; Card timeout requires provider reconciliation.
+
 ## Error Logging Rule
 
 Log safe diagnostic context such as trace ID, route, feature, action, sync item
@@ -74,8 +78,32 @@ Permission denied, unavailable camera, initialization failure, and unsupported
 platform use safe local snackbar messages; raw plugin exceptions are not shown.
 User cancellation is not treated as an error and does not mutate search/cart.
 
+## Hardware Error Rule
+
+- Typed outcomes distinguish unavailable, unauthorized, incompatible,
+  confirmed failure, unknown, audit failure and cancellation.
+- Hardware I/O is asynchronous; status and recovery remain touch-friendly and
+  responsive on phone, tablet and desktop.
+- Route/dialog disposal disables scanner input and cancels safe reads.
+- Battery/network interruption preserves operation identity and recovery state.
+
+For receipt batches, partial success is not collapsed into failure. Printed
+copies remain successful; failed copies are shown separately and are never
+automatically replayed. Timeout/partial output is `unknown`. Historical reprint
+requires a new authorized reprint operation. Audit-pending recovery reuses the
+same copy request identity and does not call the printer.
+
 ## Related Files
 
 - [[Flutter_API_Network]]
 - [[Flutter_Offline_Operation_Sync]]
 - [[Flutter_Security_Guardrails]]
+
+## Scanner typed failures (2026-07-29)
+
+Scanner flows distinguish disabled/not configured, incomplete input, invalid
+length, unsupported characters, timeout, camera permission,
+initialization/unavailable, recognition failure, duplicate suppression,
+product not found/inactive/ambiguous, lookup/backend/audit failure, untrusted
+device, permission denial and configuration conflict. Messages never expose
+stack traces, tokens, raw audit barcodes, frames or internal paths.

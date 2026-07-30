@@ -1,7 +1,7 @@
 <!-- title: Flutter Device Platform Support -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-29 -->
 
 
 # Flutter Device Platform Support
@@ -41,6 +41,20 @@ Hardware support may vary by platform.
 
 Printer, scanner, drawer, and card reader integrations must be abstracted through
 hardware services and tested per platform.
+
+Required flow is UI → provider/controller → hardware service → typed
+adapter/client → local device service/native transport → hardware. Widgets never
+perform HTTP, socket, spooler, terminal, or ESC/POS I/O.
+
+| Platform | Hardware boundary |
+|---|---|
+| Physical Android | Laptop LAN Local Agent; camera/HID where supported |
+| Android emulator | Development host mapping only; not physical evidence |
+| Windows desktop | Local Agent or accepted desktop transport |
+| iOS | Camera/HID target; printer transport remains unverified |
+
+Direct Android USB, Bluetooth and direct TCP production acceptance are pending.
+Hardware I/O is bounded asynchronous work and must not freeze the UI.
 
 ## Offline Platform Rule
 

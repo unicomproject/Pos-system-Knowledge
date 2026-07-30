@@ -1,7 +1,7 @@
 <!-- title: POS Operations Functional Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-29 -->
 
 # POS Operations Functional Rules
 
@@ -15,6 +15,14 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 - Portable POS uses the same POS rules as fixed POS.
 - Receipt print failure does not cancel a completed backend sale.
+- Flutter must print authoritative completed-receipt values without recalculating
+  totals, tax, discounts, tender allocations, or change.
+- Print audit is submitted only for a locally successful physical attempt.
+  Audit-only recovery must never resend receipt bytes.
+- Unknown print outcome requires operation lookup/operator decision; automatic
+  physical retry is prohibited.
+- A Receipt History reprint preserves the original snapshot and uses a new
+  authorized reprint operation identity.
 - Parked/held sale must remain tenant, outlet, till, and user scoped.
 - Till summary uses completed sales, payments, refunds, and cash movements.
 - Current Flutter parked sales are device-local; do not describe them as

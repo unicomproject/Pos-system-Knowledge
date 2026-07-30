@@ -1,139 +1,148 @@
 <!-- title: Barcode Scanner Integration -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-07-22 -->
-
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-29 -->
 
 # Barcode Scanner Integration
 
-## Implementation status
+## Purpose
 
-| Layer | Status |
+Define production barcode input, exact lookup, cart mutation, recovery and
+physical-acceptance rules for cashier New Sale.
+
+## Scope
+
+USB HID `TURBOGEAR TB-00D`, Android/iOS camera scanning, exact backend lookup,
+quantity-per-scan, FIFO processing, focus/lifecycle, feedback and failures.
+
+## Production Architecture
+
+HID/camera source → scan controller FIFO → exact barcode datasource →
+authoritative backend variant result → shared resolved-variant cart action →
+typed one-time feedback. Manual search stays separate.
+
+## Component Responsibilities
+
+| Component | Responsibility |
 |---|---|
-| Backend exact barcode lookup | Implemented on `scanner_inte` |
-| Reusable resolved-variant cart action | Implemented on `scanner_inte` |
-| Same-variant quantity increment | Implemented |
-| `QuantityPerScan`-ready requested quantity | Implemented in cart action; barcode API mapping remains pending |
-| Central cart stock-limit validation | Implemented |
-| Flutter USB HID framing listener | Implemented on `scanner_inte` |
-| Enter/numpad Enter completion | Implemented |
-| Leading-zero preservation | Implemented |
-| Listener enabled/disposal controls | Implemented |
-| Exact barcode Flutter API integration | Implemented on `scanner_inte` |
-| Barcode response mapping | Implemented |
-| Sequential scan queue/processing lock | Implemented |
-| Exact variant direct cart add | Implemented |
-| Route/modal lifecycle enablement | Implemented |
-| Scanner success/error visual feedback | Implemented |
-| Scanner search-field/query clearing | Implemented |
-| Pending partial-search debounce cancellation | Implemented |
-| Scanner general-search suppression | Implemented |
-| Manual product search preserved | Implemented |
-| Chunk 5 feedback and search cleanup | Implemented and verified |
-| Camera scanner button/UI | Implemented; physical camera validation pending |
-| Full scanner E2E | Partial |
+| HID listener | Preserve text, frame on Enter/numpad Enter, reset partial input |
+| Camera dialog | Permission/lifecycle and one intentional scan session |
+| Scan controller | FIFO, one lookup/mutation per completed frame |
+| Backend lookup | Exact unique barcode, product/variant, quantity and authority |
+| Cart action | Add or increment same variant using authoritative result |
 
-## Exact POS lookup
+## Supported Platforms And Transports
 
-`GET /api/v1/pos/products/by-barcode/{barcode}?deviceId={deviceId}` requires an
-authenticated tenant context plus `products.view` (or catalog view) and
-`products.search`. The device must be active, trusted, tenant-owned, and assigned
-to an active outlet.
+HID keyboard input targets supported Flutter platforms. Camera uses
+`mobile_scanner` on Android/iOS. Windows camera is not active. Package/build
+success is not physical camera/scanner evidence.
 
-The path value is trimmed only. Lookup uses exact string equality against an
-active tenant-owned `product_barcodes` row, preserving leading zeroes. Partial,
-prefix, fuzzy, and numeric matching are not used.
+## Runtime Flow
 
-A variant-level barcode resolves only its linked active/sellable variant. A
-product-level barcode resolves only when exactly one active/sellable variant
-exists; multiple variants return `pos_barcode.ambiguous`. The response returns
-the barcode record that matched, including `barcodeType` and
-`quantityPerScan`, rather than substituting the primary barcode.
+Leading zeros remain strings. Each complete scan enters FIFO; rapid scans are
+not merged or dropped. `quantityPerScan` is validated and added; repeated same
+variant increments the existing line. Search text/debounce is cleared before
+exact lookup and scan input is enabled only on the current allowed route/dialog.
 
-Product visibility, active/sellable product and variant state, default active
-price, and sellable inventory at the device outlet are applied. Out-of-stock is
-returned as a stock status, consistent with the POS catalog; checkout remains
-authoritative for final price and stock validation.
+## Configuration
 
-Stable errors include `pos_barcode.invalid`, `pos_barcode.not_found`,
-`pos_barcode.ambiguous`, `pos_product.unavailable`, `pos_variant.unavailable`,
-`pos_price.unavailable`, and `pos_device.invalid`.
+Minimum length and inactivity reset are configurable in the HID listener.
+Supported barcode formats and physical scanner suffix configuration require
+device acceptance; do not hardcode business data.
 
-## Resolved variant cart action
+## API Contract
 
-Manual product selection and future barcode/camera sources can map into the
-source-agnostic `PosResolvedSaleItem` model and call
-`PosResolvedVariantCartAction.add`. Exact variants bypass the selector. The
-action supports requested quantities greater than one, uses variant ID as the
-cart-line identity, increments an existing variant line, keeps different
-variants separate, and returns a typed `PosCartMutationResult`.
+Exact lookup uses the implemented POS product-by-barcode endpoint and typed
+result. Stable errors include invalid and not-found. Duplicate/ambiguous barcode
+data must fail safely; the client never chooses an arbitrary variant.
 
-Known stock limits are enforced centrally by `PosNewSaleCartNotifier.addToCart`
-for direct add, repeated add, and the cart increment control. Invalid quantity,
-out-of-stock, unavailable, missing-price, and insufficient-stock additions do
-not mutate the cart. Checkout remains authoritative.
+## Database And Audit Contract
 
-## USB HID framing listener
+Barcode/product/variant uniqueness and authority remain backend/database rules.
+Scanning itself does not require a business audit row. Sale/cart persistence
+follows the normal checkout contract.
 
-`PosBarcodeScannerListener` is attached at the New Sale screen root and uses
-Flutter `HardwareKeyboard`/`KeyEvent`. Printable key-down characters are buffered
-as a string, preserving leading zeroes. Enter and numpad Enter complete a scan;
-the buffer is cleared immediately and the normalized barcode is emitted once.
+## Permission And Business Rules
 
-The default minimum length is four and the default maximum inter-key delay is
-120 ms. Stale partial input is cleared by an inactivity timer. Key-up and
-non-printable events are ignored. Disabling or disposing the listener clears the
-buffer, cancels the timer, and disposal removes the exact registered handler.
+User requires New Sale access, activated device, outlet/till context and current
+route. Backend stock and price are authoritative. One scan means one configured
+quantity addition; no client-side product invention.
 
-The handler returns `false`, so normal keyboard behaviour remains available.
-When the search field is focused, HID characters may temporarily enter it. On
-completed scanner input, the New Sale search coordinator immediately clears the
-shared query, invalidates the pending 350 ms catalog debounce, and the private
-top-bar controller synchronizes to the cleared query. Focus remains unchanged.
-Manual search continues through the normal debounced catalog flow.
+## Security Rules
 
-## Exact scan pipeline coordinator
+Do not log customer/payment secrets or raw plugin exceptions. Treat scanner
+input as untrusted text and validate length/format server-side.
 
-`PosBarcodeScanController` receives completed HID barcodes and drains a FIFO
-`Queue<String>` one item at a time. It resolves the authenticated session and
-trusted active device context, calls
-`GET /api/v1/pos/products/by-barcode/{barcode}?deviceId=...`, maps the dedicated
-response to `PosResolvedSaleItem`, and invokes `PosResolvedVariantCartAction`
-with the validated `quantityPerScan` value.
+## Idempotency
 
-State exposes processing status, current barcode, pending count, and a typed
-outcome. Repeated identical scans are not suppressed. API failures and cart
-rejections do not stop later queued scans. The controller is New Sale-scoped via
-an auto-dispose provider; disposal clears pending input and delayed lookup
-results cannot mutate the cart.
+FIFO ensures one processing attempt per completed local frame, not global
+business idempotency. Checkout remains responsible for sale idempotency.
 
-The listener is enabled only while the New Sale modal route is current. Blocking
-dialogs disable capture and closing the dialog re-enables it. Each processed
-scan emits one monotonic-ID typed feedback event with safe success/error text.
-New Sale consumes each event once and replaces the current scanner snackbar, so
-the FIFO queue is never blocked and visual notifications cannot accumulate.
+## Failure And Recovery Rules
 
-Physical TURBOGEAR TB-00D verification and physical Android camera validation
-remain pending. Full scanner E2E status is partial until hardware validation
-completes.
+Incomplete HID frame resets after inactivity without cart mutation. Disconnected
+scanner leaves manual search available. Not-found/ambiguous results do not add
+items. Camera denial shows settings guidance; cancellation is silent. Lifecycle
+interruption disposes the session and prevents background scans.
 
-## Camera scanner
+## Offline Behavior
 
-The New Sale Scanner button opens a `mobile_scanner` camera dialog on Android
-and iOS. The dialog owns a rear-camera controller, accepts EAN-13, EAN-8,
-UPC-A, Code 128, and Code 39, preserves the raw string, and locks after the
-first valid frame. It stops and closes before returning the barcode to the same
-search-cleanup and `PosBarcodeScanController` pipeline used by USB HID scans.
+Exact backend lookup currently requires connectivity unless an approved,
+versioned offline barcode catalog exists. Cached stock/price cannot override
+backend-final checkout validation.
 
-Android camera permission and optional camera hardware are declared; iOS has a
-camera usage description. Permission, unavailable-camera, initialization, and
-unsupported-platform results use safe local feedback. Windows/Linux do not
-start the plugin and direct the cashier to the connected HID scanner. Close or
-back cancellation does not clear search or enqueue a scan. Physical Android
-camera validation remains pending.
+## Automated Testing
 
-Integrated New Sale widget verification confirms focused search-controller and
-query clearing, pending 350 ms debounce cancellation, no general catalog request
-for the completed barcode, exact device-scoped lookup, failure cleanup, next-scan
-readiness, feedback replay prevention across rebuild, and manual-search
-regression coverage.
+Existing widget/provider tests cover framing, leading zero, FIFO, repeated
+sessions, exact lookup, cart increment, feedback, permission denial, cancellation
+and unsupported platform behavior.
+
+## Physical Verification
+
+TB-00D repeated/rapid scan acceptance and Android/iOS camera permission,
+lifecycle, printed-code recognition and performance remain Not Run.
+
+## Production Definition Of Done
+
+Pass HID and camera matrices on supported devices; prove leading-zero,
+quantity-per-scan, rapid FIFO, route/dialog isolation, not-found/ambiguity,
+stock/price authority, accessibility and regression behavior with evidence.
+
+## Current Implementation Status
+
+Implemented — Physically Unverified. Exact lookup/FIFO/camera source exists;
+physical production acceptance is incomplete.
+
+## Known Gaps
+
+Physical TB-00D/camera matrix, supported symbology decision, offline catalog
+policy, duplicate-data operational cleanup and numeric stability targets.
+
+## Implementation Sequence
+
+Run Hardware Chunk 3 after device/test-audit foundation; close code gaps found
+by physical matrix, then re-run checkout regression.
+
+## Related Files
+
+- [[POS_Hardware_Integration]]
+- [[../10_TESTING_QA/POS_Hardware_Production_Acceptance_Matrix]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Error_Handling]]
+- [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Implementation_Status]]
+
+## Hardware Chunk 3 production implementation (2026-07-29)
+
+Supported modes are `usbHid` and `camera`. HID uses a route-scoped
+`HardwareKeyboard` handler behind `PosHidScannerInputService`; characters
+inside the configured timeout form one buffer and Enter emits it once. Timeout
+resets incomplete input. Leading zeroes and allowed case remain intact.
+
+Camera uses existing `mobile_scanner`. First-frame gating suppresses duplicate
+callbacks; resources stop in inactive/background states, resume on the active
+dialog and dispose on navigation.
+
+New Sale uses the FIFO lookup/cart path. Hardware Testing uses only
+`BarcodeScannerTestController`, stores SHA-256/length instead of raw values and
+finalizes after operator confirmation. Deduplication is event-scoped, so
+intentional repeated scans are not blocked. Automated status is green;
+physical TB-00D, camera, 50-scan and POS80 acceptance remain pending.

@@ -1,9 +1,7 @@
 <!-- title: Flutter Hardware Payment Receipt -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-18 -->
-
-
+<!-- last_updated: 2026-07-29 -->
 # Flutter Hardware Payment Receipt
 
 ## Purpose
@@ -25,7 +23,7 @@ platform and hardware integration.
 
 ## Receipt Printer Architecture (Step 10)
 
-One shared backend; each trusted POS device has its own local printer
+One shared backend; each activated POS device has its own local printer
 configuration keyed by `deviceId` in secure storage
 (`pos.device.{deviceId}.printerConfig`).
 
@@ -36,9 +34,12 @@ Adapters (exactly one selected per print):
 - `UsbReceiptPrinterAdapter`
 - `BluetoothReceiptPrinterAdapter`
 - `NetworkReceiptPrinterAdapter`
+- `LocalPrintAgentAdapter`
 
-Generator: `EscPosReceiptGenerator` — formats Completion GET values only
-(58mm / 80mm). Does not recalculate totals.
+For Local Print Agent, Flutter sends typed authoritative receipt data and the
+.NET `EscPosReceiptBuilder` owns final ESC/POS bytes and RAW spooler delivery.
+`EscPosReceiptGenerator` remains the manual generator for direct adapters. Both
+support 58/80 mm but duplicate generator drift is an active maintenance risk.
 
 Print order:
 
@@ -47,14 +48,15 @@ Print order:
 3. Load current device printer config
 4. Select one adapter
 5. Connect / status
-6. Generate ESC/POS bytes
-7. Send bytes
+6. Persist durable print operation and stable request identity
+7. Local Agent adapter/client sends receipt contract over authenticated LAN HTTP
 8. On local success → `POST /api/v1/pos/receipts/{saleId}/print` audit
 9. Show Receipt printed
 
 Physical print success + audit failure → audit-only retry (no automatic reprint).
 
-**PHYSICAL_PRINTER_VERIFICATION: NOT_VERIFIED** for USB, Bluetooth, and Network.
+Direct USB/Bluetooth are fail-safe unsupported paths. Direct TCP remains
+separate and must never be a Local Agent fallback.
 
 ## Receipt Rule
 
@@ -72,6 +74,72 @@ Card and QR payments require backend/provider validation.
 Do not finalize card/QR payment offline.
 
 Never display full PAN, CVV, or provider tokens on receipts or Step 10 UI.
+
+### Chunk 1B state (2026-07-29)
+
+Flutter consumes backend receipt contract v2 and does not infer tender, tax or
+discount allocations. Automatic receipt printing resolves intended copies from
+the completed receipt policy, creates one stable request identity per
+`receiptId + copyType + copyIndex + purpose`, and audits each copy independently.
+The safe default is one customer copy and no merchant copy.
+
+Card selection must not be treated as cash. The backend production gateway is
+currently unavailable-by-default, so the cashier receives a not-configured
+failure and the sale is not completed. A real card-terminal adapter and the
+split-payment UI/controller remain pending.
+
+## Device Security And LAN
+
+- Local Agent base URL and timeout are device configuration.
+- API key is stored through secure storage and is never written to recovery state.
+- Blank key edits preserve the existing saved secret.
+- Private LAN CIDR allow-list and `X-Local-Print-Key` are both required.
+- No silent POST retry is allowed after timeout; use operation lookup.
+- Android debug may use explicitly scoped clear-text LAN HTTP. Release keeps
+  clear-text disabled and requires trusted HTTPS for production.
+
+## Receipt Contract And Copies
+
+- Flutter sends Agent API version `1` and receipt contract version `2`.
+- Agent accepts receipt contract v1 for backward compatibility.
+- Backend owns receipt number, lines, tenders, safe card display, discounts,
+  tax lines, totals, copy policy and historical reprint snapshot.
+- Automatic copies use stable identity per receipt/copy type/index/purpose.
+- Device receipt-printer configuration persists supported purposes and
+  customer/merchant copy counts. One customer and zero merchant remains the
+  fail-safe default when no usable policy is configured.
+
+### Hardware Chunk 2 state (2026-07-29)
+
+- Sale original/reprint and return/exchange/refund completion requests use the
+  structured Local Print Agent HTTP adapter; Local Agent never falls back to
+  direct TCP or Flutter-generated RAW bytes.
+- Requests carry purpose, receipt/configuration identity, references, item
+  groups, settlement lines and stable copy/request identity.
+- `receipt_print_logs` stores the selected route/configuration snapshot and
+  typed result/failure/unknown recovery context.
+- Timeout/partial output requires operation lookup or operator decision.
+  Confirmation is an audit-only linked record and does not print again.
+- Historical controlled reprint acceptance for non-sale receipt purposes and
+  the complete physical copy/error matrix remain pending.
+- Status: `PARTIALLY IMPLEMENTED / RUNTIME VERIFICATION REQUIRED`.
+
+### Hardware Chunk 2C state (2026-07-29)
+
+Receipt History now branches by persisted receipt type. Sale continues through
+the completed-sale reprint controller; issued Refund/Return and Exchange
+snapshots map to `ReturnReceipt` and the structured non-sale Agent contract.
+The mapper is case-insensitive for legacy snapshot property casing and does not
+perform current-price/tax lookups.
+
+`NonSaleReceiptPrintOrchestrator` resolves device policy, builds deterministic
+copy identities, prints each intended copy once, submits independent audits and
+aggregates all/partial/unknown/audit-pending states. Audit-only retry resubmits
+only stored audit payloads. Agent output uses `RETURN REPRINT`, `REFUND
+REPRINT`, or `EXCHANGE REPRINT` labels.
+
+Code and automated acceptance are implemented. Physical POS80 acceptance is
+pending, so the status is `IMPLEMENTED — PHYSICAL ACCEPTANCE PENDING`.
 
 ## Cash Drawer Rule
 
@@ -102,3 +170,10 @@ Show practical messages:
 - Receipt template missing.
 - Device not trusted.
 - Print audit could not be recorded (after physical success).
+
+### Hardware Chunk 3 scanner boundary (2026-07-29)
+
+Scanner configuration/tests reuse Hardware Chunk 1 APIs. Hardware Testing never
+calls cart state. Receipt barcode acceptance must compare the exact POS80
+printed value with TB-00D and camera where available; generated-byte tests are
+not physical acceptance for scanner or printer.

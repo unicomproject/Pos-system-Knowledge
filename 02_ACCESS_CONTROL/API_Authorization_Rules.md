@@ -106,6 +106,44 @@ Do not use umbrella-only checks such as `platform.subscriptions.manage` where gr
 | Cash in/out | Cash drawer entitlement, permission, open till |
 | Close till | Till permission, open till, cash count validation |
 
+## Storefront Customer Authentication Rules
+
+Customer authentication APIs are customer-facing online store APIs. They are not
+platform admin auth and they are not tenant staff auth.
+
+| API Area | Required Checks |
+|---|---|
+| Register | Storefront tenant context present, tenant active, unique email/phone inside tenant, valid password, terms/privacy consent captured, verification email delivery available. |
+| Verify email | Storefront tenant context present, tenant/customer/OTP match, active tenant and customer, latest pending OTP, expiry and attempt limits enforced. |
+| Resend verification | Storefront tenant context present, tenant active, account exists and is not already verified, previous pending OTPs invalidated before new OTP is sent. |
+| Forgot password | Storefront tenant context present, tenant active, safe non-enumerating response where applicable, reset token stored only as hash, email delivery available. |
+| Reset password | Storefront tenant context present, active reset token hash match, tenant/customer/account still active, token consumed after success. |
+| Login | Storefront tenant context present, tenant/customer/account active, password valid, email verified before sign-in, lockout rules enforced. |
+| Refresh | Storefront tenant context present, valid refresh cookie, token hash and session active, rotation and reuse detection enforced. |
+| Logout | `CustomerOnly` JWT, tenant_id/sub/session_id from token, current session revoked, refresh cookie cleared. |
+| Customer profile read/update | `CustomerOnly` JWT, tenant_id and customer id from token only, profile scoped to current customer and tenant. |
+
+Customer auth APIs must not accept `tenant_id`, `customer_id`, raw OTP hashes,
+password hashes, refresh-token hashes, or reset-token hashes from request bodies
+as source of truth. Frontend route guards are UX helpers only; backend auth and
+repository tenant filters remain the authority.
+
+Current implementation status and QA gaps are tracked in
+[[../15_IMPLEMENTATION_TRACKING/Backend/ECommerce/Customer_Auth_Implementation_Status]].
+## Storefront Collection And Checkout Rules
+
+Storefront public catalog and collection-option reads may use the storefront tenant context, but the backend must still validate that the tenant is active and that required entitlements are effective.
+
+| API Area | Required Checks |
+|---|---|
+| Collection options read | Active tenant, effective `online_store`, effective `click_collect`, outlet belongs to tenant, collection enabled for outlet. |
+| Checkout from cart/read/update/confirm | Customer JWT, active tenant, tenant/customer from token, session/cart scoped to same tenant and customer. |
+| Checkout collection update | Existing checkout session, selected outlet belongs to tenant, requested time is generated/valid for outlet configuration, inventory reservation moved atomically when outlet changes. |
+| Checkout confirm | Existing session, requested collection window present, collection timezone snapshot still matches outlet timezone, order created inside same tenant/customer scope. |
+| Tenant admin enabling outlet collection | Tenant active, outlet-management access, effective `click_collect`, valid current open business-hours configuration. |
+
+Checkout APIs must not accept tenant id or customer id from request payload as source of truth. Cross-tenant or cross-customer checkout session access returns not found. This release stores a requested collection window only; it does not reserve pickup-slot capacity.
+
 ## POS Payment And Receipt Rules
 
 Verified current backend behavior:

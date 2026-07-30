@@ -1,7 +1,7 @@
 <!-- title: Payment & Refund Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-07-17 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-29 -->
 
 # Payment & Refund Technical Contract
 
@@ -18,7 +18,8 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 | Card brand / last4 | Sanitized JSON only in `sales_payment_transactions.provider_response_json` |
 | UI mask | Backend builds `maskedCard` as `•••• {last4}`; Flutter must not invent masks |
 | Schema change | None — reuse existing columns |
-| Non-cash checkout | Blocked with `pos_checkout.payment_provider_required` until real provider adapter exists |
+| Card boundary | `ICardPaymentGateway`; unavailable-by-default in production |
+| Non-card methods | QR/Split fail explicitly; no cash fallback |
 | Domain write helper | `PosCompletedPaymentPersistence` (+ `SafePaymentDisplay`) |
 
 ## API Contract
@@ -63,6 +64,7 @@ history/ledger behavior where applicable.
 - Use feature-owned folders and typed services/providers.
 - Widgets/components must not call HTTP APIs directly.
 - Use DTOs in data layer, domain/view models in UI layer.
+- Flutter must not synthesize provider success or authoritative tender allocation.
 - Permission and entitlement checks are UX helpers only; backend remains final authority.
 - Browser online store and Flutter business app must share backend rules but keep separate user/auth surfaces.
 
@@ -74,6 +76,10 @@ history/ledger behavior where applicable.
 - Repository interfaces stay in application layer; EF implementations stay in infrastructure layer.
 - Audit/event rows are written for sensitive state changes.
 - Idempotency keys are required for retryable commands that can create duplicates.
+- Provider capture must complete before the database sale transaction. Unknown
+  provider state must not be converted into a paid sale.
+- Split completion must be one atomic transaction across all
+  `sales_payments`; current typed tender DTO alone does not meet this contract.
 
 ## Permission And Entitlement Contract
 
@@ -114,6 +120,16 @@ Test coverage must include:
 - Accounting settlement ledger
 - Chargeback management
 - PCI vault storage
+
+## Hardware Chunk 2C refund receipt contract (2026-07-29)
+
+Historical refund printing uses the issued `REFUND` receipt and its
+`receipt_data_json`; it does not call a payment provider or recalculate refund
+value. The existing receipt reprint permission/reason endpoint authorizes one
+controlled operation. Device policy then creates independently idempotent
+customer/merchant copies and immutable audits. Only safe persisted references
+may cross the Agent contract; PAN, CVV, PIN, credentials and arbitrary provider
+payloads remain excluded.
 
 ## Related Files
 

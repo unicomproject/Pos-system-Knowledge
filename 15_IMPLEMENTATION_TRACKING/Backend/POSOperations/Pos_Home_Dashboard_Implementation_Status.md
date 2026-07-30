@@ -1,7 +1,7 @@
 <!-- title: POS Home Dashboard Backend Implementation Status -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-13 -->
+<!-- last_updated: 2026-07-23 -->
 
 
 # POS Home Dashboard Backend Implementation Status
@@ -48,6 +48,23 @@ When device/till/session cannot be resolved, returns structured
   integration tests require the local PostgreSQL column
   `platform_users.created_by_platform_user_id`.
 - No schema or data change was made, and no migration is required for this fix.
+
+## Dashboard Contract Extension (2026-07-23)
+
+- Added additive `branding` projection using `tenant_profiles.trading_name`,
+  `tenant_profiles.logo_url`, and `tenants.display_name` fallback.
+- Added cashier effective tenant-role label from the latest active tenant role.
+- Added explicit `CURRENT_TILL_SESSION` summary scope, business date, session ID,
+  currency, gross sales, completed transaction count, completed refunds,
+  discounts, and net sales.
+- Summary includes only `COMPLETED` + `PAID` orders for the resolved till session.
+  Gross is reconstructed as total plus discount; net is gross minus discounts
+  and completed refunded amounts.
+- No database migration was required.
+- Focused verification: controller 1/1 pass; repository integration 5/5 pass.
+  Application/API/Infrastructure projects compile in Release. Full solution build
+  is blocked by the pre-existing duplicate `GetProductByBarcodeAsync` method in
+  `PosReturnServiceTests.FakeProductCatalogRepository`.
 
 ## Permissions
 

@@ -1,7 +1,7 @@
 <!-- title: Payment & Refund Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-07-17 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-29 -->
 
 # Payment & Refund Functional Rules
 
@@ -37,9 +37,13 @@ Verified Unified-Commerce rules (2026-07-17):
 - Prohibited persistence: full PAN, CVV/PIN, track/EMV raw payloads, provider secrets,
   access tokens, raw unfiltered provider responses in application logs or
   `provider_response_json`.
-- Production checkout currently blocks non-cash with `pos_checkout.payment_provider_required`
-  until a real provider adapter is integrated. Persistence mapping is ready for real
-  successful provider outcomes; tests use domain factories/fakes only.
+- Card checkout crosses `ICardPaymentGateway`. The production default returns
+  `card_provider_not_configured`; it never converts Card to Cash.
+- Completed provider results alone may use provider-capture persistence.
+  Declined, cancelled, pending, failed, unknown, and unavailable outcomes create
+  no sale/payment/stock/receipt mutation.
+- QR and Split currently return `payment_method_not_implemented`. Typed split
+  tender contract groundwork is not completed multi-payment execution.
 
 ## Return Step 1 / Step 2 masked payment display
 
@@ -68,6 +72,8 @@ Verified Unified-Commerce rules (2026-07-17):
 - Use loading, empty, error, permission-denied, feature-disabled, offline, and conflict states where relevant.
 - Do not hardcode role names such as cashier, manager, or administrator as authorization logic.
 - Do not show fake data, fake counts, fake success states, or hardcoded module rows.
+- Do not present Card or Split as available while their production execution
+  dependency is unavailable.
 - Mobile, tablet, iPad, laptop, and desktop layouts must keep the same business rules.
 
 ## Backend Rules
