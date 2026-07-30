@@ -1,7 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-13 -->
+<!-- last_updated: 2026-07-29 -->
 
 # API Authorization Rules
 
@@ -48,7 +48,11 @@ Frontend route guards and menu filtering are UX only. Backend service checks are
 
 | API Area | Required permission(s) |
 |---|---|
-| Platform dashboard | `platform.dashboard.view` |
+| Platform dashboard page / aggregate API / R1 basic System Health | `platform.dashboard.view` |
+| Dashboard → tenant metrics / attention navigation | `platform.tenants.view` (destination/data; page may still load without it) |
+| Dashboard commercial widgets (MRR, pending billing, past-due values) | `platform.billing.view` (MRR additionally requires `platform.tenant_subscriptions.view`; hide when absent) |
+| Dashboard Platform Users count | `platform.users.view` |
+| Dashboard tenant-subscription metric widgets | `platform.tenant_subscriptions.view` (approved; **Partially Implemented** — catalogue/seed/Super Administrator grant + Backend Dashboard filtering present; Frontend widget/nav gating incomplete). Default grant: `super_administrator` only; Billing Admin, Support Admin, custom roles require explicit assignment. Permission-hidden sections must be omitted/hidden — not returned as authentic-looking zeros. |
 | Tenant list/summary/filter | `platform.tenants.view` |
 | Tenant create | `platform.tenants.create` |
 | Tenant update | `platform.tenants.update` |

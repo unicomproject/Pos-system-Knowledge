@@ -1,9 +1,36 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-10 -->
+<!-- last_updated: 2026-07-29 -->
 
 # Platform Subscription Plan API Endpoints
+
+## Platform Authentication (Unified Commerce)
+
+Official base route: `/api/v1/platform-auth` · Controller: `PlatformAuthController`.
+
+| Method | Canonical Endpoint | Purpose | Auth |
+|---|---|---|---|
+| POST | `/api/v1/platform-auth/login` | Platform User login | Anonymous + rate limit |
+| POST | `/api/v1/platform-auth/refresh` | Rotate Platform Admin session | Anonymous with refresh cookie |
+| POST | `/api/v1/platform-auth/logout` | Revoke Platform Admin session | `PlatformOnly` |
+| GET | `/api/v1/platform-admin/audit-logs` | Read login security audit | `platform.audit.view` |
+
+Refresh token cookie: `platform_refresh_token` · canonical path `/api/v1/platform-auth` · HttpOnly · SameSite=Strict.
+
+Journey and full contract: [[../03_USER_JOURNEYS/Platform_Admin/01_Login_Flow]].
+
+### Legacy compatibility aliases (not canonical)
+
+Controller: `PlatformAuthLegacyController` · shared service: `PlatformAuthService`.
+
+| Method | Legacy Endpoint | Note |
+|---|---|---|
+| POST | `/api/v1/auth/platform-login` | Compatibility only — different response envelope and cookie path `/api/v1/auth` |
+| POST | `/api/v1/auth/platform-refresh` | Compatibility only |
+| POST | `/api/v1/auth/platform-logout` | Compatibility only — anonymous optional cookie logout; returns 200 boolean envelope |
+
+Do **not** document legacy aliases as equal primary contracts. New development and tests should target `/api/v1/platform-auth/*`. The current Angular Platform Admin client still uses the legacy paths (documented gap **SA-AUTH-GAP-01**).
 
 ## Tenant POS Login (Unified Commerce)
 
@@ -124,19 +151,48 @@ backend and integrated by frontends.
 
 Base route: `/api/v1/platform-admin/dashboard`
 
-All endpoints require platform JWT authentication.
+All endpoints require platform JWT authentication (`PlatformOnly`).
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/platform-admin/dashboard` | `platform.dashboard.view` | Load platform dashboard KPIs and attention items |
+| Method | Endpoint | Purpose | Authentication | Permission | Current Status |
+|---|---|---|---|---|---|
+| GET | `/api/v1/platform-admin/dashboard` | Platform dashboard aggregate | PlatformOnly | `platform.dashboard.view` | **Mostly Implemented** |
 
-### Dashboard response contract (attention)
+Product contract (user category, widgets, MRR, health, gaps): [[03_USER_JOURNEYS/Platform_Admin/02_Platform_Dashboard_Flow]].
 
-Top-level counts include `totalTenants`, `activeTenants`, `suspendedTenants`, `trialTenants`, subscription totals, `pendingBillingCount`, outlet/till/user totals, `recentTenants`, `attentionItems`, `generatedAt`.
+### Current request contract
 
-`attentionItems[]` types (authoritative):
+- No query parameters.
+- No request body.
+- Permission checked in `PlatformDashboardService` (`platform.dashboard.view`).
+- Missing identity claim → **401** `platform_auth.invalid_session`.
+- Missing permission → **403** `platform_dashboard.access_denied`.
+- Failure model today: **atomic** whole response (no section-level partial failure yet).
 
-| `type` | Count definition |
+### Current response envelope
+
+Legacy `{ success, message, data }` wrapping `PlatformDashboardResponse`.
+
+### Current `data` fields (implemented)
+
+| Field | Meaning |
+|---|---|
+| `totalTenants` | Tenant count |
+| `activeTenants` | Lifecycle status `active` |
+| `suspendedTenants` | Lifecycle status `suspended` |
+| `trialTenants` | Tenants with subscription status `TRIAL` (subscription dimension, not lifecycle) |
+| `totalSubscriptions` | All tenant subscriptions |
+| `activeSubscriptions` | Subscription status `ACTIVE` |
+| `pendingBillingCount` | Invoices `PENDING` with `balance_due > 0` |
+| `totalOutlets` | Outlets excluding status `DELETED` |
+| `totalTills` | Tills excluding status `DELETED` |
+| `totalUsers` | **Tenant users** excluding `DELETED` (not platform users) |
+| `recentTenants[]` | Latest five tenants by `createdAt` (`id`, `code`, `name`, `status`, `createdAt`) |
+| `attentionItems[]` | Attention rows (`type`, `title`, `description`, `count`, `severity`) |
+| `generatedAt` | UTC generation timestamp |
+
+### Current attention types
+
+| `type` | Count definition (current implementation) |
 |---|---|
 | `suspended_tenants` | Tenants with status `suspended` |
 | `pending_activation` | Tenants with lifecycle status `PENDING_ACTIVATION` |
@@ -145,13 +201,29 @@ Top-level counts include `totalTenants`, `activeTenants`, `suspendedTenants`, `t
 
 `pendingBillingCount` must equal the `pending_billing` attention count. SA-P0-02 fixed a crossed assignment between `past_due_subscriptions` and `pending_billing` counts (2026-07-20).
 
-Verification on 2026-07-02:
+### Approved future additions (not implemented — do not treat as live fields)
 
-- Migration `20260618180000_SeedPlatformAdminPermissions` applied.
-- Historical verification on 2026-07-02: login `posunique001@gmail.com` returned 31 platform permissions for `super_administrator`. This is a point-in-time test observation, not the current catalogue size; the authoritative catalogue now contains 36 permission codes (see [[02_ACCESS_CONTROL/Permission_Code_List]]).
-- Dashboard GET returned 200 with valid JWT.
+Documented final decisions in [[02_Platform_Dashboard_Flow]] (2026-07-29):
 
-Local re-verify 2026-07-20: dashboard attention counts agreed with PostgreSQL; see [[SA-P0-02_Dashboard_Attention_Count_Fix]].
+| Addition | Approved rule |
+|---|---|
+| Per-currency MRR | `ACTIVE` only; no FX; monthly÷1, yearly÷12; quarterly÷3 when supported; currency precision; MRR currency groups include `currencyCode`, `decimalPlaces`, and `amount`; rounding mode `MidpointRounding.ToEven`; requires `platform.tenant_subscriptions.view` + `platform.billing.view`. If any eligible currency has missing/invalid central metadata → entire Revenue section UNAVAILABLE (`platform_dashboard.currency_metadata_unavailable` concept); empty eligible set → success empty/zero (not metadata failure). |
+| Historical trends / % change | Real series — not hard-coded zeros |
+| Real System Health | API, DB, jobs, email, payment, blob; HEALTHY/DEGRADED/CRITICAL/UNKNOWN |
+| Lifecycle / subscription separation | draft/setup_pending/pending_activation/pending_payment → Setup Pending; Trial subscription-only |
+| Setup Pending | Dashboard count only; detail progress; count≡filter |
+| Permission-filtered widgets | `platform.tenants.view` (tenant data/nav) / `platform.tenant_subscriptions.view` (tenant subscription widgets + navigation) / `platform.billing.view` (MRR + revenue/financial values) / `platform.users.view`. **Partial BE filtering present**; permission-hidden metrics must be omitted/hidden — not authentic-looking zeros. |
+| Trend period timezone | Platform Default Timezone defines daily/weekly/monthly period boundaries (DST-safe); backend converts local boundaries to UTC for persisted-record queries; no client timezone override (no new query parameter); invalid/missing timezone → trends unavailable |
+| Currency precision source | Monetary precision follows central backend ISO-aligned currency metadata (`currencies.decimal_places`); frontend must not hard-code per-currency precision maps; missing/invalid metadata for any eligible MRR currency → whole Revenue UNAVAILABLE (closed SA-DASH-DECISION-PENDING-01) |
+| Section-level status / errors | HTTP 200 partial sections when any section succeeds; conceptual DTO not live |
+| Platform Users count | Distinct from `totalUsers` (tenant users); requires `platform.users.view` |
+
+### Verification notes
+
+- Migration `20260618180000_SeedPlatformAdminPermissions` applied historically; additional migration `20260729153000_SeedTenantSubscriptionsViewPermission` adds `platform.tenant_subscriptions.view` + Super Administrator grant.
+- Authoritative catalogue size: **37** business permission codes (see [[02_ACCESS_CONTROL/Permission_Code_List]]).
+- Local re-verify 2026-07-20: attention counts agreed with PostgreSQL; see [[SA-P0-02_Dashboard_Attention_Count_Fix]].
+- Dashboard remains **Mostly Implemented** until SA-DASH-GAP-01…14 are closed and verified. Gap-completion audit: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-07-29-platform-dashboard/Platform_Dashboard_Second_Brain_Gap_Completion_Audit]]. SA-DASH-GAP-13 / widget permission filtering are **Partially Implemented**; SA-DASH-DECISION-PENDING-01 (missing currency metadata) is **Closed — Approved final**. All Dashboard gap product decisions are documentation-complete for implementation.
 
 ---
 

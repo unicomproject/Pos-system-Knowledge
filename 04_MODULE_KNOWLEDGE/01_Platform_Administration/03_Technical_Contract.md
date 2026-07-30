@@ -1,7 +1,8 @@
 <!-- title: Platform Administration Technical Contract -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-07-27 -->
+<!-- last_updated: 2026-07-29 -->
+<!-- note: Platform Dashboard contract added; journey SoT is 02_Platform_Dashboard_Flow -->
 
 # Platform Administration Technical Contract
 
@@ -25,7 +26,7 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
 | Area | Contract |
 |---|---|
-| API groups | `/api/v1/platform-admin/users`, `/api/v1/platform-admin/roles`, `/api/v1/platform-admin/permissions`, `/api/v1/platform-admin/settings`, `/api/v1/platform-admin/audit-logs`, `/api/v1/platform-admin/tenants`, `/api/v1/platform-admin/catalog`, `/api/v1/platform-auth/password-reset` (public validate/complete; legacy alias under `/api/v1/auth/platform-password-reset`) |
+| API groups | `/api/v1/platform-auth`, `/api/v1/platform-admin/dashboard`, `/api/v1/platform-admin/users`, `/api/v1/platform-admin/roles`, `/api/v1/platform-admin/permissions`, `/api/v1/platform-admin/settings`, `/api/v1/platform-admin/audit-logs`, `/api/v1/platform-admin/tenants`, `/api/v1/platform-admin/catalog`, `/api/v1/platform-auth/password-reset` |
 | Request format | Typed request DTOs; no raw map payloads in application layer |
 | Response format | Typed response DTOs with safe fields only |
 | Error format | Standard API error response |
@@ -42,6 +43,8 @@ Tenant API lifecycle transition:
 
 | API Group | Purpose |
 |---|---|
+| `/api/v1/platform-auth` | **Official** Platform User login, refresh, logout |
+| `/api/v1/platform-admin/dashboard` | Platform Dashboard aggregate (see Platform Dashboard Contract) |
 | `/api/v1/platform-admin/users` | Module API group |
 | `/api/v1/platform-admin/roles` | Module API group |
 | `/api/v1/platform-admin/permissions` | Module API group |
@@ -49,6 +52,128 @@ Tenant API lifecycle transition:
 | `/api/v1/platform-admin/audit-logs` | Read-only platform login/security audit list (`platform_login_audits`) |
 | `/api/v1/platform-admin/tenants` | Tenant list, detail, create-options, create, update, activate, suspend, entitlements |
 | `/api/v1/platform-admin/catalog` | Platform modules catalog read for Modules & Features admin page |
+
+## Platform Dashboard Contract
+
+Canonical endpoint: `GET /api/v1/platform-admin/dashboard`  
+Controller: `PlatformAdminDashboardController` · Auth: `PlatformOnly` · Permission: `platform.dashboard.view`.
+
+| Item | Contract |
+|---|---|
+| Current status | **Mostly Implemented** — not Completed |
+| Current response | Atomic aggregate `PlatformDashboardResponse` (tenant/subscription counts, attention items, recent tenants, outlets/tills/tenant-user totals, `generatedAt` UTC) |
+| Current failure | Whole-response success or failure (no section-level status yet) |
+
+### Dashboard Revenue Rules
+
+- Per-currency MRR; **no FX** conversion or cross-currency totals.
+- Include `ACTIVE` paid subscriptions only; exclude `TRIAL`, `PAST_DUE`, `CANCELLED`, `EXPIRED`, one-time.
+- Normalise: monthly ÷ 1, yearly ÷ 12; quarterly ÷ 3 when the data model supports quarterly (not in current billing-cycle constants).
+- Round using currency precision; display separate currency groups (e.g. LKR MRR, USD MRR).
+
+### Dashboard Lifecycle Rules
+
+- Buckets: Setup Pending / Active / Suspended / Inactive (mutually exclusive).
+- Map: `draft`, `setup_pending`, `pending_activation`, `pending_payment` → Setup Pending; `active` → Active; `suspended` → Suspended; `inactive` → Inactive.
+- Trial is subscription-only. Inactive is never residual arithmetic.
+- `pending_payment` may also raise Pending Billing attention when payment action is required.
+
+### Dashboard Health Rules
+
+- Real technical health: API, database, background jobs, email, payment provider, blob storage.
+- Statuses: `HEALTHY`, `DEGRADED`, `CRITICAL`, `UNKNOWN` (critical vs non-critical aggregation).
+- Not derived from attention/billing/suspended counts. R1 basic summary under `platform.dashboard.view`.
+
+### Dashboard Permission Rules
+
+| Concern | Permission |
+|---|---|
+| Page / basic health summary | `platform.dashboard.view` |
+| Tenant widget data / navigation | `platform.tenants.view` |
+| Billing / MRR | `platform.billing.view` |
+| Platform Users count | `platform.users.view` |
+| Dedicated tenant-subscription view | `platform.tenant_subscriptions.view` (catalogue + Super Administrator seed/migration; BE+FE Dashboard gating verified 2026-07-30 via SUBS persona — SA-DASH-GAP-13 Completed and Verified) |
+
+### Dashboard Subscription Access
+
+- Approved permission: `platform.tenant_subscriptions.view`
+- Purpose: view tenant-level subscription lifecycle and subscription summary widgets.
+- Distinction:
+  - Not `platform.subscription_plans.view` (plan catalogue/definitions).
+  - Not `platform.billing.view` (invoices/payments/revenue).
+- MRR requires BOTH `platform.tenant_subscriptions.view` and `platform.billing.view`.
+- Default role assignment (approved): `super_administrator` receives this permission by default; Billing Admin, Support Admin, and custom platform roles require explicit assignment.
+- Runtime authorization remains permission-based, not role-name-based.
+- Current status: **Completed and Verified** (2026-07-30) — catalogue/seed/migration + BE/FE Dashboard gating via SUBS persona; omit/hide (not fake-zero) verified (Gap: `SA-DASH-GAP-13`).
+- Evidence audit: [[../../15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-07-29-platform-dashboard/Platform_Dashboard_Implementation_Evidence_2026-07-29]].
+
+See the full product contract: [[../../03_USER_JOURNEYS/Platform_Admin/02_Platform_Dashboard_Flow]].
+
+### Dashboard Trend Timezone
+
+- Platform Default Timezone is authoritative for all dashboard trend-period boundaries.
+- Data remains stored/queried using UTC instants; backend converts local period edges (in Platform Default Timezone) to UTC for queries.
+- DST-safe rules apply using timezone identifiers (no fixed offsets).
+- If Platform Default Timezone is missing/invalid/unresolvable, classify trends as unavailable.
+- Current status: **Completed and Verified** (2026-07-30) — historical daily trends + Platform Default Timezone (Gap: `SA-DASH-GAP-02`).
+
+### Currency Metadata Authority
+
+- Central backend currency metadata source aligned with ISO 4217 is authoritative for currency minor-unit precision.
+- Minor-unit precision comes from `currencies.decimal_places` for each ISO `currencies.currency_code`.
+- Dashboard/Frontend must not hard-code per-currency decimal maps; rounding uses the approved backend currency-precision contract.
+- MRR rounding is applied at the final currency-group output boundary per `CurrencyCode` (no FX).
+- Approved target API/DTO contract (conceptual — not implemented): each per-currency MRR group in the dashboard response includes `currencyCode`, `decimalPlaces`, and `amount`.
+- Approved monetary rounding mode (target contract): when rounding to `decimalPlaces`, use `MidpointRounding.ToEven`.
+- **Missing/invalid currency metadata (closed SA-DASH-DECISION-PENDING-01):** if any eligible ACTIVE MRR currency cannot be resolved (no row, missing/null/invalid `decimal_places`, unsupported precision, duplicate/conflicting metadata, or otherwise unresolvable), mark the **entire Revenue / MRR section** UNAVAILABLE. Do not omit silently, default precision, assume 2 dp, infer from locale, substitute tenant default currency, FX-convert, or return zero for the affected group. Preserve other successful sections; HTTP 200 when another useful section succeeds; safe error-code concept `platform_dashboard.currency_metadata_unavailable` (not claimed implemented); secure backend log of CurrencyCode; FE safe unavailable + Refresh retry. Empty eligible ACTIVE subscriptions → successful empty/zero Revenue state (not a metadata failure).
+- Current status: **Completed and Verified** (unit + live single-currency MRR groups) — Gap: `SA-DASH-GAP-14`. Forced missing-metadata UNAVAILABLE UI remains under GAP-07 live verification.
+
+### Dashboard Failure Contract
+
+| Mode | Rule |
+|---|---|
+| Current | Atomic aggregate; whole-page error |
+| Target | HTTP **200** with per-section status when any section succeeds; **5xx** only when no useful section; conceptual sectioned DTO not implemented |
+
+Full journey, metric definitions, acceptance criteria, and gap IDs **SA-DASH-GAP-01…14**:
+
+[[../../03_USER_JOURNEYS/Platform_Admin/02_Platform_Dashboard_Flow]]
+
+## Platform Authentication API Group
+
+Official group: `/api/v1/platform-auth` · Controller: `PlatformAuthController`.
+
+| Method | Endpoint | Purpose | Auth |
+|---|---|---|---|
+| POST | `/api/v1/platform-auth/login` | Platform User login | Anonymous + rate limit |
+| POST | `/api/v1/platform-auth/refresh` | Rotate session via refresh cookie | Anonymous + refresh cookie |
+| POST | `/api/v1/platform-auth/logout` | Revoke current platform session | `PlatformOnly` |
+
+Contract rules:
+
+- Refresh token is cookie-only (`platform_refresh_token`, path `/api/v1/platform-auth`); not returned in JSON.
+- Canonical login/refresh response model is `PlatformAdminLoginResponse` (`accessToken`, `accessTokenExpiresAt`, `refreshTokenExpiresAt`, `user`, `permissions`).
+- Logout success is HTTP **204 No Content**.
+- Login requires at least one active `platform.*` permission after credential validation.
+- Login security events are written to `platform_login_audits`; retrieval uses `GET /api/v1/platform-admin/audit-logs` with `platform.audit.view`.
+
+### Legacy compatibility aliases
+
+| Legacy endpoint | Role |
+|---|---|
+| `POST /api/v1/auth/platform-login` | Compatibility only (`PlatformAuthLegacyController`) |
+| `POST /api/v1/auth/platform-refresh` | Compatibility only |
+| `POST /api/v1/auth/platform-logout` | Compatibility only |
+
+Legacy aliases share `PlatformAuthService` but use a different response envelope, cookie path (`/api/v1/auth`), and logout semantics. They are **not** an equal primary contract.
+
+### Current Angular migration gap
+
+The Platform Admin Angular app currently calls the legacy `/api/v1/auth/platform-*` endpoints and expects the legacy envelope. Migration to `/api/v1/platform-auth/*` is documented as **SA-AUTH-GAP-01** and is not completed.
+
+Full journey, lockout, refresh reuse, error codes, and acceptance criteria:
+
+[[../../03_USER_JOURNEYS/Platform_Admin/01_Login_Flow]]
 
 ## Database Contract
 
@@ -283,3 +408,7 @@ Tenant lifecycle alignment minimum future tests:
 
 - [[04_MODULE_KNOWLEDGE/01_Platform_Administration/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/01_Platform_Administration/02_Functional_Rules]]
+- [[../../03_USER_JOURNEYS/Platform_Admin/01_Login_Flow]]
+- [[../../03_USER_JOURNEYS/Platform_Admin/02_Platform_Dashboard_Flow]]
+- [[../../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]]
+- [[../../02_ACCESS_CONTROL/Permission_Code_List]]
