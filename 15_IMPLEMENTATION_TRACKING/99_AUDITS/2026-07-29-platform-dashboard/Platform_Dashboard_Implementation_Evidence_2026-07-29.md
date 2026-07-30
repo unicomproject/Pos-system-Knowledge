@@ -105,11 +105,11 @@ Approved destination (Second Brain §13 / GAP-05): **tenant detail / activation 
 
 | Suite | Passed | Failed | Skipped |
 |---|---:|---:|---:|
-| Backend UnitTests | 512 | 0 | 0 |
-| Backend Dashboard unit filter | 40 | 0 | 0 |
-| Backend Dashboard ApiTests | 6 | 0 | 0 |
-| Backend Dashboard Integration | 8 | 0 | 0 |
-| Frontend unit/component | 408 | 0 | 0 |
+| Backend UnitTests (`E_POS.UnitTests`) | 745 | 0 | 0 |
+| Backend ApiTests (`E_POS.ApiTests`) | 336 | 0 | 0 |
+| Backend IntegrationTests (`E_POS.IntegrationTests`) | 380 | 0 | 0 |
+| Total Backend Solution CI | 1461 | 0 | 0 |
+| Frontend unit/component | 138 / 420 | 0 | 0 |
 | Playwright Dashboard E2E | 11 | 0 | 0 |
 | Frontend production build | succeeded | — | style budget warnings |
 | Frontend lint | N/A (no lint target) | — | — |
