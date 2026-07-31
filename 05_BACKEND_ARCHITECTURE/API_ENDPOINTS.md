@@ -951,6 +951,30 @@ saved sale/payment outcome.
 simple/non-variant products so Flutter can send `{ variantId, qty }` to checkout
 summary/start-payment without substituting product IDs.
 
+Additionally, this endpoint supports a planned `segment` query parameter to filter and rank products (Implementation Target):
+- `all` (default): Returns all active, sellable products in the outlet.
+- `popular`: Returns manually curated products mapped to the tenant-scoped reserved collection code `POS_POPULAR` sorted by `sort_order`.
+- `frequently-sold`: Dynamically aggregates and ranks products based on net completed sales ($max(qty - cancelled - returned, 0)$) at the current outlet over a rolling 30-day window.
+- `offers`: Dynamically aggregates products with active targeted discount policies or special prices (compare-at price > selling price).
+
+Query parameters:
+- `deviceId` (Guid, required): Resolves the trusted tenant, outlet, and POS channel context.
+- `segment` (string, optional): One of `all`, `popular`, `frequently-sold`, `offers`. Invalid values return HTTP 400.
+- `categoryId` (Guid, optional): Filters results within the selected segment.
+- `search` (string, optional): Text search query evaluated within the selected segment.
+
+Computed offer projection properties in `PosProductSummaryResponseDto` (Planned):
+- `hasOffer` (bool): Indicates if an active offer or special price is available.
+- `offerType` (string): Promotion type (e.g. `percentage`, `fixed_amount`, `special_price`, `conditional`).
+- `offerPolicyId` (Guid, nullable): Unique identifier for the discount policy or price list.
+- `offerName` (string): Human-readable campaign/policy name.
+- `originalPrice` (decimal): Original selling price before the offer.
+- `sellingPrice` (decimal): Effective resolved selling price.
+- `offerPrice` (decimal, nullable): Unconditionally calculated unit price under the offer.
+- `discountLabel` (string): Badge label text (e.g., "15% OFF" or "Offer available").
+- `requiresCartValidation` (bool): True if qualification depends on cart totals or items.
+- `requiresManagerApproval` (bool): True if manager approval is required to apply the discount.
+
 `GET /api/v1/pos/products` product summaries expose variant search metadata for
 New Sale filtering. Product name remains the primary search key; variant terms
 only refine product-name searches, while exact SKU/barcode remains a direct

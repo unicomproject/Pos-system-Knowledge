@@ -1,7 +1,7 @@
 <!-- title: Flutter Cashier POS Implementation Map -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-07-31 -->
 
 
 # Flutter Cashier POS Implementation Map
@@ -38,6 +38,10 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 | Checkout summary | Wired | `POST /api/v1/pos/checkout/summary` | Integrated for current online cash flow |
 | Cash payment | Wired | Checkout summary/start-payment | Testing |
 | Receipt print audit | Wired | `POST /api/v1/pos/receipts/{saleId}/print` | Testing |
+| Discovery segments | Toggle buttons styled | `GET /api/v1/pos/products?segment=` | Planned (Not Started) |
+| Popular Products | Curation UI planned | Bootstraps `POS_POPULAR` reserved collection | Planned (Not Started) |
+| Frequently Sold | UI chip disabled | Aggregates completed order lines on the fly | Planned (Not Started) |
+| Offers / Promotions | Card badges planned | Checks active targeted policies and special price lists | Planned (Not Started) |
 
 ## POS Home Card Status
 
@@ -116,6 +120,9 @@ a 56 logical-pixel pastel circular container and a 30 logical-pixel glyph.
 - [[../15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/Pos_Products_List_Implementation_Status]]
 - [[../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]]
 - [[../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Cashier_POS_Second_Brain_vs_Code_Comparison_Implementation_Status]]
+- [[../04_MODULE_KNOWLEDGE/21_POS_Operations/04_Popular_Product_Discovery_Feature]]
+- [[../04_MODULE_KNOWLEDGE/21_POS_Operations/05_Frequently_Sold_Product_Discovery_Feature]]
+- [[../04_MODULE_KNOWLEDGE/21_POS_Operations/06_Offers_Product_Discovery_Feature]]
 
 ### Hardware Chunk 3 scanner map
 

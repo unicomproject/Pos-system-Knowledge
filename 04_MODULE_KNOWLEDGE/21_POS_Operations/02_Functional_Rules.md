@@ -32,6 +32,10 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Cash movement schema is not a successful cashier movement without a mutation
   API and persistence result.
 - Customer display is future unless explicitly enabled.
+- **Product Discovery Segments**: Cashier New Sale supports filtering products by segments: Popular, Frequently Sold, and Offers. Selecting these segments updates only the catalog grid and preserves cart, customer, and totals.
+- **Popular Products Configuration**: Uses a tenant-scoped reserved collection code `POS_POPULAR` and type `POS_QUICK_LIST` for manual product assignments and sorting order.
+- **Frequently Sold Calculation**: Aggregates net sold quantities ($max(quantity - cancelled - returned, 0)$) for completed sales at the current outlet over a rolling 30-day window.
+- **Offers & Special Pricing**: Dynamically lists active targeted discount policies and price lists. The lowest effective unit price is selected when multiple offers apply.
 
 ## User Rules
 
@@ -88,3 +92,6 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/03_Technical_Contract]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/04_Popular_Product_Discovery_Feature]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/05_Frequently_Sold_Product_Discovery_Feature]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/06_Offers_Product_Discovery_Feature]]

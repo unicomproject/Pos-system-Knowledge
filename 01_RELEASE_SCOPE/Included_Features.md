@@ -1,7 +1,7 @@
 <!-- title: Included Features -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-27 -->
+<!-- last_updated: 2026-07-31 -->
 
 
 # Included Features
@@ -21,7 +21,7 @@ in other EPOS or e-commerce products.
 ## Application Surfaces
 
 | Surface | Included | Notes |
-|---|---:|---|
+|---|---|---|
 | Mobile POS | Yes | Phone/tablet selling flow |
 | Desktop EPOS | Yes | Laptop/desktop business operation |
 | Online Store | Yes | Customer product browsing and ordering |
@@ -65,7 +65,7 @@ and audit visibility.
 
 Included: business setup, outlet/till management, device and hardware profile
 setup, user management, role/permission management, product and variant
-management, category/attribute/image/barcode management, inventory visibility,
+management, category/attribute/image/barcode management, Popular Products list curation and manual reordering (under Collection management), inventory visibility,
 stock in, stock adjustment, alerts, movement history, and reports.
 
 ## POS Operations
@@ -76,6 +76,7 @@ Included:
 - Device activation and trusted device validation.
 - Outlet and till selection.
 - Till open, current till session, cash count, and cash movements.
+- Product discovery segment filtering (Popular by default, Frequently Sold, Offers).
 - Product lookup, barcode scan, basket/cart, quantity changes, and item removal.
 - Price, tax, discount, and receipt calculation.
 - Cash payment.

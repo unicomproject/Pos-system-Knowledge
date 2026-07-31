@@ -1,7 +1,7 @@
 <!-- title: POS Flow Test Cases -->
 <!-- status: Draft -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-31 -->
 
 # POS Flow Test Cases
 
@@ -44,4 +44,10 @@
 
 Manual and physical cases remain `Not Verified` until a dated device/result
 record exists. Test filenames alone are not pass evidence.
+
+## Product Discovery Segment Test Cases
+
+- [[Test_Case/21_POS_Operations/POS_Popular_Product_Discovery_Test_Cases]]
+- [[Test_Case/21_POS_Operations/POS_Frequently_Sold_Product_Discovery_Test_Cases]]
+- [[Test_Case/21_POS_Operations/POS_Offers_Product_Discovery_Test_Cases]]
 
