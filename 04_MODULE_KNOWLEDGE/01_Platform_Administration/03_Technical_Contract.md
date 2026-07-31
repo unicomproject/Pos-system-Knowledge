@@ -50,10 +50,34 @@ Tenant API lifecycle transition:
 | `/api/v1/platform-admin/permissions` | Module API group |
 | `/api/v1/platform-admin/settings` | Module API group |
 | `/api/v1/platform-admin/audit-logs` | Read-only platform login/security audit list (`platform_login_audits`) |
-| `/api/v1/platform-admin/tenants` | Tenant list, detail, create-options, create, update, activate, suspend, entitlements |
+| `/api/v1/platform-admin/tenants` | Tenant list, summary, filter-options, create-options, detail, create, update, activate, suspend, reactivate, entitlements, and tenant audit-logs |
 | `/api/v1/platform-admin/catalog` | Platform modules catalog read for Modules & Features admin page |
 
+## Platform Tenant Management Technical Contract
+
+Canonical Journey: [[../../03_USER_JOURNEYS/Platform_Admin/03_Tenant_Management_Flow]]
+
+### Key Rules & Contracts (Approved Decisions Closed 2026-07-31)
+
+1. **Permission Gating & Data Redaction:**
+   - Tenant profile/footprint read requires `platform.tenants.view`.
+   - Subscription data requires `platform.tenant_subscriptions.view`. Without it, backend MUST omit/redact the `Subscription` payload object (permission leakage fix `SA-TENANT-GAP-01`).
+   - Commercial billing data requires `platform.billing.view`.
+   - Tenant audit history tab requires `platform.audit.view`.
+2. **Reactivation Contract:**
+   - `POST /api/v1/platform-admin/tenants/{tenantId}/reactivate` is the dedicated endpoint.
+   - Permitted strictly when `tenants.status == SUSPENDED`. Uses canonical permission `platform.tenants.activate`.
+   - Emits distinct audit event `tenant.reactivated`.
+3. **No Self-Service Cancellation in Release 1:**
+   - No Cancel Tenant UI button or `POST .../cancel` endpoint in Release 1 (`SA-TENANT-DECISION-PENDING-01`). `CANCELLED` is a terminal read-only state.
+4. **Tenant Audit History Tab:**
+   - `GET /api/v1/platform-admin/tenants/{tenantId}/audit-logs` requires `platform.audit.view`.
+   - Returns paginated, tenant-isolated audit log events (`tenant.created`, `tenant.profile_updated`, `tenant.entitlements_updated`, `tenant.activated`, `tenant.suspended`, `tenant.reactivated`). Scrubbed of sensitive credentials/tokens.
+5. **Optimistic Concurrency Control:**
+   - Tenant updates (`PUT .../tenants/{id}` and `PUT .../entitlements`) validate `concurrencyVersion`. Stale updates return HTTP 409 `platform_tenants.conflict`.
+
 ## Platform Dashboard Contract
+
 
 Canonical endpoint: `GET /api/v1/platform-admin/dashboard`  
 Controller: `PlatformAdminDashboardController` · Auth: `PlatformOnly` · Permission: `platform.dashboard.view`.
