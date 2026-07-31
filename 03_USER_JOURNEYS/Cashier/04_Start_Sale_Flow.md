@@ -1,13 +1,13 @@
 <!-- title: Start Sale Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-07-31 -->
 
 # Start Sale Flow
 
 ## Purpose
 
-Defines cashier start-sale, product search/scan, cart build, and park/recall entry points.
+Defines cashier start-sale, product search/scan, cart build, product discovery segments (Popular, Frequently Sold, Offers), and park/recall entry points.
 
 ## Source Basis
 
@@ -21,8 +21,8 @@ coupon, AI, or accounting scope.
 
 | Actor | Responsibility |
 |---|---|
-| Cashier | Builds cart and starts sale |
-| Backend | Validates product, price, stock, and POS context |
+| Cashier | Builds cart, selects product discovery segments, and starts sale |
+| Backend | Validates product, price, stock, segment filters, and POS context |
 | POS Device | Provides scan/input context |
 
 ## Preconditions
@@ -37,6 +37,7 @@ coupon, AI, or accounting scope.
 | Step | User/System Action | Expected Result |
 |---:|---|---|
 | 1 | Tap Start Sale | POS terminal opens |
+| 1.1 | Toggle Discovery Segment (Popular/Frequently Sold/Offers/All) | Product grid filters dynamically without affecting the cart or totals. Popular is active by default. |
 | 2 | Search/scan/click product tile | Product and variant data is loaded |
 | 3 | Select variant where required | Sellable variant is selected |
 | 4 | Add item to cart | Cart totals update |
@@ -47,7 +48,8 @@ coupon, AI, or accounting scope.
 ```mermaid
 flowchart TD
     S1[Tap Start Sale]
-    S1 --> S2[Search/scan/click product tile]
+    S1 --> S1_1[Toggle Segment: Popular/Frequently Sold/Offers/All]
+    S1_1 --> S2[Search/scan/click product tile]
     S2 --> S3[Select variant where required]
     S3 --> S4[Add item to cart]
     S4 --> S5[Choose next action]
@@ -57,6 +59,7 @@ flowchart TD
 ## Business Rules
 
 - Sale must remain tenant/outlet scoped.
+- Product discovery segment selection is a read-only client query that does not modify the current cart state, customer association, or applied discount state.
 - Product price/stock must be validated by backend.
 - Cart totals must recalculate after item changes.
 - Park/recall is supported for held sales.
@@ -134,6 +137,9 @@ Full code map: [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cashier_POS_Implementati
 - [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
 - [[../../05_BACKEND_ARCHITECTURE/API_Standards]]
 - [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cashier_POS_Implementation_Map]]
+- [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/04_Popular_Product_Discovery_Feature]]
+- [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/05_Frequently_Sold_Product_Discovery_Feature]]
+- [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/06_Offers_Product_Discovery_Feature]]
 
 ## Hardware Chunk 3 scanner update (2026-07-29)
 

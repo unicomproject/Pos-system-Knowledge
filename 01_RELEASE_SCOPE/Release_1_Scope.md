@@ -1,7 +1,7 @@
 <!-- title: TM-EPOS MVP Scope -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-07-31 -->
 
 
 # TM-EPOS MVP Scope

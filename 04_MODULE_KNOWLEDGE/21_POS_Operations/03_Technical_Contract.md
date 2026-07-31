@@ -138,10 +138,21 @@ Test coverage must include:
   authorized operation may contain multiple independently audited copies.
 - Reprint copy types distinguish duplicate customer and merchant output.
 
+## Product Discovery Segment Contract (Planned)
+
+- The POS product grid endpoint `GET /api/v1/pos/products` accepts an optional `segment` parameter (valid values: `all`, `popular`, `frequently-sold`, `offers`).
+- The response returns a unified `PosProductSummaryResponseDto` structure.
+- **Popular**: Filters products mapped to the tenant's `POS_POPULAR` collection, sorted by `sort_order`.
+- **Frequently Sold**: Aggregates net quantities sold ($max(quantity - cancelled - returned, 0)$) dynamically on the backend for the outlet over a rolling 30-day lookback.
+- **Offers**: Computes current promotional prices or labels from active discount policies and price lists. Returns the lowest effective unit price, setting conditional flags where applicable.
+
 ## Related Files
 
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/02_Functional_Rules]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/04_Popular_Product_Discovery_Feature]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/05_Frequently_Sold_Product_Discovery_Feature]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/06_Offers_Product_Discovery_Feature]]
 
 ## Hardware Chunk 3 barcode contract (2026-07-29)
 

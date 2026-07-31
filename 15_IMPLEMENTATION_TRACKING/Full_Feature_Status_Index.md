@@ -1,7 +1,7 @@
-﻿<!-- title: Full Feature Status Index -->
+<!-- title: Full Feature Status Index -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-07-29 -->
+<!-- system: TM-EPOS MVP -->
+<!-- last_updated: 2026-07-31 -->
 
 # Full Feature Status Index
 
@@ -90,6 +90,13 @@ PR/commit reference is recorded.
 | Flutter | Hardware | HID / Camera Barcode Scanner | Testing | - | Current working tree | Chunk 3 code and automation implemented; TB-00D/camera/POS80 physical matrix pending |
 | Flutter | Hardware | Hardware Testing Workflow | Testing | - | Current working tree | Authoritative versioned printer config and backend test-log lifecycle wired; scanner screen and physical matrix pending |
 | Flutter | Sales | Offline Cash Sale / Outbox | Not Started | - | - | Included MVP scope; no verified end-to-end cashier implementation |
+| Backend | CatalogProduct | POS Popular Products | Not Started | - | - | Manual Popular product list curation and default segment |
+| Backend | CatalogProduct | POS Frequently Sold | Not Started | - | - | Dynamic sales aggregation lookback calculation |
+| Backend | CatalogProduct | POS Offers Product List | Not Started | - | - | Dynamic targeted discount and special price retrieval |
+| Flutter | Sales | POS Popular Products | Not Started | - | - | Popular segment toggle and admin reorder UI |
+| Flutter | Sales | POS Frequently Sold | Not Started | - | - | Frequently Sold segment grid |
+| Flutter | Sales | POS Offers Product List | Not Started | - | - | Offers segment grid and product card badges |
+
 
 | Backend | ECommerce / CustomerAuth | Storefront Customer Authentication | Testing | - | - | Implementation tracking added; latest regression and commit evidence pending. See [[Backend/ECommerce/Customer_Auth_Implementation_Status]] |
 | Backend | ECommerce / Storefront | Public Storefront Browse APIs | Testing | - | - | Implementation tracking added; search/category-by-slug focused evidence pending. See [[Backend/ECommerce/Storefront_Browse_Implementation_Status]] |

@@ -117,11 +117,11 @@ open.
 | Tamil/large/long names | Legible/wrapped | Partial | Limited | None | Rendering decision | Blocked | Unicode/raster |
 | Direct TCP/USB/BT | Approved per platform | TCP only | Partial | None | Platform decision | In Progress | Acceptance/adapters |
 | HID/camera scanner | FIFO exact lookup | Implemented | Passed | None | Devices | Testing | Physical matrix |
-| Cash drawer | Policy pulse/audit | Absent | None | None | Pin/timing | Not Started | Full feature |
+| Cash drawer | Policy pulse/audit | Implemented | Passed | None | Pin/timing | Implemented | Physical acceptance pending |
 | Card terminal | Reconciled provider | Boundary only | Safety | None | Provider/model | Blocked | Full adapter |
 | Hardware-test audit | Persist result/evidence | Printer chain implemented | Passed targeted | None | Physical tests | Testing | Scanner UI/physical matrix |
 | Till reports/change | Audit/report policy | Config version/reason audit implemented; reports partial | Targeted | None | Policy/physical | In Progress | Report printing and physical change test |
-| Offline/restart | No duplicate/known state | Print recovery partial | Passed | None | Offline design | In Progress | E2E |
+| Offline/restart | No duplicate/known state | Implemented | Passed | None | None | Implemented | Physical failure acceptance pending |
 | Security/HTTPS | Private trusted release | Hardening partial | Passed | None | Certificate | Blocked | Deployment |
 
 ## Production Definition Of Done
@@ -137,6 +137,9 @@ Hardware Chunk 2 receipt production code and automated acceptance are
 implemented, including non-sale historical reprints and device-policy copies.
 Required POS80 physical rows remain open; overall hardware remains not
 production-ready.
+
+Hardware Chunk 4 cash drawer business lifecycle is implemented, including cash-sale auto-trigger, cash-refund auto-trigger, manual no-sale authorization flow with manager credentials approval, dedicated audit logging, and physical verification UI. Required physical acceptance is pending.
+
 
 ## Known Gaps
 See readiness matrix, acceptance matrix and Open Questions. Health/spooler
@@ -169,3 +172,10 @@ configuration version, request idempotency and `pos.hardware.settings`
 enforcement remain authoritative.
 
 Status: `HARDWARE CHUNK 3 IMPLEMENTED — PHYSICAL ACCEPTANCE PENDING`.
+
+## Hardware Chunk 6 implementation update (2026-07-30)
+
+Authoritative cash sale completion, cash drawer operation client-side secure store log/persistence, and local Print Agent idempotency check with direct request ID reuse are implemented. Scanner disconnect/reconnect simulation and recovery test suite verify exact single-pulse and offline outcomes.
+
+Status: `HARDWARE CHUNK 6 IMPLEMENTED — PHYSICAL FAILURE ACCEPTANCE PENDING`.
+

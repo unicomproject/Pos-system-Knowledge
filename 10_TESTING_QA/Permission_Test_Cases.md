@@ -1,7 +1,7 @@
-﻿<!-- title: Permission Test Cases -->
+<!-- title: Permission Test Cases -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-07-31 -->
 
 # Permission Test Cases
 
@@ -57,3 +57,6 @@ Run permission regression tests after changes to:
 - [[../02_ACCESS_CONTROL/Permission_Code_List]]
 - [[../02_ACCESS_CONTROL/API_Authorization_Rules]]
 - [[Testing_Strategy]]
+- [[Test_Case/21_POS_Operations/POS_Popular_Product_Discovery_Test_Cases]]
+- [[Test_Case/21_POS_Operations/POS_Frequently_Sold_Product_Discovery_Test_Cases]]
+- [[Test_Case/21_POS_Operations/POS_Offers_Product_Discovery_Test_Cases]]
