@@ -32,6 +32,29 @@ Controller: `PlatformAuthLegacyController` · shared service: `PlatformAuthServi
 
 Do **not** document legacy aliases as equal primary contracts. New development and tests should target `/api/v1/platform-auth/*`. The current Angular Platform Admin client still uses the legacy paths (documented gap **SA-AUTH-GAP-01**).
 
+## Platform Tenant Administration (Unified Commerce)
+
+Base route: `/api/v1/platform-admin/tenants` · Controller: `PlatformAdminTenantsController` · Auth Policy: `PlatformOnly`.
+
+Journey and full contract: [[../03_USER_JOURNEYS/Platform_Admin/03_Tenant_Management_Flow]].
+
+| Method | Route | Permission | Purpose | Implementation Status |
+|---|---|---|---|---|
+| GET | `/api/v1/platform-admin/tenants/summary` | `platform.tenants.view` | Summary aggregate metrics (total, active, setup pending, suspended) | Implemented |
+| GET | `/api/v1/platform-admin/tenants/filter-options` | `platform.tenants.view` | Filter lookup values (plans, statuses, operating modes) | Implemented |
+| GET | `/api/v1/platform-admin/tenants/create-options` | `platform.tenants.create` | Create tenant wizard lookup options | Implemented |
+| GET | `/api/v1/platform-admin/tenants` | `platform.tenants.view` | Search, filter (5 R1 filters), sort, and paginate tenant list (Subscription payload requires `platform.tenant_subscriptions.view`) | Implemented (`SA-TENANT-GAP-01` pending) |
+| GET | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.view` | Tenant detail (profile, address, footprint, setup checklist, `concurrencyVersion`; Subscription requires `platform.tenant_subscriptions.view`) | Implemented (`SA-TENANT-GAP-01` pending) |
+| GET | `/api/v1/platform-admin/tenants/{tenantId}/entitlement-options` | `platform.tenants.entitlements.update` | Entitlement options for selected plan & catalog modules | Implemented |
+| GET | `/api/v1/platform-admin/tenants/{tenantId}/audit-logs` | `platform.audit.view` | Tenant-isolated audit log history | Target Endpoint (`SA-TENANT-GAP-05`) |
+| POST | `/api/v1/platform-admin/tenants` | `platform.tenants.create` | Create tenant via wizard payload | Implemented |
+| PUT | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.update` | Update tenant profile/address (`concurrencyVersion` check) | Implemented (`SA-TENANT-GAP-06` pending) |
+| POST | `/api/v1/platform-admin/tenants/{tenantId}/activate` | `platform.tenants.activate` | Activate tenant from `PENDING_ACTIVATION` (`tenant.activated`) | Implemented |
+| POST | `/api/v1/platform-admin/tenants/{tenantId}/suspend` | `platform.tenants.suspend` | Suspend active tenant (`tenant.suspended`) | Implemented |
+| POST | `/api/v1/platform-admin/tenants/{tenantId}/reactivate` | `platform.tenants.activate` | Reactivate tenant from `SUSPENDED` (`tenant.reactivated`) | Target Endpoint (`SA-TENANT-GAP-04`) |
+| PUT | `/api/v1/platform-admin/tenants/{tenantId}/entitlements` | `platform.tenants.entitlements.update` | Update feature entitlements (`concurrencyVersion` check) | Implemented |
+| POST | `/api/v1/platform-admin/tenants/{tenantId}/cancel` | N/A | Excluded from R1 self-service (`SA-TENANT-DECISION-PENDING-01`) | Excluded from R1 |
+
 ## Tenant POS Login (Unified Commerce)
 
 Base route: `/api/v1/tenant-auth`
