@@ -1,6 +1,6 @@
 <!-- title: POS Return Inspection Draft Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-17 -->
 
 # POS Return Inspection Draft Flow (Step 6)

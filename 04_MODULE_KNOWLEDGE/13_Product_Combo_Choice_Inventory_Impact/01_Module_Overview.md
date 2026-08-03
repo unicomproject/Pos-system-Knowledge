@@ -1,6 +1,6 @@
 <!-- title: Product Combo, Choice Options & Inventory Impact Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-06-29 -->
 
 # Product Combo, Choice Options & Inventory Impact Module Overview
@@ -9,7 +9,7 @@
 
 Support combo meals/bundles, combo components, combo groups, choice options, product choice groups, and inventory impact from selected choices.
 
-This module is part of the new TM-EPOS MVP scope: mobile and desktop EPOS,
+This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device
 support, and low-cost hardware usage for events, stalls, food and beverage,
 merchandising, attractions, and temporary retail locations.

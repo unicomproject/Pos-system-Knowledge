@@ -1,6 +1,6 @@
 <!-- title: Flutter API Network -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines Flutter API networking rules for TM-EPOS MVP.
+This file defines Flutter API networking rules for OneVerz POS MVP.
 
 Network code must support online operation, safe retries, offline fallback, and
 sync upload without duplicating sensitive actions.

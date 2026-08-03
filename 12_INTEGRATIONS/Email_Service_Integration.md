@@ -1,6 +1,6 @@
 <!-- title: Email Service Integration -->
 <!-- status: Draft (Cashier receipts); platform email superseded -->
-<!-- system: TM-EPOS MVP / OneVerz -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-27 -->
 <!-- superseded_by: Email_Architecture_And_Provider_Decisions (platform / ACS / onboarding only) -->
 

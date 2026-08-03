@@ -1,13 +1,13 @@
 <!-- title: Reservations, Stock Movements, Serial & Cost Allocation Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-06-29 -->
 
 # Reservations, Stock Movements, Serial & Cost Allocation Functional Rules
 
 ## Purpose
 
-Defines business and UX rules for `Reservations_Stock_Movements_Serial_Cost` in the new TM-EPOS MVP scope.
+Defines business and UX rules for `Reservations_Stock_Movements_Serial_Cost` in the new OneVerz POS MVP scope.
 These rules must be applied before creating backend APIs, Flutter screens,
 responsive online store screens, Angular/admin screens, tests, or database changes.
 

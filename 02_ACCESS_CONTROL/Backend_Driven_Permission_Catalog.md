@@ -1,6 +1,6 @@
 <!-- title: Backend Driven Permission Catalog -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines the backend-driven permission catalog rule for TM-EPOS MVP.
+This file defines the backend-driven permission catalog rule for OneVerz POS MVP.
 
 The frontend must not own the permission catalog.
 The backend and database seed/catalog are the source of truth.

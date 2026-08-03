@@ -1,6 +1,6 @@
 <!-- title: Offline Operation Architecture -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines backend offline operation rules for TM-EPOS MVP.
+This file defines backend offline operation rules for OneVerz POS MVP.
 
 Offline operation allows limited POS continuity during network issues.
 It does not mean every business action is final offline.

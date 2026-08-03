@@ -1,6 +1,6 @@
 <!-- title: Flutter Virtual Caching Strategy -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines Flutter virtual caching strategy for TM-EPOS MVP.
+This file defines Flutter virtual caching strategy for OneVerz POS MVP.
 
 Virtual caching means the app keeps frequently used reference/config data in
 memory and local cache so the POS feels fast and can survive temporary network

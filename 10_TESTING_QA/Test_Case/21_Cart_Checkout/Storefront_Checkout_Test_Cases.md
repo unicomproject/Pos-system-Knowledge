@@ -1,6 +1,6 @@
 <!-- title: Storefront Checkout Test Cases -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- module: Cart Checkout -->
 <!-- feature: Storefront Checkout / Requested Collection Window -->
 <!-- last_updated: 2026-07-17 -->

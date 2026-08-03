@@ -1,9 +1,15 @@
 <!-- title: Full Feature Status Index -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-31 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 # Full Feature Status Index
+
+> 2026-08-02 correction: Payment Method target rearrangement is **partially
+> implemented**. Source composition and automated verification are present, but
+> the earlier runtime screenshot did not match the approved target. A new device
+> launch reached the login screen because no authenticated session was available,
+> so target-route runtime visual sign-off remains pending.
 
 ## Purpose
 
@@ -67,6 +73,8 @@ PR/commit reference is recorded.
 | Flutter | Till | Open Till Layout | Completed | 2026-07-10 | `Sale_Screen` | Full-screen tablet layout |
 | Flutter | Sales | End Shift + Close Till | Completed | 2026-07-09 | `d04ecf0` | Close till API + logout |
 | Flutter | Sales | Start Sale UI | In Progress | - | `Sale_Screen` | Catalog API wired; no mock fallback; checkout blocked |
+| Backend | CatalogProduct | POS Product Variant Detail / Frequently Bought Together | In Progress | - | Current working tree | Chunk 1 persistence and Chunk 2 backend/API contracts implemented; backend regression 1,491/1,491. Fractional POS quantity, exhaustive integration fixtures, Flutter/E2E and production validation pending. [[Backend/CatalogProduct/Pos_Product_Variant_Detail_Implementation_Status]] |
+| Flutter | Sales | Product Variant Selection Popup | Partial | 2026-08-02 | Current working tree | Target-screen adaptive UI aligned with single-image rule; production validation bypass, rounding/category and currency fallbacks removed. Analysis clean; 16/16 focused tests pass; full suite 703 passed/11 unrelated baseline failures. Authenticated real-backend emulator, configurable recommendation, fractional quantity and physical-device validation remain pending. [[Flutter/Sales/Product_Variant_Popup_Implementation_Status]] |
 | Flutter | Sales | Cashier POS Second Brain vs Code Comparison | Completed | 2026-07-02 | - | Audit note; see delta in same file |
 | Angular | Tenant | Tenant List Page | In Progress | - | - | Wired to platform-admin tenants API |
 | Backend | Tenant / Outlet | Outlet Create | Completed | 2026-06-18 | dashboard_tenant | `POST /api/v1/tenant-admin/outlets` |
@@ -90,12 +98,12 @@ PR/commit reference is recorded.
 | Flutter | Hardware | HID / Camera Barcode Scanner | Testing | - | Current working tree | Chunk 3 code and automation implemented; TB-00D/camera/POS80 physical matrix pending |
 | Flutter | Hardware | Hardware Testing Workflow | Testing | - | Current working tree | Authoritative versioned printer config and backend test-log lifecycle wired; scanner screen and physical matrix pending |
 | Flutter | Sales | Offline Cash Sale / Outbox | Not Started | - | - | Included MVP scope; no verified end-to-end cashier implementation |
-| Backend | CatalogProduct | POS Popular Products | Not Started | - | - | Manual Popular product list curation and default segment |
-| Backend | CatalogProduct | POS Frequently Sold | Not Started | - | - | Dynamic sales aggregation lookback calculation |
-| Backend | CatalogProduct | POS Offers Product List | Not Started | - | - | Dynamic targeted discount and special price retrieval |
-| Flutter | Sales | POS Popular Products | Not Started | - | - | Popular segment toggle and admin reorder UI |
-| Flutter | Sales | POS Frequently Sold | Not Started | - | - | Frequently Sold segment grid |
-| Flutter | Sales | POS Offers Product List | Not Started | - | - | Offers segment grid and product card badges |
+| Backend | CatalogProduct | POS Popular Products | Completed | 2026-07-31 | - | Manual Popular product list curation and default segment |
+| Backend | CatalogProduct | POS Frequently Sold | Completed | 2026-07-31 | Current working tree | Dynamic sales aggregation lookback calculation |
+| Backend | CatalogProduct | POS Offers Product List | Completed | 2026-07-31 | Current working tree | Dynamic targeted discount and special price retrieval |
+| Flutter | Sales | POS Popular Products | Completed | 2026-07-31 | - | Popular segment toggle and admin reorder UI |
+| Flutter | Sales | POS Frequently Sold | Completed | 2026-07-31 | Current working tree | Frequently Sold segment grid |
+| Flutter | Sales | POS Offers Product List | Completed | 2026-07-31 | Current working tree | Offers segment grid and product card badges |
 
 
 | Backend | ECommerce / CustomerAuth | Storefront Customer Authentication | Testing | - | - | Implementation tracking added; latest regression and commit evidence pending. See [[Backend/ECommerce/Customer_Auth_Implementation_Status]] |

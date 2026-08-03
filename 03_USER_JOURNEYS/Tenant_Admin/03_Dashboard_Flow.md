@@ -1,6 +1,6 @@
 <!-- title: Tenant Admin Dashboard Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-30 -->
 
 # Tenant Admin Dashboard Flow
@@ -15,7 +15,7 @@ Tenant Admin
 
 ## Source
 
-Derived from `Slide 3 - Tenant Admin Dashboard Flow` in `tenant-full-journey.pptx` and aligned to TM-EPOS MVP Second Brain scope.
+Derived from `Slide 3 - Tenant Admin Dashboard Flow` in `tenant-full-journey.pptx` and aligned to OneVerz POS MVP Second Brain scope.
 
 ## Trigger
 

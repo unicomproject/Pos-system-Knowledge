@@ -1,6 +1,6 @@
 <!-- title: Brand Collection CRUD Implementation Status -->
 <!-- status: Completed with Brand MVP extensions 2026-07-28 -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- module: CatalogProduct -->
 <!-- feature: Brand CRUD / Collection CRUD / Brand MVP fields -->
 <!-- last_updated: 2026-07-28 -->

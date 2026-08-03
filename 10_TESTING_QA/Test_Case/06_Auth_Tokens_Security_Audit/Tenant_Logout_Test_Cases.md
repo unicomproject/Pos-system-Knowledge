@@ -1,6 +1,6 @@
 <!-- title: Tenant Logout Test Cases -->
 <!-- status: Completed -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-02 -->
 
 # Tenant Logout Test Cases

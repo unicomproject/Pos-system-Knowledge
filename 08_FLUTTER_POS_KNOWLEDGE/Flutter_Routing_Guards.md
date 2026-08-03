@@ -1,6 +1,6 @@
 <!-- title: Flutter Routing Guards -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines Flutter routing and guard rules for TM-EPOS MVP.
+This file defines Flutter routing and guard rules for OneVerz POS MVP.
 
 Routing must respect authentication, tenant status, feature entitlement,
 permission, outlet, till, device, and offline state.

@@ -1,6 +1,6 @@
 <!-- title: Tenant Admin First Login Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP / OneVerz -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-27 -->
 
 # Tenant Admin First Login Flow

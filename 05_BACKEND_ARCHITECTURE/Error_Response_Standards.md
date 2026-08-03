@@ -1,6 +1,6 @@
 <!-- title: Error Response Standards -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines backend error response standards for TM-EPOS MVP.
+This file defines backend error response standards for OneVerz POS MVP.
 
 Errors must be safe, consistent, and useful without exposing sensitive internals.
 

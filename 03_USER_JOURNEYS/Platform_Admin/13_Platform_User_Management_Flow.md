@@ -1,6 +1,6 @@
 <!-- title: Platform User Management Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-20 -->
 
 # Platform User Management Flow
@@ -15,7 +15,7 @@ Platform Admin
 
 ## Source
 
-Derived from `Slide 8 - Platform User Management Flow` in `SYSTEM_USER_JOURNEY.pptx`, aligned to TM-EPOS MVP scope and the implemented Unified Commerce backend + Angular Platform Admin UI.
+Derived from `Slide 8 - Platform User Management Flow` in `SYSTEM_USER_JOURNEY.pptx`, aligned to OneVerz POS MVP scope and the implemented Unified Commerce backend + Angular Platform Admin UI.
 
 ## Trigger
 

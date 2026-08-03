@@ -1,6 +1,6 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-30 -->
 
 # Permission Code List
@@ -26,7 +26,7 @@ Do not create one large `PermissionCode` enum.
 
 Do not place permission codes inside generic `Domain/Enums`.
 
-Platform Admin uses **Option A** permission strategy (TM-EPOS MVP):
+Platform Admin uses **Option A** permission strategy (OneVerz POS MVP):
 
 - Plural domain codes for tenant lifecycle, users, settings, billing, audit, dashboard.
 - **Granular action codes** for subscription plans, platform roles, and permission catalog (already implemented in backend and Angular).

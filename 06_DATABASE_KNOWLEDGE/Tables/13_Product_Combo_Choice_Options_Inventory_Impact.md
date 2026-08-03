@@ -1,6 +1,6 @@
 <!-- title: Product Combo, Choice Options & Inventory Impact -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-04 -->
 <!-- source: Uploaded ERD Image: 13_Product Combo, Choice Options & Inventory Impact -->
 

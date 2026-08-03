@@ -1,6 +1,6 @@
 <!-- title: SA-P1 Payment Links Release 1 Scope And Sequencing -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-20 -->
 
 # SA-P1 — Platform Admin Payment Links (Release 1 Scope And Sequencing)

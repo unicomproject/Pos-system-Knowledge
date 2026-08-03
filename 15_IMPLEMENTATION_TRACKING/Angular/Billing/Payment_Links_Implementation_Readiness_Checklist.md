@@ -1,6 +1,6 @@
 <!-- title: Payment Links Implementation Readiness Checklist -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-20 -->
 
 # Payment Links — Implementation Readiness Checklist

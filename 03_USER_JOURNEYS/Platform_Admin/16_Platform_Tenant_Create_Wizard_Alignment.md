@@ -1,6 +1,6 @@
 <!-- title: Platform Tenant Create Wizard Alignment -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP / OneVerz -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-27 -->
 
 # Platform Tenant Create Wizard Alignment

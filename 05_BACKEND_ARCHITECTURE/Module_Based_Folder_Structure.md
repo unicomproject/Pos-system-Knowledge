@@ -1,6 +1,6 @@
 <!-- title: Module Based Folder Structure -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-30 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines backend folder structure for TM-EPOS MVP modules.
+This file defines backend folder structure for OneVerz POS MVP modules.
 
 The structure must support POS, online store, cart/checkout, orders, click and
 collect, offline sync, reporting, notification, and integration modules.

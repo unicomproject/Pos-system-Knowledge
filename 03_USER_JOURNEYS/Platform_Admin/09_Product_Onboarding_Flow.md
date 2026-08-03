@@ -1,6 +1,6 @@
 <!-- title: Product Onboarding Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-30 -->
 
 # Product Onboarding Flow
@@ -15,7 +15,7 @@ Platform Admin
 
 ## Source
 
-Derived from `Slide 6 - Product Onboarding Flow Updated` in `SYSTEM_USER_JOURNEY.pptx` and aligned to TM-EPOS MVP Second Brain scope.
+Derived from `Slide 6 - Product Onboarding Flow Updated` in `SYSTEM_USER_JOURNEY.pptx` and aligned to OneVerz POS MVP Second Brain scope.
 
 ## Trigger
 

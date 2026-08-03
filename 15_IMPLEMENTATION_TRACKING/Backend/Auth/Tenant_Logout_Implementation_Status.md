@@ -1,6 +1,6 @@
 <!-- title: Tenant Logout Implementation Status -->
 <!-- status: Completed -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-02 -->
 
 # Tenant Logout Implementation Status

@@ -1,6 +1,6 @@
 <!-- title: Hardware Testing Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 # Hardware Testing Flow
 ## Purpose

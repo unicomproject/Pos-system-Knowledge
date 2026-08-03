@@ -1,6 +1,6 @@
 <!-- title: 02. Tenant Foundation -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- source: Updated from uploaded ERD image: 02_Tenant Foundation.png -->
 
 # 02. Tenant Foundation

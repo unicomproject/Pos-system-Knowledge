@@ -1,14 +1,14 @@
 <!-- title: Excluded Features -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 
 # Excluded Features
 
 ## Purpose
 
-This file lists what must not be implemented as active TM-EPOS MVP scope.
+This file lists what must not be implemented as active OneVerz POS MVP scope.
 
 It prevents scope creep from old documents, unused database references, future
 roadmap ideas, and unsupported assumptions.
@@ -23,7 +23,7 @@ Database presence does not automatically override this file.
 ## Important Scope Correction
 
 Online Store, Click & Collect, and Offline Operation are no longer excluded.
-They are part of the current TM-EPOS MVP.
+They are part of the current OneVerz POS MVP.
 
 Old files that say e-commerce, click and collect, or offline sync are excluded
 must be treated as outdated until updated.
@@ -36,7 +36,7 @@ must be treated as outdated until updated.
 | Own delivery management | Deferred |
 | Driver assignment and delivery tracking | Deferred |
 | Franchise and chain management | Deferred |
-| Full CRM inside TM-EPOS | Deferred / external boundary |
+| Full CRM inside OneVerz POS | Deferred / external boundary |
 | Supplier management | Excluded unless separately approved |
 | Purchase order and supplier invoice module | Excluded unless approved |
 | Stock transfer between outlets | Excluded unless approved |
@@ -48,6 +48,10 @@ must be treated as outdated until updated.
 | Offline refund/exchange finalization | Excluded |
 | Redis/caching dependency | Excluded unless approved |
 | CQRS/MediatR | Excluded unless approved |
+| Multi-image browsing in the Cashier variant popup | Excluded; the popup uses one resolved image slot |
+| AI/ML Frequently Bought Together | Excluded; Release 1 uses manual relationships |
+
+These popup exclusions do not remove shared multi-image product-media management or the included manual Frequently Bought Together feature.
 
 ## Offline Exclusion Boundary
 

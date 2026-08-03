@@ -1,13 +1,13 @@
 ﻿<!-- title: API Testing Standards -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-30 -->
 
 # API Testing Standards
 
 ## Purpose
 
-This file defines API-level testing rules for TM-EPOS MVP backend endpoints.
+This file defines API-level testing rules for OneVerz POS MVP backend endpoints.
 
 ## Scope
 

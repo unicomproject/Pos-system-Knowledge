@@ -1,6 +1,6 @@
 <!-- title: Flutter App Architecture -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines the Flutter application architecture for TM-EPOS MVP.
+This file defines the Flutter application architecture for OneVerz POS MVP.
 
 Flutter is used for POS, tenant/business admin, device operation, fulfilment and
 pickup staff workflows, and offline-capable selling flows.

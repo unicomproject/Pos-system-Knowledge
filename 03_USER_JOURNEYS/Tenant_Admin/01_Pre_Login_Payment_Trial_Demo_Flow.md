@@ -1,6 +1,6 @@
 <!-- title: Tenant Admin Pre-Login Payment Trial Demo Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP / OneVerz -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-27 -->
 <!-- decision_date: 2026-07-27 -->
 

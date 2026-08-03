@@ -1,6 +1,6 @@
 <!-- title: POS Frequently Sold Flutter Implementation Status -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-31 -->
 
 # POS Frequently Sold Flutter Implementation Status
@@ -12,11 +12,11 @@
 | Platform | Flutter |
 | Module | Sales / POS |
 | Feature | Frequently Sold segment grid |
-| Status | Not Started |
-| Completed Date | - |
+| Status | Completed |
+| Completed Date | 2026-07-31 |
 | Branch | - |
-| PR / Commit | - |
-| Tests | Not Run |
+| PR / Commit | Current working tree |
+| Tests | Catalog remote datasource unit tests passed |
 
 ---
 
@@ -29,7 +29,9 @@ Enables the "Frequently Sold" quick-filter chip in Cashier POS. Retrieves ranked
 ## Files Changed
 
 ```text
-No implementation files changed. Documentation phase only.
+- lib/features/pos/presentation/widgets/new_sale/catalogue/pos_product_category_chips.dart
+- lib/features/pos/presentation/widgets/new_sale/product_card/pos_product_grid.dart
+- lib/features/pos/presentation/screens/new_sale/pos_new_sale_screen.dart
 ```
 
 ---
@@ -37,9 +39,8 @@ No implementation files changed. Documentation phase only.
 ## Tests Written
 
 ```text
-Planned test coverage documented.
-Implementation tests not created.
-Result: Not Run.
+Unit tests extended in test/features/cart/pos_catalog_remote_datasource_test.dart to verify segment parameter.
+Result: Passed.
 ```
 
 ---

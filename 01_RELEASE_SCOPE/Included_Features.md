@@ -1,20 +1,20 @@
 <!-- title: Included Features -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-31 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 
 # Included Features
 
 ## Purpose
 
-This file lists features that may be implemented for the TM-EPOS MVP.
+This file lists features that may be implemented for the OneVerz POS MVP.
 
 If a feature is not listed here, check [[Excluded_Features]] before building it.
 
 ## Inclusion Rule
 
-A feature is included only when it supports the updated TM-EPOS MVP scope.
+A feature is included only when it supports the updated OneVerz POS MVP scope.
 Do not add modules, APIs, screens, tables, or flows only because they are common
 in other EPOS or e-commerce products.
 
@@ -78,6 +78,7 @@ Included:
 - Till open, current till session, cash count, and cash movements.
 - Product discovery segment filtering (Popular by default, Frequently Sold, Offers).
 - Product lookup, barcode scan, basket/cart, quantity changes, and item removal.
+- Product Variant Selection Popup with one displayed image, dynamic options, optional product-line note and manually configured Frequently Bought Together recommendations.
 - Price, tax, discount, and receipt calculation.
 - Cash payment.
 - Card/QR payment where online/backend/provider validation is available.
@@ -85,6 +86,8 @@ Included:
 - Park/hold and recall sale.
 - Return, refund, exchange, and related audit.
 - Close till and reconciliation with backend validation.
+
+Frequently Bought Together is separate from the Frequently Sold discovery segment. See [[../04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 
 ## Online Store
 

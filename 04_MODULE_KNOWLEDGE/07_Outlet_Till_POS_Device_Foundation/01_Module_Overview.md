@@ -1,6 +1,6 @@
 <!-- title: Outlet, Till & POS Device Foundation Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Outlet, Till & POS Device Foundation Module Overview
@@ -9,7 +9,7 @@
 
 Model outlets, outlet addresses, business hours, tills, POS devices, till-device assignments, and linked hardware profiles for mobile and desktop EPOS operation.
 
-This module is part of the new TM-EPOS MVP scope: mobile and desktop EPOS,
+This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device
 support, and low-cost hardware usage for events, stalls, food and beverage,
 merchandising, attractions, and temporary retail locations.

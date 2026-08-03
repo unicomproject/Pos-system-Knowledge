@@ -1,6 +1,6 @@
 <!-- title: Code Review Checklist -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-01 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines the TM-EPOS MVP code review checklist.
+This file defines the OneVerz POS MVP code review checklist.
 
 Reviewers must check correctness, scope, architecture, security, tenant safety,
 and maintainability.

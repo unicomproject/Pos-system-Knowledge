@@ -1,14 +1,14 @@
 <!-- title: POS Operations Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 # POS Operations Technical Contract
 
 ## Purpose
 
 Defines the implementation contract for `POS_Operations`. This contract is based on
-new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
+new OneVerz POS MVP scope images and the uploaded Unified Commerce database design.
 
 ## API Contract
 
@@ -68,6 +68,8 @@ history/ledger behavior where applicable.
 
 ## Backend Contract
 
+- Target product detail, Frequently Bought Together and cart-line contracts are defined in [[04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]]. They remain pending unless code evidence proves otherwise.
+
 - Controllers stay thin.
 - Application services own use cases.
 - Domain entities/value objects hold stable business invariants.
@@ -116,7 +118,7 @@ Test coverage must include:
 5. Build frontend route/screen/component/provider/service.
 6. Add loading, empty, error, denied, feature-disabled, offline, and conflict states.
 7. Add unit/integration/API/widget tests.
-8. Review against new TM-EPOS MVP module boundaries.
+8. Review against new OneVerz POS MVP module boundaries.
 
 ## Out Of Scope
 
@@ -153,6 +155,7 @@ Test coverage must include:
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/04_Popular_Product_Discovery_Feature]]
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/05_Frequently_Sold_Product_Discovery_Feature]]
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/06_Offers_Product_Discovery_Feature]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]]
 
 ## Hardware Chunk 3 barcode contract (2026-07-29)
 

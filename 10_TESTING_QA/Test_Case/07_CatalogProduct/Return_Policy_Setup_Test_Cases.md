@@ -1,6 +1,6 @@
 <!-- title: Return Policy Setup Test Cases -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- module: CatalogProduct -->
 <!-- feature: Return Policy Templates / Return Policy CRUD -->
 <!-- last_updated: 2026-07-03 -->

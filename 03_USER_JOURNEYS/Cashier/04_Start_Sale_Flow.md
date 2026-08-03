@@ -1,7 +1,7 @@
 <!-- title: Start Sale Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-31 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 # Start Sale Flow
 
@@ -38,10 +38,12 @@ coupon, AI, or accounting scope.
 |---:|---|---|
 | 1 | Tap Start Sale | POS terminal opens |
 | 1.1 | Toggle Discovery Segment (Popular/Frequently Sold/Offers/All) | Product grid filters dynamically without affecting the cart or totals. Popular is active by default. |
-| 2 | Search/scan/click product tile | Product and variant data is loaded |
-| 3 | Select variant where required | Sellable variant is selected |
-| 4 | Add item to cart | Cart totals update |
-| 5 | Choose next action | Proceed payment, discount, customer, park, or continue sale |
+| 2 | Search/scan/click product tile | Exact eligible variant may direct-add; otherwise the popup opens |
+| 3 | Load product detail and resolve required options | One active sellable variant is resolved by option/value IDs |
+| 4 | Set quantity, optional product-line note and optional Frequently Bought Together selections | Inputs remain separate from order-level notes; recommendations are separate lines |
+| 5 | Submit backend cart calculation/addition | Backend revalidates product, price, stock and totals atomically |
+| 6 | Apply successful cart response | Cart lines/totals update from backend authority |
+| 7 | Choose next action | Proceed payment, discount, customer, park, or continue sale |
 
 ## Journey Diagram
 
@@ -50,10 +52,13 @@ flowchart TD
     S1[Tap Start Sale]
     S1 --> S1_1[Toggle Segment: Popular/Frequently Sold/Offers/All]
     S1_1 --> S2[Search/scan/click product tile]
-    S2 --> S3[Select variant where required]
-    S3 --> S4[Add item to cart]
-    S4 --> S5[Choose next action]
-    S5 --> Done[Journey completed]
+    S2 --> D{Exact eligible variant?}
+    D -->|Yes| S4[Backend cart calculation]
+    D -->|No| S3[Popup: variant, quantity, note, recommendations]
+    S3 --> S4
+    S4 --> S5[Update cart from backend response]
+    S5 --> S6[Choose next action]
+    S6 --> Done[Journey completed]
 ```
 
 ## Business Rules
@@ -78,8 +83,8 @@ flowchart TD
 
 | Area | References |
 |---|---|
-| API groups | `/api/v1/pos/sales`, `/api/v1/products` |
-| Tables | `sales`, `sale_lines`, `products`, `product_variants`, `inventory_balances`, `price_list_items` |
+| API groups | `/api/v1/pos/products`, `/api/v1/pos/products/{productId}`, `/api/v1/pos/cart/calculate`, `/api/v1/pos/checkout/*` |
+| Tables | `sales_orders`, `sales_order_lines`, `shopping_cart_items`, `checkout_session_lines`, `products`, `product_variants`, `inventory_balances`, `price_list_items` |
 
 ## Edge Cases
 
@@ -118,7 +123,7 @@ A one-shot camera result enters the same exact lookup, resolved-variant cart,
 feedback, and search-cleanup pipeline. Cancellation is silent and unsupported
 Windows/Linux execution falls back safely to USB HID guidance. Physical Android
 camera validation remains pending.
-| Select variant | Yes | `PosProductVariantSheet` |
+| Select variant | Partial | `PosProductVariantSheet` exists; production popup note/recommendation/single-image/atomic-cart scope remains pending |
 | Add to cart | Yes | Reusable resolved-variant action; variant-key increment, requested quantity and central known-stock limit supported |
 | Proceed payment / park / customer | Partial | Cash checkout and customer/discount entry are API-backed; Card/QR/Split are placeholders; park/recall is device-local secure storage |
 
@@ -140,6 +145,7 @@ Full code map: [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cashier_POS_Implementati
 - [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/04_Popular_Product_Discovery_Feature]]
 - [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/05_Frequently_Sold_Product_Discovery_Feature]]
 - [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/06_Offers_Product_Discovery_Feature]]
+- [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]]
 
 ## Hardware Chunk 3 scanner update (2026-07-29)
 

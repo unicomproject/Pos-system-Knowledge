@@ -16,7 +16,7 @@
 
 ## Purpose
 
-Defines validation, access, and database tests for the Price Lists Setup functionality in TM-EPOS MVP.
+Defines validation, access, and database tests for the Price Lists Setup functionality in OneVerz POS MVP.
 
 ## Preconditions
 

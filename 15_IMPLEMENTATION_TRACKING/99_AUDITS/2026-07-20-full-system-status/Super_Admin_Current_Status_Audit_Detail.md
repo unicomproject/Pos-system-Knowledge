@@ -1,6 +1,6 @@
 <!-- title: Super Admin Current Status Audit Detail -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-20 -->
 
 # Super Admin Audit Detail (Matrix, Gaps, SB)

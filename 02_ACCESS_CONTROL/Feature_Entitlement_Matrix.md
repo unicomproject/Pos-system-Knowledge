@@ -1,6 +1,6 @@
 <!-- title: Feature Entitlement Matrix -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines tenant-level feature entitlements for the TM-EPOS MVP.
+This file defines tenant-level feature entitlements for the OneVerz POS MVP.
 
 Feature entitlement decides whether a tenant can use a module.
 Permissions decide what an individual user can do inside that enabled module.

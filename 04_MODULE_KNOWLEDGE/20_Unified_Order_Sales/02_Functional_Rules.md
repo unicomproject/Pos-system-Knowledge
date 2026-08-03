@@ -1,13 +1,13 @@
 <!-- title: Unified Order & Sales Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
+<!-- last_updated: 2026-08-01 -->
 
 # Unified Order & Sales Functional Rules
 
 ## Purpose
 
-Defines business and UX rules for `Unified_Order_Sales` in the new TM-EPOS MVP scope.
+Defines business and UX rules for `Unified_Order_Sales` in the new OneVerz POS MVP scope.
 These rules must be applied before creating backend APIs, Flutter screens,
 responsive online store screens, Angular/admin screens, tests, or database changes.
 
@@ -18,6 +18,7 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Status history is append-only and drives auditability.
 - Document numbers must come from controlled sequences.
 - Order total is backend validated before payment and fulfilment.
+- A normalized optional product-line note is line-scoped, not an order-level note, and must survive supported cart/hold/recall/checkout/order/receipt flows. Same variant/UOM/modifier identity merges only when the normalized note also matches.
 
 ## User Rules
 

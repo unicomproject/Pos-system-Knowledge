@@ -1,21 +1,21 @@
-<!-- title: TM-EPOS Second Brain Start Here -->
+<!-- title: OneVerz POS Second Brain Start Here -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
-# TM-EPOS Second Brain Start Here
+# OneVerz POS Second Brain Start Here
 
 ## Purpose
 
-This folder is the entry point for the TM-EPOS MVP Second Brain.
+This folder is the entry point for the OneVerz POS MVP Second Brain.
 It tells every developer, designer, tester, reviewer, and AI assistant what to
 read first before making implementation decisions.
 It also defines how the updated MVP scope replaces older POS-first assumptions.
 
 ## Current Product Context
 
-TM-EPOS is a low-cost, multi-tenant EPOS platform for events, stalls, temporary
+OneVerz POS is a low-cost, multi-tenant EPOS platform for events, stalls, temporary
 retail locations, food and beverage counters, merchandise sellers, and small
 businesses.
 
@@ -49,7 +49,7 @@ challenging selling environments.
 
 ## Target Customers
 
-TM-EPOS initially targets:
+OneVerz POS initially targets:
 
 - Event merchandise shops.
 - Stadiums and arenas.

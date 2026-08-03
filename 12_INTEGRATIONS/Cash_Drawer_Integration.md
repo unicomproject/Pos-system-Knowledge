@@ -1,6 +1,6 @@
 <!-- title: Cash Drawer Integration -->
 <!-- status: Draft -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Cash Drawer Integration

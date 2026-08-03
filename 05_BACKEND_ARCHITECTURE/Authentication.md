@@ -1,6 +1,6 @@
 <!-- title: Authentication -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines authentication boundaries for TM-EPOS MVP backend.
+This file defines authentication boundaries for OneVerz POS MVP backend.
 
 Authentication confirms identity.
 Authorization decides what the authenticated identity can do.

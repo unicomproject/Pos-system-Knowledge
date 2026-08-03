@@ -1,6 +1,6 @@
 <!-- title: Offline Operation & Sync -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-04 -->
 <!-- source: Updated from uploaded ERD image: 28_Offline Operation & Sync(1).png -->
 

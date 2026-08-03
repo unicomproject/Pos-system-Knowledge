@@ -1,7 +1,7 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -1010,6 +1010,18 @@ See [[../99_Archive/04_MODULE_KNOWLEDGE/Subscription/04_Subscription_Catalog_Mod
 
 # POS Payment And Receipt API Endpoints
 
+## Product Variant Selection Popup Targets (Pending)
+
+The production popup contract is **Documentation Ready; implementation remains pending verification/implementation**. Authority: [[../04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
+
+| Method | Route | Target purpose | Status |
+|---|---|---|---|
+| GET | `/api/v1/pos/products/{productId}?deviceId={deviceId}` | Dynamic option/value/variant detail, authoritative price/stock and one resolved image | Pending verification/implementation |
+| GET | `/api/v1/pos/products/{productId}/recommendations?deviceId={deviceId}&type=frequently-bought-together&limit=3` | Up to three manually configured recommendations | Implementation Pending |
+| POST | `/api/v1/pos/cart/calculate` | Validate main/recommendation lines and return authoritative cart lines/totals | Implementation Pending for full popup contract |
+
+Product detail uses ID-based option mappings and one resolved image, not a popup gallery. Cart request lines target `clientLineId`, `variantId`, `quantity`, `uomId`, nullable normalized `lineNote`, `source` and optional `recommendationParentReference`; responses return product/variant snapshots, SKU/name, quantity/UOM, unit price, discount, tax, total, stock status, conflict code and normalized `lineNote`. Preserve the line contract through checkout, supported hold/recall, completed sale and receipt. Do not log note text.
+
 > **Unified-Commerce status (2026-07-10):** The routes below are the **target
 > contract** carried forward from legacy `SCS.Api` documentation. They are
 > **not implemented** in `E_POS.Api` yet. Flutter datasources still reference
@@ -1031,8 +1043,7 @@ Base routes: `/api/v1/pos/cart`, `/api/v1/pos/checkout`,
 | GET | `/api/v1/pos/receipts/{saleId}` | `receipts.view` or `receipts.print` | Receipt preview data with `barcodeValue` |
 | POST | `/api/v1/pos/receipts/{saleId}/print` | `receipts.print` | Receipt print audit row |
 
-Cash checkout writes `sales`, `sale_lines`, `payments`,
-`sale_payment_allocations`, and `receipts`. Print audit writes
+The Unified Commerce target writes `sales_orders`, `sales_order_lines`, payment/allocation records and `receipts`. Print audit writes
 `receipt_print_logs`.
 
 Cash checkout request includes `cashReceived`. Successful cash checkout response

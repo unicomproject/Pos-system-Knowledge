@@ -1,6 +1,6 @@
 <!-- title: Virtual Caching Architecture -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines backend virtual caching rules for TM-EPOS MVP.
+This file defines backend virtual caching rules for OneVerz POS MVP.
 
 Virtual cache is used for speed, reduced repeated reads, and operational
 resilience.

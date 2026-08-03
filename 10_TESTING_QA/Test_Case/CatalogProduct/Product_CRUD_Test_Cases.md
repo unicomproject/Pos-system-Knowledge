@@ -1,6 +1,6 @@
 <!-- title: Product CRUD Test Cases -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-04 -->
 
 # Product CRUD Test Cases

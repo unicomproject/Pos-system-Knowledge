@@ -1,6 +1,6 @@
 <!-- title: 23. Fulfilment & Pickup -->
 <!-- status: ERD aligned -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-05 -->
 <!-- source: 23_Fulfilment & Pickup ERD(3).png -->
 

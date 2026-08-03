@@ -1,7 +1,7 @@
 <!-- title: 22. Cart & Checkout -->
 <!-- status: ERD aligned -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-05 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 <!-- source: 22_Cart & Checkout ERD(3).png -->
 
 # 22. Cart & Checkout
@@ -87,6 +87,7 @@ Purpose: Stores shopping cart line items.
 | `sku_snapshot` | varchar(100) |  | NULL | SKU snapshot. |
 | `product_name_snapshot` | varchar(200) |  | NOT NULL | Product name snapshot. |
 | `product_structure` | varchar(40) |  | NULL | Product structure snapshot. |
+| `line_note` | varchar(500) |  | NULL | Target normalized product-line note; migration pending. |
 | `quantity` | numeric(18,4) |  | NOT NULL | Cart quantity. |
 | `unit_price` | numeric(18,4) |  | NOT NULL | Unit price snapshot. |
 | `line_subtotal_amount` | numeric(18,4) |  | NOT NULL | Line subtotal. |
@@ -113,6 +114,7 @@ CHECK(line_subtotal_amount >= 0)
 CHECK(line_discount_amount >= 0)
 CHECK(line_tax_amount >= 0)
 CHECK(line_total_amount >= 0)
+CHECK(line_note IS NULL OR char_length(line_note) <= 500)
 CHECK(line_status IN ('ACTIVE', 'REMOVED', 'UNAVAILABLE', 'PRICE_CHANGED'))
 ```
 
@@ -212,6 +214,7 @@ Purpose: Stores checkout line snapshots.
 | `product_variant_id` | uuid | FK | NULL | References product_variants(id). |
 | `sku_snapshot` | varchar(100) |  | NULL | SKU snapshot. |
 | `product_name_snapshot` | varchar(200) |  | NOT NULL | Product name snapshot. |
+| `line_note` | varchar(500) |  | NULL | Target normalized product-line note; migration pending. |
 | `quantity` | numeric(18,4) |  | NOT NULL | Checkout quantity. |
 | `unit_price` | numeric(18,4) |  | NOT NULL | Unit price snapshot. |
 | `line_subtotal_amount` | numeric(18,4) |  | NOT NULL | Line subtotal. |
@@ -237,7 +240,10 @@ CHECK(line_subtotal_amount >= 0)
 CHECK(line_discount_amount >= 0)
 CHECK(line_tax_amount >= 0)
 CHECK(line_total_amount >= 0)
+CHECK(line_note IS NULL OR char_length(line_note) <= 500)
 ```
+
+Both `line_note` additions are target schema only; no migration or persistence implementation is claimed. The normalized note participates in cart-line identity and must survive checkout/order/receipt flow.
 
 ## `checkout_session_line_options`
 

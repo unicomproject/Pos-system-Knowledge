@@ -1,6 +1,6 @@
 <!-- title: Tenant Admin User Flow Analysis -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-30 -->
 
 # Tenant Admin User Flow Analysis
@@ -15,7 +15,7 @@ Tenant Admin
 
 ## Source
 
-Derived from `Slides 1-20` in `tenant-full-journey.pptx` and aligned to TM-EPOS MVP Second Brain scope.
+Derived from `Slides 1-20` in `tenant-full-journey.pptx` and aligned to OneVerz POS MVP Second Brain scope.
 
 ## Trigger
 
@@ -30,14 +30,14 @@ Uploaded deck analysis.
 | Step | Action | System Behavior |
 |---:|---|---|
 | 1 | Analyze deck | Slides were rendered because most content is image-based. |
-| 2 | Map tenant flows | Each slide was converted into a TM-EPOS Tenant Admin user journey. |
+| 2 | Map tenant flows | Each slide was converted into a OneVerz POS Tenant Admin user journey. |
 | 3 | Align with MVP scope | Online store, click and collect, offline/cache boundaries, and stock-transfer exclusions were considered. |
 
 ## Data Used Or Captured
 
 - 20 rendered slide flows
 - Existing Second Brain tenant-admin scope
-- TM-EPOS MVP scope rules
+- OneVerz POS MVP scope rules
 
 ## Access And Security Rules
 

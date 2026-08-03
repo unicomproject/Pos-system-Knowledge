@@ -1,6 +1,6 @@
 ﻿<!-- title: Feature Test Case Template -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-30 -->
 
 # Feature Test Case Template

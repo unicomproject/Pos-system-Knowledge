@@ -1,13 +1,13 @@
 <!-- title: Outlet, Till & POS Device Foundation Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Outlet, Till & POS Device Foundation Functional Rules
 
 ## Purpose
 
-Defines business and UX rules for `Outlet_Till_POS_Device_Foundation` in the new TM-EPOS MVP scope.
+Defines business and UX rules for `Outlet_Till_POS_Device_Foundation` in the new OneVerz POS MVP scope.
 These rules must be applied before creating backend APIs, Flutter screens,
 responsive online store screens, Angular/admin screens, tests, or database changes.
 

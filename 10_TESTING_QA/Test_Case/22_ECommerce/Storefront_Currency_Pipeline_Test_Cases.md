@@ -1,6 +1,6 @@
 <!-- title: Storefront Currency Pipeline Test Cases -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-22 -->
 
 # Storefront Currency Pipeline Test Cases

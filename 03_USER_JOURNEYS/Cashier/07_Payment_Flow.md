@@ -1,9 +1,15 @@
 <!-- title: Payment Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Payment Flow
+
+> Current Payment Method UI decision (2026-08-02): Cash, Card, QR Pay and Split
+> Payment only; Pay Later is excluded. Cash is executable. Card, QR Pay and Split
+> remain safely unavailable until their real capability is proven and never fall
+> back to Cash. The count-derived equal-card rule is recorded in
+> `Payment_Method_Screen_Redesign_Implementation_Status.md`.
 
 ## Purpose
 

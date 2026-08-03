@@ -1,6 +1,6 @@
 <!-- title: Return, Inspection & Exchange -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-17 -->
 <!-- source: Updated from uploaded ERD image: 25_Return, Inspection & Exchange ERD(1).png -->
 

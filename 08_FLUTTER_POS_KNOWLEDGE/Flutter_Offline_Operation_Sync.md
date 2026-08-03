@@ -1,6 +1,6 @@
 <!-- title: Flutter Offline Operation Sync -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines Flutter offline operation and sync rules for TM-EPOS MVP.
+This file defines Flutter offline operation and sync rules for OneVerz POS MVP.
 
 Offline mode allows limited POS continuity.
 It does not make the device the final business authority.

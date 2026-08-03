@@ -1,6 +1,6 @@
 <!-- title: Platform Admin Role Management -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines Platform Admin role management rules for TM-EPOS MVP.
+This file defines Platform Admin role management rules for OneVerz POS MVP.
 
 Platform Admin users manage the SaaS platform, not tenant daily POS operations.
 
@@ -35,7 +35,7 @@ audited.
 
 ## Platform Permission Strategy (Option A)
 
-Platform permissions use TM-EPOS plural domain codes for lifecycle/admin areas and
+Platform permissions use OneVerz POS plural domain codes for lifecycle/admin areas and
 **granular action codes** for implemented modules.
 
 Rules:

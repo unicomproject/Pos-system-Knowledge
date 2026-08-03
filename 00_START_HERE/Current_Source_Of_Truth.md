@@ -1,6 +1,6 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-01 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines which project inputs control the TM-EPOS MVP Second Brain.
+This file defines which project inputs control the OneVerz POS MVP Second Brain.
 It prevents developers and AI assistants from mixing old POS-first scope, future
 ideas, and current MVP delivery work.
 Use this file before writing, implementing, reviewing, or generating any module
@@ -16,7 +16,7 @@ documentation.
 
 ## Highest Priority Decision
 
-The current scope is TM-EPOS MVP.
+The current scope is OneVerz POS MVP.
 
 The MVP includes mobile and desktop EPOS, online store, click and collect,
 offline operation, product and variant management, inventory management, order
@@ -30,7 +30,7 @@ sync are excluded must be updated or treated as superseded.
 | Priority | Source | How To Use |
 |---:|---|---|
 | 1 | Confirmed project decisions in chat | Controls final MVP interpretation |
-| 2 | Updated TM-EPOS scope images | Controls market, scope, platform, offline direction |
+| 2 | Updated OneVerz POS scope images | Controls market, scope, platform, offline direction |
 | 3 | Unified Commerce Database Design | Controls updated data model and table constraints |
 | 4 | Existing Second Brain | Reuse only where it does not conflict |
 | 5 | Backend architecture | Use for layering/security unless contradicted by new scope |
@@ -49,7 +49,7 @@ sync are excluded must be updated or treated as superseded.
 
 ## Product Name Rule
 
-Use TM-EPOS as the current MVP product/scope name.
+Use OneVerz POS as the current MVP product/scope name.
 
 Existing SCS-TIX EPOS references are historical or old-folder wording until the
 file is updated. Do not silently mix both names in new content.

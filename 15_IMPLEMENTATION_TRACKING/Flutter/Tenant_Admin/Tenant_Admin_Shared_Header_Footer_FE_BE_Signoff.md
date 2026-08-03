@@ -1,6 +1,6 @@
 <!-- title: Tenant Admin Shared Header Footer FE BE Signoff -->
 <!-- status: Signed off — FE shell complete; BE no new chrome API needed -->
-<!-- system: TM-EPOS MVP / OneVerz POS -->
+<!-- system: OneVerz POS MVP POS -->
 <!-- module: Tenant Admin Shared Header + Footer -->
 <!-- platform: Flutter Tenant Admin + Backend (existing APIs) -->
 <!-- last_updated: 2026-07-28 -->

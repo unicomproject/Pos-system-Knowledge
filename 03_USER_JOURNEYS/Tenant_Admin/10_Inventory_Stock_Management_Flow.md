@@ -1,6 +1,6 @@
 <!-- title: Tenant Admin Inventory Stock Management Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-30 -->
 
 # Tenant Admin Inventory Stock Management Flow
@@ -15,7 +15,7 @@ Tenant Admin
 
 ## Source
 
-Derived from `Slide 10 - Inventory / Stock Management Flow` in `tenant-full-journey.pptx` and aligned to TM-EPOS MVP Second Brain scope.
+Derived from `Slide 10 - Inventory / Stock Management Flow` in `tenant-full-journey.pptx` and aligned to OneVerz POS MVP Second Brain scope.
 
 ## Trigger
 

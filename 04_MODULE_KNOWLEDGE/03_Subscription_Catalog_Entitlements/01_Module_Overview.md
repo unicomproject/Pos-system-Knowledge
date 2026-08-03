@@ -1,6 +1,6 @@
 <!-- title: Subscription Catalog, Plans, Add-ons & Entitlements Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-06-29 -->
 
 # Subscription Catalog, Plans, Add-ons & Entitlements Module Overview
@@ -9,7 +9,7 @@
 
 Define sellable SaaS plans, add-ons, feature limits, platform modules, platform features, tenant entitlements, and feature flags used to activate MVP modules.
 
-This module is part of the new TM-EPOS MVP scope: mobile and desktop EPOS,
+This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device
 support, and low-cost hardware usage for events, stalls, food and beverage,
 merchandising, attractions, and temporary retail locations.
