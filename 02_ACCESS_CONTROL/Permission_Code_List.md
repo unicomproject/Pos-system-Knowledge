@@ -440,3 +440,26 @@ Never rename a permission code casually after development starts.
 - [[API_Authorization_Rules]]
 - [[../05_BACKEND_ARCHITECTURE/Authorization_And_Permissions]]
 - [[../06_DATABASE_KNOWLEDGE/Tables/Permissions]]
+
+
+## Tenant Admin Till / Hardware Permission Alignment (2026-08-01)
+
+Seeded / Backend constants (migration `SeedTenantAdminTillHardwarePermissions` + `TenantAdminTillPermissions`):
+
+| Code | Meaning |
+|---|---|
+| `tenant.tills.view` | View tills / summary / list |
+| `tenant.tills.create` | Create tills |
+| `tenant.tills.update` | Update tills |
+| `tenant.tills.delete` | Delete tills |
+| `tenant.tills.manage` | Manage umbrella |
+| `tenant.tills.details.view` | View till details panel |
+| `tenant.tills.assign_outlet` | Assign till outlet |
+| `tenant.hardware.view` | View hardware connections/status/warnings/alerts |
+| `tenant.hardware.manage` | Register/edit/assign/release hardware; initiate supported tests |
+
+**Note:** The Tenant Admin Permissions table above previously listed only `tenant.hardware.manage`. `tenant.hardware.view`, `tenant.tills.details.view`, and `tenant.tills.assign_outlet` are confirmed seeded codes and must be treated as canonical.
+
+Feature entitlement for till management APIs: **`till_management`** (see platform module catalog seed). Peripheral capability may also be gated by **`device_hardware`**.
+
+Hardware-denied users must still view permitted Till list/summary; show hardware-restricted state instead of failing the whole page.

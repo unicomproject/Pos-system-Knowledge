@@ -13,14 +13,54 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 ## Business Rules
 
-- Outlet code is tenant-unique.
+- Outlet code is tenant-unique within the tenant.
+- Tenant isolation is strictly enforced.
+- Only one default outlet per tenant.
+- Soft deletion is used. Outlets with active tills, orders, stock, or users cannot be hard deleted. Deletion becomes deactivation when dependencies exist.
 - Till belongs to an outlet and is used for POS sessions.
 - Trusted POS device must match tenant, outlet, and assigned till policy.
+- One active Till-device assignment per Till/device where defined.
+- Assignment history should be preserved using `released_at`.
 - One device assignment cannot silently bypass permissions.
 - Revoked or cross-tenant devices cannot load or operate hardware configuration.
 - Configuration changes require actor, device, old/new version and timestamp audit.
 - A cashier cannot silently change the shift printer, drawer or terminal.
 - Business hours can guide online store and pickup availability but do not replace backend validation.
+
+## Outlet Types
+
+**Confirmed Supported Types:**
+- `STORE`: Standard retail location.
+- `WAREHOUSE`: Storage/fulfillment operation.
+
+**Proposed Future Types:**
+- `TEMPORARY`, `KIOSK`, `COLLECTION_POINT`, `POPUP`: These are visually suggested by UI but require domain additions, DB migrations, and API contract updates to be fully supported. Not required for Release 1 unless explicitly requested.
+
+## Outlet Statuses
+
+**Persisted Lifecycle Status:**
+- `Active`: Outlet is operational.
+- `Inactive`: Outlet is suspended or no longer operational.
+- *Transitions:* Allowed between Active and Inactive for users with `tenant.outlets.manage` permission. Requires audit-log.
+
+**Derived Operational Health Status:**
+- `Needs Attention`: This is a derived UI/Operational state, NOT a persisted database status. It requires backend rules (e.g., inactive status, missing manager, no till, device issue) to be aggregated. Currently pending product decision on exact rule definition.
+
+## Till Status Rules
+
+**Till Lifecycle Status:**
+- `ACTIVE`
+- `INACTIVE`
+- `MAINTENANCE`
+- `DELETED`
+
+**Till Operational Status (Monitoring):**
+- `ONLINE`: Till lifecycle is ACTIVE, active Till-device assignment exists, assigned POS device is active, and POS device last-seen timestamp (e.g., `pos_devices.last_seen_at`) is inside the configured heartbeat window (default 5 minutes).
+- `OFFLINE`: No active device assignment exists, assigned device is inactive, device heartbeat missing, device heartbeat older than threshold, or Till is INACTIVE/MAINTENANCE.
+- `NEEDS_ATTENTION`: Till is in MAINTENANCE, ACTIVE Till has no device assignment, assigned POS device is inactive, hardware is missing, hardware latest test failed, hardware warning exists, or hardware is not ready.
+
+**Current Cashier Rule:**
+Current cashier should be resolved dynamically from the current OPEN Till session (`till_sessions.status = OPEN`, `till_sessions.opened_by_tenant_user_id`). Do not treat a permanently assigned user as the current cashier unless verified. If no open session, current cashier is `null` (displayed as `—`).
 
 ## User Rules
 

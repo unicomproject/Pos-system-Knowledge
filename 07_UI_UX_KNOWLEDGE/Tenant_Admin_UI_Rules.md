@@ -62,6 +62,17 @@ Older Release 1 menu lists in this note (Discounts, Loyalty, Reports as primary 
 - Shared fixed black footer: Home, New Sale, Orders, Customers, Settings
 - On Settings screens: sidebar Settings + footer Settings both active
 
+## Till Monitoring UI Layout
+
+The approved Till Monitoring screen operates within the TenantAdminSharedShell.
+- **Header**: Standard black header. Do not hardcode dynamic values (like outlet name, notification count).
+- **Sidebar**: "Tills" is the active item.
+- **Footer**: Active item must be route-aware, do not hardcode "Settings" as active.
+- **Desktop/Tablet Layout**: Uses a Master-Detail pattern. The Till list on the left, and a selected Till detail panel on the right displaying hardware readiness and alerts.
+- **Mobile Layout**: Stacks vertically. Shows the Till list first. Selecting a Till navigates to a separate detail route/screen. Do not force a squished two-column layout.
+- **Summary Cards**: Show Total, Online, and Offline percentages/counts.
+- **Search & Filters**: Support filtering by status (Online, Offline, Needs Attention, Inactive).
+
 ## Permission Rules
 
 Navigation is permission + feature-entitlement based. Do not hardcode cashier/manager/admin access in UI. Do not invent permission keys.

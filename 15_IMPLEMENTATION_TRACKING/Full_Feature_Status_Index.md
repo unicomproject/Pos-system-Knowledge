@@ -71,6 +71,7 @@ PR/commit reference is recorded.
 | Angular | Tenant | Tenant List Page | In Progress | - | - | Wired to platform-admin tenants API |
 | Backend | Tenant / Outlet | Outlet Create | Completed | 2026-06-18 | dashboard_tenant | `POST /api/v1/tenant-admin/outlets` |
 | Flutter | Tenant Admin / Outlet | Outlet Create UI | Completed | 2026-06-18 | tenant-dashboard | Add/Edit outlet screens |
+| Flutter | Tenant Admin / Till | Till Monitoring UI | Partially Implemented | - | - | Implementation tracking added. See [[Flutter/Tenant_Admin/Till_Monitoring_UI_Implementation_Status]] |
 | Flutter | Sales | Discount | Testing | - | `scanner_inte` | API-backed list/validate/apply flow; manager approval is permission-dependent |
 | Flutter | Sales | Customer Management | Testing | - | `scanner_inte` | List/create/update/select/attach implemented; loyalty is separate and incomplete |
 | Flutter | Sales | Loyalty Earn / Redeem | Not Started | - | - | No verified cashier Flutter-to-backend loyalty flow |

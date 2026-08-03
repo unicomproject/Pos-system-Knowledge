@@ -127,6 +127,3 @@ acceptance.
 ## Related Files
 
 - [[POS_Hardware_Integration]]
-- [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/02_Functional_Rules]]
-- [[../10_TESTING_QA/POS_Hardware_Production_Acceptance_Matrix]]
-- [[../13_DECISIONS_AND_CHANGES/Open_Questions]]

@@ -187,3 +187,14 @@ unrelated New Sale failures. No physical test was performed. Status:
 - [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Hardware_Payment_Receipt]]
 - [[../15_IMPLEMENTATION_TRACKING/Backend/POSOperations/Receipt_Printer_Local_Agent_Implementation_Status]]
 - [[../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Payment_Receipt_Contract_Implementation_Status]]
+
+
+## Tenant Admin Monitoring Boundary (2026-08-01)
+
+Network printer raw TCP testing must use Android/Windows native POS or an approved local hardware bridge — **not** Tenant Admin Flutter Web.
+
+Tenant Admin displays Backend-reported connection/test status on the Till hardware card only.
+
+Status of physical printer matrix remains **PHYSICAL VERIFICATION PENDING**.
+
+See [[POS_Hardware_Integration]].
