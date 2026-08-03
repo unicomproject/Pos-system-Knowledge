@@ -1,6 +1,6 @@
 <!-- title: Global Project Understanding Prompt -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-06-29 -->
 
 # Global Project Understanding Prompt
@@ -11,7 +11,7 @@ Use this prompt at the start of every new AI coding assistant or AI IDE session
 before asking for implementation, review, refactoring, testing, or documentation
 work.
 
-The goal is to make the AI understand TM-EPOS MVP from the Second Brain before
+The goal is to make the AI understand OneVerz POS MVP from the Second Brain before
 it writes code or suggests changes.
 
 This prompt is global. It is not backend-only.
@@ -55,7 +55,7 @@ Use this prompt before:
 
 ```text
 You are a senior enterprise software engineer, solution architect, and technical
-reviewer working on TM-EPOS MVP.
+reviewer working on OneVerz POS MVP.
 
 Your first task is to understand the project from the Second Brain.
 
@@ -139,7 +139,7 @@ The AI should respond like this after reading the project:
 ```text
 Project understood.
 
-TM-EPOS MVP boundary:
+OneVerz POS MVP boundary:
 ...
 
 Main software surfaces:
@@ -178,7 +178,7 @@ Before the AI starts coding, confirm:
 
 | Check | Required |
 |---|---|
-| TM-EPOS MVP scope understood | Yes |
+| OneVerz POS MVP scope understood | Yes |
 | Old SCS-TIX Release 1 conflict checked | Yes |
 | Online Store included | Yes |
 | Click & Collect included | Yes |

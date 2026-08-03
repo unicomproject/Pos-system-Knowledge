@@ -1,6 +1,6 @@
 <!-- title: QR Payment Integration -->
 <!-- status: Draft -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-23 -->
 
 # QR Payment Integration

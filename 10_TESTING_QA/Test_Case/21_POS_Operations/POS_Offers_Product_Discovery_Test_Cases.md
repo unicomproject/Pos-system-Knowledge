@@ -1,6 +1,6 @@
 <!-- title: POS Offers Product Discovery Test Cases -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-31 -->
 
 # POS Offers Product Discovery Test Cases

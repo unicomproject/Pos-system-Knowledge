@@ -1,6 +1,6 @@
 <!-- title: Tenant Admin Settings Responsive Design -->
 <!-- status: Active — responsive rules for white sidebar + shared shell -->
-<!-- system: TM-EPOS MVP / OneVerz POS -->
+<!-- system: OneVerz POS MVP POS -->
 <!-- last_updated: 2026-07-29 -->
 <!-- doc_type: Architecture approval — documentation only; implementation not complete -->
 

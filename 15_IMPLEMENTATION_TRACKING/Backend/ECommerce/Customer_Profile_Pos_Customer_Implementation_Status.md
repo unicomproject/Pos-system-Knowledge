@@ -1,6 +1,6 @@
 <!-- title: Customer Profile POS Customer Implementation Status -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Customer Profile POS Customer Implementation Status

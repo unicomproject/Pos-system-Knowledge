@@ -1,6 +1,6 @@
 <!-- title: Backend Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines the backend architecture direction for TM-EPOS MVP.
+This file defines the backend architecture direction for OneVerz POS MVP.
 
 The backend supports mobile POS, desktop EPOS, online store, click and collect,
 offline operation, unified order management, payment/refund, reporting, hardware,
@@ -16,7 +16,7 @@ notifications, integrations, and platform/tenant administration.
 
 ## Core Backend Decision
 
-TM-EPOS backend uses Clean Architecture with module-based folders.
+OneVerz POS backend uses Clean Architecture with module-based folders.
 
 Controllers are thin.
 Application services own use-case orchestration.

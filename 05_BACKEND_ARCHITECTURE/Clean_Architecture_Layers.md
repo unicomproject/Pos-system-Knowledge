@@ -1,6 +1,6 @@
 <!-- title: Clean Architecture Layers -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-01 -->
 
 
@@ -10,7 +10,7 @@
 
 This file defines how backend code is separated into layers.
 
-The layer rule remains valid after the TM-EPOS MVP scope update.
+The layer rule remains valid after the OneVerz POS MVP scope update.
 
 ## Layer Order
 

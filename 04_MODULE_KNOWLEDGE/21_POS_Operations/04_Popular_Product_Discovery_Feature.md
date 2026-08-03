@@ -1,6 +1,6 @@
 <!-- title: Popular Product Discovery Feature Specification -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-31 -->
 
 # Popular Product Discovery Feature

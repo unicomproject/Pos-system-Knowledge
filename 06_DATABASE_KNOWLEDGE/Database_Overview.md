@@ -1,6 +1,6 @@
 <!-- title: Database Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-30 -->
 <!-- source: Unified_Commerce_Databse_Design.docx -->
 
@@ -9,7 +9,7 @@
 
 ## Purpose
 
-This folder documents the TM-EPOS MVP database design using the uploaded
+This folder documents the OneVerz POS MVP database design using the uploaded
 Unified Commerce database design as the source of truth.
 
 This version expands every module into implementation-style table attribute
@@ -19,7 +19,7 @@ sections.
 
 The uploaded design provides entity tables with PK/FK/UNIQUE/CHECK constraints.
 These Markdown files expand those constraints into practical implementation
-attribute tables using consistent TM-EPOS database standards.
+attribute tables using consistent OneVerz POS database standards.
 
 ## Enum Rule
 

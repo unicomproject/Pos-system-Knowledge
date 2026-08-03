@@ -1,6 +1,6 @@
 <!-- title: Payment & Refund Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Payment & Refund Module Overview
@@ -9,7 +9,7 @@
 
 Support payment methods, sales payments, payment transactions/events, refunds, refund payment allocations, and refund lines across POS and online channels.
 
-This module is part of the new TM-EPOS MVP scope: mobile and desktop EPOS,
+This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device
 support, and low-cost hardware usage for events, stalls, food and beverage,
 merchandising, attractions, and temporary retail locations.

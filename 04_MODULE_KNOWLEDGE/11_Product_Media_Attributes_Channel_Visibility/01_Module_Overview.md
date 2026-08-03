@@ -1,6 +1,6 @@
 <!-- title: Product Media, Attributes & Channel Visibility Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-06-29 -->
 
 # Product Media, Attributes & Channel Visibility Module Overview
@@ -9,7 +9,7 @@
 
 Control product images, barcodes, attribute definitions/options/values, and channel visibility for POS, online store, click and collect, and future delivery channels.
 
-This module is part of the new TM-EPOS MVP scope: mobile and desktop EPOS,
+This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device
 support, and low-cost hardware usage for events, stalls, food and beverage,
 merchandising, attractions, and temporary retail locations.

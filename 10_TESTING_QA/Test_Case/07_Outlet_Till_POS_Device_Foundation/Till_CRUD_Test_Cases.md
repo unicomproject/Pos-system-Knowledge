@@ -1,6 +1,6 @@
 <!-- title: Till CRUD Test Cases -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-02 -->
 
 # Till CRUD Test Cases

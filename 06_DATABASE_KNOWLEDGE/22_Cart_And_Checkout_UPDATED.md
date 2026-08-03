@@ -1,6 +1,6 @@
 <!-- title: 22. Cart & Checkout -->
 <!-- status: ERD aligned -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-17 -->
 <!-- source: 22_Cart & Checkout ERD(3).png -->
 

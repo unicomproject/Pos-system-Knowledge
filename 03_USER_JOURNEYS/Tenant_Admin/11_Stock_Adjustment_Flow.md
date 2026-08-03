@@ -1,6 +1,6 @@
 <!-- title: Tenant Admin Stock Adjustment Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-30 -->
 
 # Tenant Admin Stock Adjustment Flow
@@ -15,7 +15,7 @@ Tenant Admin
 
 ## Source
 
-Derived from `Slide 11 - Stock Adjustment Flow` in `tenant-full-journey.pptx` and aligned to TM-EPOS MVP Second Brain scope.
+Derived from `Slide 11 - Stock Adjustment Flow` in `tenant-full-journey.pptx` and aligned to OneVerz POS MVP Second Brain scope.
 
 ## Trigger
 

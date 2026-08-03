@@ -1,6 +1,6 @@
 <!-- title: Flutter API Integration -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 

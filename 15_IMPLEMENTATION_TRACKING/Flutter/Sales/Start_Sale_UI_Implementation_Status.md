@@ -1,10 +1,14 @@
 <!-- title: Start Sale UI Implementation Status -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-07-11 -->
+<!-- last_updated: 2026-08-01 -->
 
 
 # Start Sale UI Implementation Status
+
+## Product Variant Popup Scope Update (2026-08-01)
+
+Documentation Ready: [[Product_Variant_Popup_Implementation_Status]]. Existing `PosProductVariantSheet`, resolved-variant direct-add and scanner evidence are partial only. One-image production popup behaviour, line note, manual Frequently Bought Together, atomic cart integration, dedicated automated coverage and physical validation remain Implementation Pending.
 
 ## Product and Variant Stock Status (2026-07-18)
 
@@ -185,3 +189,9 @@ flutter test
 ## Related Files
 
 - [[../Full_Feature_Status_Index]]
+
+## Product Variant Popup Integration (2026-08-02)
+
+The active New Sale flow now opens the existing variant popup for configurable products, preserves direct-add behavior for an already resolved sellable variant, validates the atomic main/recommendation line set through the existing Chunk 2 cart calculation endpoint, and displays line notes in the cart. Focused Flutter evidence is 10/10 passing, cart/sale groups are 114/114 passing, and final static analysis is clean. Repository-wide Flutter regression is not green (702 passed, 11 unrelated pre-existing POS shell/widget expectation failures). Real backend, emulator and physical-device validation remain Pending; fractional quantities and configurable recommendations remain Partial.
+
+Target-screen alignment was added on 2026-08-02 without changing the New Sale background or application shell. The popup now provides adaptive three-section landscape layout, stacked portrait/mobile layout, single-image-only rendering, OneVerz orange controls, compact quantity/note controls and a dedicated FBT card. The production validation bypass, recommendation rounding/category fallback and silent currency fallback were removed. Updated focused evidence is 16/16 passing; full-suite evidence is 703 passed / 11 existing unrelated failures. Pixel Tablet was detected, but authenticated real-backend visual validation remains Pending.

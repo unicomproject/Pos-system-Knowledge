@@ -1,6 +1,6 @@
 <!-- title: Customer Basic, Authentication & Consent -->
 <!-- status: Updated -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-04 -->
 <!-- source: 19_Customer Basic, Authentication & Consent ERD image -->
 

@@ -1,6 +1,6 @@
 <!-- title: Discount & Expiry Discount Management -->
 <!-- status: ERD aligned -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-13 -->
 <!-- source: 15_Discount & Expiry Discount Management(1).png -->
 

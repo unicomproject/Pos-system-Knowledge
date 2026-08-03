@@ -1,6 +1,6 @@
 <!-- title: Product Review API Test Cases -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-16 -->
 
 # Product Review API Test Cases

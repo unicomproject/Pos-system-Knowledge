@@ -1,6 +1,6 @@
 <!-- title: Brand Collection CRUD Test Cases -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- module: CatalogProduct -->
 <!-- feature: Brand CRUD / Collection CRUD -->
 <!-- last_updated: 2026-07-03 -->

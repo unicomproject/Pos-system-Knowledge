@@ -1,6 +1,6 @@
 <!-- title: Flutter Permission Based UI Rendering -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines permission-based UI rendering rules for TM-EPOS Flutter apps.
+This file defines permission-based UI rendering rules for OneVerz POS Flutter apps.
 
 Permissions are backend-driven and must not be hardcoded by role name.
 

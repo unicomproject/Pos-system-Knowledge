@@ -1,6 +1,6 @@
 <!-- title: SA-P1-06 Platform Admin User Password Reset Implementation -->
 <!-- status: Completed -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- module: PlatformAdministration / Auth -->
 <!-- feature: Platform Admin User Password Reset -->
 <!-- last_updated: 2026-07-24 -->

@@ -1,6 +1,6 @@
 <!-- title: Flutter Device Platform Support -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines device and platform support expectations for TM-EPOS Flutter.
+This file defines device and platform support expectations for OneVerz POS Flutter.
 
 The MVP direction supports selling and operations across mobile, tablet, and
 desktop-style devices.

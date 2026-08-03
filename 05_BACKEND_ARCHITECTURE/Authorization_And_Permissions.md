@@ -1,6 +1,6 @@
 <!-- title: Authorization And Permissions -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines backend authorization rules for TM-EPOS MVP.
+This file defines backend authorization rules for OneVerz POS MVP.
 
 Authorization must protect platform admin, tenant admin, POS, online store admin,
 cart/checkout, orders, fulfilment, pickup, payments/refunds, offline sync,

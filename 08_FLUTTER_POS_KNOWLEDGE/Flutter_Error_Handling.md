@@ -1,6 +1,6 @@
 <!-- title: Flutter Error Handling -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines error handling rules for TM-EPOS Flutter apps.
+This file defines error handling rules for OneVerz POS Flutter apps.
 
 Errors must be clear for staff, safe for customers, and useful for developers.
 

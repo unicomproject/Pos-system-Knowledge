@@ -1,13 +1,13 @@
 <!-- title: Tenant Isolation Test Cases -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-31 -->
 
 # Tenant Isolation Test Cases
 
 ## Purpose
 
-This file defines tenant isolation tests for TM-EPOS MVP backend features.
+This file defines tenant isolation tests for OneVerz POS MVP backend features.
 
 ## Tenant Isolation Rule
 

@@ -1,6 +1,6 @@
 <!-- title: Unified Order & Sales -->
 <!-- status: Updated -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-17 -->
 <!-- source: Final fixed Unified Order & Sales ERD design -->
 

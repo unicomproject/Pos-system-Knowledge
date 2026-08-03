@@ -1,13 +1,13 @@
 <!-- title: Tenant Admin UI Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP / OneVerz POS -->
+<!-- system: OneVerz POS MVP POS -->
 <!-- last_updated: 2026-07-29 -->
 
 # Tenant Admin UI Rules
 
 ## Purpose
 
-Tenant Admin UI rules for OneVerz POS / TM-EPOS MVP.
+Tenant Admin UI rules for OneVerz POS MVP.
 
 Tenant Admin works inside the same Flutter POS app, but uses a separate operational admin layout.
 

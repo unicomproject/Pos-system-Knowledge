@@ -1,6 +1,6 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Hardware Operations, Till Session & Cash Control Module Overview
@@ -9,7 +9,7 @@
 
 Control hardware devices, hardware assignments, hardware tests, till sessions, cash movements, cash reconciliation, and denomination counts.
 
-This module is part of the new TM-EPOS MVP scope: mobile and desktop EPOS,
+This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device
 support, and low-cost hardware usage for events, stalls, food and beverage,
 merchandising, attractions, and temporary retail locations.

@@ -1,6 +1,6 @@
 <!-- title: UOM Seed List Implementation Status -->
 <!-- status: Completed -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- module: CatalogProduct -->
 <!-- feature: UOM Seed/List -->
 <!-- last_updated: 2026-07-03 -->

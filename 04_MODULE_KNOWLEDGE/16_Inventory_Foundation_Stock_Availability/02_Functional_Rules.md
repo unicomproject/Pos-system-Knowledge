@@ -1,13 +1,13 @@
 <!-- title: Inventory Foundation, Product Tracking & Stock Availability Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
+<!-- last_updated: 2026-08-01 -->
 
 # Inventory Foundation, Product Tracking & Stock Availability Functional Rules
 
 ## Purpose
 
-Defines business and UX rules for `Inventory_Foundation_Stock_Availability` in the new TM-EPOS MVP scope.
+Defines business and UX rules for `Inventory_Foundation_Stock_Availability` in the new OneVerz POS MVP scope.
 These rules must be applied before creating backend APIs, Flutter screens,
 responsive online store screens, Angular/admin screens, tests, or database changes.
 
@@ -24,6 +24,7 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - A variable product is in stock only when at least one active and sellable variant has positive current-outlet availability. Inactive, deleted, and non-sellable variants must not affect product availability.
 - Missing or unrecognized API stock status must render as unavailable/unknown in clients and must never default to a positive stock state.
 - Product list and detail responses must use the same outlet-scoped aggregation. Cart and checkout validation remain backend-authoritative regardless of UI badges or disabled controls.
+- Popup quantity validation also considers matching quantity already in the cart. Tracked variants without a valid balance have zero availability; conflicts trigger refresh/reselection. See [[../21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 
 ## User Rules
 

@@ -1,6 +1,6 @@
 <!-- title: Access Control Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines the access-control model for the TM-EPOS MVP.
+This file defines the access-control model for the OneVerz POS MVP.
 
 The MVP now covers mobile POS, desktop EPOS, online store, click and collect,
 offline operation, unified orders, payments, refunds, reports, and business admin

@@ -1,6 +1,6 @@
 <!-- title: Flutter DTO And Mapping Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines Flutter DTO and mapping rules for TM-EPOS MVP.
+This file defines Flutter DTO and mapping rules for OneVerz POS MVP.
 
 DTOs belong to the data layer.
 UI must use view models or domain models, not raw API DTOs.

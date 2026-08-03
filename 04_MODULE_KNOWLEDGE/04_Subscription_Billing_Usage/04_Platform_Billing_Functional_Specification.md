@@ -1,6 +1,6 @@
 <!-- title: Platform Billing Functional Specification -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-15 -->
 
 # Platform Billing Functional Specification

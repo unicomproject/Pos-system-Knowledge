@@ -1,6 +1,6 @@
 <!-- title: SA-P0-02 Dashboard Attention Count Fix -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-20 -->
 
 # SA-P0-02 — Platform Admin dashboard attention count accuracy (COMPLETE)

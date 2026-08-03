@@ -1,6 +1,6 @@
 <!-- title: Device Activation Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-23 -->
 
 # Device Activation Flow

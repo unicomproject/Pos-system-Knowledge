@@ -1,6 +1,6 @@
 <!-- title: 04. Subscription Catalog, Plans, Add-ons & Entitlements -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- source: Updated from uploaded ERD image: 04_Subscription Catalog, Plans, Add-ons & Entitlements.png -->
 
 # 04. Subscription Catalog, Plans, Add-ons & Entitlements

@@ -1,6 +1,6 @@
 <!-- title: Payment & Refund Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Payment & Refund Technical Contract
@@ -8,7 +8,7 @@
 ## Purpose
 
 Defines the implementation contract for `Payment_Refund`. This contract is based on
-new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
+new OneVerz POS MVP scope images and the uploaded Unified Commerce database design.
 
 ## POS Safe Card Metadata Contract (2026-07-17)
 
@@ -112,7 +112,7 @@ Test coverage must include:
 5. Build frontend route/screen/component/provider/service.
 6. Add loading, empty, error, denied, feature-disabled, offline, and conflict states.
 7. Add unit/integration/API/widget tests.
-8. Review against new TM-EPOS MVP module boundaries.
+8. Review against new OneVerz POS MVP module boundaries.
 
 ## Out Of Scope
 

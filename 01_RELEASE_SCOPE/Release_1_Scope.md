@@ -1,19 +1,19 @@
-<!-- title: TM-EPOS MVP Scope -->
+<!-- title: OneVerz POS MVP Scope -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-31 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 
-# TM-EPOS MVP Scope
+# OneVerz POS MVP Scope
 
 ## Purpose
 
-This file locks the current TM-EPOS MVP scope.
+This file locks the current OneVerz POS MVP scope.
 Use it before creating journeys, backend modules, database migrations, UI tasks,
 test cases, or AI development prompts.
 
 This file replaces older POS-first scope statements where they conflict with the
-updated TM-EPOS scope images and Unified Commerce database design.
+updated OneVerz POS scope images and Unified Commerce database design.
 
 ## Scope Decision Rule
 
@@ -26,7 +26,7 @@ When uncertain, ask for confirmation before implementation.
 
 ## MVP Product Position
 
-TM-EPOS is a modern, low-cost, offline-capable EPOS platform for events,
+OneVerz POS is a modern, low-cost, offline-capable EPOS platform for events,
 merchandising, food and beverage operators, attractions, stadiums, and temporary
 retail locations.
 
@@ -104,6 +104,10 @@ flowchart TD
     G --> I[Reports and reconciliation]
     H --> I
 ```
+
+## Cashier Product Configuration Scope
+
+Cashier New Sale includes the production Product Variant Selection Popup before cart addition when direct-add rules cannot resolve a sellable variant. It uses one image slot, supports an optional product-line note and up to three manually configured Frequently Bought Together products. Popup image browsing and AI/ML recommendations are excluded; shared product-media multi-image capability remains available elsewhere. See [[../04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 
 ## Offline Boundary
 

@@ -1,6 +1,6 @@
 <!-- title: POS Frequently Sold Backend Implementation Status -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-31 -->
 
 # POS Frequently Sold Backend Implementation Status
@@ -12,11 +12,11 @@
 | Platform | Backend |
 | Module | CatalogProduct / POS |
 | Feature | Frequently Sold Product Discovery (`segment=frequently-sold`) |
-| Status | Not Started |
-| Completed Date | - |
+| Status | Completed |
+| Completed Date | 2026-07-31 |
 | Branch | - |
-| PR / Commit | - |
-| Tests | Not Run |
+| PR / Commit | Current working tree |
+| Tests | All 20 repository integration tests passed |
 
 ---
 
@@ -37,7 +37,7 @@ Dynamic lookback calculation aggregating completed sales at the product level fo
 ## Files Changed
 
 ```text
-No implementation files changed. Documentation phase only.
+- src/E_POS.Infrastructure/Modules/Tenant/CatalogProduct/Repositories/PosProductCatalogRepository.cs
 ```
 
 ---
@@ -45,9 +45,13 @@ No implementation files changed. Documentation phase only.
 ## Tests Written
 
 ```text
-Planned test coverage documented.
-Implementation tests not created.
-Result: Not Run.
+Five new integration test cases added to PosProductCatalogRepositoryTests.cs:
+- ListProductsAsync_FrequentlySold_ReturnsRankedProducts
+- ListProductsAsync_FrequentlySold_DeductsCancellationsAndReturns
+- ListProductsAsync_FrequentlySold_ExcludesNonCompletedAndOldOrders
+- ListProductsAsync_FrequentlySold_ResolvesConfigsAndAppliesLimit
+- ListProductsAsync_FrequentlySold_ObeysTenantAndOutletIsolation
+Result: Passed (20/20 total repository tests).
 ```
 
 ---

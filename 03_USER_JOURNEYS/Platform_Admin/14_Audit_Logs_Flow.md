@@ -1,6 +1,6 @@
 <!-- title: Audit Logs Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-03 -->
 
 # Audit Logs Flow
@@ -34,7 +34,7 @@ Platform Admin
 
 ## Source
 
-Derived from `Slide 8 - Audit Logs Flow` in `SYSTEM_USER_JOURNEY.pptx` and aligned to TM-EPOS MVP Second Brain scope.
+Derived from `Slide 8 - Audit Logs Flow` in `SYSTEM_USER_JOURNEY.pptx` and aligned to OneVerz POS MVP Second Brain scope.
 
 ## Trigger
 

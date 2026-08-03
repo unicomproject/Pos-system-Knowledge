@@ -1,12 +1,12 @@
 <!-- title: Backend Feature Prompt With Optional Reads -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-01 -->
 
 # Backend Feature Prompt With Optional Reads
 
 ```text
-You are a senior .NET backend engineer working on TM-EPOS MVP.
+You are a senior .NET backend engineer working on OneVerz POS MVP.
 
 Assume the project understanding prompt was already read in this session.
 

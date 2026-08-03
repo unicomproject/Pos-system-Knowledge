@@ -1,6 +1,6 @@
 <!-- title: Tenant Admin Settings Layout Implementation Status -->
 <!-- status: Architecture approved — white sidebar + shared shell; code incomplete -->
-<!-- system: TM-EPOS MVP / OneVerz POS -->
+<!-- system: OneVerz POS MVP POS -->
 <!-- module: Tenant Admin Shared Layout -->
 <!-- platform: Flutter Tenant Admin + Backend -->
 <!-- last_updated: 2026-07-29 -->

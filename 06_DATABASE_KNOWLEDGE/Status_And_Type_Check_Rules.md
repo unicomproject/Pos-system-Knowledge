@@ -1,6 +1,6 @@
 ﻿<!-- title: Status And Type Check Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-04 -->
 <!-- source: Unified_Commerce_Databse_Design.docx -->
 

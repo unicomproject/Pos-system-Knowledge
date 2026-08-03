@@ -1,6 +1,6 @@
 <!-- title: Tenant Management Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP / OneVerz -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-31 -->
 <!-- decision_closure_date: 2026-07-31 -->
 
@@ -16,7 +16,7 @@ Platform Admin (or Platform User with approved platform permissions).
 
 ## Source
 
-Derived from `Slide 3 - Tenant Management Flow` in `SYSTEM_USER_JOURNEY.pptx` and aligned to TM-EPOS MVP Second Brain scope.
+Derived from `Slide 3 - Tenant Management Flow` in `SYSTEM_USER_JOURNEY.pptx` and aligned to OneVerz POS MVP Second Brain scope.
 
 ## Trigger
 

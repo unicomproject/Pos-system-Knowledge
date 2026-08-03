@@ -1,8 +1,7 @@
 <!-- title: POS Hardware Integration -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-08-01 -->
-
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-07-29 -->
 # POS Hardware Integration
 ## Purpose
 Authoritative production architecture, readiness and implementation order for

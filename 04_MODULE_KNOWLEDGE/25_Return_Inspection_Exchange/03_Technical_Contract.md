@@ -1,6 +1,6 @@
 <!-- title: Return, Inspection & Exchange Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-23 -->
 
 # Return, Inspection & Exchange Technical Contract
@@ -8,7 +8,7 @@
 ## Purpose
 
 Defines the implementation contract for `Return_Inspection_Exchange`. This contract is based on
-new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
+new OneVerz POS MVP scope images and the uploaded Unified Commerce database design.
 
 ## API Contract
 
@@ -96,7 +96,7 @@ Test coverage must include:
 5. Build frontend route/screen/component/provider/service.
 6. Add loading, empty, error, denied, feature-disabled, offline, and conflict states.
 7. Add unit/integration/API/widget tests.
-8. Review against new TM-EPOS MVP module boundaries.
+8. Review against new OneVerz POS MVP module boundaries.
 
 ## Out Of Scope
 

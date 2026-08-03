@@ -1,6 +1,6 @@
 <!-- title: Permission Test Cases -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-31 -->
 
 # Permission Test Cases

@@ -1,13 +1,13 @@
 <!-- title: Discount & Expiry Discount Management Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-07-13 -->
 
 # Discount & Expiry Discount Management Functional Rules
 
 ## Purpose
 
-Defines business and UX rules for `Discount_Expiry_Discount_Management` in the new TM-EPOS MVP scope.
+Defines business and UX rules for `Discount_Expiry_Discount_Management` in the new OneVerz POS MVP scope.
 These rules must be applied before creating backend APIs, Flutter screens,
 responsive online store screens, Angular/admin screens, tests, or database changes.
 

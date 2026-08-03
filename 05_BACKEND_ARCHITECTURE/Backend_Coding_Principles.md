@@ -1,6 +1,6 @@
 <!-- title: Backend Coding Principles -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-01 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines backend coding rules for TM-EPOS MVP.
+This file defines backend coding rules for OneVerz POS MVP.
 
 The rules prevent duplicated logic, tenant leaks, unsafe offline behavior, and
 unreviewable code.
@@ -67,7 +67,7 @@ MVP areas.
 
 ## SOLID Principles
 
-| Principle | TM-EPOS Usage |
+| Principle | OneVerz POS Usage |
 |---|---|
 | Single Responsibility | Controller handles HTTP only; service handles use case only |
 | Open/Closed | Add provider adapters without rewriting core payment flow |

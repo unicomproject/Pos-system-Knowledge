@@ -1,6 +1,6 @@
 <!-- title: Tenant Lifecycle Post-Merge Smoke Verification -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP / OneVerz -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-28 -->
 
 # Tenant Lifecycle Post-Merge Smoke Verification

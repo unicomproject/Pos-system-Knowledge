@@ -20,7 +20,7 @@ Platform Admin
 
 ## Source
 
-Derived from `Slide 2 - Platform Dashboard Flow` in `SYSTEM_USER_JOURNEY.pptx` and aligned to TM-EPOS MVP Second Brain scope.
+Derived from `Slide 2 - Platform Dashboard Flow` in `SYSTEM_USER_JOURNEY.pptx` and aligned to OneVerz POS MVP Second Brain scope.
 
 ## Trigger
 
@@ -552,7 +552,7 @@ MRR data requires BOTH `platform.tenant_subscriptions.view` and `platform.billin
 | Layer | Behaviour |
 |---|---|
 | Backend | No MRR fields on `PlatformDashboardResponse` |
-| Frontend | `monthlyRecurringRevenue: 0`, label �Not tracked in TM-EPOS MVP� |
+| Frontend | `monthlyRecurringRevenue: 0`, label �Not tracked in OneVerz POS MVP� |
 | Gap | SA-DASH-GAP-01 |
 
 ### Approved formula
@@ -1210,7 +1210,7 @@ Gap documentation standard: each gap below is the implementation-ready contract 
 Release 1 requires real per-currency MRR; current product shows a permanent-looking placeholder.
 
 #### Current documented behaviour
-Backend `PlatformDashboardResponse` has no MRR fields. Frontend hardcodes `monthlyRecurringRevenue: 0` and labels �Not tracked in TM-EPOS MVP�.
+Backend `PlatformDashboardResponse` has no MRR fields. Frontend hardcodes `monthlyRecurringRevenue: 0` and labels �Not tracked in OneVerz POS MVP�.
 
 #### Current verified implementation
 Not Implemented (placeholder only).

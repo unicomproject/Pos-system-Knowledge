@@ -1,6 +1,6 @@
 <!-- title: ACS Email Operations and Deployment Runbook -->
 <!-- status: APPROVED -->
-<!-- system: TM-EPOS MVP / OneVerz -->
+<!-- system: OneVerz POS MVP -->
 <!-- owner: Platform Architecture / Operations (OneVerz) -->
 <!-- last_updated: 2026-07-27 -->
 <!-- applies_to: ACS Email configuration and operations (no secrets) -->

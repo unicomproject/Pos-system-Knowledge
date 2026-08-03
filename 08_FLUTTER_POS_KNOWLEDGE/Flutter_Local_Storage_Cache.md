@@ -1,6 +1,6 @@
 <!-- title: Flutter Local Storage Cache -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines local persistent cache rules for TM-EPOS Flutter apps.
+This file defines local persistent cache rules for OneVerz POS Flutter apps.
 
 Local storage keeps important reference data and offline state available after app
 restart, crash, or temporary internet failure.

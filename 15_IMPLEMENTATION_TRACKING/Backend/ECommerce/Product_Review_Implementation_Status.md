@@ -1,6 +1,6 @@
 <!-- title: Product Review Implementation Status -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Product Review Implementation Status

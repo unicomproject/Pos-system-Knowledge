@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin Device Hardware Management Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-31 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-06-30 -->
 
 # Tenant Admin Device Hardware Management Flow
 

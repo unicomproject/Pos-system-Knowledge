@@ -1,6 +1,6 @@
 <!-- title: Tenant Admin User Management Add New User Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-27 -->
 
 # Tenant Admin User Management Add New User Flow
@@ -17,7 +17,7 @@ Tenant Admin
 
 ## Source
 
-Derived from `Slide 7 - User Management Add New User Flow` in `tenant-full-journey.pptx` and aligned to TM-EPOS MVP Second Brain scope.
+Derived from `Slide 7 - User Management Add New User Flow` in `tenant-full-journey.pptx` and aligned to OneVerz POS MVP Second Brain scope.
 
 ## Trigger
 

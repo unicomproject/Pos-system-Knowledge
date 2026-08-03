@@ -1,6 +1,6 @@
 <!-- title: Tenant Lifecycle Status Alignment Implementation Status -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP / OneVerz -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-28 -->
 
 # Tenant Lifecycle Status Alignment Implementation Status

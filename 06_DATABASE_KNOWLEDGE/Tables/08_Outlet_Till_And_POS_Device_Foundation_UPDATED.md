@@ -1,6 +1,6 @@
 <!-- title: 08. Outlet, Till & POS Device Foundation -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-06 -->
 <!-- source: Updated from uploaded ERD image -->
 

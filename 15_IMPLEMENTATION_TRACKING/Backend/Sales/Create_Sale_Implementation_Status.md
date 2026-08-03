@@ -1,7 +1,7 @@
 <!-- title: Create Sale Implementation Status -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-10 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 
 # Create Sale Implementation Status
@@ -62,6 +62,15 @@ Unified-Commerce.
 1. Implement POS checkout/cart/receipt controllers in `E_POS.Api`.
 2. Wire Flutter cash checkout end-to-end against Unified-Commerce.
 3. Add integration tests and update API_ENDPOINTS verified table.
+4. Preserve normalized product-line notes through cart, supported hold/recall, checkout, `sales_order_lines`, receipt and order detail; support atomic main/recommendation addition. Documentation Ready; implementation/tests remain pending verification.
+
+## Product Variant Popup Chunk 1 Persistence Evidence (2026-08-01)
+
+Database/domain foundation is implemented by `20260801181031_AddProductVariantPopupPersistenceFoundation`: `sales_order_lines.line_note`, `shopping_cart_items.line_note`, `checkout_session_lines.line_note`, and `product_recommendation_links`. Backend POS checkout currently creates `sales_order_lines` directly; backend holds reference the held sales order and its lines; receipts retain JSON snapshots. API DTO/application propagation, receipt line-note serialization and atomic recommendation addition remain Pending. Focused tests passed 5/5 and the complete backend suite passed 1,485/1,485; no shared database migration was applied.
+
+## Product Variant Popup Chunk 2 Backend Evidence (2026-08-01)
+
+The active Unified-Commerce routes were re-audited and are implemented despite older status text above: `POST /api/v1/pos/cart/calculate`, `/api/v1/pos/checkout/summary`, `/api/v1/pos/checkout/start-payment`, `/api/v1/pos/holds`, and receipt persistence. Chunk 2 adds backward-compatible line metadata and normalization. The normalized line note now flows through stateless cart calculation, backend hold/create and recall, payment revalidation, `sales_order_lines`, payment/hold responses and receipt JSON. Recommendation-marked lines require a current active server-side relationship; validation failure returns no calculated partial response. Full backend regression passed 1,491/1,491 (711 unit, 340 API, 392 integration, 48 Local Print Agent). Flutter integration, fractional POS quantities, explicit displayed-price conflict tokens and full popup E2E remain Pending.
 
 ## Related Files
 

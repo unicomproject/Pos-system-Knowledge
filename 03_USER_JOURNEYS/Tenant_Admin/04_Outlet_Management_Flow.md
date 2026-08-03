@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin Outlet Management Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-06-30 -->
 
 # Tenant Admin Outlet Management Flow
 

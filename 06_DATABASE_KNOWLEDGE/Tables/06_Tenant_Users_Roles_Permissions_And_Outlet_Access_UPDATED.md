@@ -1,6 +1,6 @@
 <!-- title: Tenant Users, Roles, Permissions & Outlet Access -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-06 -->
 <!-- source: Updated from uploaded ERD image: 06_Tenant Users, Roles, Permissions & Outlet Access.png -->
 

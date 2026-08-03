@@ -1,14 +1,14 @@
 <!-- title: Product Option Templates & Variant Configuration Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
+<!-- last_updated: 2026-08-01 -->
 
 # Product Option Templates & Variant Configuration Technical Contract
 
 ## Purpose
 
 Defines the implementation contract for `Product_Option_Variant_Configuration`. This contract is based on
-new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
+new OneVerz POS MVP scope images and the uploaded Unified Commerce database design.
 
 ## API Contract
 
@@ -45,6 +45,8 @@ unique constraints, CHECK constraints, hash-only token rules, and append-only
 history/ledger behavior where applicable.
 
 ## Frontend Contract
+
+- Typed POS detail DTOs expose option IDs, option-value IDs and variant mappings. Clients filter in memory after detail load and treat zero/multiple exact matches as unavailable/integrity errors.
 
 - Use feature-owned folders and typed services/providers.
 - Widgets/components must not call HTTP APIs directly.
@@ -92,7 +94,7 @@ Test coverage must include:
 5. Build frontend route/screen/component/provider/service.
 6. Add loading, empty, error, denied, feature-disabled, offline, and conflict states.
 7. Add unit/integration/API/widget tests.
-8. Review against new TM-EPOS MVP module boundaries.
+8. Review against new OneVerz POS MVP module boundaries.
 
 ## Out Of Scope
 

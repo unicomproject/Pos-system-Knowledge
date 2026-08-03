@@ -1,15 +1,15 @@
-<!-- title: TM-EPOS Technology Stack -->
+<!-- title: OneVerz POS Technology Stack -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-06-29 -->
 
 # TM[[]]-EPOS Technology Stack
 
 ## Purpose
 
-This file defines the confirmed technology stack for TM-EPOS MVP.
+This file defines the confirmed technology stack for OneVerz POS MVP.
 
-TM-EPOS is a mobile and desktop EPOS platform with responsive online store,
+OneVerz POS is a mobile and desktop EPOS platform with responsive online store,
 click and collect, offline-capable POS operation, multi-device support, and
 low-cost hardware integration.
 
@@ -119,7 +119,7 @@ low-cost hardware integration.
 
 ## Cache And Offline Decision
 
-TM-EPOS uses cache for speed and offline support, but cache is not final truth.
+OneVerz POS uses cache for speed and offline support, but cache is not final truth.
 
 ```text
 Memory cache = fast current session

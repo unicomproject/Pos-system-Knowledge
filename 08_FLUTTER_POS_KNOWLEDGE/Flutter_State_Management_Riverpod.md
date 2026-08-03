@@ -1,6 +1,6 @@
 <!-- title: Flutter State Management Riverpod -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines Riverpod usage for TM-EPOS Flutter apps.
+This file defines Riverpod usage for OneVerz POS Flutter apps.
 
 Riverpod manages screen state, loaded context, cart state, permissions, device
 state, cache state, and sync status.

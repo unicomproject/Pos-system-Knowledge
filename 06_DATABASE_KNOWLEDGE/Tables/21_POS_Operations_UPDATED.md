@@ -1,6 +1,6 @@
 <!-- title: POS Operations -->
 <!-- status: Updated -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-23 -->
 <!-- source: 21_POS Operations ERD image -->
 

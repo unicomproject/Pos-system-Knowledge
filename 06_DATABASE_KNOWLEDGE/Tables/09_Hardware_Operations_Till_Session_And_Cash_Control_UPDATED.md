@@ -1,6 +1,6 @@
 <!-- title: Hardware Operations, Till Session & Cash Control -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-23 -->
 <!-- source: Updated from uploaded ERD image: 09_Hardware Operations, Till Session & Cash Control.png -->
 

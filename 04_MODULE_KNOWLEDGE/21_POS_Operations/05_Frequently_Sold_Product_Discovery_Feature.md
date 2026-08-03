@@ -1,6 +1,6 @@
 <!-- title: Frequently Sold Product Discovery Feature Specification -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-31 -->
 
 # Frequently Sold Product Discovery Feature
@@ -69,3 +69,23 @@ The feature uses the standard POS catalogue view permissions:
 - Search and category filters work inside the Frequently Sold segment.
 - If there is no sales history in the rolling window, the empty state displays: `No frequently sold products yet`.
 - Error and retry states are fully supported.
+
+---
+
+## Implementation Evidence
+
+### 1. Backend Implementation Details
+- **Repository Class**: [PosProductCatalogRepository.cs](file:///C:/Users/User/Downloads/EPOS/POS%20Backend/Unified-Commerce/src/E_POS.Infrastructure/Modules/Tenant/CatalogProduct/Repositories/PosProductCatalogRepository.cs)
+- **Aggregation Query**: LINQ query that dynamically aggregates completed sales at the product level for the current outlet.
+- **Configurations**:
+  - `PosProducts:FrequentlySold:LookbackDays` (Default: `30`)
+  - `PosProducts:FrequentlySold:Limit` (Default: `20`)
+
+### 2. Frontend Implementation Details
+- **Quick Chip Widget**: [pos_product_category_chips.dart](file:///C:/Users/User/Downloads/EPOS/Pos%20Frontend/Nytroz-POS-App/lib/features/pos/presentation/widgets/new_sale/catalogue/pos_product_category_chips.dart)
+- **Empty State Grid**: [pos_product_grid.dart](file:///C:/Users/User/Downloads/EPOS/Pos%20Frontend/Nytroz-POS-App/lib/features/pos/presentation/widgets/new_sale/product_card/pos_product_grid.dart)
+- **Segment Header Prefix**: [pos_new_sale_screen.dart](file:///C:/Users/User/Downloads/EPOS/Pos%20Frontend/Nytroz-POS-App/lib/features/pos/presentation/screens/new_sale/pos_new_sale_screen.dart)
+
+### 3. Automated Test Evidence
+- **Backend Integration Tests**: [PosProductCatalogRepositoryTests.cs](file:///C:/Users/User/Downloads/EPOS/POS%20Backend/Unified-Commerce/tests/E_POS.IntegrationTests/CatalogProduct/PosProductCatalogRepositoryTests.cs) (All 20 integration tests passed successfully).
+- **Frontend Unit Tests**: [pos_catalog_remote_datasource_test.dart](file:///C:/Users/User/Downloads/EPOS/Pos%20Frontend/Nytroz-POS-App/test/features/cart/pos_catalog_remote_datasource_test.dart) (Verified `segment=frequently-sold` query parameter).

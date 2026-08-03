@@ -1,6 +1,6 @@
 <!-- title: SA-P0-01 Tenant Wizard Field Persistence Fix -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-20 -->
 
 # SA-P0-01 — Create Tenant wizard field persistence (COMPLETE)
