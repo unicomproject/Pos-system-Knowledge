@@ -97,52 +97,48 @@ Existing widget/provider tests cover framing, leading zero, FIFO, repeated
 sessions, exact lookup, cart increment, feedback, permission denial, cancellation
 and unsupported platform behavior.
 
-## Physical Verification
+## Exact scan pipeline coordinator
 
-TB-00D repeated/rapid scan acceptance and Android/iOS camera permission,
-lifecycle, printed-code recognition and performance remain Not Run.
+`PosBarcodeScanController` receives completed HID barcodes and drains a FIFO
+`Queue<String>` one item at a time. It resolves the authenticated session and
+trusted active device context, calls
+`GET /api/v1/pos/products/by-barcode/{barcode}?deviceId=...`, maps the dedicated
+response to `PosResolvedSaleItem`, and invokes `PosResolvedVariantCartAction`
+with the validated `quantityPerScan` value.
 
-## Production Definition Of Done
+State exposes processing status, current barcode, pending count, and a typed
+outcome. Repeated identical scans are not suppressed. API failures and cart
+rejections do not stop later queued scans. The controller is New Sale-scoped via
+an auto-dispose provider; disposal clears pending input and delayed lookup
+results cannot mutate the cart.
 
-Pass HID and camera matrices on supported devices; prove leading-zero,
-quantity-per-scan, rapid FIFO, route/dialog isolation, not-found/ambiguity,
-stock/price authority, accessibility and regression behavior with evidence.
+The listener is enabled only while the New Sale modal route is current. Blocking
+dialogs disable capture and closing the dialog re-enables it. Each processed
+scan emits one monotonic-ID typed feedback event with safe success/error text.
+New Sale consumes each event once and replaces the current scanner snackbar, so
+the FIFO queue is never blocked and visual notifications cannot accumulate.
 
-## Current Implementation Status
+Physical TURBOGEAR TB-00D verification and physical Android camera validation
+remain pending. Full scanner E2E status is partial until hardware validation
+completes.
 
-Implemented — Physically Unverified. Exact lookup/FIFO/camera source exists;
-physical production acceptance is incomplete.
+## Camera scanner
 
-## Known Gaps
+The New Sale Scanner button opens a `mobile_scanner` camera dialog on Android
+and iOS. The dialog owns a rear-camera controller, accepts EAN-13, EAN-8,
+UPC-A, Code 128, and Code 39, preserves the raw string, and locks after the
+first valid frame. It stops and closes before returning the barcode to the same
+search-cleanup and `PosBarcodeScanController` pipeline used by USB HID scans.
 
-Physical TB-00D/camera matrix, supported symbology decision, offline catalog
-policy, duplicate-data operational cleanup and numeric stability targets.
+Android camera permission and optional camera hardware are declared; iOS has a
+camera usage description. Permission, unavailable-camera, initialization, and
+unsupported-platform results use safe local feedback. Windows/Linux do not
+start the plugin and direct the cashier to the connected HID scanner. Close or
+back cancellation does not clear search or enqueue a scan. Physical Android
+camera validation remains pending.
 
-## Implementation Sequence
-
-Run Hardware Chunk 3 after device/test-audit foundation; close code gaps found
-by physical matrix, then re-run checkout regression.
-
-## Related Files
-
-- [[POS_Hardware_Integration]]
-- [[../10_TESTING_QA/POS_Hardware_Production_Acceptance_Matrix]]
-- [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Error_Handling]]
-- [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Implementation_Status]]
-
-## Hardware Chunk 3 production implementation (2026-07-29)
-
-Supported modes are `usbHid` and `camera`. HID uses a route-scoped
-`HardwareKeyboard` handler behind `PosHidScannerInputService`; characters
-inside the configured timeout form one buffer and Enter emits it once. Timeout
-resets incomplete input. Leading zeroes and allowed case remain intact.
-
-Camera uses existing `mobile_scanner`. First-frame gating suppresses duplicate
-callbacks; resources stop in inactive/background states, resume on the active
-dialog and dispose on navigation.
-
-New Sale uses the FIFO lookup/cart path. Hardware Testing uses only
-`BarcodeScannerTestController`, stores SHA-256/length instead of raw values and
-finalizes after operator confirmation. Deduplication is event-scoped, so
-intentional repeated scans are not blocked. Automated status is green;
-physical TB-00D, camera, 50-scan and POS80 acceptance remain pending.
+Integrated New Sale widget verification confirms focused search-controller and
+query clearing, pending 350 ms debounce cancellation, no general catalog request
+for the completed barcode, exact device-scoped lookup, failure cleanup, next-scan
+readiness, feedback replay prevention across rebuild, and manual-search
+regression coverage.

@@ -366,9 +366,59 @@ cash_reconciliations 1 -> many cash_count_denominations
 - A hardware assignment must target exactly one of `till_id` or `pos_device_id`.
 - One active/open till session is allowed per till by `UNIQUE(till_id) WHERE closed_at IS NULL`.
 
+## Till Monitoring UI Data Mapping
+
+**Hardware Readiness & Latest Test Mapping:**
+- **Hardware Type**: `hardware_devices.hardware_device_type`
+- **Device Name**: `hardware_devices.hardware_device_name`
+- **Latest Test Status**: Resolved from the most recent row in `hardware_test_logs` for the `hardware_device_id`.
+- **Warnings/Alerts**: Derived from missed heartbeats, missing assignments in `hardware_device_assignments`, or a failed state in `hardware_test_logs`. Do not use a separate `hardware_alerts` table.
+
+**Current Cashier Mapping:**
+- **Current Cashier ID**: `till_sessions.opened_by_tenant_user_id` where `status = 'OPEN'`.
+- **Current Cashier Name**: Resolved via `tenant_users.display_name` (or equivalent) matching the `opened_by_tenant_user_id`.
+
+**Current Implementation Limitations:**
+- Hardware fields are currently stored flat on the Till entity (e.g., `printerName`, `scannerName`) instead of utilizing the normalized `hardware_devices` and `hardware_device_assignments` tables.
+- Hardware test logging workflow is defined in schema but not yet implemented as an end-to-end API.
+- Live readiness and hardware status cannot be proven merely by the presence of a non-null flat string field on the Till.
+
 ## Related Files
 
 - [[08_Outlet_Till_And_POS_Device_Foundation]]
 - [[20_Unified_Order_And_Sales]]
 - [[21_POS_Operations]]
 - [[24_Payment_And_Refund]]
+
+
+
+## Tenant Admin Till Hardware Monitoring Addendum (2026-08-01)
+
+### Tables relevant to Till right-side hardware card
+
+| Table | Role for Till monitoring |
+|---|---|
+| `tills` | Selected Till identity and lifecycle |
+| `outlets` | Outlet display |
+| `till_sessions` | Current cashier via open session `opened_by_tenant_user_id` |
+| `tenant_users` | Cashier display name |
+| `pos_devices` | Assigned POS device; `last_seen_at` drives till online/offline and last activity |
+| `till_device_assignments` | Active POS ↔ Till link |
+| `hardware_devices` | Inventory of peripherals; `last_seen_at`, `status`, type, connection |
+| `hardware_device_assignments` | Model A (till_id) or Model B (pos_device_id); release via `released_at` |
+| `hardware_test_logs` | Append-only tests; latest row informs health/warnings |
+| `audit_logs` / permission tables | Write audit and access control |
+
+### RLS / tenant isolation
+
+All hardware and till queries must be tenant-scoped. Assignment uniqueness: one active assignment per hardware device (`UNIQUE(hardware_device_id) WHERE released_at IS NULL`). Exactly one of `till_id` or `pos_device_id`.
+
+### MVP alerts
+
+No dedicated `hardware_alerts` table required for MVP. Derive alerts from lifecycle, heartbeat, latest test, warning payload.
+
+### Implementation mapping status
+
+- Entities/EF configs exist in Unified-Commerce HardwareCash module.
+- Till readiness repository currently loads **direct Till assignments only** (does not yet merge POS-device assignments).
+- Flat Till string fields (`printer_name` etc. if present on tills) are **not** the hardware inventory SoT.

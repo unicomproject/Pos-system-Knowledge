@@ -209,3 +209,7 @@ drop/duplicate counts and local latency. Raw barcode values, camera frames and
 key streams are not persisted. Product lookup is separate: unknown product
 input can pass the hardware test without mutating cart, sale, payment or
 inventory data. Physical acceptance remains pending.
+
+## Tenant Admin Monitoring Link (2026-08-01)
+
+Cashier hardware testing remains the physical execution path. Results must eventually land in `hardware_test_logs` for Tenant Admin Till monitoring. End-to-end logging chain remains incomplete; physical verification pending. See [[../../12_INTEGRATIONS/POS_Hardware_Integration]].

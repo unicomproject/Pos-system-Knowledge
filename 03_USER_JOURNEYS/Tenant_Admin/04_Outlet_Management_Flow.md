@@ -7,74 +7,78 @@
 
 ## Purpose
 
-Defines how Tenant Admin creates or updates outlets and optional collection points.
+Defines all Outlet Management user journeys for Tenant Admins based on the approved UI specification.
 
-## Actor
+## Core Journeys
 
-Tenant Admin
+### 1. View Outlet List
+- **Actor**: Tenant Admin, Operations Manager
+- **Preconditions**: User is logged in, has `tenant.outlets.view` permission.
+- **Trigger**: Clicks "Outlets" from the Tenant Admin Sidebar.
+- **Main flow**: System fetches outlet list via `GET /api/v1/outlets` and displays the paginated list, along with summary cards (Total, Active, Warehouses, Needs Attention).
+- **API interaction**: `GET /api/v1/outlets`
+- **Permission failure**: System shows no-access state.
 
-## Source
+### 2. Search Outlets
+- **Actor**: Tenant Admin
+- **Trigger**: Enters text in search bar (Name or Code).
+- **Main flow**: System queries API with `search` param and updates table.
 
-Derived from `Slide 4 - Outlet Management Flow` in `tenant-full-journey.pptx` and aligned to OneVerz POS MVP Second Brain scope.
+### 3. Filter Outlets
+- **Actor**: Tenant Admin
+- **Trigger**: Selects Type or Status filter.
+- **Main flow**: System queries API with filter params and updates table.
 
-## Trigger
+### 4. View Outlet Details
+- **Actor**: Tenant Admin
+- **Trigger**: Clicks "View" on an outlet row.
+- **Main flow**: System fetches details (`GET /api/v1/tenant-admin/outlets/{id}`), displays overview panel, till assignments, users.
 
-Tenant Admin opens outlet management.
+### 5. Create Outlet
+- **Actor**: Tenant Admin
+- **Preconditions**: Has `tenant.outlets.manage` permission.
+- **Trigger**: Clicks "Add outlet" primary action.
+- **Main flow**: Fetches create-options. User fills form (Name, Code, Type, Address/City, Timezone). Submits. System calls `POST /api/v1/outlets`.
+- **Validation flow**: Checks unique code.
+- **Database impact**: Inserts into `outlets` and `outlet_addresses`.
+- **Audit event**: OutletCreated audit log written.
 
-## Preconditions
+### 6. Edit Outlet
+- **Actor**: Tenant Admin
+- **Trigger**: Clicks "Edit" action.
+- **Main flow**: Edits fields, submits. Calls `PUT /api/v1/outlets/{id}`.
 
-- Tenant Admin has outlet management permission.
+### 7. Activate or Deactivate Outlet
+- **Actor**: Tenant Admin
+- **Trigger**: Toggles status.
+- **Main flow**: Calls `PUT /api/v1/outlets/{id}` with updated Status (`Active`/`Inactive`).
 
-## Main Flow
+### 8. Delete or Archive Outlet
+- **Actor**: Tenant Admin
+- **Trigger**: Clicks "Delete".
+- **Alternate flow**: If outlet has active tills, orders, stock, or users, the system blocks deletion and may offer deactivation instead. Calls `DELETE /api/v1/outlets/{id}` (Soft delete).
 
-| Step | Action | System Behavior |
-|---:|---|---|
-| 1 | Open outlet management | System opens outlet list. |
-| 2 | View outlet list | System displays existing outlets. |
-| 3 | Click add outlet | System opens outlet form. |
-| 4 | Enter outlet details | Tenant Admin enters outlet data. |
-| 5 | Set operating hours | Tenant Admin defines operating hours. |
-| 6 | Enable collection point if needed | Tenant Admin enables pickup collection point for click and collect. |
-| 7 | Set outlet status | Tenant Admin sets active/inactive. |
-| 8 | Validate outlet details | System validates data. |
-| 9 | Save outlet | System saves outlet. |
-| 10 | Outlet ready for till assignment | Outlet can be used for tills and pickup operations. |
+### 9. View Outlet Operational Summary
+- **Actor**: Tenant Admin
+- **Trigger**: Views the Outlet Overview panel.
+- **Main flow**: Displays Total, Active, Attention, Inactive counts. (Depends on new/pending summary API).
 
-## Data Used Or Captured
+### 10. View Top Performing Outlet
+- **Actor**: Tenant Admin
+- **Preconditions**: Has report viewing permission.
+- **Trigger**: Views "Top Performing Outlet" panel.
+- **Main flow**: Displays outlet with highest sales/transactions. (Backend API pending).
 
-- Outlet name
-- Outlet code
-- Address
-- Contact
-- Operating hours
-- Collection point flag
-- Status
+### 11. Navigate from Outlet to its Tills
+- **Actor**: Tenant Admin
+- **Trigger**: Clicks till count or view tills action on an outlet.
+- **Main flow**: Navigates to Till Management screen pre-filtered for the outlet.
 
-## Access And Security Rules
+### 12. Assign or change Outlet Manager
+- **Actor**: Tenant Admin
+- **Trigger**: Clicks Assign Manager (UI Approved, Backend Pending).
+- **Alternate flow**: Documented as future scope.
 
-- Tenant Admin must be authenticated unless the flow is a setup/payment link flow before first login.
-- Tenant status, feature entitlement, permission, and outlet access must be enforced where applicable.
-- Tenant-owned data must be isolated by tenant context resolved server-side.
-- All create/update/status actions should be audit logged.
-- Collection point is active MVP scope for Click & Collect.
-- Outlet code must be tenant-unique.
-
-## Validation And Error Cases
-
-- Validation error
-- Duplicate outlet code
-- Invalid operating hours
-- Permission denied
-
-## Outcome
-
-Outlet is created/updated and ready for till assignment.
-
-## Related Modules
-
-- 07_Outlet_Till_POS_Device_Foundation
-- 23_Fulfilment_Pickup_ClickCollect
-
-## Related Files
-
-- 06_DATABASE_KNOWLEDGE/Tables/08_Outlet_Till_And_POS_Device_Foundation.md
+### 13. Configure an outlet as an e-commerce collection point
+- **Actor**: Tenant Admin
+- **Main flow**: Set in create/edit form if applicable to e-commerce setup.

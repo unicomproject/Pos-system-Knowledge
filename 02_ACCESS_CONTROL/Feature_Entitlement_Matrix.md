@@ -94,3 +94,13 @@ engine, AI modules, and full accounting are not active MVP entitlements.
 - [[Permission_Code_List]]
 - [[../01_RELEASE_SCOPE/Included_Features]]
 - [[../01_RELEASE_SCOPE/Excluded_Features]]
+
+
+## Till Management Entitlement (2026-08-01)
+
+| Feature code | Required for |
+|---|---|
+| `till_management` | Tenant Admin till CRUD/monitoring APIs and Flutter Tills page (Backend seed / `SubscriptionCatalogLimitSeedConstants.TillManagementFeatureCode`) |
+| `device_hardware` | POS device and peripheral integration surfaces |
+
+A disabled `till_management` entitlement must block till management APIs even if the user has till permissions.
