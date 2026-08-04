@@ -67,7 +67,7 @@ All P0 cases must pass against PostgreSQL and the production Angular build. Unit
 - Unit: all normalizers/validators and min/max boundaries; duplicate classification; draft/tenant/operation/manual-payment state transitions; submission validation; amount/currency checks; approval eligibility; provider-neutral mapping; `checkoutUrl` null behavior; progress rounding; effective entitlement/dependency/limit calculation; permission predicates; paid/trial/demo/deferred billing rules; tenant-admin timing and token lifecycle.
 - Backend integration: platform authentication/authorization; draft CRUD/list/resume/expiry; PostgreSQL uniqueness/rollback/isolation; subscription/invoice/payment/evidence/review/add-on/entitlement/contact/admin persistence; manual submission/review/resubmission and paid/pending/activation transitions; idempotency replay/conflict; concurrent PATCH/finalize/review/activate; proof access; audit/outbox rows and retry.
 - Frontend: exact labels/order; typed forms/cross-field mapping; server defaults; draft save/resume/autosave failure; guard; duplicate warning and strict conflict; permissioned overrides; review/edit; pending payment/manual review/evidence/payment-recipient/pending activation/success; ETag conflict; stable-key retry; accessible focus and responsive layout.
-- E2E: all 17 scenarios below, using real API and PostgreSQL with fake email/private-storage adapters only for the manual release. No mocked plan, feature, tenant, draft, billing or permission data in the application path.
+- E2E: all 17 whole-wizard scenarios below plus the 20-scenario Angular manual-payment browser matrix, using the real API and PostgreSQL with controlled email/private-storage boundaries only for the manual release. No mocked plan, feature, tenant, draft, billing or permission data in the application path.
 
 ## Future provider contract tests
 
@@ -79,14 +79,14 @@ Test empty, whitespace, min/max and one-over-max values; Unicode names; code/slu
 
 ## Existing evidence and gaps
 
-The final backend solution at `db9d579` passes **1,458/1,458** tests: Unit 740, API 341 and Integration 377. New focused evidence covers the payment state machine, manual provider behavior, access/invoice projections, validation and malware rejection, permission boundaries, raw-path redaction, wizard manual finalization, PostgreSQL schema/migration shape, conflicting concurrent review and concurrent activation with exactly one success/replay/invitation. The previously recorded Angular suite remains 420/420, but no Angular manual-payment UI or canonical browser E2E evidence exists yet. Future provider callback tests are absent by design and are not a manual-release gate.
+The final backend solution after `db9d579` and projection correction `994f19b` passes **1,460/1,460** tests: Unit 742, API 341 and Integration 377. Focused evidence covers the payment state machine, manual provider behavior, access/invoice projections, validation and malware rejection, permission boundaries, raw-path redaction, wizard manual finalization, PostgreSQL schema/migration shape, conflicting concurrent review and concurrent activation with exactly one success/replay/invitation. Angular commits `90d85f3` and `8bbfb39` pass production build, both strict TypeScript projects and **453/453** tests. The 20-scenario Playwright manual-payment matrix is implemented but its recorded run discovered 20 and environment-skipped all 20; it is blocked rather than passed. Future provider callback tests are absent by design and are not a manual-release gate.
 
 ### Backend execution evidence
 
 | Gate | Result |
 |---|---|
 | Build | PASS - 0 warnings, 0 errors |
-| Full solution | PASS - 1,458 tests, 0 failed |
+| Full solution | PASS - 1,460 tests, 0 failed |
 | Manual unit focus | PASS - 12 |
 | Manual API/security focus | PASS - 5 |
 | PostgreSQL migration/concurrency focus | PASS - 4 |
@@ -96,6 +96,12 @@ The final backend solution at `db9d579` passes **1,458/1,458** tests: Unit 740, 
 | Changed-file formatter and `git diff --check` | PASS |
 
 The repository-wide formatter still reports 785 pre-existing whitespace findings outside this change; the changed/new non-generated C# scope is formatted and verified. Browser, live Blob/ClamAV/ACS and production E2E remain required release evidence.
+
+### Angular manual-payment browser matrix - implemented, environment blocked
+
+`qa-dashboard/manual-payment.e2e.spec.mjs` uses the existing Playwright stack and contains 20 real-path cases: paid creation, secure recipient access, valid submission, duplicate retry, queue filtering/detail, private proof, approve to Pending Activation, separate activation, rejection, information/correction/history, stale-review conflict, route/API permission denial, review denial, expired link, unsafe evidence, notification resend, cross-tenant proof isolation, activation retry, invitation resend and the complete lifecycle. It uses no HTTP route fulfilment or fake payment success.
+
+Latest execution status: **20 discovered, 20 skipped, 0 passed - BLOCKED BY ENVIRONMENT**. `FLOW4_E2E_ENABLED=true`, controlled fixtures/credentials, isolated PostgreSQL, private Blob, ClamAV and email capture/delivery were not available. This result does not satisfy F4-T16, F4-T22, F4-T27, F4-T29, F4-T34, F4-T35 or the browser portions of the other P0 cases.
 
 ## Required E2E scenario details
 

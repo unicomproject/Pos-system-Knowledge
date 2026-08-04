@@ -1,5 +1,5 @@
 <!-- title: Flow 4 Manual Payment Backend Implementation Evidence 2026-08-04 -->
-<!-- status: Backend Implemented and Verified - GO for Angular Integration -->
+<!-- status: Backend Implemented and Verified - Angular Integrated -->
 <!-- system: TM-EPOS MVP / OneVerz -->
 <!-- last_updated: 2026-08-04 -->
 
@@ -10,9 +10,9 @@
 - Backend implementation: complete for the approved manual-payment phase.
 - Database implementation: forward migration generated, inspected and verified on representative and clean PostgreSQL databases.
 - Security implementation: purpose-bound hash-only access, redaction, rate limiting, private validated/scanned evidence and permissioned review are implemented.
-- Runtime readiness: **95% backend**, **88% overall Flow 4**.
-- Release readiness: backend ready for Angular integration; production is gated by UI/E2E and target-environment dependencies.
-- Decision: **GO - Backend ready for Angular manual-payment implementation**.
+- Additive integration correction: recipient/admin projections now contain every implemented UI field while internal evidence checksums remain excluded from public DTOs.
+- Release readiness: backend automated gates pass; overall production remains gated by real-browser and target-environment dependencies.
+- Decision: **GO - Backend implemented and verified for the manual-payment phase**.
 
 ## B. Repository evidence
 
@@ -21,11 +21,12 @@
 | Repository | `C:\Users\User\Desktop\Nytroz__POS\Nytroz POS - Backend New\Unified-Commerce` |
 | Branch | `feat/flow4-create-tenant-runtime` |
 | Starting commit | `2a3c83e1a5cde8f99ae5e7e60698a01004b5943f` |
-| Final backend commit | `db9d579d94ad5fb41355fa8aeaf01d55d0ea481a` |
-| Push | PASS - `origin/feat/flow4-create-tenant-runtime` advanced to `db9d579` |
-| Scope | 63 committed files; 35,445 insertions; 70 deletions |
+| Runtime backend commit | `db9d579d94ad5fb41355fa8aeaf01d55d0ea481a` |
+| UI projection correction | `994f19b211150745e77b231cfedff1b71721a839` |
+| Push | PASS - `origin/feat/flow4-create-tenant-runtime` advanced to `994f19b` |
+| Scope | Runtime: 63 files, 35,445 insertions, 70 deletions; correction: 3 files, 90 insertions, 8 deletions |
 | Working tree | Implementation clean; unrelated pre-existing untracked `projects/12_IMPLEMENTATION_TRACKING/Backend/Email/` preserved |
-| Angular verification | `306dcb7c0218962675ac0c2ca9b1b20c50f48bc8`; no files modified |
+| Angular integration | Runtime `90d85f3`; tests/E2E/final `8bbfb3977b3c9afb0847fcd8974a6737d143d853` |
 
 Major file groups: three new API controllers and redaction middleware; manual contracts/DTOs/service; payment constants/evidence/review and extended transaction/link entities; EF configurations/repositories/storage/scanner/token service/outbox worker; migration/snapshot; unit/API/PostgreSQL integration tests. A current development seed source was corrected to use bounded URLs so the clean migration chain can succeed; historical migrations were not edited.
 
@@ -154,10 +155,10 @@ Legacy `MarkPaid` no longer creates activation eligibility by itself.
 |---|---|---|---|
 | `dotnet restore E_POS.sln` | PASS | 0 failures | baseline |
 | `dotnet build E_POS.sln --no-restore` | PASS | 0 warnings, 0 errors | final 2.63 s |
-| Full UnitTests project | PASS | 740/740, 0 failed | approximately 3 s |
+| Full UnitTests project | PASS | 742/742, 0 failed | final solution run |
 | Full ApiTests project | PASS | 341/341, 0 failed | approximately 5 s |
 | Full IntegrationTests project | PASS | 377/377, 0 failed | approximately 1 min |
-| `dotnet test E_POS.sln --no-build` | PASS | 1,458/1,458, 0 failed | approximately 65 s |
+| Complete solution after Angular projection correction | PASS | 1,460/1,460, 0 failed | approximately 152 s |
 | Manual-payment unit focus | PASS | 12/12 | focused run |
 | Manual-payment API/redaction focus | PASS | 5/5 | focused run |
 | PostgreSQL manual migration/concurrency focus | PASS | 4/4 | approximately 57 s |
@@ -167,19 +168,21 @@ Legacy `MarkPaid` no longer creates activation eligibility by itself.
 | Scoped `dotnet format ... --verify-no-changes` | PASS | changed/new non-generated C# | final |
 | `git diff --check` / staged diff check | PASS | no errors | final |
 
-Baseline was 1,436 passing tests: Unit 727, API 336 and Integration 373. The final implementation adds 22 passing tests without regressing the existing suite. Repository-wide format verification reports 785 pre-existing whitespace findings; only the scoped changed-file verification is used as this change's formatting gate.
+Baseline was 1,436 passing tests: Unit 727, API 336 and Integration 373. The final implementation and projection correction add 24 passing tests without regressing the existing suite. Repository-wide format verification reports 785 pre-existing whitespace findings; only the scoped changed-file verification is used as this change's formatting gate.
 
 ## K. Remaining work
 
-### Angular frontend
+### Angular frontend - completed
 
-- Recipient instructions/status/invoice/evidence/correction/history states.
-- Platform Billing review queue/detail/proof/review/history/resend states.
-- Pending-payment, action-required, rejected, pending-activation and invitation handoff projections.
+- Recipient instructions/status/invoice/evidence/correction/history states are implemented.
+- Platform Billing review queue/detail/proof/review/history/resend states are implemented.
+- Pending-payment, action-required, rejected, pending-activation and invitation handoff projections are implemented.
+- Production build, strict TypeScript and 453/453 Angular tests pass. See [[FLOW_4_MANUAL_PAYMENT_ANGULAR_IMPLEMENTATION_EVIDENCE_2026-08-04]].
 
 ### Browser and environment
 
-- Run the canonical 17 browser E2E scenarios, responsive checks and accessibility evidence.
+- Supply the controlled environment/credentials and pass the implemented canonical 20-scenario Playwright matrix; the current run discovered 20 and environment-skipped all 20.
+- Complete responsive and keyboard/screen-reader browser acceptance evidence.
 - Validate live/private Azure Blob container behavior, ClamAV connectivity/failure modes and authorized proof download.
 - Validate ACS payment/invitation email delivery, recipient routing, retry and redacted telemetry.
 - Configure `AzureBlobStorage`, `ManualPaymentEvidenceScanner`, `TenantOnboardingOutbox:PaymentAccessBaseUrl`, `TenantAdminAppBaseUrl`, `ManualPaymentInstructions` and `PaymentSupportDetails` through deployment configuration/secret storage.
@@ -206,7 +209,7 @@ Baseline was 1,436 passing tests: Unit 727, API 336 and Integration 373. The fin
 
 ## M. Git and PR
 
-- Backend commit: `db9d579d94ad5fb41355fa8aeaf01d55d0ea481a` (`feat(billing): implement Flow 4 manual payment runtime`).
+- Backend commits: `db9d579d94ad5fb41355fa8aeaf01d55d0ea481a` (`feat(billing): implement Flow 4 manual payment runtime`) and `994f19b211150745e77b231cfedff1b71721a839` (`fix(billing): complete manual payment UI projections`).
 - Backend push: complete to `origin/feat/flow4-create-tenant-runtime`.
 - Second Brain commit/push: recorded in the final task handoff after this document is committed.
 - PR: prepare from `feat/flow4-create-tenant-runtime`; do not merge until review confirms migration/deployment settings and the backend P0 evidence above.
@@ -214,6 +217,6 @@ Baseline was 1,436 passing tests: Unit 727, API 336 and Integration 373. The fin
 
 ## N. Final decision
 
-**GO - Backend ready for Angular manual-payment implementation.**
+**GO - Backend implemented and verified for Angular/manual-payment integration.**
 
-No backend security, data-integrity, migration or automated-test blocker remains. Overall Flow 4 is not complete and production remains gated by the UI, E2E and live environment work in section K.
+No backend security, data-integrity, migration or automated-test blocker remains. Overall Flow 4 is not complete and production remains gated by the real-browser and live-environment work in section K.

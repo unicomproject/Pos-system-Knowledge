@@ -224,7 +224,7 @@ Future provider contract tests cover Stripe/PayHere session mapping, signatures,
 
 ## Runtime implementation status - 2026-08-04
 
-The backend design in this document is implemented and verified by backend commit `db9d579d94ad5fb41355fa8aeaf01d55d0ea481a` on `feat/flow4-create-tenant-runtime`.
+The backend design in this document is implemented and verified by backend commits `db9d579d94ad5fb41355fa8aeaf01d55d0ea481a` and `994f19b211150745e77b231cfedff1b71721a839` on `feat/flow4-create-tenant-runtime`.
 
 - The wizard finalization path creates a real `MANUAL` payment transaction, invoice, purpose-bound access grant and outbox notification. It does not create a provider session or fake checkout URL.
 - Recipient status, invoice, evidence submission/update and history APIs are live. Access uses a random 256-bit token; only a keyed, purpose-bound hash is persisted. Token-bearing path segments are redacted before exception logging and the anonymous surface is rate limited.
@@ -232,8 +232,10 @@ The backend design in this document is implemented and verified by backend commi
 - Platform Billing queue, detail, proof stream, immutable history, review and notification-resend APIs are live. Review and resubmission use version checks and command idempotency.
 - An approved payment reaches `PENDING_ACTIVATION` only. A separate locked, idempotent activation path validates the exact tenant/subscription/invoice/payment/amount/currency chain, creates one invitation request, and never treats legacy `MarkPaid` as activation authority.
 - `IPaymentProvider` now defines provider-neutral create/status/callback/cancel/refund mapping. The current manual adapter returns no checkout session and accepts no callback; Stripe and PayHere remain deferred.
+- Recipient status and Platform Billing detail projections now include the authoritative tenant/subscription/invoice/submission/lifecycle fields required by the Angular runtime. Internal evidence checksum and storage fields are not serialized.
+- Angular commits `90d85f3` and `8bbfb39` implement the purpose-bound recipient route, Platform Billing queue/detail/review, private proof access, post-payment activation/invitation actions and the 20-scenario Playwright matrix. Production code uses the real APIs and has no fake gateway or HTTP-mocked runtime path.
 
-Backend release decision: **GO for Angular integration**. Production enablement still requires private Blob, ClamAV, email and public payment-access URL configuration. Overall Flow 4 remains incomplete until the Angular manual-payment surfaces and browser E2E matrix pass.
+Backend and Angular automated release decision: **GO**. Production enablement still requires private Blob, ClamAV, email and public payment-access URL configuration. Overall Flow 4 remains incomplete because the 20 real-browser scenarios were environment-skipped and must pass with responsive/accessibility artifacts against the controlled target environment.
 
 ## Related
 
