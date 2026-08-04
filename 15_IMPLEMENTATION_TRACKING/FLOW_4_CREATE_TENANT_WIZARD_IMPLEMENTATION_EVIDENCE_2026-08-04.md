@@ -12,13 +12,15 @@ Release remains **NO-GO**. Payment provider session creation and signed callback
 
 ## Repository evidence
 
-| Repository | Branch | Starting commit |
-|---|---|---|
-| Backend | `feat/flow4-create-tenant-runtime` | `7c67bbd80310b6d2afdde5ba6b67e88dd880f8e5` |
-| Platform Admin Angular | `feat/flow4-create-tenant-runtime` | `29b169fd4e77b659fb94afa51f8883351cbc89d7` |
-| Second Brain | `docs/flow4-create-tenant-runtime` | `d3a04d3c4d7e1c1dce4ff00a97d57138e19524d0` |
+| Repository | Branch | Starting commit | Implemented/evidence commit |
+|---|---|---|---|
+| Backend | `feat/flow4-create-tenant-runtime` | `7c67bbd80310b6d2afdde5ba6b67e88dd880f8e5` | `2a3c83e1a5cde8f99ae5e7e60698a01004b5943f` |
+| Platform Admin Angular | `feat/flow4-create-tenant-runtime` | `29b169fd4e77b659fb94afa51f8883351cbc89d7` | `306dcb7c0218962675ac0c2ca9b1b20c50f48bc8` |
+| Second Brain | `docs/flow4-create-tenant-runtime` | `d3a04d3c4d7e1c1dce4ff00a97d57138e19524d0` | `d91562b5d1181fc46829d1e98ccf58d1b73b176a` (evidence bundle) |
 
 The unrelated backend untracked `projects/12_IMPLEMENTATION_TRACKING/Backend/Email/` directory was preserved and excluded.
+
+All three branches were pushed to their corresponding `origin` remotes. Draft PR creation was not available because GitHub CLI authentication is not configured in this environment; no PR was created and nothing was merged.
 
 ## Database and backend implemented
 
