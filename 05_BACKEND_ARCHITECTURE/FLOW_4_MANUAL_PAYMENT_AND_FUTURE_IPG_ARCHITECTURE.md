@@ -222,6 +222,19 @@ P0 coverage must include status transitions, validation, amount/currency mismatc
 
 Future provider contract tests cover Stripe/PayHere session mapping, signatures, callback deduplication, mismatches, duplicate/out-of-order callbacks, provider timeout/unknown result, cancellation/refund capability, and reconciliation. Live-provider tests remain future/environment-dependent and must not be represented as manual-payment release evidence.
 
+## Runtime implementation status - 2026-08-04
+
+The backend design in this document is implemented and verified by backend commit `db9d579d94ad5fb41355fa8aeaf01d55d0ea481a` on `feat/flow4-create-tenant-runtime`.
+
+- The wizard finalization path creates a real `MANUAL` payment transaction, invoice, purpose-bound access grant and outbox notification. It does not create a provider session or fake checkout URL.
+- Recipient status, invoice, evidence submission/update and history APIs are live. Access uses a random 256-bit token; only a keyed, purpose-bound hash is persisted. Token-bearing path segments are redacted before exception logging and the anonymous surface is rate limited.
+- Evidence is private, type/extension/magic-byte/size validated, stored by an Azure Blob adapter and scanned through a ClamAV `INSTREAM` adapter. A positive result is rejected before storage. Approval fails closed unless the selected evidence scan result is `CLEAN`.
+- Platform Billing queue, detail, proof stream, immutable history, review and notification-resend APIs are live. Review and resubmission use version checks and command idempotency.
+- An approved payment reaches `PENDING_ACTIVATION` only. A separate locked, idempotent activation path validates the exact tenant/subscription/invoice/payment/amount/currency chain, creates one invitation request, and never treats legacy `MarkPaid` as activation authority.
+- `IPaymentProvider` now defines provider-neutral create/status/callback/cancel/refund mapping. The current manual adapter returns no checkout session and accepts no callback; Stripe and PayHere remain deferred.
+
+Backend release decision: **GO for Angular integration**. Production enablement still requires private Blob, ClamAV, email and public payment-access URL configuration. Overall Flow 4 remains incomplete until the Angular manual-payment surfaces and browser E2E matrix pass.
+
 ## Related
 
 - [[../03_USER_JOURNEYS/Platform_Admin/FLOW_4_CREATE_TENANT_WIZARD_CANONICAL_SPEC]]

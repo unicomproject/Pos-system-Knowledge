@@ -3,7 +3,7 @@
 <!-- system: TM-EPOS MVP / OneVerz -->
 <!-- last_updated: 2026-08-04 -->
 
-> Implementation status (2026-08-04): In progress. Durable drafts, the canonical Angular sequence, atomic locked internal finalization, outbox leasing, and secure invitation-token generation are implemented. The approved current-release collection model is now manual payment verification; manual submission/review, activation retry/audit, focused PostgreSQL concurrency, and E2E gates remain. See [[../../05_BACKEND_ARCHITECTURE/FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]] and [[../../15_IMPLEMENTATION_TRACKING/FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_EVIDENCE_2026-08-04]].
+> Implementation status (2026-08-04): Backend runtime implemented and verified at `db9d579`. Durable drafts/finalization, manual payment access/submission/review/history, private scanned evidence, notification retry, payment-to-pending-activation, separate activation and invitation resend are live. Angular manual-payment surfaces and canonical browser E2E remain. See [[../../05_BACKEND_ARCHITECTURE/FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]] and [[../../15_IMPLEMENTATION_TRACKING/FLOW_4_MANUAL_PAYMENT_BACKEND_IMPLEMENTATION_EVIDENCE_2026-08-04]].
 
 # Flow 4 — Create Tenant Wizard Canonical Specification
 

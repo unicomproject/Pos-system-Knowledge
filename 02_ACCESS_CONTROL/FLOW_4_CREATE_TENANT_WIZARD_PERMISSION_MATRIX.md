@@ -48,6 +48,8 @@ Secure recipient actions do not add an R1 Platform Admin permission. Viewing ins
 
 Controller policy establishes platform authentication. Application service checks base and conditional permissions. Repository code never decides authorization. Finalization checks the saved selections, not client-provided `can*` flags. Outbox retry handlers authenticate the initiating API command and record both original and retry actors.
 
+Implementation evidence at `db9d579`: recipient access is anonymous only through an unguessable expiring purpose-bound token and a dedicated rate-limit policy. Platform queue/detail/history/proof/tenant-status reads require `platform.billing.view`; review and payment-notification resend require `platform.billing.manage`. Proof access revalidates the payment/evidence association and streams with private/no-store headers. Payment approval cannot activate a tenant, and activation cannot issue an invitation unless the caller has the existing tenant lifecycle permission and the exact paid lineage passes repository checks.
+
 ## Test obligations
 
 For each matrix row test allowed, denied and direct-API bypass. Include revoked-mid-draft, owner/non-owner, hidden-data serialization, secure-access expiry/purpose/tamper, proof object-ID substitution, review without billing-manage, concurrent review, waiver without billing-manage, override without entitlement-update, activation without activate, audit without audit-view, payment-notification resend throttling and invitation resend throttling.

@@ -204,9 +204,28 @@ The inspected Platform Administration module is application-service/repository b
 
 Mapping remains explicit static/manual mapping in the existing DTO style. External ACS/payment calls are infrastructure adapters invoked by background consumers after commit. The application service owns orchestration; entities own valid state transitions; repositories own persistence only; neither controllers nor repositories decide permissions.
 
-## Compatibility gaps in the current API
+## Implemented manual-payment API surface - 2026-08-04
 
-The runtime branch now supplies the canonical draft and operation foundation, but manual payment access/submission/review/history/resend APIs, duplicate advice, operation retry, and invitation resend remain absent. Its payment outbox handler returns `payment_provider_not_configured`; this is source evidence to replace with the approved manual handler, not accepted current-release behavior. These are implementation gaps, not accepted variants.
+Backend commit `db9d579` implements the current-release manual surface:
+
+| Audience | Endpoint | Enforcement/result |
+|---|---|---|
+| Recipient | `GET /api/v1/tenant-onboarding/payment-access/{accessToken}` | Purpose/expiry/hash lookup, rate limited; safe manual status projection |
+| Recipient | `GET /api/v1/tenant-onboarding/payment-access/{accessToken}/invoice` | Same grant; bounded invoice projection |
+| Recipient | `POST /api/v1/tenant-onboarding/payment-access/{accessToken}/evidence` | Multipart PDF/JPEG/PNG, 10 MiB request limit, `Idempotency-Key`, validation and malware scan |
+| Recipient | `PUT /api/v1/tenant-onboarding/payment-access/{accessToken}/submissions/{paymentId}` | Corrective resubmission with expected version and idempotency |
+| Recipient | `GET /api/v1/tenant-onboarding/payment-access/{accessToken}/history` | Recipient-safe immutable history |
+| Platform Billing | `GET /api/v1/platform-admin/billing/manual-payments` | `platform.billing.view`; filtered/searchable/sorted/paged queue |
+| Platform Billing | `GET /api/v1/platform-admin/billing/manual-payments/{paymentId}` | `platform.billing.view`; expected-versus-submitted detail |
+| Platform Billing | `GET /api/v1/platform-admin/billing/manual-payments/{paymentId}/proof/{evidenceId}` | `platform.billing.view`; exact ownership check, private no-store stream |
+| Platform Billing | `POST /api/v1/platform-admin/billing/manual-payments/{paymentId}/review` | `platform.billing.manage`; expected version + idempotency; approve/reject/request-information |
+| Platform Billing | `GET /api/v1/platform-admin/billing/manual-payments/{paymentId}/history` | `platform.billing.view`; immutable review/submission history |
+| Platform Billing | `POST /api/v1/platform-admin/billing/manual-payments/{paymentId}/notification/resend` | `platform.billing.manage`; rate-limited/idempotent outbox command |
+| Platform tenant | `GET /api/v1/platform-admin/tenant-onboarding/tenants/{tenantId}/payment-status` | `platform.billing.view` bounded tenant payment projection |
+| Platform tenant | `POST /api/v1/platform-admin/tenant-onboarding/operations/{operationId}/retry` | Existing platform-only operation retry |
+| Platform tenant | `POST /api/v1/platform-admin/tenant-onboarding/tenants/{tenantId}/invitation/resend` | Activation-gated invitation resend |
+
+Manual responses keep `checkoutUrl` null. `IPaymentProvider` supplies create/status/callback/cancel/refund mapping for future providers, but the manual adapter creates no provider session and exposes no callback endpoint.
 
 ## Related
 

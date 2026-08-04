@@ -1,5 +1,5 @@
 <!-- title: Flow 4 Manual Payment Second Brain Alignment 2026-08-04 -->
-<!-- status: Complete - Ready for Manual Payment Implementation -->
+<!-- status: Complete - Backend Implemented and Verified -->
 <!-- system: TM-EPOS MVP / OneVerz -->
 <!-- last_updated: 2026-08-04 -->
 
@@ -11,7 +11,7 @@ The current-release payment decision is now closed: Flow 4 uses manual payment v
 
 Future Stripe or PayHere support uses a provider adapter, signed callback boundary, event deduplication, reconciliation, and the same internal payment/activation state machine. Fake checkout URLs, provider IDs, and payment success are prohibited.
 
-Documentation decision: **GO - Ready for manual payment implementation**. Runtime release remains **NO-GO** until the implementation/test gates are complete.
+Implementation decision: **GO - Backend ready for Angular integration**. Backend commit `db9d579d94ad5fb41355fa8aeaf01d55d0ea481a` implements the manual-payment, activation and invitation runtime. Overall release remains **NO-GO** until Angular/browser E2E and production dependency validation are complete.
 
 ## Documents and source inspected
 
@@ -63,7 +63,7 @@ Backend reference evidence included invoice, payment transaction/link, onboardin
 | Current release requires provider payment-link generation | Current release is manual payment; no provider checkout | Flow 4 spec/API/data/test/readiness/evidence; onboarding email docs; billing docs |
 | `tenant.paid_created` CTA is a gateway payment link | CTA is the secure payment-status page; invoice is a separate link | Email flow/catalog and API terminology |
 | Provider callback is a current P0 release gate | Callback architecture/tests are future gateway gates, not current manual-payment gates | Test matrix/readiness/evidence; provider-neutral architecture retains future requirements |
-| Payment worker failure `payment_provider_not_configured` blocks current approach | Manual handler/notification/evidence/review replaces provider-session work | Implementation evidence/readiness; source remains unchanged in this documentation task |
+| Audited payment worker failure `payment_provider_not_configured` blocked the prior approach | Manual handler/notification/evidence/review replaces provider-session work | Implemented by backend commit `db9d579`; retained here as historical audit evidence |
 | Existing Mark Paid alone is sufficient manual verification | Mark Paid is only a bridge; canonical review requires submitted evidence, concurrency, idempotency, review history, and audit | Platform Billing functional/API docs |
 | `payment_url` can mean any payment link | `paymentStatusUrl`, `invoiceUrl`, and `checkoutUrl` are distinct | Flow 4 API/data/email docs |
 | Payment received email is deferred | Submission and review outcome communications are current manual-workflow requirements | Email catalog; separate activation/setup template remains mandatory |
@@ -100,27 +100,17 @@ These scores measure readiness to implement the newly approved manual-payment ta
 | Documentation | 100% | Canonical decision and cross-document alignment complete |
 | Overall implementation readiness | **92%** | **GO to implement; not a release score** |
 
-Flow 4 executable readiness remains approximately **72%** until the manual-payment runtime replaces the unconfigured provider path and the remaining activation/audit/concurrency/E2E gates pass.
+Flow 4 executable readiness is approximately **88%**. Backend manual-payment readiness is **95%**: the application, schema, migration, authorization, private proof boundary, concurrency/idempotency and activation handoff are implemented and tested. The remaining feature-level gap is the Angular manual-payment experience, canonical browser E2E and live production-dependency validation.
 
 ## Required implementation sequence
 
-1. Verify existing payment entities.
-2. Finalize EF model delta.
-3. Generate migration.
-4. Implement manual payment backend.
-5. Implement secure payment-status access.
-6. Implement payment proof storage.
-7. Implement Platform Admin payment verification.
-8. Implement payment notifications.
-9. Implement activation transition.
-10. Implement Tenant Admin invitation handoff.
-11. Add Stripe/PayHere provider interfaces.
-12. Implement frontend screens.
-13. Add tests.
-14. Execute E2E.
-15. Update implementation evidence.
-16. Raise PR.
+Steps 1-11, backend automated tests, migration verification and implementation evidence are complete. Remaining sequence:
+
+1. Configure and validate private Blob storage, ClamAV, ACS email and the public payment-access base URL in the target environment.
+2. Implement the Angular recipient and Platform Billing manual-payment surfaces without changing the canonical wizard step order.
+3. Execute the canonical browser E2E/accessibility/responsive matrix.
+4. Merge the reviewed backend and documentation PRs; enable production only after environment evidence is attached.
 
 ## Final decision
 
-**GO - Ready for manual payment implementation.** The current release architecture is coherent and provider-neutral. Production release remains NO-GO until the documented runtime and P0 test gates pass.
+**GO - Backend implemented and verified; ready for Angular integration.** Production release remains NO-GO until UI/E2E and target-environment storage, malware scanning, email and URL configuration are proven.

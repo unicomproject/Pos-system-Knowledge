@@ -79,7 +79,23 @@ Test empty, whitespace, min/max and one-over-max values; Unicode names; code/slu
 
 ## Existing evidence and gaps
 
-Current backend and Angular suites include Flow 4 draft/wizard foundations and secure invitation/outbox unit evidence. On 2026-08-04 the full Angular suite passed 420/420 and the full backend solution passed 1,436 tests. No current tests prove the complete manual access/evidence/review/history/notification workflow, concurrent review/approval, proof isolation, paid-to-pending-activation handoff, or canonical E2E. Future provider callback tests are also absent but are not a manual-release gate. Existing tests are regression assets, not completion evidence for this matrix.
+The final backend solution at `db9d579` passes **1,458/1,458** tests: Unit 740, API 341 and Integration 377. New focused evidence covers the payment state machine, manual provider behavior, access/invoice projections, validation and malware rejection, permission boundaries, raw-path redaction, wizard manual finalization, PostgreSQL schema/migration shape, conflicting concurrent review and concurrent activation with exactly one success/replay/invitation. The previously recorded Angular suite remains 420/420, but no Angular manual-payment UI or canonical browser E2E evidence exists yet. Future provider callback tests are absent by design and are not a manual-release gate.
+
+### Backend execution evidence
+
+| Gate | Result |
+|---|---|
+| Build | PASS - 0 warnings, 0 errors |
+| Full solution | PASS - 1,458 tests, 0 failed |
+| Manual unit focus | PASS - 12 |
+| Manual API/security focus | PASS - 5 |
+| PostgreSQL migration/concurrency focus | PASS - 4 |
+| Representative apply / rollback / reapply | PASS |
+| Clean PostgreSQL full migration chain | PASS |
+| EF pending-model check | PASS - none |
+| Changed-file formatter and `git diff --check` | PASS |
+
+The repository-wide formatter still reports 785 pre-existing whitespace findings outside this change; the changed/new non-generated C# scope is formatted and verified. Browser, live Blob/ClamAV/ACS and production E2E remain required release evidence.
 
 ## Required E2E scenario details
 
