@@ -1,9 +1,12 @@
 <!-- title: Create Tenant Wizard Flow -->
-<!-- status: Active -->
+<!-- status: Historical / Superseded -->
 <!-- system: TM-EPOS MVP / OneVerz -->
-<!-- last_updated: 2026-07-27 -->
+<!-- last_updated: 2026-07-31 -->
+<!-- superseded: true -->
 
 # Create Tenant Wizard Flow
+
+> **SUPERSEDED — DO NOT IMPLEMENT FROM THIS FILE.** The approved replacement is [[FLOW_4_CREATE_TENANT_WIZARD_CANONICAL_SPEC]]. This file is retained as evidence of the pre-2026-07-31 implementation baseline.
 
 ## Purpose
 

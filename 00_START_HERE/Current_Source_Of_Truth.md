@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-01 -->
+<!-- last_updated: 2026-08-04 -->
 
 
 # Current Source Of Truth
@@ -13,6 +13,12 @@ It prevents developers and AI assistants from mixing old POS-first scope, future
 ideas, and current MVP delivery work.
 Use this file before writing, implementing, reviewing, or generating any module
 documentation.
+
+## Flow 4 Tenant Onboarding Authority
+
+Platform Admin tenant creation is governed by [[../03_USER_JOURNEYS/Platform_Admin/FLOW_4_CREATE_TENANT_WIZARD_CANONICAL_SPEC]] and its linked API, database, permission, test, decision and readiness documents. Older tenant-wizard flows, state notes and prompts are historical evidence only.
+
+Runtime implementation evidence is recorded in [[../15_IMPLEMENTATION_TRACKING/FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_EVIDENCE_2026-08-04]]. Current estimated readiness is 72% and release status is NO-GO until its listed P0 gates pass.
 
 ## Highest Priority Decision
 

@@ -1,7 +1,7 @@
 <!-- title: TM-EPOS Second Brain Start Here -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-04 -->
 
 
 # TM-EPOS Second Brain Start Here
@@ -108,6 +108,8 @@ final sale total.
 5. Then read [[../01_RELEASE_SCOPE/Release_1_Scope]].
 6. Then read [[../02_ACCESS_CONTROL/Access_Control_Overview]].
 7. Then read the relevant journey, module, database, UI, or architecture file.
+
+For Platform Admin tenant onboarding, the relevant journey starts at [[../03_USER_JOURNEYS/Platform_Admin/FLOW_4_CREATE_TENANT_WIZARD_CANONICAL_SPEC]] and its linked API, data, permission, decision, test, audit and readiness pack. Superseded wizard documents are evidence only.
 
 ## Immediate Update Rule
 

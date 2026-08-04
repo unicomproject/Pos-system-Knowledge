@@ -1,9 +1,12 @@
 <!-- title: Platform Tenant Create Wizard Alignment -->
-<!-- status: Active -->
+<!-- status: Historical / Superseded -->
 <!-- system: TM-EPOS MVP / OneVerz -->
-<!-- last_updated: 2026-07-27 -->
+<!-- last_updated: 2026-07-31 -->
+<!-- superseded: true -->
 
 # Platform Tenant Create Wizard Alignment
+
+> **SUPERSEDED — DO NOT IMPLEMENT FROM THIS FILE.** Use [[FLOW_4_CREATE_TENANT_WIZARD_CANONICAL_SPEC]]. This document remains historical evidence of the one-shot wizard alignment completed before the canonical Flow 4 audit.
 
 ## Email and lifecycle alignment (2026-07-27)
 

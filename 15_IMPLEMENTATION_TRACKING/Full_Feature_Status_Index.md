@@ -1,7 +1,7 @@
 ﻿<!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-04 -->
 
 # Full Feature Status Index
 
@@ -56,6 +56,7 @@ PR/commit reference is recorded.
 
 | Platform | Module | Feature | Status | Completed Date | PR / Commit | Notes |
 |---|---|---|---|---|---|---|
+| Cross-platform | Platform Tenant | Flow 4 Create Tenant Wizard | Ready for implementation (57%; not release-ready) | 2026-08-04 | [[99_AUDITS/FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_READINESS]] | Canonical spec revalidated; draft, idempotency, payment-link, secure invite and canonical E2E remain |
 | Backend | Auth | Tenant Login | Completed | 2026-07-01 | Tenant auth module | `POST /api/v1/tenant-auth/login` |
 | Backend | OutletTillDevice | Device Context | Completed | 2026-07-09 | `5c99b66` | `devices/current`, `devices/activate` |
 | Backend | OutletTillDevice | Till Session Open/Close | Completed | 2026-07-09 | `06048db` | current-session, open, close |
