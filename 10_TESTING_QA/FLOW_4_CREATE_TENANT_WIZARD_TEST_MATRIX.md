@@ -26,7 +26,7 @@ All P0 cases must pass against PostgreSQL and the production Angular build. Unit
 | F4-T13 | Unit | Plan/add-on/effective limit calculations | Server prices/limits win; invalid override rejected | P0 |
 | F4-T14 | Unit/integration | Included/optional/prerequisite features | Effective entitlement set is correct | P0 |
 | F4-T15 | Authorization | Entitlement override without permission | 403 and no persisted override | P0 |
-| F4-T16 | E2E | Paid happy path | Tenant pending payment; invoice/outbox/operation created | P0 |
+| F4-T16 | E2E | Prepaid/manual happy path | Tenant pending payment; invoice, `AWAITING_PAYMENT`, secure access, notification outbox and operation created; `checkoutUrl` null | P0 |
 | F4-T17 | E2E | Trial happy path | No payment link; provisioned tenant active | P0 |
 | F4-T18 | E2E | Demo happy path | No payment link; configured demo limits; active | P0 |
 | F4-T19 | PostgreSQL integration | Failure at every transactional write point | Full rollback; draft remains retryable; no orphan rows | P0 |
@@ -36,8 +36,8 @@ All P0 cases must pass against PostgreSQL and the production Angular build. Unit
 | F4-T23 | Security | Tenant admin invitation | Strong random raw token only at worker; hash at rest; no plaintext password/token in response/log | P0 |
 | F4-T24 | Integration | Cross-tenant same admin email | Allowed; same-tenant duplicate blocked | P0 |
 | F4-T25 | Integration | Invitation resend | Old token revoked, new hash saved, rate limit/audit applied | P0 |
-| F4-T26 | Integration | Payment provider callback replay | Signature checked; one transaction/result; idempotent | P0 |
-| F4-T27 | Integration | Payment failed then success | Payment operation changes; tenant lifecycle remains valid | P0 |
+| F4-T26 | Integration | Manual evidence command replay | Same key/hash returns one submission; changed request conflicts | P0 |
+| F4-T27 | Integration | Rejected/action-required then corrected resubmission | Review history retained; tenant lifecycle remains pending payment | P0 |
 | F4-T28 | Authorization | Waiver with/without billing manage | Allowed with reason/audit; denied otherwise | P0 |
 | F4-T29 | Integration | Paid lifecycle transitions | Only pending payment → pending activation → active | P0 |
 | F4-T30 | Integration | Outbox delivery failure | Tenant retained; retryable operation; no duplicate invoice/invite | P0 |
@@ -51,14 +51,27 @@ All P0 cases must pass against PostgreSQL and the production Angular build. Unit
 | F4-T38 | Integration | Paid finalize before activation | Membership exists; no live setup invite/token; payment notification only | P0 |
 | F4-T39 | Integration | Trial/demo or paid activation invite request | Outbox request committed; worker creates hash and sends token only in memory | P0 |
 | F4-T40 | Migration | Historical registration/tax migration lineage | New forward migration applies from current snapshot without editing July 2/July 7 history | P0 |
-| F4-T41 | Security | Payment-link URL projection/logging | URL/token absent from audit/log/unauthorized DTO; provider payload redacted | P0 |
+| F4-T41 | Security | Invoice/payment-status/checkout URL semantics | Purpose URLs are distinct; manual `checkoutUrl` null; raw access token/proof URL absent from audit/log/unauthorized DTO | P0 |
+| F4-T42 | Unit | Manual payment status transitions | Only documented transitions; invoice/payment/tenant states remain separate | P0 |
+| F4-T43 | Unit/API | Submission amount/currency/date/method/reference validation | Expected invoice values enforced; stable field errors | P0 |
+| F4-T44 | PostgreSQL integration | Concurrent manual reviews | One version wins; stale reviewer conflicts; one audit/review transition | P0 |
+| F4-T45 | PostgreSQL integration | Duplicate approval request | Same command replays; no duplicate paid/pending-activation/outbox rows | P0 |
+| F4-T46 | Integration/security | Payment proof upload/access | Private approved MIME/size/checksum; cross-ID and expired grant denied; short-lived access only | P0 |
+| F4-T47 | Integration | Request information and resubmission | `ACTION_REQUIRED` -> `PAYMENT_SUBMITTED`; full immutable review chronology | P0 |
+| F4-T48 | Integration | Approval handoff | `PAID` -> tenant `PENDING_ACTIVATION`; no direct ACTIVE or invitation token | P0 |
+| F4-T49 | Integration | Payment notifications | Required/submitted/approved/rejected/action-required events are deduplicated and contain no account setup credential | P0 |
+| F4-T50 | Authorization | Manual review and proof permissions | Billing view/manage split, secure recipient grant, direct API and cross-tenant isolation enforced | P0 |
 
 ## Layer coverage checklist
 
-- Unit: all normalizers/validators and min/max boundaries; duplicate classification; draft/tenant/operation state transitions; progress rounding; effective entitlement/dependency/limit calculation; permission predicates; paid/trial/demo billing rules; tenant-admin timing and token lifecycle.
-- Backend integration: platform authentication/authorization; draft CRUD/list/resume/expiry; PostgreSQL uniqueness/rollback/isolation; subscription/invoice/add-on/entitlement/contact/admin persistence; paid/pending/activation transitions; idempotency replay/conflict; concurrent PATCH/finalize/activate; audit/outbox rows and retry.
-- Frontend: exact labels/order; typed forms/cross-field mapping; server defaults; draft save/resume/autosave failure; guard; duplicate warning and strict conflict; permissioned overrides; review/edit; pending payment/activation/success; ETag conflict; stable-key retry; accessible focus and responsive layout.
-- E2E: all 17 scenarios below, using real API and PostgreSQL with fake external adapters only. No mocked plan, feature, tenant, draft, billing or permission data in the application path.
+- Unit: all normalizers/validators and min/max boundaries; duplicate classification; draft/tenant/operation/manual-payment state transitions; submission validation; amount/currency checks; approval eligibility; provider-neutral mapping; `checkoutUrl` null behavior; progress rounding; effective entitlement/dependency/limit calculation; permission predicates; paid/trial/demo/deferred billing rules; tenant-admin timing and token lifecycle.
+- Backend integration: platform authentication/authorization; draft CRUD/list/resume/expiry; PostgreSQL uniqueness/rollback/isolation; subscription/invoice/payment/evidence/review/add-on/entitlement/contact/admin persistence; manual submission/review/resubmission and paid/pending/activation transitions; idempotency replay/conflict; concurrent PATCH/finalize/review/activate; proof access; audit/outbox rows and retry.
+- Frontend: exact labels/order; typed forms/cross-field mapping; server defaults; draft save/resume/autosave failure; guard; duplicate warning and strict conflict; permissioned overrides; review/edit; pending payment/manual review/evidence/payment-recipient/pending activation/success; ETag conflict; stable-key retry; accessible focus and responsive layout.
+- E2E: all 17 scenarios below, using real API and PostgreSQL with fake email/private-storage adapters only for the manual release. No mocked plan, feature, tenant, draft, billing or permission data in the application path.
+
+## Future provider contract tests
+
+Stripe/PayHere tests are future/environment-dependent and do not block the manual-payment release. Before enabling either provider, contract tests must prove session creation/status mapping, secret/config isolation, callback signature verification, provider-event deduplication, amount/currency/invoice/tenant mismatch rejection, duplicate/out-of-order callbacks, provider timeout/unknown result, idempotent success/failure, cancellation/refund capability mapping and reconciliation. Live sandbox/production evidence is reported separately from automated adapter tests.
 
 ## Validation boundary set
 
@@ -66,13 +79,13 @@ Test empty, whitespace, min/max and one-over-max values; Unicode names; code/slu
 
 ## Existing evidence and gaps
 
-Current backend has wizard service/validator/controller/repository tests and an invoice-line PostgreSQL-style integration test; Angular has page, validator and mapper specs. On 2026-08-04, `npm test -- --watch=false` passed 54 files/420 tests and a focused backend filter for wizard service/validator, create-mode, lifecycle and permission tests passed 80/80. The broader project suites also passed in the 2026-07-31 independent validation, but no current tests prove drafts/resume, finalization idempotency, atomic counter/audit writes, secure token delivery, payment-link onboarding, cross-tenant email policy, provider callback, or canonical paid/trial/demo E2E. Existing tests are regression assets, not completion evidence for this matrix.
+Current backend and Angular suites include Flow 4 draft/wizard foundations and secure invitation/outbox unit evidence. On 2026-08-04 the full Angular suite passed 420/420 and the full backend solution passed 1,436 tests. No current tests prove the complete manual access/evidence/review/history/notification workflow, concurrent review/approval, proof isolation, paid-to-pending-activation handoff, or canonical E2E. Future provider callback tests are also absent but are not a manual-release gate. Existing tests are regression assets, not completion evidence for this matrix.
 
 ## Required E2E scenario details
 
-Base data: isolated PostgreSQL schema; a Platform Admin with all needed permissions; active paid/trial/demo plans with known features/limits; alternate configured defaults not equal to LK/LKR for default tests; fake provider/email adapters that record requests without real delivery. Cleanup deletes the test schema/tenant fixtures through the test harness, never production-like shared data.
+Base data: isolated PostgreSQL schema; a Platform Admin with all needed permissions; active prepaid/deferred/trial/demo plans with known features/limits; alternate configured defaults not equal to LK/LKR for default tests; private proof-storage and email adapters that record requests without real delivery. No gateway adapter is enabled for the current manual-release scenarios. Cleanup deletes the test schema/tenant fixtures through the test harness, never production-like shared data.
 
-Every E2E row uses this execution protocol unless its distinguishing steps override it: seed only through approved test fixtures/API; sign in through platform auth; navigate to `/admin/tenants/create`; enter data through the seven UI steps; save/reload where required; intercept only the fake provider/email boundary; assert the API envelope/status/trace ID; query PostgreSQL directly for exact rows/constraints; assert UI state and correlated audit events; then dispose the isolated schema and clear adapter captures. Screenshots/video and request correlation IDs are attached before cleanup. A scenario that skips its API, database, UI, audit or cleanup assertion is incomplete.
+Every E2E row uses this execution protocol unless its distinguishing steps override it: seed only through approved test fixtures/API; sign in through platform auth; navigate to `/admin/tenants/create`; enter data through the seven UI steps; save/reload where required; intercept only the private storage/email boundaries; assert the API envelope/status/trace ID; query PostgreSQL directly for exact rows/constraints; assert UI state and correlated audit events; then dispose the isolated schema and clear adapter captures. Screenshots/video and request correlation IDs are attached before cleanup. A scenario that skips its API, database, UI, audit or cleanup assertion is incomplete.
 
 | Scenario | Preconditions / distinguishing data | Expected API and database | Expected UI and audit |
 |---|---|---|---|
@@ -80,9 +93,9 @@ Every E2E row uses this execution protocol unless its distinguishing steps overr
 | 2 Save after Step 1/resume | Unique basic details | Draft create/patch/get; no tenant rows | Resume at saved step with exact values; create/update/resume events |
 | 3 Save after Step 5/resume | Valid plan/billing/entitlements | Draft JSON and derived progress persist; no final rows | Steps 1–5 restored; plan/entitlement change events |
 | 4 Duplicate tenant | Existing normalized code/slug/domain; similar legal name | Advisory warning then finalize 409 on strict field; no new tenant | Field message and retained draft; duplicate check/override audit where applicable |
-| 5 Paid creation | Paid plan/invoice email; submit review and allow payment worker | One tenant pending payment, invoice/lines, payment outbox; no live setup invite/token; 201 | Payment-required completion; payment initiated/requested events only |
-| 6 Payment remains pending | Provider has no callback | Tenant remains pending payment; operation pending | Refresh/poll shows pending; no activation event |
-| 7 Payment fail/retry | Signed failed callback then success | One transaction history; payment failed then confirmed; no duplicate invoice/link | Retry state then confirmed; failure/retry/confirmed events |
+| 5 Paid creation | Prepaid plan/invoice email; submit review | One tenant pending payment, invoice/lines, `AWAITING_PAYMENT`, secure payment-access hash and notification outbox; no live setup invite/token; `checkoutUrl` null; 201 | Payment-required result with invoice/status links and manual instructions; no setup credential |
+| 6 Payment remains pending | Recipient does not submit evidence | Tenant/payment remain pending/awaiting; operation stable | Refresh/poll shows awaiting payment; no activation event |
+| 7 Payment rejected/retried | Submit evidence, reviewer rejects or requests information, payer corrects/resubmits, reviewer approves | Immutable review history; exactly one paid result; tenant reaches only pending activation; no duplicate invoice/access record | Rejection/action-required/resubmit/approved states and correlated notifications/audit |
 | 8 Pending activation | Verified paid invoice | Lifecycle changes only to pending activation | Activation action shown only to authorized actor; activation-pending event |
 | 9 Activation fail/retry | Inject retryable delivery/provisioning-side failure around activation | No invalid lifecycle/partial duplicate; operation retry count increments | Failure detail and retry control; failed/retried/activated events |
 | 10 Invitation delivery fails | Email adapter fails after commit | Tenant remains durable; outbox retryable; token hash only | Warning/retry status; invitation requested/failed events without token |
@@ -101,5 +114,7 @@ Each scenario also asserts no unexpected rows, validates server errors and trace
 Record commit SHA, command, environment/database provider, pass/fail count, duration and artifact link. Flaky retries do not count as pass without root-cause disposition. P0 failures block release; accepted P1 exceptions require owner, reason and expiry.
 
 ## Related
+
+[[../05_BACKEND_ARCHITECTURE/FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]]
 
 [[../03_USER_JOURNEYS/Platform_Admin/FLOW_4_CREATE_TENANT_WIZARD_CANONICAL_SPEC]] · [[Idempotency_Test_Cases]]

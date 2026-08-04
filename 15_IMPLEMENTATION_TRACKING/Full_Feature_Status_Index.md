@@ -56,7 +56,8 @@ PR/commit reference is recorded.
 
 | Platform | Module | Feature | Status | Completed Date | PR / Commit | Notes |
 |---|---|---|---|---|---|---|
-| Cross-platform | Platform Tenant | Flow 4 Create Tenant Wizard | Ready for implementation (57%; not release-ready) | 2026-08-04 | [[99_AUDITS/FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_READINESS]] | Canonical spec revalidated; draft, idempotency, payment-link, secure invite and canonical E2E remain |
+| Cross-platform | Platform Tenant | Flow 4 Create Tenant Wizard | In Progress (72%; NO-GO) | 2026-08-04 | [[FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_EVIDENCE_2026-08-04]] | Durable onboarding foundation implemented; manual-payment architecture approved and aligned; secure access/proof/review/activation/audit/concurrency/E2E remain |
+| Cross-platform | Platform Billing | Flow 4 Manual Payment + Future IPG | Ready for implementation (architecture 92%; runtime incomplete) | 2026-08-04 | [[99_AUDITS/FLOW_4_MANUAL_PAYMENT_SECOND_BRAIN_ALIGNMENT_2026-08-04]] | Current release manual verification; `checkoutUrl` null; Stripe/PayHere provider adapters are future extensions |
 | Backend | Auth | Tenant Login | Completed | 2026-07-01 | Tenant auth module | `POST /api/v1/tenant-auth/login` |
 | Backend | OutletTillDevice | Device Context | Completed | 2026-07-09 | `5c99b66` | `devices/current`, `devices/activate` |
 | Backend | OutletTillDevice | Till Session Open/Close | Completed | 2026-07-09 | `06048db` | current-session, open, close |

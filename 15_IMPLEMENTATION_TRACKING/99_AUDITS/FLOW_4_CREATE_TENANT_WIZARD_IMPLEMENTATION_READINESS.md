@@ -3,7 +3,7 @@
 <!-- system: TM-EPOS MVP / OneVerz -->
 <!-- last_updated: 2026-08-04 -->
 
-> Runtime update (2026-08-04): implementation is in progress on dedicated runtime branches. Estimated readiness is 72%; builds, existing automated suites, snapshot verification, and representative PostgreSQL migration application pass. Release remains NO-GO for the P0 items in [[../FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_EVIDENCE_2026-08-04]].
+> Runtime update (2026-08-04): implementation is in progress on dedicated runtime branches. Estimated executable readiness is 72%; builds, existing automated suites, snapshot verification, and representative PostgreSQL migration application pass. The current-release payment architecture is now manual verification, not a real gateway. Documentation alignment is complete and implementation may proceed; release remains NO-GO for the P0 items in [[../FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_EVIDENCE_2026-08-04]].
 
 # Flow 4 — Create Tenant Wizard Implementation Readiness
 
@@ -12,6 +12,12 @@
 # GO — Ready for implementation
 
 This is a go to begin implementation against the canonical documents, not a release approval. No unresolved product or architecture decision prevents coding. Production release remains blocked until all P0 gates pass.
+
+## Manual-payment decision addendum
+
+The current release supports `MANUAL` payment setup for prepaid paid plans. Finalization yields tenant `PENDING_PAYMENT` and payment `AWAITING_PAYMENT`; the payer uses separate invoice and secure payment-status links to submit proof; an authorized, concurrency-protected and idempotent review approves, rejects, or requests information. Approval yields `PENDING_ACTIVATION`, never direct activation. `checkoutUrl` is null. Stripe/PayHere are future adapters and signed callback implementations.
+
+Architecture/documentation readiness for this slice is **92% and GO for implementation**. This is not the executable/release score. Runtime gaps are the EF delta, secure access, proof storage, submission/review APIs, screens, notification handlers, activation hardening and P0 tests. See [[../../05_BACKEND_ARCHITECTURE/FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]] and [[FLOW_4_MANUAL_PAYMENT_SECOND_BRAIN_ALIGNMENT_2026-08-04]].
 
 ## Readiness scorecard
 
@@ -23,7 +29,7 @@ This is a go to begin implementation against the canonical documents, not a rele
 | Backend | 55% | Partially Ready | One-shot aggregate exists; orchestration and safety gaps |
 | Database | 62% | Partially Ready | Most final tables exist; draft/operation/contact changes required |
 | Subscription | 75% | Partially Ready | Plan/add-on resolution exists; canonical state authority needs refactor |
-| Billing and payment | 35% | Blocked | Invoice schema/path exists; payment-link onboarding absent |
+| Billing and payment | 35% | Blocked | Invoice schema/path exists; manual access/submission/review/notification workflow absent |
 | Feature entitlements | 68% | Partially Ready | Included-feature path exists; optional/override contract absent |
 | Tenant Admin handoff | 38% | Blocked | Pending user/role path exists; activation-gated secure token/delivery absent |
 | Permissions | 85% | Ready | Existing codes cover R1; conditional enforcement to add |
@@ -53,7 +59,7 @@ Scores represent current executable conformance, not document volume: 100 means 
 2. Draft APIs: create/list/get/patch/delete/validate, ownership and concurrency.
 3. Finalization refactor: full transaction, constraint mapping, idempotent replay, fix tenant-local email policy.
 4. Secure onboarding: activation-eligible invitation request, worker-only token generation, hash-only persistence, resend and operation status.
-5. Billing: paid invoice/payment-link worker, callback idempotency, waiver and lifecycle transitions.
+5. Billing: manual payment access, instructions, proof submission, review/history, notification and paid-to-pending-activation transition; preserve future provider adapter/callback extension points.
 6. Angular: canonical steps, server defaults, autosave/resume/dirty guard, duplicate warnings, operation result.
 7. Verification: P0 PostgreSQL integration, security, Angular E2E, accessibility/responsive and operational evidence.
 
@@ -67,7 +73,7 @@ Each slice should update implementation tracking but must not alter the canonica
 4. Implement draft repository/application services/validators/controllers and permission tests.
 5. Refactor final creation into one idempotent unit-of-work transaction with receipt/audit/counters/outbox.
 6. Implement secure setup-token generation, invitation delivery/resend and retryable operation status.
-7. Implement paid invoice/payment-link/provider callback and lifecycle orchestration.
+7. Implement paid invoice/manual access, evidence submission/review/history/notifications and lifecycle orchestration; add provider-neutral interfaces without enabling a gateway.
 8. Refactor Angular route/shell/forms into the canonical seven steps.
 9. Add autosave, manual save, resume list, progress, dirty guard, duplicate warnings and conflict recovery.
 10. Connect plan/billing/entitlement/admin/review/result states to authoritative APIs.
@@ -87,7 +93,7 @@ Paths are relative to their verified repository roots. New filenames are recomme
 | 5 | BE `Infrastructure/.../PlatformAdmin/Repositories/PlatformTenantRepository.Wizard.cs` | Add draft CRUD/atomic versioning; fix tenant-local email; atomic finalize/history | Data correctness | repository PostgreSQL tests |
 | 6 | BE `Application/.../PlatformAdmin/Services/PlatformTenantService.Wizard.cs` | Split draft/finalize orchestration, derive statuses, require idempotency | Current service has post-commit failure window | service/idempotency/fault tests |
 | 7 | BE `Api/Controllers/V1/Platform/PlatformAdmin/PlatformAdminTenantsController.cs` | Add onboarding controller/group; preserve/deprecate compatibility endpoints | Versioned API contract | controller/API tests |
-| 8 | BE subscription billing services/repositories | Implement payment-link request/callback/waiver and operation retries | Paid lifecycle | provider/callback/lifecycle integration tests |
+| 8 | BE subscription billing services/repositories | Implement manual access/evidence/review/history/notifications/waiver and operation retries; retain future provider interfaces | Paid lifecycle | manual review/concurrency/lifecycle integration tests plus future adapter contracts |
 | 9 | BE tenant auth invitation/token/email integration | Secure hash-only token, outbox consumer, resend | Admin handoff | security and delivery retry tests |
 | 10 | FE `src/app/features/admin/models/platform-tenant-create.model.ts` | Canonical typed draft/step/operation models; remove temporary password | API alignment | model/mapper specs |
 | 11 | FE `.../mappers/platform-tenant-create.mapper.ts` and validators | Map named draft sections/finalize; canonical field/cross-field rules | New API/models | mapper/validator specs |
@@ -123,7 +129,7 @@ The following paths remove ambiguity from the plan. `New` means the file does no
 | 16 | BE `src/E_POS.Application/Modules/Platform/PlatformAdmin/Services/PlatformTenantService.Wizard.cs` | Remove LKR/timezone fallbacks, premature mock invite and post-commit failure window; compatibility facade only | New service ready | Existing wizard service tests updated |
 | 17 | BE new `src/E_POS.Application/Modules/Platform/PlatformAdmin/Services/PlatformTenantOnboardingService.cs` | Canonical create-options/draft/validate/finalize/operation orchestration | Repository/outbox | New service/idempotency/fault tests |
 | 18 | BE new `src/E_POS.Api/Controllers/V1/Platform/PlatformAdmin/PlatformTenantOnboardingController.cs`; existing `PlatformAdminTenantsController.cs` | Add canonical endpoints; retain documented activation/compatibility endpoints and correct error mapping | Application service | Controller integration tests new/updated |
-| 19 | BE `src/E_POS.Infrastructure/Modules/Platform/Subscription/Configurations/SubscriptionPaymentTransactionConfiguration.cs` and payment services | Add partial unique idempotency index and provider callback/link workflow | Shared outbox | Payment replay/provider tests |
+| 19 | BE `src/E_POS.Infrastructure/Modules/Platform/Subscription/Configurations/SubscriptionPaymentTransactionConfiguration.cs` and payment services | Preserve existing idempotency index; add manual status/submission/review/proof/access delta and future provider-event extension point | Shared outbox | Manual command/concurrency/isolation tests; future adapter contracts |
 | 20 | BE tenant-auth email delivery service plus new outbox worker under existing infrastructure convention | Generate raw setup token only in worker memory; store hash; ACS send/retry | Active tenant + outbox | Security/delivery retry tests |
 | 21 | FE `src/app/features/admin/models/platform-tenant-create.model.ts`, `mappers/platform-tenant-create.mapper.ts`, `validators/platform-tenant-create.validators.ts` | Replace legacy step/state contract, remove temporary-password property | API DTOs | Existing three spec files updated |
 | 22 | FE `src/app/features/admin/services/platform-tenant-api.service.ts` | Add canonical methods and ETag/idempotency headers | API available | `platform-tenant-api.service.spec.ts` |
@@ -137,7 +143,7 @@ The following paths remove ambiguity from the plan. `New` means the file does no
 - Any P0 test failure.
 - Placeholder invitation token or any plaintext password/token storage/logging.
 - Finalization that can return failure after a committed tenant without a stable replay result.
-- Missing payment-link path for paid onboarding.
+- Missing manual payment-status access, proof submission/review/history/notification path for paid onboarding.
 - Missing draft concurrency/idempotency.
 - Hard-coded country/currency defaults.
 - Hard-coded backend timezone/currency fallbacks.
@@ -156,7 +162,7 @@ The following paths remove ambiguity from the plan. `New` means the file does no
 
 ## Dependencies that are not design blockers
 
-Production email/provider credentials, selected payment-provider adapter configuration, platform base domain and deployment-specific defaults can be supplied through configuration. Implementations must remain provider-neutral and fail safely when configuration is absent.
+Production email/blob credentials, platform base domain, manual instructions/support configuration and deployment-specific defaults can be supplied through configuration. No payment-provider credential is required for the manual release. Future provider credentials and adapter configuration remain environment dependencies only when Stripe/PayHere is enabled. Implementations must remain provider-neutral and fail safely when configuration is absent.
 
 ## Canonical implementation pack
 

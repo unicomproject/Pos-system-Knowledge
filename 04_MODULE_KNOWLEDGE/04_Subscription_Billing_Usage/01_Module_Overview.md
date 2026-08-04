@@ -1,9 +1,11 @@
 <!-- title: Subscription Billing, Payments & Usage Module Overview -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-07-15 -->
+<!-- last_updated: 2026-08-04 -->
 
 # Subscription Billing, Payments & Usage Module Overview
+
+> Flow 4 current-release alignment (2026-08-04): prepaid onboarding uses manual payment verification with invoice/manual instructions, secure payment-status access, proof submission and authorized review. It does not use a live gateway. Future Stripe/PayHere support is provider-neutral; see [[../../05_BACKEND_ARCHITECTURE/FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]].
 
 > [!NOTE]
 > The generic `/api/v1/billing/*` groups below describe the broader target

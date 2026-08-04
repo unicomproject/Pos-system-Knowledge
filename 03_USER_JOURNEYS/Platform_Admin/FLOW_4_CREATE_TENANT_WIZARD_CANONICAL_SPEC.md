@@ -3,7 +3,7 @@
 <!-- system: TM-EPOS MVP / OneVerz -->
 <!-- last_updated: 2026-08-04 -->
 
-> Implementation status (2026-08-04): In progress. Durable drafts, the canonical Angular sequence, atomic locked internal finalization, outbox leasing, and secure invitation-token generation are implemented. Payment provider/callback, activation retry/audit, focused PostgreSQL concurrency, and E2E gates remain; see [[../../15_IMPLEMENTATION_TRACKING/FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_EVIDENCE_2026-08-04]].
+> Implementation status (2026-08-04): In progress. Durable drafts, the canonical Angular sequence, atomic locked internal finalization, outbox leasing, and secure invitation-token generation are implemented. The approved current-release collection model is now manual payment verification; manual submission/review, activation retry/audit, focused PostgreSQL concurrency, and E2E gates remain. See [[../../05_BACKEND_ARCHITECTURE/FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]] and [[../../15_IMPLEMENTATION_TRACKING/FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_EVIDENCE_2026-08-04]].
 
 # Flow 4 — Create Tenant Wizard Canonical Specification
 
@@ -94,11 +94,11 @@ Completion: one active plan, one supported subscription type, a plan-supported b
 
 Fields depend on subscription type. The Step 3 billing cycle is displayed, while invoice email, tax, discount, start/renewal dates and auto-renew are configured and server validated. The plan currency is authoritative for subscription charges; any mismatch with tenant base currency is displayed.
 
-- `PAID`: create a draft invoice at finalization. Default billing state is `pending`. The tenant begins `PENDING_PAYMENT`. Create a secure payment link after commit through a durable outbox. Manual payment verification or an approved waiver moves it to `PENDING_ACTIVATION`.
+- `PAID`: create and issue the authoritative invoice at finalization. For a prepaid plan, the tenant begins `PENDING_PAYMENT` and payment begins `AWAITING_PAYMENT`. The durable outbox queues a payment-required notification with separate `invoiceUrl` and secure `paymentStatusUrl`; `checkoutUrl` is null for the current manual-payment release. An authorized, versioned and idempotent manual approval or approved waiver moves the tenant only to `PENDING_ACTIVATION`.
 - `TRIAL`: no payment link. Validate trial dates and limits; tenant may auto-activate only after transactional provisioning succeeds.
 - `DEMO`: no payment link. Apply configured demo dates/limits; tenant may auto-activate only after transactional provisioning succeeds.
 - Waiver requires `platform.billing.manage`, a non-empty reason and audit event. The actor cannot submit arbitrary billing/subscription statuses.
-- Provider callbacks require an idempotency key/signature and update payment records, not `tenants.status` directly except through the lifecycle service.
+- Provider callbacks are a future Stripe/PayHere extension. They require signature verification and event deduplication and update payment records through the provider-neutral application command, never `tenants.status` directly. They are not simulated in the manual-payment release.
 - Billing address/contact are immutable snapshots for the created billing account/invoice; copying from Step 2 is a UI convenience. No PAN, CVV, magnetic-stripe data or provider secret is accepted or stored. `paymentMethod` is a provider-neutral method code or invoice/manual option from create-options, never card data.
 
 Completion: `PAID` has invoice email, billing address, billing cycle and an allowed payment method; invoice/manual terms satisfy policy. `TRIAL`/`DEMO` have valid configured start/end dates and no payment-only fields. Any waiver or protected discount has the required permission and reason.
@@ -124,7 +124,7 @@ Finalization creates a tenant-local pending-invite user, bootstrap administrator
 
 Completion: required identity fields are valid, no same-tenant email/phone constraint is violated, the bootstrap permission catalogue is complete, and the invitation method is the fixed `SET_PASSWORD_LINK` method. Email verification occurs when the single-use link is redeemed; it is not a wizard prerequisite.
 
-Handoff sequence: paid finalization queues `tenant.paid_created` with payment link and no setup link; verified payment/waiver reaches pending activation; authorized activation queues `tenant.paid_activated`/password setup. Trial/demo finalization atomically activates and queues two distinct business notifications—created information first, activated/password setup second. Delivery order is preserved per tenant by outbox aggregate sequence. A failed informational email does not prevent the later activation email; operation status exposes each result.
+Handoff sequence: paid finalization queues `tenant.paid_created` with invoice/manual-payment instructions and a secure payment-status link, but no checkout or setup link. Manual payment approval/waiver reaches pending activation; authorized activation queues `tenant.paid_activated`/password setup. Trial/demo finalization atomically activates and queues two distinct business notifications—created information first, activated/password setup second. Delivery order is preserved per tenant by outbox aggregate sequence. A failed informational email does not prevent the later activation email; operation status exposes each result.
 
 ## Step 7 — Review, Create & Activation
 
@@ -140,7 +140,7 @@ Completion: all seven server predicates pass, the displayed review is based on t
 
 Partial data lives in a dedicated `platform_tenant_onboarding_drafts` aggregate; it must not create partial production tenant rows. Finalization performs one PostgreSQL transaction containing tenant/profile/addresses/domain/contacts, subscription/history/invoice/lines, entitlements/add-ons/limits, tenant admin/role/permissions, capacity counters, onboarding operation, creation receipt/audit and outbox messages. Trial/demo finalization also records the setup-invitation request and activation email events. Paid finalization records no setup-token request; paid activation later records that request and activation event transactionally. Token material is generated only by the post-commit worker. Strict duplicate constraints are rechecked within each boundary.
 
-External email and payment-provider calls never run inside the database transaction. Durable outbox consumers retry them. If the transaction rolls back, no tenant is created. If an external call fails after commit, the tenant remains durable and the onboarding operation records a retryable failure; no duplicate tenant may be created.
+External email, object-storage and future payment-provider calls never run inside the database transaction. Durable outbox consumers retry eligible work. Manual review commands transact only local payment/invoice/lifecycle/audit/outbox state. If finalization rolls back, no tenant is created. If an external call fails after commit, the tenant remains durable and the onboarding operation records a retryable failure; no duplicate tenant may be created.
 
 ## Lifecycle and operation states
 
@@ -159,7 +159,7 @@ Persisted `tenants.status` values remain exactly `DRAFT`, `PENDING_PAYMENT`, `PE
 | State | Entry | Allowed actions / UI | Blocks | Exit / next state | Audit and retry |
 |---|---|---|---|---|---|
 | `DRAFT` | A complete tenant aggregate is created in draft mode by an internal provisioning operation; partial wizard input is not this state | Inspect provisioning; cancel; retry failed transaction from the separate wizard draft | Tenant login and paid activation | Trial/demo successful provision → `ACTIVE`; paid orchestration normally enters `PENDING_PAYMENT`; cancel → `CANCELLED` | State entry and result event; transaction failure rolls back rather than retaining a broken row |
-| `PENDING_PAYMENT` | Paid tenant aggregate committed with invoice/outbox | View/retry payment link, record verified payment, authorized waiver, cancel | Activation and admin handoff | verified/waived → `PENDING_ACTIVATION`; cancel → `CANCELLED` | payment requested/failed/confirmed/waived; callbacks retry idempotently |
+| `PENDING_PAYMENT` | Prepaid paid tenant aggregate committed with invoice, `AWAITING_PAYMENT` record, secure access and outbox | View invoice/instructions, submit or review evidence, authorized waiver, resend notice, cancel | Activation and admin handoff | approved/waived → `PENDING_ACTIVATION`; cancel → `CANCELLED` | instructions/submission/review/waiver events; commands are concurrency protected and idempotent |
 | `PENDING_ACTIVATION` | Paid payment verified/waived and provisioning complete | Authorized activate, inspect/retry delivery, cancel | Tenant login until activation | activate → `ACTIVE`; cancel → `CANCELLED` | pending/activated/failure events; activation command is idempotent |
 | `ACTIVE` | Trial/demo provisioned or paid tenant activated | Normal tenant use, suspend, cancel under existing rules | Duplicate activation has no new effect | suspend → `SUSPENDED`; cancel → `CANCELLED` | activated/suspended/cancelled |
 | `SUSPENDED` | Authorized suspension of active tenant | View, authorized reactivate/cancel | Tenant operations per suspension policy | reactivate → `ACTIVE`; cancel → `CANCELLED` | suspended/reactivated; concurrency protected |
@@ -213,9 +213,10 @@ The draft owner is the authenticated Platform Admin that creates it. `created_by
 | Two editors save one draft | Atomic expected-version update | One 200/version+1; stale writer 409/no overwrite | Compare/reload, manually reapply local fields |
 | Two finalizers or duplicate checks race | Named unique constraints inside finalize transaction | One tenant; loser 409 field conflict | Retain draft and return to conflicting field |
 | Two actors activate | Tenant concurrency token, lifecycle row lock, activation command key | One transition/outbox request; other receives idempotent active result or 409 stale version | Refresh status; never repeat provisioning |
-| Payment webhook repeats/out-of-order | Signature, unique provider reference/key, payment state machine | Existing transaction/result returned; invalid regression rejected | Refresh operation; no duplicate invoice/transition |
+| Manual approval repeats or reviewers race | Payment row lock/version, command key+hash, payment state machine | One review transition; exact replay returns the result; stale/different request conflicts | Reload review; no duplicate invoice/lifecycle transition |
+| Future webhook repeats/out-of-order | Adapter signature verification, unique provider event/key, shared payment state machine | Existing transaction/result returned; invalid regression rejected | Refresh operation; no duplicate invoice/transition |
 | Database timeout before commit | Transaction rollback plus unknown-outcome receipt lookup by draft/key | Retryable 5xx; receipt lookup determines whether commit occurred | Retry same key only |
-| External payment timeout | Outbox lease/retry with provider idempotency key | Tenant remains pending payment; operation retryable | Pending state, retry/manual refresh |
+| Proof storage/notification timeout | Private storage boundary or outbox lease/retry | Tenant remains pending payment; submission/operation remains safely retryable | Keep stable submission key; refresh/retry without fake success |
 | Email failure/crash around send | Outbox lease; worker generates a fresh token per attempt and revokes prior hash | Tenant retained; latest link only is valid; bounded retry/final failure | Show delivery warning/resend when authorized |
 | Partial provisioning exception | Single local UoW | Full rollback, draft restored in progress | Correct input or retry same key |
 | Catalogue/permission changes after save | Re-read current catalogue and permissions during validation/finalize | 409 catalogue change or 403 permission revoked | Refresh/reconfirm; draft preserved |
@@ -231,7 +232,7 @@ Retries use bounded exponential backoff with jitter and a configured maximum att
 
 ## Audit events
 
-Required structured events: `tenant_onboarding.draft_created`, `draft_updated`, `draft_resumed`, `draft_discarded`, `duplicate_override_acknowledged`, `plan_selected`, `plan_changed`, `billing_configured`, `payment_initiated`, `payment_confirmed`, `payment_failed`, `entitlements_changed`, `tenant_admin_details_added`, `finalization_started`, `tenant.created`, `provisioning_started`, `provisioning.failed`, `activation_pending`, `tenant.activated`, `activation_failed`, `activation_retried`, `billing.waived`, `payment_link.requested`, `tenant_admin.invitation_requested`, `invitation_sent`, `invitation_failed`, `invitation_resent`. Store actor ID/type, UTC time, draft/tenant correlation, entity type/ID, action, result, reason where required, changed field names or masked before/after values, trace/request/idempotency correlation, and source IP only where the platform already captures it. Never store tokens, passwords, full provider payloads or unnecessary PII.
+Required structured events: `tenant_onboarding.draft_created`, `draft_updated`, `draft_resumed`, `draft_discarded`, `duplicate_override_acknowledged`, `plan_selected`, `plan_changed`, `billing_configured`, `tenant.finalized_pending_payment`, `invoice.generated`, `payment.instructions_issued`, `payment.notification_queued`, `payment.notification_sent`, `manual_payment.submitted`, `submission_updated`, `review_started`, `approved`, `rejected`, `information_requested`, `resubmitted`, `entitlements_changed`, `tenant_admin_details_added`, `finalization_started`, `tenant.created`, `provisioning_started`, `provisioning.failed`, `activation_pending`, `activation.queued`, `tenant.activated`, `activation_failed`, `activation_retried`, `billing.waived`, `tenant_admin.invitation_requested`, `invitation_sent`, `invitation_failed`, `invitation_resent`. Store actor ID/type, UTC time, draft/tenant/payment/invoice correlation, entity type/ID, action, result, reason where required, changed field names or masked before/after values, trace/request/idempotency correlation, and source IP only where the platform already captures it. Never store tokens, token-bearing URLs, proof URLs/storage keys, passwords, full provider payloads, bank details or unnecessary PII.
 
 ## Four-layer validation matrix
 
@@ -263,4 +264,5 @@ Implementation is complete only when the API, field/table, permission and test m
 - [[../../02_ACCESS_CONTROL/FLOW_4_CREATE_TENANT_WIZARD_PERMISSION_MATRIX]]
 - [[../../10_TESTING_QA/FLOW_4_CREATE_TENANT_WIZARD_TEST_MATRIX]]
 - [[../../13_DECISIONS_AND_CHANGES/FLOW_4_CREATE_TENANT_WIZARD_DECISION_REGISTER]]
+- [[../../05_BACKEND_ARCHITECTURE/FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]]
 - [[../../15_IMPLEMENTATION_TRACKING/99_AUDITS/FLOW_4_CREATE_TENANT_WIZARD_FULL_AUDIT_2026-07-31]]

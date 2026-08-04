@@ -1,9 +1,11 @@
 <!-- title: Subscription Billing, Payments & Usage Technical Contract -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-07-15 -->
+<!-- last_updated: 2026-08-04 -->
 
 # Subscription Billing, Payments & Usage Technical Contract
+
+> Flow 4 target extension (2026-08-04): reuse invoices, payment transactions, secure token hashes and the shared outbox; add manual submission/review metadata, private proof association/history and purpose-bound payment access. Future gateway work implements a provider adapter plus signed/deduplicated callbacks. Canonical detail: [[../../05_BACKEND_ARCHITECTURE/FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]].
 
 > [!IMPORTANT]
 > This document describes the broader target architecture for subscription

@@ -1,10 +1,12 @@
 <!-- title: Tenant Activation Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP / OneVerz -->
-<!-- last_updated: 2026-07-27 -->
+<!-- last_updated: 2026-08-04 -->
 <!-- decision_date: 2026-07-27 -->
 
 # Tenant Activation Flow
+
+> Flow 4 payment alignment (2026-08-04): the current release uses manual payment verification. Payment approval moves a prepaid tenant from `PENDING_PAYMENT` to `PENDING_ACTIVATION`; it never directly marks the tenant `ACTIVE`. The separate activation command then validates eligibility, activates idempotently and queues the Tenant Admin setup invitation.
 
 ## Purpose
 
@@ -30,7 +32,7 @@ Platform Admin (manual paid activation); system (automatic trial/demo activation
 | Step | Action | System behavior |
 |---:|---|---|
 | 1 | Open tenant detail | Status expected `PENDING_PAYMENT` until payment is resolved |
-| 2 | Confirm payment resolved | Manual Mark Paid / verify payment (R1) or approved payment waiver recorded |
+| 2 | Confirm payment resolved | Authorized, versioned and idempotent manual review approves submitted evidence, or an approved payment waiver is recorded |
 | 3 | Prepare for activation | Lifecycle → `PENDING_ACTIVATION` |
 | 4 | Click Activate Tenant | Requires verified payment or approved waiver |
 | 5 | Confirm | Lifecycle → `ACTIVE` |
@@ -50,6 +52,8 @@ Platform Admin (manual paid activation); system (automatic trial/demo activation
 
 - Never email a plain password.
 - Set-password link **only** on activation email.
+- Before payment approval there is no setup token or setup invitation; payment and account-setup communications are separate.
+- Current manual payment uses invoice/payment-status links and has no provider checkout URL.
 - `tenants.status` uses lifecycle values only — see [[../../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]].
 
 ## Implementation status

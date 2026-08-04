@@ -35,6 +35,7 @@
 | F4-D24 | Plan visibility | `platform.tenants.create` includes the minimum active plan/price/feature projection needed by the wizard; `platform.tenant_subscriptions.view` remains required for general tenant subscription reads. |
 | F4-D25 | Finalize-key scope | The idempotency tuple is scoped to one draft. Do not add a globally unique key-only index; the locked draft stores the one accepted key/hash and completed receipt. |
 | F4-D26 | Registration/tax lineage | The July 2 migration added tenant-profile registration/tax columns and the July 7 migration removed them; current entity/snapshot are authoritative. Reintroduce them only through a new additive migration. |
+| F4-D27 | Current-release payment model | Use manual payment verification; no real gateway/session/callback is integrated in this phase. Prepaid paid tenants remain `PENDING_PAYMENT` until an authorized, concurrent and idempotent approval moves them to `PENDING_ACTIVATION`. `invoiceUrl` and secure `paymentStatusUrl` are supported; `checkoutUrl` is null. Future Stripe/PayHere use provider adapters, signed idempotent callbacks and the same internal state machine. Fake links, provider IDs and success are prohibited. |
 
 ## Resolved contradictions
 
@@ -53,6 +54,9 @@
 | Paid setup invite created at finalization vs activation-only set-password email | Create membership at finalization; activation queues the request and the worker generates/stores/sends token material. |
 | Create permission needs plan data vs subscription-view restriction | Permit the narrow create-options projection with create permission; keep broad subscription reads separately protected. |
 | Draft-scoped key vs globally unique finalize key column | Scope key/hash to the locked draft; no key-only global uniqueness. |
+| Current-release gateway link vs approved manual verification | Manual instructions, invoice and secure payment-status access replace gateway checkout; no provider callback is required for the manual release. |
+| Existing Mark Paid bridge vs complete verification workflow | Preserve as current source evidence only; target adds evidence submission, review history, version/idempotency, reject/request-information and activation handoff. |
+| Generic payment-link terminology vs purpose-specific URLs | Use `invoiceUrl`, `paymentStatusUrl`, and nullable `checkoutUrl`; never call the manual status page a gateway link. |
 
 ## Detailed contradiction traceability
 
@@ -76,6 +80,8 @@ Path roots: `SB = C:\Users\User\Desktop\Nytroz__POS\Nytroz POS - Second Brain\Po
 | F4-C14 Invite timing | Current wizard persists a mock invite before activation vs approved onboarding email flow permits setup link only after activation | BE wizard `UserInvite.CreatePending`; SB `18_Tenant_Onboarding_Email_Flows.md` | Token expires while paid tenant waits; premature account handoff | Persist membership at finalize; activation queues a request; worker generates raw token in memory and persists only its hash | Canonical/data/API/email tests | Resolved |
 | F4-C15 Plan projection authorization | Draft permission matrix implied subscription-view is needed while current create-options and the wizard require prices under create | BE `GetCreateOptionsAsync`; FE create route; permission catalogue | A creator cannot complete Step 3 or prices leak through broad APIs | Create permission authorizes only the bounded active create-options projection; broad subscription APIs still require view | Permission/API docs and auth tests | Resolved |
 | F4-C16 Registration/tax schema | Historical July 2 migration added fields; July 7 migration removed them; current entity has none | migrations `20260702182515...`, `20260707185919...`; current `TenantProfile`/configuration/snapshot | Editing old migrations or assuming columns exist breaks deployed schema | New forward-only reintroduction with current snapshot verification | Data/audit docs; migration/model tests | Resolved |
+| F4-C17 Payment delivery | Earlier Flow 4/email docs required a provider payment link and current worker reports `payment_provider_not_configured` vs approved manual collection | Canonical Flow 4/API/data/test docs; onboarding worker; payment link/transaction entities | Current release cannot complete paid onboarding and may be misrepresented as needing a gateway | Manual instructions + secure status/evidence/review; `checkoutUrl` null; future adapter contract retained | Manual payment architecture; API/data/email/test updates; runtime implementation next | Resolved |
+| F4-C18 Manual verification depth | Existing invoice Mark Paid command vs evidence-based manual review requirement | Platform Billing API/domain; no proof/review/history APIs | Weak evidence, racing reviewers and unsafe activation eligibility | Add submission/evidence/review state machine with version and command idempotency; approval reaches pending activation only | Billing/Flow 4 contracts and tests | Resolved |
 
 No item is `Needs approval`. Production provider credentials and domain/default values are configuration choices within the approved provider-neutral model.
 

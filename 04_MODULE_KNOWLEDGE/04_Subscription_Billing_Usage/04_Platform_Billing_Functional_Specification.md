@@ -1,9 +1,11 @@
 <!-- title: Platform Billing Functional Specification -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-15 -->
+<!-- last_updated: 2026-08-04 -->
 
 # Platform Billing Functional Specification
+
+> Flow 4 addendum (2026-08-04): the current-release onboarding collection model is manual payment verification. The implemented Issue/Mark Paid surface below remains source evidence and a compatibility bridge, but it is not the complete target review workflow. Canonical target behavior is defined in [[../../05_BACKEND_ARCHITECTURE/FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]].
 
 ## Purpose
 
@@ -67,6 +69,17 @@ DRAFT -> PENDING -> PAID
 - Settles the entire invoice: paid amount becomes total amount and balance due
   becomes zero.
 - No partial amount or overpayment amount is accepted.
+
+For Flow 4, direct Mark Paid must not bypass submitted evidence, current payment version, command idempotency, reviewer authorization, immutable review history or audit. The target review action approves, rejects, or requests information. Approval records payment `PAID` and advances the tenant only to `PENDING_ACTIVATION`; activation remains a separate `platform.tenants.activate` command.
+
+## Flow 4 manual-payment target
+
+- Prepaid paid finalization creates the invoice and `AWAITING_PAYMENT` state.
+- The payment-required communication exposes separate authorized `invoiceUrl` and secure `paymentStatusUrl`; manual `checkoutUrl` is null.
+- The recipient submits method, reference, amount, currency, payment date, private proof and optional note.
+- Platform Billing adds a review queue/detail/history, private proof access, approve/reject/request-information and notification resend.
+- `platform.billing.view` protects reads/proof; `platform.billing.manage` protects review and resend.
+- A real gateway is not integrated in this phase. Future Stripe/PayHere use provider adapters and signed idempotent callbacks.
 
 ## Read-Only Behaviour
 

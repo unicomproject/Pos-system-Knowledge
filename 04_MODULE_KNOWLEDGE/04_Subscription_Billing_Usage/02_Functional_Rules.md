@@ -1,9 +1,11 @@
 <!-- title: Subscription Billing, Payments & Usage Functional Rules -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-04 -->
 
 # Subscription Billing, Payments & Usage Functional Rules
+
+> Flow 4 rule (2026-08-04): manual payment is the active onboarding setup type. A prepaid tenant remains pending payment until an authorized, versioned and idempotent review approves evidence. Approval reaches pending activation only; account setup is queued only after separate activation. Manual `checkoutUrl` is null.
 
 ## Purpose
 

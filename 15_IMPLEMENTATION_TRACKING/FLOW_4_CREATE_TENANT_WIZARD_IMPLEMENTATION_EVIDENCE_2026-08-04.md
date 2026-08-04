@@ -8,7 +8,7 @@
 
 Implementation advanced from the audited 57% baseline to an estimated 72%. Durable drafts, ETag concurrency, the canonical seven-step Angular order, save/resume UI, idempotent transaction locking, atomic internal persistence, a shared leased outbox, activation-gated hash-only invitation generation, contact/tax persistence, and a forward migration are implemented.
 
-Release remains **NO-GO**. Payment provider session creation and signed callback processing are not implemented because no provider adapter exists in the repository. Retry/resend APIs, complete correlated draft audit coverage, activation-command outbox refactoring, focused PostgreSQL concurrency/fault-injection coverage, and canonical E2E execution also remain P0.
+Release remains **NO-GO**. The approved current-release model is now manual payment verification, so a real provider session and signed callback are no longer current-release P0 gates. The manual access/instructions, proof submission, review/history, payment notifications and paid-to-pending-activation implementation are not built. Retry/resend APIs, complete correlated audit coverage, activation-command outbox refactoring, focused PostgreSQL concurrency/fault-injection coverage, and canonical E2E execution also remain P0.
 
 ## Repository evidence
 
@@ -32,7 +32,16 @@ All three branches were pushed to their corresponding `origin` remotes. Draft PR
 - Tenant Admin identity is tenant-local. Placeholder invite creation was removed from finalization.
 - The outbox worker uses `FOR UPDATE SKIP LOCKED`, bounded leases, exponential retry, maximum attempts, and safe error codes.
 - Invitation delivery generates a 256-bit raw token only in worker memory, persists its keyed hash, invalidates older pending invites, checks activation eligibility, and uses the existing ACS boundary without token logging.
-- Payment-link work is durably queued but currently retries with `payment_provider_not_configured`; no fake link or success is produced.
+- The existing payment outbox message currently retries with `payment_provider_not_configured`; no fake link or success is produced. The approved next change is a real manual-payment handler and secure payment-status workflow, not gateway emulation.
+
+## Approved payment architecture update
+
+- Current release: manual payment verification.
+- Prepaid paid result: tenant `PENDING_PAYMENT`, payment `AWAITING_PAYMENT`, invitation not eligible.
+- Available target links: `invoiceUrl`, secure `paymentStatusUrl`; manual `checkoutUrl` is null.
+- Approval target: payment `PAID`, tenant `PENDING_ACTIVATION`, then separate activation and invitation.
+- Future Stripe/PayHere: provider-neutral adapter, signed callback, event deduplication and provider contract tests; not current manual-release evidence.
+- Documentation alignment evidence: [[99_AUDITS/FLOW_4_MANUAL_PAYMENT_SECOND_BRAIN_ALIGNMENT_2026-08-04]].
 
 ## Angular implemented
 
@@ -61,20 +70,22 @@ All 17 are **Not executed** as browser/API E2E scenarios in this environment. Ex
 
 ## Remaining P0 blockers
 
-1. Real payment provider adapter, session persistence, signed callback verification, amount/currency/reference validation, and callback-deduplication tests.
-2. Operation retry and invitation resend APIs with idempotency and throttling.
-3. Existing activation command refactor for locked/idempotent activation and transactional invitation outbox publication.
-4. Complete correlated audit events for draft/payment/activation/invitation transitions.
-5. Focused PostgreSQL concurrency, idempotency, fault-injection, lease-expiry, and isolation tests.
-6. Canonical 17 E2E scenarios plus accessibility/responsive browser evidence.
-7. Clean-database migration and downgrade verification; representative existing-database application passed.
+1. Manual-payment EF delta: statuses/submission/reviewer metadata, proof association, immutable review history, purpose-bound payment access and raw-URL removal.
+2. Secure payment-status/invoice access, proof upload, submission/update, Platform Admin review/history, notification and resend APIs/UI.
+3. Operation retry and invitation resend APIs with idempotency and throttling.
+4. Existing activation command refactor for locked/idempotent approval-to-pending-activation and activation/invitation outbox publication.
+5. Complete correlated audit events for draft/manual-payment/activation/invitation transitions.
+6. Focused PostgreSQL concurrency, idempotency, fault-injection, lease-expiry, proof isolation and cross-tenant tests.
+7. Canonical 17 E2E scenarios plus accessibility/responsive browser evidence.
+8. Clean-database migration and downgrade verification; representative existing-database application passed.
 
 ## Deployment configuration
 
 - `TenantOnboardingOutbox:TenantAdminAppBaseUrl`
 - ACS endpoint/connection/sender values
 - Tenant signing key from secret storage
-- Payment provider credentials, webhook signature secret, and callback URL after adapter implementation
+- Manual payment instructions/reference format, support contact, proof-storage/scanning and secure recipient-access configuration
+- Future-only provider credentials, webhook signature secret, and callback URL when a Stripe/PayHere adapter is enabled
 - Platform base domain and create-option defaults
 
 ## Release decision

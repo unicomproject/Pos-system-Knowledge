@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin Pre-Login Payment Trial Demo Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP / OneVerz -->
-<!-- last_updated: 2026-07-27 -->
+<!-- last_updated: 2026-08-04 -->
 <!-- decision_date: 2026-07-27 -->
 
 # Tenant Admin Pre-Login Payment Trial Demo Flow
@@ -25,9 +25,9 @@ Platform Admin creates tenant and selects subscription type: `PAID`, `TRIAL`, or
 | Step | Paid | Trial / Demo |
 |---:|---|---|
 | 1 | Tenant created → `PENDING_PAYMENT` | Tenant created |
-| 2 | Email `tenant.paid_created` with plan/amount/currency/frequency/due date/**payment link** (no set-password) | Email `tenant.trial_created` or `tenant.demo_created` (type, start, expiry, next steps; no set-password) |
-| 3 | Tenant pays via payment link | Payment skipped |
-| 4 | Super Admin **manually verifies** payment (R1) | — |
+| 2 | Email `tenant.paid_created` with invoice summary/manual instructions, `invoiceUrl` and secure `paymentStatusUrl`; `checkoutUrl` null; no set-password | Email `tenant.trial_created` or `tenant.demo_created` (type, start, expiry, next steps; no set-password) |
+| 3 | Recipient views status and submits method/reference/amount/currency/date/private proof and optional note | Payment skipped |
+| 4 | Platform Admin reviews and approves, rejects or requests information; recipient corrects/resubmits when eligible | — |
 | 5 | Super Admin **manually activates** | System **auto-activates** after provisioning |
 | 6 | Email activated + set-password | Email activated + set-password (second email) |
 | 7 | Set password → login | Set password → login |
@@ -41,18 +41,18 @@ Platform Admin creates tenant and selects subscription type: `PAID`, `TRIAL`, or
 
 Only email 2 contains the set-password link.
 
-### Deferred
+### Manual payment recipient screens
 
-- Payment Received acknowledgement email (R1 deferred).
+Before activation, the recipient can view the authorized invoice, instructions, current payment/activation status, submit proof, see confirmation, respond to information requests and see safe approved/rejected outcomes. The access grant is random, expiring and purpose-bound; a tenant or invoice ID alone is never authorization. Screens define loading/uploading/scanning, validation, expired/tampered access, retry, accessible error/focus/live status and responsive states.
 
 ## Security
 
-- Payment link and setup link must not expose raw tokens in logs or APIs beyond intended delivery.
+- Payment-status and setup links must not expose raw tokens in logs or APIs beyond intended delivery. Proof URLs/storage keys and full bank details are private.
 - Never email plain/temporary passwords.
 
 ## Implementation status
 
-Approved journeys **NOT IMPLEMENTED** for tenant emails and payment-link send. Platform password-reset ACS is unrelated and already complete.
+Approved journeys **NOT IMPLEMENTED** for manual payment access/submission/review notifications and tenant onboarding emails. Platform password-reset ACS is unrelated and already complete.
 
 ## Decision history — superseded
 

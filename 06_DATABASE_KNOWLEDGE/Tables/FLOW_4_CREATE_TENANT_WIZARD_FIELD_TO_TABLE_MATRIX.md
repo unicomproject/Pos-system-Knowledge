@@ -38,7 +38,7 @@ Use a dedicated `platform_tenant_onboarding_drafts` table. Partial data must not
 
 ### New onboarding operation table
 
-Business purpose: retain post-commit payment/delivery progress and retry state without polluting `tenants.status`.
+Business purpose: retain post-commit payment/delivery progress and retry state without polluting `tenants.status`. The manual-payment aggregate in `subscription_payment_transactions` is authoritative for detailed status; this operation projects it for onboarding polling.
 
 | Column | PostgreSQL type | Null/default | Constraint/index/audit |
 |---|---|---|---|
@@ -46,7 +46,7 @@ Business purpose: retain post-commit payment/delivery progress and retry state w
 | `draft_id` | uuid | No | Unique FK to draft, restrict delete |
 | `tenant_id` | uuid | No | Unique FK to tenant, restrict delete |
 | `provisioning_status` | varchar(32) | No / `SUCCEEDED` after atomic finalize | Check: `PROCESSING`, `SUCCEEDED`, `FAILED_RETRYABLE`, `FAILED_FINAL` |
-| `payment_status` | varchar(24) | No / derived | Check: `NOT_REQUIRED`, `PENDING`, `CONFIRMED`, `FAILED`, `WAIVED` |
+| `payment_status` | varchar(24) | No / derived | Expand/project canonical `NOT_REQUIRED`, `AWAITING_PAYMENT`, `PAYMENT_SUBMITTED`, `UNDER_REVIEW`, `ACTION_REQUIRED`, `PAID`, `REJECTED`, `FAILED`, `EXPIRED`, `CANCELLED`, `DEFERRED`, plus separately audited waiver if retained |
 | `invitation_status` | varchar(24) | No / derived | Check: `NOT_ELIGIBLE`, `PENDING`, `SENT`, `FAILED`, `ACCEPTED`, `EXPIRED` |
 | `last_error_code` | varchar(100) | Yes / null | Safe code only; never provider payload/PII |
 | `retry_count` | integer | No / 0 | Check `>= 0` |
@@ -83,9 +83,9 @@ Use partial unique index `uq_tenant_contacts_active_type (tenant_id, contact_typ
 
 Reuse existing entitlement `source_type`, `source_reference_id`, `effective_from` and `effective_until`; add `OVERRIDE` to the source-type vocabulary. `effective_until IS NULL` means an explicitly permanent override, so no duplicate permanent flag is added.
 
-### New shared integration outbox table
+### Shared integration outbox table
 
-No outbox entity/table exists in the inspected source. A shared table is justified because payment-link, email and activation delivery must be committed atomically and retried outside the transaction; Flow 4 must not create separate email/payment outboxes.
+The Flow 4 runtime branch implements `integration_outbox_messages` and a leased onboarding worker. Manual-payment notification/activation work must reuse this table and worker architecture; Flow 4 must not create separate email/payment outboxes. The existing provider-not-configured payment handler is an implementation gap, not the target manual handler.
 
 | Column | PostgreSQL type | Null/default | Constraint/index/audit |
 |---|---|---|---|
@@ -138,8 +138,8 @@ There is no current billing-account aggregate. R1 does not add a duplicate `bill
 | Add-ons | `tenant_subscription_addons` | Yes | Preserve unique subscription/add-on key |
 | Effective entitlements | `tenant_feature_entitlements` | Yes | Reuse existing source/effective fields and unique tenant/feature key; add only override reason and source vocabulary |
 | Draft invoice/lines | `subscription_invoices`, `subscription_invoice_lines` | Yes | Always create for paid path; same transaction |
-| Payment link | `subscription_payment_links` | Schema/entity exists; no onboarding service | Create via outbox worker; token hash only |
-| Payment transaction | `subscription_payment_transactions` | Schema/entity exists | Enforce unique provider reference and partial unique idempotency key (documentation already expects it; EF config currently lacks the latter) |
+| Secure payment-status access | `subscription_payment_links` | Token hashes/status/expiry exist; `payment_url` semantics are ambiguous | Reuse as purpose-bound manual payment access; never persist a raw token-bearing status URL; add link purpose and distinguish nullable provider checkout URL |
+| Payment transaction | `subscription_payment_transactions` | Schema/entity and partial unique idempotency index exist | Expand manual statuses and submission/review fields; request hash, method, dates, verifier and future provider-event deduplication |
 | Tenant admin | `tenant_users` | Yes | Enforce per-tenant email key, not global application check |
 | Admin role/grants | `tenant_roles`, `tenant_role_permissions`, `tenant_user_roles` | Yes | Same transaction |
 | Setup invitation | `user_invites` | Yes | Replace placeholder hash; worker creates/replaces the hash only from an activation-eligible outbox request, never during paid pending-payment finalization |
@@ -173,7 +173,7 @@ Defaults below are server/configuration defaults. “None” means the user/serv
 | 4 | Invoice email/method/notes | matching fields | TenantSubscription | matching columns | existing types, conditional | email/catalog/bounds; no raw card data | redact notes/details |
 | 4 | Tax/discount | matching fields | TenantSubscription | matching numeric columns | decimal, defaults 0/null | non-negative and policy maxima | values/reason |
 | 4 | Invoice/lines | server derived | SubscriptionInvoice/Line | invoice tables | existing, no for paid | tenant invoice number unique; line number unique | IDs/totals |
-| 4 | Payment link/reference | server/provider | PaymentLink/Transaction | payment tables | existing, conditional | token hash/provider ref unique; idempotency partial unique | no URL token/provider payload |
+| 4 | Payment access/reference | server/manual handler or future provider | PaymentLink/Transaction | payment tables | existing plus documented delta, conditional | token hash/manual/provider ref and idempotency rules | no URL token, proof URL, bank data or provider payload |
 | 5 | Effective feature set | `entitlements.featureIds` | TenantFeatureEntitlement | entitlement table | uuid rows | active/prerequisite; tenant-feature unique | added/removed IDs |
 | 5 | Override metadata | `entitlements.overrides[]` | TenantFeatureEntitlement | existing source/effective fields + new `.override_reason` | varchar(500) reason nullable; existing expiry nullable | source `OVERRIDE`; reason required; null expiry means explicit permanent | full reason and actor |
 | 6 | Admin identity | `tenantAdmin.*` | TenantUser | tenant-user columns | existing bounded values | first/email required; tenant-email unique | mask email/phone |
@@ -239,7 +239,7 @@ This is the required one-row-per-field implementation matrix. `Draft only` means
 | 4 | Tax percentage | `billing.taxPercentage` | TenantSubscription | `tenant_subscriptions` | `tax_percentage` | numeric existing precision | No | Server policy/0 | 0..policy maximum | None | None | Value |
 | 4 | Billing notes | `billing.notes` | TenantSubscription | `tenant_subscriptions` | `notes` | existing text | Yes | null | Max 1,000; PII/secret scrub | None | None | Do not copy text to audit |
 | 4 | Waiver reason | `billing.waiverReason` | Receipt/audit | draft/outbox/history | payload/event reason | varchar(500) | Conditional | null | Required with billing-manage waiver | None | Per finalize tuple | Full scrubbed reason |
-| 4 | Payment reference/status | Server/provider derived | PaymentTransaction/Operation | payment/operation tables | provider reference/status | varchar bounded | Conditional | null/pending | Signature, unique provider ref, state machine | Unique provider ref + idempotency | Provider/global rule | Redacted reference/status |
+| 4 | Payment reference/status | Server/manual review or future provider derived | PaymentTransaction/Operation | payment/operation tables | manual/provider reference and canonical status | varchar bounded | Conditional | `NOT_REQUIRED`, `AWAITING_PAYMENT` or `DEFERRED` by policy | Manual review version/idempotency; future signature/event checks | Normalized reference advice + command/provider idempotency | Payment-scoped rule | Redacted reference/status |
 | 5 | Effective feature IDs | `entitlements.featureIds[]` | TenantFeatureEntitlement | `tenant_feature_entitlements` | `platform_feature_id` | uuid rows | No per row | Plan/add-on derived | Active, dependency/conflict valid, distinct | Existing unique composite | Tenant+feature | IDs |
 | 5 | Override reason | `entitlements.overrides[].reason` | TenantFeatureEntitlement | `tenant_feature_entitlements` | `override_reason` new | varchar(500) | Conditional | null | Required for `OVERRIDE` | None | Tenant+feature row | Full scrubbed reason |
 | 5 | Override expiry | `entitlements.overrides[].expiresAt` | TenantFeatureEntitlement | `tenant_feature_entitlements` | `effective_until` existing | timestamptz | Yes | null=explicit permanent | Future UTC or explicit permanent | None | Tenant+feature row | Date/permanent |
@@ -254,6 +254,32 @@ This is the required one-row-per-field implementation matrix. `Draft only` means
 
 The current `tenant_profiles.legal_name` database capacity is 250 while the canonical API/UI maximum is 200; no narrowing migration is required. Default country is not duplicated onto `tenants`: it seeds and must equal the authoritative registered-address country at finalization. The billing address/contact copy flags are draft-only; final rows are independent snapshots.
 
+## Manual payment field-to-table delta
+
+This delta is the approved current-release target. It reuses the existing invoice, transaction, access-link, media/blob, operation and outbox foundations before adding any object.
+
+| Requirement | Existing table/field | Reuse | Modify | New field/table | Reason |
+|---|---|---:|---:|---|---|
+| Expected subtotal/tax/total/currency/due date | `subscription_invoices` | Yes | Remove the remaining runtime `LKR` fallback | None | Invoice remains amount authority |
+| Manual payment status/amount/currency/invoice | `subscription_payment_transactions` | Yes | Expand status state machine; clarify amount semantics | None | Avoid duplicate aggregate |
+| Payment method/manual reference | Provider fields are partial | Partial | Normalize provider=`MANUAL`; keep future adapter references separate | `payment_method`, optional normalized manual reference | Method is not provider; duplicate advice remains privacy-safe |
+| Submission metadata | No complete fields | No | No | `submitted_at`, `payment_date`, `submitted_by_type`, `submitted_by_id`, `payer_note` | Required evidence/accountability |
+| Review metadata | No fields | No | No | `verified_by_platform_user_id`, `verified_at`, `received_at`, `review_note`, `rejection_reason_code` | Approval/rejection evidence |
+| Concurrency/idempotency | Transaction `updated_at`; `idempotency_key` unique | Yes | Make concurrency explicit; store hashed/namespaced key | `version` if needed; `request_hash` | Concurrent review and same-key changed-request protection |
+| Future callback deduplication | Provider reference/ID | Partial | Keep payment/session reference | `provider_event_id` unique nullable | Event and payment identifiers differ |
+| Payment-status grant | `subscription_payment_links` token hashes, expiry, status | Yes | Treat manual record as payment-access grant; raw URL not persisted | `link_purpose`; nullable/deprecated raw `payment_url`; separate nullable `checkout_url`/session reference | `paymentStatusUrl` and provider checkout are different |
+| Invoice URL | Invoice ID plus access context | Yes | Generate authorized route | None | Avoid stale/public durable URL |
+| Proof blob | Private storage/media exists but accepts only image assets | Partial | Extend safe document MIME/actor policy if reused | `subscription_payment_evidence` link to private asset | PDF/image proof revisions, ownership and retention |
+| Review chronology | Subscription history is not payment-review history | No | No | `subscription_payment_reviews` | Immutable actions, notes, actor, version and idempotency result |
+| Instructions snapshot | `billing_details_json` and server configuration | Yes | Version and validate structured snapshot | Approved structured JSON/column; no secrets | Historical invoice instructions must remain traceable |
+| Checkout URL | Existing `payment_url` is ambiguous | No | Separate semantics | Nullable provider checkout field/reference | Always null for manual payment |
+
+Suggested `subscription_payment_evidence`: `id`, `tenant_id`, `payment_transaction_id`, private `media_asset_id` or approved document reference, `submission_revision`, checksum/MIME/size snapshot, `status`, uploader context, `created_at`, and retention/deletion metadata. Use a tenant/payment composite FK or equivalent repository predicate. Proof is never public and download URLs are short lived.
+
+Suggested `subscription_payment_reviews`: `id`, `tenant_id`, `payment_transaction_id`, `sequence_number`, `action` (`REVIEW_STARTED`, `APPROVED`, `REJECTED`, `INFORMATION_REQUESTED`, `RESUBMITTED`), from/to status, reviewer platform-user ID where applicable, safe reason code, scrubbed note, command-key hash, request hash, correlation ID and UTC timestamp. Sequence allocation is atomic; command-key uniqueness is payment/action scoped.
+
+Implementation must audit current deployed nullability and duplicate legacy FK columns before migration. It must not edit historical migrations or store raw access tokens, token-bearing URLs, proof download URLs, bank account details, provider secrets, or unredacted provider payloads.
+
 ## Constraints and isolation
 
 - Keep global unique constraints on normalized tenant code, slug and domain.
@@ -266,12 +292,14 @@ The current `tenant_profiles.legal_name` database capacity is 250 while the cano
 
 ## Migration requirements
 
-Create forward-only migrations in this order: `AddPlatformTenantOnboardingDraftsAndOperations`; `AddTenantOnboardingContactsAndProfileIdentifiers`; `AddSharedIntegrationOutbox`; `AddTenantEntitlementOverrideReasonAndSource`; `AlignTenantSubscriptionPlanAuthority` to remove the unconditional database `monthly` default while preserving existing populated rows. Exact timestamp prefixes are generated at implementation time. New tables need no data backfill. Profile identifier and override columns default null. Existing entitlements retain `MANUAL`; no historical row is recategorized. The billing-cycle default removal changes only future inserts; existing values remain. Each Down migration drops/reverses only objects introduced by its Up and is development rollback support, not a production rollback plan. Update the EF snapshot, run PostgreSQL model-shape/index/check/FK tests and verify the deployed schema. Do not edit `20260702182515_AddTenantCreateWizardSupport`, `20260707185919_UpdateTenantAuthAndFoundationEntities`, or lifecycle migrations.
+The first runtime delta is implemented as the reviewed forward migration `20260804055813_AddFlow4TenantOnboardingRuntime`; do not split or edit it after deployment. Generate a new forward-only manual-payment migration from the current snapshot after auditing deployed nullability and duplicate payment-link/transaction FKs. It should add only the approved transaction metadata/status constraints, purpose-bound access semantics, proof association/storage delta, immutable review history, concurrency/idempotency/event indexes and removal of the remaining invoice currency fallback. Preserve existing populated invoice/transaction data with an explicit deterministic status mapping; do not infer that every historical `PENDING` transaction has submitted evidence. Each Down reverses only newly introduced development objects and is not a production rollback plan. Update the EF snapshot, run clean and representative PostgreSQL model-shape/index/check/FK/migration tests, and do not edit historical migrations.
 
 ## Current-schema evidence
 
-The current schema already has tenant/profile/address/domain, plan/subscription/add-on/entitlement/invoice/payment-link/payment-transaction, tenant-user/role/invite and usage-counter structures. It lacks draft/resume and onboarding-operation persistence. Payment-link entities exist, but presence of a table is not proof of an implemented onboarding workflow.
+The current runtime branch has tenant/profile/address/domain, plan/subscription/add-on/entitlement/invoice/payment-access-link/payment-transaction, tenant-user/role/invite, usage-counter, onboarding draft/operation/contact and shared outbox structures through `20260804055813_AddFlow4TenantOnboardingRuntime`. It does not yet have the complete manual submission/reviewer metadata, purpose-bound access semantics, proof association or immutable payment-review history described above. Payment-link-shaped entities exist, but their names/table presence are not proof of a gateway or manual-payment workflow.
 
 ## Related
+
+[[../../05_BACKEND_ARCHITECTURE/FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]]
 
 [[../../03_USER_JOURNEYS/Platform_Admin/FLOW_4_CREATE_TENANT_WIZARD_CANONICAL_SPEC]] · [[../../05_BACKEND_ARCHITECTURE/FLOW_4_CREATE_TENANT_WIZARD_API_CONTRACT]]

@@ -9,6 +9,8 @@
 
 Base route: `/api/v1/platform-admin/tenant-onboarding`. Platform-only authentication is mandatory. Responses use the existing `{ success, message, data, errorCode, errors, traceId }` envelope. Draft IDs are UUIDs. `version` is an opaque string and is also returned as a quoted `ETag`. Draft write/delete/finalize requests require `If-Match`; finalization additionally requires `Idempotency-Key` (1–100 visible ASCII characters). A missing precondition returns 428; malformed headers return 400.
 
+Current-release payment terminology is fixed by [[FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]]: `invoiceUrl` views/downloads the invoice, `paymentStatusUrl` opens the secure manual-payment experience, and `checkoutUrl` is null. No manual URL is labelled or serialized as a provider checkout/payment link.
+
 ## Endpoint catalogue
 
 | Method and route | Purpose | Permission | Success |
@@ -23,10 +25,10 @@ Base route: `/api/v1/platform-admin/tenant-onboarding`. Platform-only authentica
 | `POST /duplicate-checks` | Advisory normalized duplicate check | `platform.tenants.create` | 200 |
 | `POST /drafts/{draftId}/finalize` | Transactionally create aggregate | `platform.tenants.create` plus conditional permissions | 201/200 replay |
 | `GET /operations/{operationId}` | Provisioning/delivery/payment status | `platform.tenants.view` | 200 |
-| `POST /operations/{operationId}/retry` | Retry retryable outbox work | update plus domain permission | 202 |
+| `POST /operations/{operationId}/retry` | Retry eligible notification/activation outbox work | update plus domain permission | 202 |
 | `POST /tenants/{tenantId}/admin-invitation/resend` | Replace and resend setup invitation | `platform.tenants.update` | 202 |
 
-Requirement routing is deliberately non-duplicative: create-options includes the bounded active plan catalogue and feature catalogue; Step 4 billing setup is saved through draft PATCH; initial paid payment initiation is the finalize outbox result; payment status is the operation resource plus existing invoice detail; Tenant Admin validation occurs through step validation; review summary is returned by full draft validation; activation reuses the existing tenant lifecycle endpoint. No parallel APIs are added for the same operation.
+Requirement routing is deliberately non-duplicative: create-options includes the bounded active plan catalogue, feature catalogue, payment setup types, and plan payment policy; Step 4 billing setup is saved through draft PATCH; paid finalization creates the invoice/manual-payment access and queues the payment-required notice; payment status is the operation resource plus billing/payment resources; Tenant Admin validation occurs through step validation; review summary is returned by full draft validation; activation reuses the existing tenant lifecycle endpoint. No parallel APIs are added for the same operation.
 
 ### Endpoint behavior, audit and transaction matrix
 
@@ -45,7 +47,30 @@ Requirement routing is deliberately non-duplicative: create-options includes the
 | `POST /operations/{id}/retry` | retryable state, domain permission, command key | 202 operation DTO | command idempotent | retry event+outbox atomic |
 | `POST .../admin-invitation/resend` | active tenant/pending user/rate limit, command key | 202 invitation status | command idempotent | request+audit+outbox atomic; worker replaces hash and sends |
 
-Payment initiation is represented by finalization outbox work for the first paid invoice; subsequent retry uses the operation retry endpoint. Payment status is exposed through the operation and existing billing APIs. Activation continues to reuse `POST /api/v1/platform-admin/tenants/{tenantId}/activate`, with `platform.tenants.activate`, `If-Match`, a command `Idempotency-Key`, verified-payment/waiver preconditions, idempotent already-active behavior, and transactional lifecycle/audit/invitation-request outbox handling. A retryable activation-side delivery failure is retried through `POST /operations/{operationId}/retry`; it does not roll the active lifecycle back.
+Manual payment initialization is represented by finalization persistence plus a payment-required notification outbox message; no provider session is created. Payment status is exposed through the operation and billing/manual-payment APIs. Activation continues to reuse `POST /api/v1/platform-admin/tenants/{tenantId}/activate`, with `platform.tenants.activate`, `If-Match`, a command `Idempotency-Key`, approved-payment/waiver preconditions, idempotent already-active behavior, and transactional lifecycle/audit/invitation-request outbox handling. A retryable activation-side delivery failure is retried through `POST /operations/{operationId}/retry`; it does not roll the active lifecycle back.
+
+## Manual payment API extension
+
+The Platform Admin review routes extend `/api/v1/platform-admin/billing`; secure recipient routes never authorize by a guessable tenant or invoice ID.
+
+| Method and route | Authentication/permission | Request and response | Concurrency/idempotency/audit |
+|---|---|---|---|
+| `GET /tenants/{tenantId}/payment-status` | Platform session; `platform.billing.view` | Safe invoice/payment/activation projection including nullable `checkoutUrl` | Read-only; tenant existence privacy |
+| `GET /api/v1/platform-admin/billing/manual-payments` | Platform session; `platform.billing.view` | Paged review queue with safe filters | Stable ordering; no proof/contact leakage |
+| `GET /api/v1/platform-admin/billing/manual-payments/{paymentId}` | Platform session; `platform.billing.view` | Expected/submitted amount, currency, method, dates, safe reference, proof metadata, status/version | ETag returned; access audit where required |
+| `GET .../{paymentId}/proof/{evidenceId}` | Platform session; `platform.billing.view` | Short-lived private proof download/preview | Object ownership and access audit; no durable URL |
+| `POST .../{paymentId}/review` | Platform session; `platform.billing.manage` | `{ action: APPROVE|REJECT|REQUEST_INFORMATION, expectedVersion, reviewNote?, reasonCode? }` -> payment/review result | `If-Match` plus `Idempotency-Key`; payment/invoice/lifecycle/review/audit/outbox atomic |
+| `GET .../{paymentId}/history` | Platform session; `platform.billing.view` | Redacted immutable review history | Read-only; actor labels subject to permission |
+| `POST .../{paymentId}/notification/resend` | Platform session; `platform.billing.manage` | Optional reason -> operation | Command key, rate limit, outbox/audit atomic |
+| `GET /api/v1/tenant-onboarding/payment-access/{accessToken}` | Secure expiring purpose-bound token or equivalent authenticated recipient session | Instructions, invoice summary, status, `invoiceUrl`, `paymentStatusUrl`, `checkoutUrl: null` | Keyed-hash lookup, purpose/expiry/rate limit; read audit |
+| `GET .../{accessToken}/invoice` | Same secure access | Invoice view/download | Content-disposition/privacy controls |
+| `POST .../{accessToken}/evidence` | Same secure access | Reference, method, amount, currency, payment date, proof, optional note -> submission/status/version | `Idempotency-Key`; request hash; private upload controls; submission/audit/outbox atomic after storage succeeds |
+| `PUT .../{accessToken}/submissions/{paymentId}` | Same payment ownership and eligible status | Corrected submission/action-required response | `If-Match`; stable command key; no history deletion |
+| `GET .../{accessToken}/history` | Same secure access | Safe status/outcome chronology | Reviewer/contact/bank data redacted |
+
+Review approval records payment as `PAID`, settles the invoice consistently, and transitions the tenant only to `PENDING_ACTIVATION`. The separate activation endpoint remains mandatory. Review rejection or request-information leaves the tenant `PENDING_PAYMENT`.
+
+Stable manual-payment errors are `manual_payment.validation_failed`, `access_invalid_or_expired`, `concurrency_conflict`, `idempotency_conflict`, `invalid_transition`, `amount_mismatch`, `currency_mismatch`, `proof_required`, `proof_access_denied`, `review_note_required`, `not_found`, `access_denied`, and `rate_limited`. Safe 404 behavior prevents cross-tenant/resource enumeration.
 
 The existing `GET /api/v1/platform-admin/tenants/create-options` and `POST /api/v1/platform-admin/tenants` remain compatibility endpoints during migration, then become deprecated. They must not be extended as a second competing contract.
 
@@ -89,9 +114,9 @@ No geographic value is selected by array position or frontend constant.
 | `TenantDuplicateCheckRequest` | bounded optional identifier/contact candidates and `excludeDraftId` | At least one candidate; same normalization as finalize; max ten candidates |
 | `TenantDuplicateCheckResponse` | classifications, stable warning codes, safe message, optionally authorized matched ID | Advisory; never returns contact values or existence details to unauthorized actor |
 | `FinalizeTenantOnboardingRequest` | distinct warning codes; structured override reasons; optional billing-waiver reason | No prices, statuses, permissions, token/password/card fields; complete revalidation |
-| `TenantOnboardingReceiptResponse` | tenant/draft/operation IDs, tenant/provisioning/payment/invitation status, timestamps, links, replay flag | Stable persisted receipt; same-key replay returns same business result |
+| `TenantOnboardingReceiptResponse` | tenant/draft/operation IDs, tenant/provisioning/payment/invitation status, timestamps, `invoiceUrl`, `paymentStatusUrl`, nullable `checkoutUrl`, replay flag | Stable persisted receipt; same-key replay returns same business result; URL fields follow purpose-specific authorization |
 | `TenantOnboardingOperationResponse` | IDs, four status values, safe error code, retryable flag/count/next time, updated time/version | Does not expose provider payload, payment URL token or invite token |
-| `RetryTenantOnboardingOperationRequest` | optional expected component: `PAYMENT_LINK`, `INVITATION`, `ACTIVATION_DELIVERY` | Must match current retryable component; command key required |
+| `RetryTenantOnboardingOperationRequest` | optional expected component: `PAYMENT_NOTIFICATION`, `INVITATION`, `ACTIVATION_DELIVERY` | Must match current retryable component; command key required; it never fabricates payment approval |
 | `ResendTenantAdminInvitationRequest` | optional reason, expected tenant user ID | Tenant must be active; command key/rate limit; no email override or token input |
 
 Nested step DTO field names and database ownership are authoritative in the field-to-table matrix. Common bounds: display/legal/contact names 2–200, code 3–60, slug 3–100, email max 255, phone max 40, URL max 500, address lines max 250, city/state 120, postal 30, registration/tax 100, notes 1,000, reason 500, add-on quantity 1–10,000. Exact plan/discount/tax limits come from create-options policy metadata and are revalidated in the domain.
@@ -160,7 +185,7 @@ Field paths use the payload names, for example `payload.businessContact.register
 
 Finalize locks the draft, accepts or verifies its draft-scoped idempotency key/hash and writes the complete aggregate, capacity counters, audit/history, operation, receipt and outbox in one transaction. No global key-only unique index is used. The completed draft stores `createdTenantId`. A database rollback restores `in_progress`; the same tuple may retry. Provider/email failures update the operation asynchronously and are retried without re-running finalization.
 
-Payment callbacks use provider signature verification plus a unique provider reference and optional idempotency key. Invitation outbox processing generates the raw setup token in worker memory only, transactionally replaces the prior hash, sends the URL, and never places the raw token in the outbox, database, API response or logs. If delivery fails, retry generates another token and invalidates the prior one. Resend queues this same idempotent process.
+Manual submissions and reviews use payment-scoped versions plus command key/request hash semantics. A duplicate approval returns the existing result; a changed request under the same key conflicts. Future provider callbacks use adapter signature verification plus a unique provider event/reference and the same internal payment-state command. Invitation outbox processing generates the raw setup token in worker memory only, transactionally replaces the prior hash, sends the URL, and never places the raw token in the outbox, database, API response or logs. If delivery fails, retry generates another token and invalidates the prior one. Resend queues this same idempotent process.
 
 ## Clean Architecture use-case map
 
@@ -181,8 +206,10 @@ Mapping remains explicit static/manual mapping in the existing DTO style. Extern
 
 ## Compatibility gaps in the current API
 
-Current code only supplies `GET .../tenants/create-options` and final `POST .../tenants`; it has no draft, resume, duplicate-check, operation, retry, payment-link or invitation-resend endpoints. Current final create has no idempotency header/version, writes audit and capacity counters after the create transaction, and maps most unknown errors to 403. These are implementation gaps, not accepted variants.
+The runtime branch now supplies the canonical draft and operation foundation, but manual payment access/submission/review/history/resend APIs, duplicate advice, operation retry, and invitation resend remain absent. Its payment outbox handler returns `payment_provider_not_configured`; this is source evidence to replace with the approved manual handler, not accepted current-release behavior. These are implementation gaps, not accepted variants.
 
 ## Related
+
+[[FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]]
 
 [[../03_USER_JOURNEYS/Platform_Admin/FLOW_4_CREATE_TENANT_WIZARD_CANONICAL_SPEC]] · [[../06_DATABASE_KNOWLEDGE/Tables/FLOW_4_CREATE_TENANT_WIZARD_FIELD_TO_TABLE_MATRIX]]

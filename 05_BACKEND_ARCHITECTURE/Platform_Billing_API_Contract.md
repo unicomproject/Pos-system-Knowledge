@@ -1,9 +1,11 @@
 <!-- title: Platform Billing API Contract -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-15 -->
+<!-- last_updated: 2026-08-04 -->
 
 # Platform Billing API Contract
+
+> Flow 4 addendum (2026-08-04): the endpoints below describe the currently implemented invoice-management bridge. The approved manual-payment target extends this API with a review queue/detail/proof/history, an idempotent versioned `APPROVE|REJECT|REQUEST_INFORMATION` command, and notification resend. See [[FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]] and [[FLOW_4_CREATE_TENANT_WIZARD_API_CONTRACT]].
 
 ## Purpose And Scope
 
@@ -199,6 +201,8 @@ DRAFT -> PENDING -> PAID
 - Mark Paid settles the whole invoice; no amount is accepted from the client.
 
 Mark Paid is the current Release 1 manual verification path for paid-tenant activation. Approved business rule: verified payment or an approved payment waiver may satisfy activation. Current implementation: waiver persistence and waiver API/UI are **NOT IMPLEMENTED** in this billing API scope. Do not accept an unpersisted request flag or arbitrary boolean as a waiver.
+
+Mark Paid is not the final Flow 4 contract. The canonical manual-payment review first validates submitted proof/reference/amount/currency against the invoice under payment concurrency and command idempotency, then appends immutable review/audit history. Approval settles the invoice and transitions the tenant only to `PENDING_ACTIVATION`; rejection or request information leaves it `PENDING_PAYMENT`. No action creates a fake provider transaction or checkout URL.
 
 ## Concurrency
 

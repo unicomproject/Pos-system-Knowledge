@@ -1,9 +1,11 @@
 <!-- title: Subscription And Billing Management Flow -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-20 -->
+<!-- last_updated: 2026-08-04 -->
 
 # Subscription And Billing Management Flow
+
+> Flow 4 alignment (2026-08-04): current tenant onboarding collection uses manual payment evidence and Platform Admin review. Existing invoice Issue/Mark Paid behavior is a compatibility bridge, not the full Flow 4 contract. Review approval advances only to `PENDING_ACTIVATION`; gateway checkout is future work.
 
 ## Purpose
 
