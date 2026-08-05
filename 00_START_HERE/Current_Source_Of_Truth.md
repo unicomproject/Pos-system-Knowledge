@@ -22,6 +22,8 @@ The approved current-release Flow 4 collection model is **manual payment verific
 
 Runtime implementation evidence is recorded in [[../15_IMPLEMENTATION_TRACKING/FLOW_4_MANUAL_PAYMENT_BACKEND_IMPLEMENTATION_EVIDENCE_2026-08-04]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_MANUAL_PAYMENT_ANGULAR_IMPLEMENTATION_EVIDENCE_2026-08-04]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_EVIDENCE_2026-08-04]] and [[../15_IMPLEMENTATION_TRACKING/FLOW_4_RELEASE_ENVIRONMENT_AND_E2E_VALIDATION_EVIDENCE_2026-08-04]]. Backend tests pass 1,461/1,461 and Angular tests pass 453/453. Isolated PostgreSQL, ClamAV, Azurite and real-browser validation now produce six distinct E2E passes and fourteen exact token/lifecycle blocks. Overall Flow 4 remains NO-GO until all mandatory scenarios, the private proof path and live ACS pass.
 
+The 2026-08-05 pre-implementation documentation audit is the current traceability layer: [[../15_IMPLEMENTATION_TRACKING/FLOW_4_SECOND_BRAIN_DOCUMENT_READ_MANIFEST_2026-08-05]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_REQUIREMENT_TRACEABILITY_MATRIX_2026-08-05]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_DOCUMENT_CONFLICT_AND_GAP_REGISTER_2026-08-05]] and [[../15_IMPLEMENTATION_TRACKING/FLOW_4_APPROVED_NEXT_IMPLEMENTATION_SCOPE_2026-08-05]]. It does not replace the canonical requirements above. It records 72 atomic requirements, six non-verified P0 requirements and a `CONDITIONAL_GO_FOR_IMPLEMENTATION` limited to the approved gap-closing scope; production remains NO-GO.
+
 ## Highest Priority Decision
 
 The current scope is TM-EPOS MVP.
