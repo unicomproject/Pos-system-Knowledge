@@ -19,9 +19,9 @@ The explicit Current Source of Truth and canonical Flow 4 specification/decision
 | F4-CONFLICT-004 | Email/outbox implementation status | Approved Email Architecture and ACS Runbook current-capability tables | Backend/Angular/release evidence | A says onboarding email/outbox not implemented; evidence proves shared outbox and Flow 4 handlers exist, while live ACS remains blocked | Architecture/security rules remain authoritative; its status table is stale evidence | Outbox/runtime implemented; provider acceptance/delivery not live-validated | Factual documentation-status correction only; keep provider/security decisions intact |
 | F4-CONFLICT-005 | Wizard steps/draft model | Superseded `04_Create_Tenant_Wizard_Flow.md` and `16_...Alignment.md` | Canonical spec + D01/D02 | Old one-shot sequence has separate limits/add-ons and no dedicated draft | Canonical spec explicitly supersedes both | Fixed canonical seven steps and dedicated versioned draft | No implementation decision needed; keep historical banners and prevent index promotion |
 | F4-CONFLICT-006 | Email event URL terminology | Some onboarding email/catalog rows say payment link | Manual-payment architecture | Generic phrase can imply provider checkout; canonical requires invoice/status URLs and null checkout | Manual architecture is newer and explicitly authoritative | Name exact purpose URLs; never call status route a gateway link | Targeted terminology correction proposal |
-| F4-CONFLICT-007 | Production migration scope | Migration rules require readable, production-safe forward data handling | `20260804190000_BackfillDevelopmentRetailBusinessCode` summary/comment and SQL | Migration identifies a development seed and hard-codes its UUID in the production chain; Down can clear a legitimate RETAIL value | General migration rules do not approve this special-case production mutation | Production safety is unresolved; local success is not production approval | Architecture/data owner must approve replacement, separation or guarded retention before merge/release |
+| F4-CONFLICT-007 | Production migration scope | Migration rules require readable, production-safe forward data handling | Original `20260804190000_BackfillDevelopmentRetailBusinessCode` summary/comment and SQL | Original migration targeted a development UUID and had destructive Down behavior | [[../13_DECISIONS_AND_CHANGES/FLOW_4_RETAIL_BUSINESS_CODE_MIGRATION_DISPOSITION_2026-08-05]] now supplies explicit migration authority | **Resolved:** guarded natural-provenance repair + forward history bridge + non-destructive rollback | Closed by backend `877703f` and focused PostgreSQL evidence |
 
-No unresolved product conflict remains for the manual-payment lifecycle itself. F4-CONFLICT-007 is an unresolved production data-governance decision and is release critical.
+No unresolved product conflict remains for the manual-payment lifecycle itself. F4-CONFLICT-007 is resolved; the migration disposition is no longer a release-critical gap.
 
 ## Gap register
 
@@ -32,7 +32,7 @@ No unresolved product conflict remains for the manual-payment lifecycle itself. 
 | F4-GAP-003 | F4-REQ-061 | ENVIRONMENT_GAP | Azurite and the Blob adapter are configured/reachable, but no real recipient token/submission created a private object and no authorized review streamed it. | Blob, recipient API/UI, review API/UI | P0 | Private proof release gate not met | Execute valid upload, metadata/scan, private retrieval, cross-ID denial, cleanup and no-public-URL assertions through the real path |
 | F4-GAP-004 | F4-REQ-056,063 | LIVE_SERVICE_GAP | Live ACS credentials, verified sender, staging recipient and authorization for token-bearing mail were unavailable. Protocol sink does not prove live provider acceptance/routing/delivery. | Email, outbox, operations | P0 | Payment and invitation communications not production-proven | Use secret store + approved staging mailbox; capture ACS operation/provider IDs, accepted status, recipient routing, retries, redacted logs; report inbox delivery separately |
 | F4-GAP-005 | F4-REQ-060,067 | TEST_GAP / ENVIRONMENT_GAP | Playwright has 20 real-path scenarios but only six distinct scenarios passed; fourteen are blocked by tokens/state/live boundaries. | Angular, API, DB, CI | P0 | Mandatory 20/20 release-mode gate fails | Populate fixtures through approved bootstrap, run preflight + all 20 once, retain HTML/JSON/JUnit/trace/video/screenshots and fail on skip |
-| F4-GAP-006 | F4-REQ-059,069 | DATABASE_GAP / REQUIREMENT_AMBIGUITY | `20260804190000_BackfillDevelopmentRetailBusinessCode` passed local migration tests but contains a development-specific UUID and rollback that can erase a legitimate RETAIL code. No Second Brain decision authorizes it for production. | EF migration, production data | P0 | Blocks safe production migration approval | Decide before merge: preferably remove from production chain before deployment and seed/fix isolated test data through fixture authority, or replace with an environment-neutral data repair with collision precheck, provenance, rollback/forward-only rationale and production owner approval |
+| F4-GAP-006 | F4-REQ-059,069 | CLOSED (was DATABASE_GAP / REQUIREMENT_AMBIGUITY) | Guarded `20260804190000...` now uses exact natural seed provenance without UUID; `20260805120000...` covers already-recorded history; both Downs are non-destructive. | EF migration, production data | CLOSED (was P0) | No remaining migration-specific release block | Closed by decision record, backend `877703f`, 9/9 PostgreSQL scenarios, 1,470/1,470 regression and no pending model changes |
 | F4-GAP-007 | F4-REQ-064,065 | TEST_GAP | Reviewer queue has five-viewport/focus evidence, but token-gated recipient accessibility, keyboard, live-region and responsive matrix remains unexecuted. | Angular recipient UI | P1 | Acceptance incomplete; follows token fixture | Run axe/keyboard/focus/error/live-region and 360/tablet/desktop checks with retained artifacts after G1/G2 |
 | F4-GAP-008 | F4-REQ-072 | DOCUMENTATION_GAP / OPERATIONS_GAP | Docker cleanup is safe and scoped, but canonical retention/cleanup for fixture rows, raw process tokens, blobs, email captures and browser artifacts is not fully specified. | Test infrastructure, CI, storage | P1 | Risk of secret/test-data residue | Define per-resource owner, TTL, teardown, failure cleanup, artifact redaction and proof that unrelated resources are untouched |
 | F4-GAP-009 | F4-REQ-022,044,056 | DOCUMENTATION_GAP | Supporting email/billing/module status tables still say onboarding outbox/emails are unimplemented or require a gateway link. | Second Brain | P2 | Can mislead future implementation; does not block bounded next work because canonical hierarchy is explicit | Apply a later factual status/terminology correction referencing canonical docs and latest evidence |
@@ -72,24 +72,25 @@ P0 live checks cover payment-required, payment outcome as applicable, activation
 
 ### What it does and why
 
-The migration updates `business_types.business_code` to `RETAIL` when the row has UUID `44444444-0002-4000-8000-000000000001` and an empty code. It was added because isolated Flow 4 finalization failed active business-type validation against the development Retail row.
+The original migration used UUID `44444444-0002-4000-8000-000000000001`. The approved implementation preserves its migration ID but now selects only a blank, active row with normalized name `Retail` and exact development-seed provenance description. Forward migration `20260805120000_ApplyProductionSafeRetailBusinessCodeRepair` replays the identical guard for databases that may already have recorded the original ID.
 
 ### Safety assessment
 
-- Development assumption: explicit in class name/comment and encoded in the hard-coded seed UUID.
-- Idempotent Up: conditionally yes for the exact empty row; a repeat does nothing.
-- Production safe: **not established**. If production contains that UUID with an empty code for another provenance, it will be silently changed. If another row already owns `RETAIL`, the unique constraint can fail deployment.
-- Down safety: **unsafe/ambiguous**. It clears any matching `RETAIL` value without proving that this migration originally set it, and therefore can undo a later legitimate correction.
-- Rollback documentation: absent beyond executable Down SQL.
-- Authority: general migration rules allow controlled backfills but no decision approves a development-fixture repair in the production migration chain.
+- Identification: no development UUID; exact seed provenance, active status and blank code are required.
+- Collision/ambiguity: explicit prechecks raise before mutation; no partial row change occurs.
+- Existing data: all nonblank codes and absent-seed databases are unchanged.
+- Idempotency: repeated guarded SQL is a no-op after success.
+- Down safety: intentionally non-destructive because later provenance cannot justify clearing a valid code.
+- History compatibility: the original ID remains and a new forward migration covers an already-recorded original.
+- Authority: approved by the dated disposition decision and verified evidence.
 
 ### Finding
 
-**Do not approve this migration for production in its current documented state.** Because this audit cannot modify migrations, F4-GAP-006 requires an explicit data-owner/architecture decision. Preferred disposition, if it has not reached any shared production-like environment, is to separate development/test seed repair from the production chain and create required test catalog state through approved fixture setup. If a production repair is genuinely needed, replace it through the authorized forward-migration process with environment-neutral matching, uniqueness precheck, provenance, forward/rollback rationale and deployment runbook. Never edit already-deployed migration history without a deployment-aware plan.
+**Resolved and approved.** Disposition E + C accounts for both not-yet-recorded and potentially recorded databases. PostgreSQL 17.10 clean, legacy, correct, different, collision, absent, ambiguous, rollback/reapply and history scenarios pass. See [[FLOW_4_RETAIL_BUSINESS_CODE_MIGRATION_RESOLUTION_EVIDENCE_2026-08-05]].
 
 ## Current release decision
 
-The lifecycle/product requirements are clear, but P0 fixture authority, 20/20 browser execution, real proof path, live ACS and production migration disposition remain open. These are bounded gaps; they do not justify guessing or relaxing production security.
+The lifecycle/product requirements and production migration disposition are clear. P0 fixture authority, 20/20 browser execution, real proof path and live ACS remain open. These bounded gaps do not justify guessing or relaxing production security.
 
 ## Related
 

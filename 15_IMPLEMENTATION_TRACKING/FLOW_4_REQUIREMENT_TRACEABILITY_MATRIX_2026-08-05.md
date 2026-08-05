@@ -13,7 +13,7 @@ Atomic requirements were extracted before code inspection. The short mappings be
 - `BE-MP`: `ManualPaymentAccessController`, `PlatformManualPaymentsController`, `PlatformTenantOnboardingPaymentStatusController`, `ManualPaymentService`, `ManualPaymentRepository`.
 - `BE-ACT`: tenant activation in `PlatformTenantOnboardingRepository.ActivateAsync` and onboarding operation/invitation APIs.
 - `BE-SEC`: `ManualPaymentAccessTokenService`, `PaymentAccessRequestRedactionMiddleware`, `RateLimitingExtensions`, `AzureManualPaymentEvidenceStorage`, `ClamAvManualPaymentEvidenceScanner`.
-- `DB-F4`: migrations `20260804055813_AddFlow4TenantOnboardingRuntime`, `20260804110736_AddFlow4ManualPaymentRuntime`, EF configurations and current model snapshot.
+- `DB-F4`: migrations `20260804055813_AddFlow4TenantOnboardingRuntime`, `20260804110736_AddFlow4ManualPaymentRuntime`, guarded `20260804190000_BackfillDevelopmentRetailBusinessCode`, forward correction `20260805120000_ApplyProductionSafeRetailBusinessCodeRepair`, EF configurations and current model snapshot.
 - `FE-WIZ`: `platform-create-tenant-page`, draft/result pages, onboarding model and `platform-tenant-api.service`.
 - `FE-MP`: `/payment/:accessToken`, recipient page, manual-payment queue/detail/result pages, mapper/model and billing API service.
 - `PW`: `qa-dashboard/manual-payment.e2e.spec.mjs`; `CI`: `.github/workflows/flow4-release-validation.yml`.
@@ -121,7 +121,7 @@ Atomic requirements were extracted before code inspection. The short mappings be
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | F4-REQ-057 | Backend build, unit, API and PostgreSQL integration suites must pass with no Flow 4 failure. | TESTING | DOC-022,052,054 | release gate/evidence | P0 | Entire solution | PostgreSQL tests | — | auth suites | security suites | 743+341+377 | 1,461/1,461 pass | IMPLEMENTED_VERIFIED | — |
 | F4-REQ-058 | Angular production build, strict TypeScript and unit/component tests must pass. | TESTING | DOC-022,053,054 | Angular evidence | P0 | — | — | entire app | guards/masking | interceptor tests | 453 tests | Build + 453/453 pass | IMPLEMENTED_VERIFIED | — |
-| F4-REQ-059 | Full migration chain, rollback/reapply and no-pending-model-change checks must pass on PostgreSQL. | TESTING | DOC-020,022,052,054 | migration evidence | P0 | EF migrations | DB-F4/current snapshot | — | — | data constraints | migration tests | Isolated PostgreSQL passed | IMPLEMENTED_VERIFIED | F4-GAP-006 still affects production approval |
+| F4-REQ-059 | Full migration chain, rollback/reapply and no-pending-model-change checks must pass on PostgreSQL. | TESTING | DOC-020,022,052,054 | migration evidence | P0 | EF migrations | DB-F4/current snapshot | — | — | data constraints | 9 focused PostgreSQL migration tests | Clean/history/rollback/reapply pass on PostgreSQL 17.10; no pending model changes | IMPLEMENTED_VERIFIED | F4-GAP-006 closed |
 | F4-REQ-060 | All twenty real-path Playwright scenarios must pass without HTTP mocks, fake gateway success or uncontrolled DB mutation. | RELEASE | DOC-022,054 | browser matrix | P0 | Real API | isolated PostgreSQL | PW | real identities | real scoped tokens | E2E 1–20 | 6 distinct pass; 14 blocked | BLOCKED_ENVIRONMENT | F4-GAP-005 |
 | F4-REQ-061 | Private Blob upload/download/proof-stream flow must pass through a real recipient submission and authorized review path. | RELEASE | DOC-018,022,054 | proof gate | P0 | Azure storage adapter | evidence/blob metadata | recipient/reviewer pages | grant/billing.view | private/no-store | E2E 3,6,15,17 | Azurite reachable; full path blocked | BLOCKED_ENVIRONMENT | F4-GAP-003 |
 | F4-REQ-062 | ClamAV must accept a valid proof, detect EICAR and preserve scan-before-availability/fail-closed behavior. | SECURITY | DOC-018,022,054 | malware gate | P0 | ClamAV adapter | scan result | safe progress/error | grant/manage | positive rejected | F4-T46/E2E15 | Local PDF OK and EICAR found | IMPLEMENTED_VERIFIED | — |
@@ -131,7 +131,7 @@ Atomic requirements were extracted before code inspection. The short mappings be
 | F4-REQ-066 | Cross-tenant/token/object-ID substitution must be privacy-safe and public recipient requests must not receive platform bearer tokens. | SECURITY | DOC-018,021,022,054 | isolation/privacy | P0 | BE-SEC/BE-MP | exact associations | auth-token interceptor exclusion | view/manage/grant | safe 403/404 | F4-T33,T41,T46,T50 | E2E 14/17 pass + tests | IMPLEMENTED_VERIFIED | — |
 | F4-REQ-067 | Release CI must fail fast on missing fixtures/services and run build/tests/preflight/all 20 scenarios with protected secrets and retained artifacts. | RELEASE | DOC-022,054 | CI gate | P0 | target API | target DB | CI/PW | protected identities | environment secrets | workflow | Workflow implemented; full run cannot pass yet | IMPLEMENTED_VERIFIED | F4-GAP-005 |
 | F4-REQ-068 | Stripe/PayHere checkout/callback work must remain disabled in the manual release and later enter only through signed, deduplicated provider adapters. | BUSINESS | DOC-002,018,023 | future provider boundary | P2 | `IPaymentProvider`/manual adapter | nullable future fields | no gateway UI | future configuration | signature/event checks later | future contract tests | Intentionally deferred | NOT_APPLICABLE_CURRENT_RELEASE | — |
-| F4-REQ-069 | Every production migration must be environment-neutral, forward-safe, rollback-safe and documented; a development-seed repair must not silently mutate a production record. | DATABASE | DOC-043,045,054 | migration rules; Retail backfill | P0 | migration `20260804190000...` | hard-coded seed UUID/conditional SQL | — | — | production data integrity | apply/rollback only | Local chain passed; production authority unsafe/unclear | CONFLICTING_REQUIREMENT | F4-GAP-006 |
+| F4-REQ-069 | Every production migration must be environment-neutral, forward-safe, rollback-safe and documented; a development-seed repair must not silently mutate a production record. | DATABASE | DOC-043,045,054 | migration rules; Retail backfill | P0 | guarded `20260804190000...` + forward `20260805120000...` | natural provenance, collision/ambiguity precheck, non-destructive Down | — | — | existing values protected; no UUID targeting | 9 focused PostgreSQL cases + 1,470 full regression | Decision/evidence approved; clean and existing-history paths pass | IMPLEMENTED_VERIFIED | F4-CONFLICT-007 resolved; F4-GAP-006 closed |
 | F4-REQ-070 | A test-only recipient-token bootstrap, if used, must be explicitly approved, isolated to a test host, return raw token only to the invoking test process, store only hash, redact output and clean up. | SECURITY | DOC-013,018,020,022,054 | token rules; E2E protocol | P0 | No approved endpoint/service found | hash-only rule exists | PW needs secret input | test-only authority needed | strict environment/process boundary | E2E 2–11 etc. | No documented bootstrap authority | MISSING_IMPLEMENTATION | F4-GAP-001 |
 | F4-REQ-071 | Awaiting/submitted/rejected/action-required/approvable/rejectable/conflict/paid/active/retry/happy-path fixtures must be produced through an approved deterministic API/test-host/helper, never uncontrolled DB mutation. | TESTING | DOC-022,054 | required E2E details; blockers | P0 | No complete fixture builder found | isolated schema only | PW env manifest | role-specific actors | token/PII cleanup | E2E 2–20 | Fixture values unavailable | MISSING_IMPLEMENTATION | F4-GAP-002 |
 | F4-REQ-072 | Test fixture/token/proof/email captures must have explicit retention and cleanup that removes test-owned state without touching unrelated resources. | OPERATIONS | DOC-013,018,022,054 | retention; E2E protocol; cleanup | P1 | Test harness design required | isolated schema/objects | artifact policy | test identity | secret-safe deletion/redaction | cleanup assertions | Docker safety documented; lifecycle fixture cleanup undefined | DOCUMENTED_ONLY | F4-GAP-008 |
@@ -140,13 +140,13 @@ Atomic requirements were extracted before code inspection. The short mappings be
 
 | Status | Count | Requirement IDs | Release impact |
 |---|---:|---|---|
-| IMPLEMENTED_VERIFIED | 60 | F4-REQ-001–008, 010–055, 057–059, 062, 066–067 | Strong automated implementation baseline; not a production release by itself |
+| IMPLEMENTED_VERIFIED | 61 | F4-REQ-001–008, 010–055, 057–059, 062, 066–067, 069 | Strong automated implementation baseline; not a production release by itself |
 | IMPLEMENTED_NOT_RUNTIME_VERIFIED | 2 | F4-REQ-009, 056 | Full browser/live handoff evidence absent |
 | PARTIALLY_IMPLEMENTED | 2 | F4-REQ-064–065 | Recipient accessibility/responsive acceptance incomplete |
 | DOCUMENTED_ONLY | 1 | F4-REQ-072 | Cleanup contract not implemented end to end |
 | BLOCKED_ENVIRONMENT | 3 | F4-REQ-060–061, 063 | Prevents release gate |
 | MISSING_IMPLEMENTATION | 2 | F4-REQ-070–071 | Prevents deterministic 20/20 execution |
-| CONFLICTING_REQUIREMENT | 1 | F4-REQ-069 | Production migration decision required |
+| CONFLICTING_REQUIREMENT | 0 | — | F4-CONFLICT-007 and F4-GAP-006 resolved by the guarded/history-safe migration decision |
 | NOT_APPLICABLE_CURRENT_RELEASE | 1 | F4-REQ-068 | Future IPG only |
 | TEST_ONLY / BLOCKED_DEPENDENCY | 0 | — | No requirement is credited solely to a test or an unidentified dependency |
 
@@ -154,7 +154,7 @@ Atomic requirements were extracted before code inspection. The short mappings be
 
 | Priority | Total | Verified | Non-verified/blocked |
 |---|---:|---:|---:|
-| P0 | 64 | 58 | 6 (F4-REQ-060,061,063,069,070,071) |
+| P0 | 64 | 59 | 5 (F4-REQ-060,061,063,070,071) |
 | P1 | 7 | 2 | 5 (F4-REQ-009,056,064,065,072) |
 | P2 | 1 | 0 applicable | F4-REQ-068 is future/not applicable |
 | P3 | 0 | 0 | — |
@@ -162,13 +162,13 @@ Atomic requirements were extracted before code inspection. The short mappings be
 ### Ratios
 
 - Documentation coverage: **72 / 72 = 100%** have an identified authoritative or explicitly conflicting source.
-- Full implementation coverage: **62 / 71 = 87.3%** applicable requirements are implemented (verified plus implemented-not-runtime-verified; partial is not counted as complete).
-- Verified coverage: **60 / 71 = 84.5%** applicable requirements have implementation plus passing automated/runtime evidence.
-- Release-critical coverage: **58 / 64 = 90.6%** P0 requirements are verified. This ratio does not waive the six remaining P0 requirements.
+- Full implementation coverage: **63 / 71 = 88.7%** applicable requirements are implemented (verified plus implemented-not-runtime-verified; partial is not counted as complete).
+- Verified coverage: **61 / 71 = 85.9%** applicable requirements have implementation plus passing automated/runtime evidence.
+- Release-critical coverage: **59 / 64 = 92.2%** P0 requirements are verified. This ratio does not waive the five remaining P0 requirements.
 
 ## Gate interpretation
 
-Requirements are sufficiently explicit to implement the bounded next scope without guessing only after the migration disposition and secret-safe test-fixture contract are approved as documentation decisions. The implementation is not production-ready: 20/20 browser, real proof path and live ACS remain P0 gates.
+The migration disposition is approved and verified; Chunk 2 may proceed under the remaining secret-safe test-fixture authority. The implementation is not production-ready: 20/20 browser, real proof path and live ACS remain P0 gates.
 
 ## Related
 

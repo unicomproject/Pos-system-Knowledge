@@ -14,14 +14,14 @@ Implementation gate: **CONDITIONAL_GO_FOR_IMPLEMENTATION**.
 Conditions before the first runtime change:
 
 1. Approve the test-host-only token/fixture security contract described under F4-GAP-001/F4-GAP-002.
-2. Decide the production disposition of `20260804190000_BackfillDevelopmentRetailBusinessCode` under F4-GAP-006.
+2. **Completed 2026-08-05:** disposition E + C approved and implemented for `20260804190000_BackfillDevelopmentRetailBusinessCode`; F4-GAP-006 is closed.
 3. Confirm an isolated test database, secret store, staging mailbox/sender and target Blob/ClamAV/ACS environments. Missing live ACS may be worked around only for local non-live tasks; it still blocks the final release gate.
 
 ## Ordered work plan
 
 | Order | Gap IDs | Requirement IDs | Workstream | Repository | Expected Files/Areas | Tests | Completion Evidence |
 | ----- | ------- | --------------- | ---------- | ---------- | -------------------- | ----- | ------------------- |
-| 1 | F4-GAP-006 | F4-REQ-059,069 | Production migration disposition | Second Brain first; Backend only after approval | New ADR/data decision; migration/seed/fixture area named by decision | PostgreSQL clean apply, upgrade from representative pre-migration state, collision case, rollback/forward-only test, no pending model changes | Approved decision plus safe migration/seed evidence; no development-only production mutation |
+| 1 | F4-GAP-006 | F4-REQ-059,069 | Production migration disposition - **COMPLETED** | Second Brain + Backend | Dated decision/evidence; guarded original and forward corrective migration | 9/9 PostgreSQL cases, clean/history/rollback/reapply, no pending model changes; full 1,470/1,470 | Backend `877703f`; F4-CONFLICT-007 resolved and F4-GAP-006 closed |
 | 2 | F4-GAP-001,008 | F4-REQ-070,072 | Secret-safe test bootstrap contract | Second Brain, then Backend | Test-host design, environment gate, token service adapter, cleanup/TTL contract; never production controller registration | Test host refuses non-test environment; raw token never logged/persisted/artifacted; keyed hash/purpose/expiry/revocation; teardown | Threat-model/ADR approval and security test evidence |
 | 3 | F4-GAP-002 | F4-REQ-071 | Deterministic lifecycle fixture builder | Backend test host/integration tests; Angular QA harness | Flow 4 fixture service/helper and manifest generation for awaiting/submitted/rejected/action-required/approvable/rejectable/conflict/paid/active/retry/happy states | Idempotent creation, isolated ownership, exact state assertions, cleanup, failure cleanup | One secret-safe generated manifest with every required ID/token and no console/track leakage |
 | 4 | F4-GAP-003 | F4-REQ-028,029,034,061,062,066 | Real private-proof lifecycle | Backend + Angular QA | Azure Blob/Azurite adapter configuration, recipient upload, reviewer proof stream, cleanup assertions | Valid PDF/JPEG/PNG; mismatch/oversize/EICAR; exact association; expired/cross-ID denial; no-store/private metadata | Real submission upload and authorized download pass; private Blob inspected; cleanup passes |
@@ -43,19 +43,15 @@ The implementation prompt for Orders 2–3 must state all of these controls:
 - Creation and teardown are idempotent and namespaced by run ID. Cleanup removes isolated schema/rows/blobs/mail captures/secrets and leaves unrelated Docker resources and user data untouched.
 - The harness prints only non-secret fixture aliases/IDs needed for correlation; secret scanning runs before artifact upload.
 
-## Migration condition
+## Migration condition - resolved
 
-Do not silently retain, edit or delete `20260804190000_BackfillDevelopmentRetailBusinessCode`. First record whether it has been applied outside disposable local databases. The approved choice must account for migration-history immutability:
-
-- If not shared/deployed, prefer removing the development-fixture repair from the production chain and producing valid Retail fixture data in test setup.
-- If shared but not production, use the repository's approved migration-history coordination procedure.
-- If production repair is truly required, use a new environment-neutral forward repair with uniqueness/provenance checks and an explicit rollback or forward-only rationale.
+Disposition E + C is approved in [[../13_DECISIONS_AND_CHANGES/FLOW_4_RETAIL_BUSINESS_CODE_MIGRATION_DISPOSITION_2026-08-05]]. Repository evidence found only isolated local application, but manual shared application could not be excluded. The original migration ID is therefore retained with safe guards and a later forward correction covers already-recorded history. Exact natural seed provenance replaces UUID selection; collision and ambiguity fail before mutation; existing nonblank values remain unchanged; rollback is intentionally non-destructive.
 
 ## Release completion gate
 
 The next phase is complete only when:
 
-- all six non-verified P0 requirements (F4-REQ-060, 061, 063, 069, 070, 071) are verified;
+- all five remaining non-verified P0 requirements (F4-REQ-060, 061, 063, 070, 071) are verified;
 - Playwright is 20/20 with zero environment skip;
 - private proof and ClamAV paths run through a real purpose-bound recipient submission;
 - live ACS evidence distinguishes queued, attempted, provider accepted, delivered and opened;
@@ -66,7 +62,7 @@ The next phase is complete only when:
 
 ## Generated next-implementation directive
 
-Implement Orders 1–9 in sequence from this document and the linked traceability matrix. Pause before runtime work if the test bootstrap contract or migration disposition is not approved. Preserve the current manual-payment state machine and production security controls. Use isolated, deterministic, secret-safe fixtures; execute real services and all 20 Playwright cases; then update evidence and recalculate the release gate without claiming blocked checks as passes.
+Order 1 is complete. Implement Orders 2–9 in sequence from this document and the linked traceability matrix. Pause before runtime work if the test bootstrap contract is not approved. Preserve the current manual-payment state machine and production security controls. Use isolated, deterministic, secret-safe fixtures; execute real services and all 20 Playwright cases; then update evidence and recalculate the release gate without claiming blocked checks as passes.
 
 ## Related
 
