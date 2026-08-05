@@ -1,7 +1,7 @@
 <!-- title: Flow 4 Create Tenant Wizard Test Matrix -->
 <!-- status: Canonical -->
 <!-- system: TM-EPOS MVP / OneVerz -->
-<!-- last_updated: 2026-08-04 -->
+<!-- last_updated: 2026-08-05 -->
 
 # Flow 4 — Create Tenant Wizard Test Matrix
 
@@ -79,14 +79,14 @@ Test empty, whitespace, min/max and one-over-max values; Unicode names; code/slu
 
 ## Existing evidence and gaps
 
-The final backend solution after `db9d579` and projection correction `994f19b` passes **1,460/1,460** tests: Unit 742, API 341 and Integration 377. Focused evidence covers the payment state machine, manual provider behavior, access/invoice projections, validation and malware rejection, permission boundaries, raw-path redaction, wizard manual finalization, PostgreSQL schema/migration shape, conflicting concurrent review and concurrent activation with exactly one success/replay/invitation. Angular commits `90d85f3` and `8bbfb39` pass production build, both strict TypeScript projects and **453/453** tests. The 20-scenario Playwright manual-payment matrix is implemented but its recorded run discovered 20 and environment-skipped all 20; it is blocked rather than passed. Future provider callback tests are absent by design and are not a manual-release gate.
+The final backend solution passes **1,461/1,461** tests: Unit 743, API 341 and Integration 377. Focused evidence covers the payment state machine, manual provider behavior, access/invoice projections, validation and malware rejection, permission boundaries, raw-path redaction, wizard manual finalization, PostgreSQL schema/migration shape, conflicting concurrent review and concurrent activation with exactly one success/replay/invitation. Angular 21.2.19 passes production build, both strict TypeScript projects and **453/453** tests with zero production npm vulnerabilities. Isolated real-browser execution now has six distinct passing scenarios and fourteen exact token/lifecycle blocks. Future provider callback tests are absent by design and are not a manual-release gate. See [[../15_IMPLEMENTATION_TRACKING/FLOW_4_RELEASE_ENVIRONMENT_VALIDATION_EVIDENCE_2026-08-05]].
 
 ### Backend execution evidence
 
 | Gate | Result |
 |---|---|
 | Build | PASS - 0 warnings, 0 errors |
-| Full solution | PASS - 1,460 tests, 0 failed |
+| Full solution | PASS - 1,461 tests, 0 failed |
 | Manual unit focus | PASS - 12 |
 | Manual API/security focus | PASS - 5 |
 | PostgreSQL migration/concurrency focus | PASS - 4 |
@@ -95,13 +95,13 @@ The final backend solution after `db9d579` and projection correction `994f19b` p
 | EF pending-model check | PASS - none |
 | Changed-file formatter and `git diff --check` | PASS |
 
-The repository-wide formatter still reports 785 pre-existing whitespace findings outside this change; the changed/new non-generated C# scope is formatted and verified. Browser, live Blob/ClamAV/ACS and production E2E remain required release evidence.
+The repository-wide formatter still reports 785 pre-existing whitespace findings outside this change; the changed/new non-generated C# scope is formatted and verified. Fourteen browser scenarios, the real private Blob proof path and live ACS remain required release evidence.
 
-### Angular manual-payment browser matrix - implemented, environment blocked
+### Angular manual-payment browser matrix - partially executed, release blocked
 
 `qa-dashboard/manual-payment.e2e.spec.mjs` uses the existing Playwright stack and contains 20 real-path cases: paid creation, secure recipient access, valid submission, duplicate retry, queue filtering/detail, private proof, approve to Pending Activation, separate activation, rejection, information/correction/history, stale-review conflict, route/API permission denial, review denial, expired link, unsafe evidence, notification resend, cross-tenant proof isolation, activation retry, invitation resend and the complete lifecycle. It uses no HTTP route fulfilment or fake payment success.
 
-Latest execution status: **20 discovered, 20 skipped, 0 passed - BLOCKED BY ENVIRONMENT**. `FLOW4_E2E_ENABLED=true`, controlled fixtures/credentials, isolated PostgreSQL, private Blob, ClamAV and email capture/delivery were not available. This result does not satisfy F4-T16, F4-T22, F4-T27, F4-T29, F4-T34, F4-T35 or the browser portions of the other P0 cases.
+Latest execution status: the authoritative all-20 run completed with **5 passed and 15 explicit environment skips**; focused E2E 13 also passed, for **6 distinct passes and 14 blocks**. E2E 1, 5, 12, 13, 14 and 17 pass through the real Angular/API path. Isolated PostgreSQL, ClamAV and Azurite were available; raw purpose-bound recipient tokens, submitted/review/activation fixtures, the real private-proof path and live ACS were not. This does not satisfy the full release gate.
 
 ## Required E2E scenario details
 

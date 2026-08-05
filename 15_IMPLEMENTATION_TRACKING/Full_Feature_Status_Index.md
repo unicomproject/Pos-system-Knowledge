@@ -1,7 +1,7 @@
 ﻿<!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-08-04 -->
+<!-- last_updated: 2026-08-05 -->
 
 # Full Feature Status Index
 
@@ -56,9 +56,9 @@ PR/commit reference is recorded.
 
 | Platform | Module | Feature | Status | Completed Date | PR / Commit | Notes |
 |---|---|---|---|---|---|---|
-| Cross-platform | Platform Tenant | Flow 4 Create Tenant Wizard | In Progress (automated gates pass; production NO-GO) | 2026-08-04 | [[FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_EVIDENCE_2026-08-04]] | Backend and Angular manual-payment/activation/invitation runtime implemented; 20 real-browser scenarios and live dependencies remain blocked |
-| Backend | Platform Billing | Flow 4 Manual Payment + Future IPG | Backend implemented and verified | 2026-08-04 | [[FLOW_4_MANUAL_PAYMENT_BACKEND_IMPLEMENTATION_EVIDENCE_2026-08-04]] | `db9d579` + projection correction `994f19b`; 1,460 backend tests pass; current release manual and `checkoutUrl` null; Stripe/PayHere deferred |
-| Angular | Platform Billing | Flow 4 Manual Payment | Implemented; automated gates pass; browser acceptance blocked | 2026-08-04 | [[FLOW_4_MANUAL_PAYMENT_ANGULAR_IMPLEMENTATION_EVIDENCE_2026-08-04]] | `90d85f3` + `8bbfb39`; 453 tests pass; 20 Playwright scenarios discovered and environment-skipped |
+| Cross-platform | Platform Tenant | Flow 4 Create Tenant Wizard | Testing (production NO-GO) | 2026-08-05 | [[FLOW_4_RELEASE_ENVIRONMENT_VALIDATION_EVIDENCE_2026-08-05]] | Isolated PostgreSQL/ClamAV/Azurite and real browser executed; 6 distinct scenarios pass, 14 token/lifecycle scenarios plus live ACS/private proof remain blocked |
+| Backend | Platform Billing | Flow 4 Manual Payment + Future IPG | Backend implemented and verified | 2026-08-05 | [[FLOW_4_MANUAL_PAYMENT_BACKEND_IMPLEMENTATION_EVIDENCE_2026-08-04]] | Real execution defects fixed; 1,461 backend tests pass; EF model current; current release manual and `checkoutUrl` null; Stripe/PayHere deferred |
+| Angular | Platform Billing | Flow 4 Manual Payment | Testing; partial browser acceptance; production NO-GO | 2026-08-05 | [[FLOW_4_MANUAL_PAYMENT_ANGULAR_IMPLEMENTATION_EVIDENCE_2026-08-04]] | 453 tests and production audit pass; responsive 5-viewport queue passes; 6 distinct Playwright scenarios pass and 14 remain blocked |
 | Backend | Auth | Tenant Login | Completed | 2026-07-01 | Tenant auth module | `POST /api/v1/tenant-auth/login` |
 | Backend | OutletTillDevice | Device Context | Completed | 2026-07-09 | `5c99b66` | `devices/current`, `devices/activate` |
 | Backend | OutletTillDevice | Till Session Open/Close | Completed | 2026-07-09 | `06048db` | current-session, open, close |
