@@ -1,11 +1,13 @@
 <!-- title: Flow 4 Manual Payment and Future IPG Architecture -->
 <!-- status: Canonical -->
 <!-- system: TM-EPOS MVP / OneVerz -->
-<!-- last_updated: 2026-08-04 -->
+<!-- last_updated: 2026-08-05 -->
 
 # Flow 4 - Manual Payment and Future IPG Architecture
 
 ## Decision and scope
+
+Release-validation note (2026-08-05): the manual architecture remains unchanged after isolated runtime execution. PostgreSQL and ClamAV boundaries passed locally; six browser scenarios passed. The real private-proof lifecycle, fourteen token/state-dependent scenarios and live ACS remain release blockers. See [[../15_IMPLEMENTATION_TRACKING/FLOW_4_RELEASE_ENVIRONMENT_AND_E2E_VALIDATION_EVIDENCE_2026-08-04]].
 
 The current release uses **manual payment verification**. It does not create a Stripe, PayHere, or other gateway checkout session. The architecture remains provider-neutral so a future gateway is added through an adapter and callback boundary rather than by redesigning tenant onboarding.
 

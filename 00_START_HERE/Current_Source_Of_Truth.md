@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-08-04 -->
+<!-- last_updated: 2026-08-05 -->
 
 
 # Current Source Of Truth
@@ -20,7 +20,7 @@ Platform Admin tenant creation is governed by [[../03_USER_JOURNEYS/Platform_Adm
 
 The approved current-release Flow 4 collection model is **manual payment verification**. `invoiceUrl` and secure `paymentStatusUrl` are supported target concepts; manual `checkoutUrl` is null. Prepaid payment approval reaches `PENDING_ACTIVATION`, followed by separate activation and Tenant Admin invitation. Future Stripe/PayHere support uses provider adapters and signed idempotent callbacks. Authority: [[../05_BACKEND_ARCHITECTURE/FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]]; alignment evidence: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/FLOW_4_MANUAL_PAYMENT_SECOND_BRAIN_ALIGNMENT_2026-08-04]].
 
-Runtime implementation evidence is recorded in [[../15_IMPLEMENTATION_TRACKING/FLOW_4_MANUAL_PAYMENT_BACKEND_IMPLEMENTATION_EVIDENCE_2026-08-04]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_MANUAL_PAYMENT_ANGULAR_IMPLEMENTATION_EVIDENCE_2026-08-04]] and [[../15_IMPLEMENTATION_TRACKING/FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_EVIDENCE_2026-08-04]]. Backend commits `db9d579` and `994f19b` implement the secure manual-payment runtime and UI-complete projections; Angular commits `90d85f3` and `8bbfb39` implement the recipient, reviewer, activation/invitation and 20-scenario Playwright surfaces. Backend tests pass 1,460/1,460 and Angular tests pass 453/453. Overall Flow 4 remains NO-GO for production because the 20 real-browser scenarios and target-environment Blob, ClamAV, email and public URL validation are blocked, not passed.
+Runtime implementation evidence is recorded in [[../15_IMPLEMENTATION_TRACKING/FLOW_4_MANUAL_PAYMENT_BACKEND_IMPLEMENTATION_EVIDENCE_2026-08-04]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_MANUAL_PAYMENT_ANGULAR_IMPLEMENTATION_EVIDENCE_2026-08-04]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_EVIDENCE_2026-08-04]] and [[../15_IMPLEMENTATION_TRACKING/FLOW_4_RELEASE_ENVIRONMENT_AND_E2E_VALIDATION_EVIDENCE_2026-08-04]]. Backend tests pass 1,461/1,461 and Angular tests pass 453/453. Isolated PostgreSQL, ClamAV, Azurite and real-browser validation now produce six distinct E2E passes and fourteen exact token/lifecycle blocks. Overall Flow 4 remains NO-GO until all mandatory scenarios, the private proof path and live ACS pass.
 
 ## Highest Priority Decision
 

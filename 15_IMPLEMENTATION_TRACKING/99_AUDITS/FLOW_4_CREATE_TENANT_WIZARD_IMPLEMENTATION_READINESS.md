@@ -1,9 +1,11 @@
 <!-- title: Flow 4 Create Tenant Wizard Implementation Readiness -->
-<!-- status: Ready for Implementation -->
+<!-- status: Runtime Implemented - Production Validation Blocked -->
 <!-- system: TM-EPOS MVP / OneVerz -->
-<!-- last_updated: 2026-08-04 -->
+<!-- last_updated: 2026-08-05 -->
 
 > Runtime update (2026-08-04): implementation is in progress on dedicated runtime branches. Estimated executable readiness is 72%; builds, existing automated suites, snapshot verification, and representative PostgreSQL migration application pass. The current-release payment architecture is now manual verification, not a real gateway. Documentation alignment is complete and implementation may proceed; release remains NO-GO for the P0 items in [[../FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_EVIDENCE_2026-08-04]].
+
+> Release-validation update (2026-08-05): runtime implementation and isolated service execution are complete for locally safe boundaries. Six distinct E2E scenarios pass and fourteen remain blocked by raw purpose-token/lifecycle fixtures; live ACS and the real private-proof submission path remain P0. Backend 1,461/1,461 and Angular 453/453 regressions pass. See [[../FLOW_4_RELEASE_ENVIRONMENT_AND_E2E_VALIDATION_EVIDENCE_2026-08-04]].
 
 # Flow 4 — Create Tenant Wizard Implementation Readiness
 

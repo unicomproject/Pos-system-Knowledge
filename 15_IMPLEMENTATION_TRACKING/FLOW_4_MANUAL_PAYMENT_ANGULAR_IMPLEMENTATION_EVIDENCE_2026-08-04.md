@@ -9,7 +9,7 @@
 
 ### Release-validation update - 2026-08-05
 
-The isolated real-browser run now records six distinct passes (E2E 1, 5, 12, 13, 14 and 17) and fourteen exact environment/token/lifecycle blocks. Queue responsiveness passes at 360, 768, 1024, 1366 and 1600 pixel widths after tablet card-layout containment fixes. Angular 21.2.19, production build, strict TypeScript and **453/453** tests pass; the production npm audit reports zero vulnerabilities. Production remains **NO-GO**. See [[FLOW_4_RELEASE_ENVIRONMENT_VALIDATION_EVIDENCE_2026-08-05]].
+The isolated real-browser run now records six distinct passes (E2E 1, 5, 12, 13, 14 and 17) and fourteen exact environment/token/lifecycle blocks. Queue responsiveness passes at 360, 768, 1024, 1366 and 1600 pixel widths after tablet card-layout containment fixes. Angular 21.2.19, production build, strict TypeScript and **453/453** tests pass; the production npm audit reports zero vulnerabilities. Production remains **NO-GO**. See [[FLOW_4_RELEASE_ENVIRONMENT_AND_E2E_VALIDATION_EVIDENCE_2026-08-04]].
 
 The Platform Admin and payment-recipient Angular runtime is implemented on `feat/flow4-create-tenant-runtime`. Production code calls the real Flow 4 APIs; it contains no payment gateway simulation, HTTP mock, fake payment success, or client-side lifecycle override. Manual payment remains the only current-release collection method and `checkoutUrl` is never presented.
 

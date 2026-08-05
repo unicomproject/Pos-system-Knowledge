@@ -9,7 +9,7 @@
 
 ### Release-validation update - 2026-08-05
 
-Safe live execution against isolated PostgreSQL/ClamAV/Azurite found and corrected a JSONB onboarding-history defect, a development business-code data defect and a real PostgreSQL queue translation defect. The final backend solution passes **1,461/1,461** tests and EF reports no pending model changes. Overall production remains **NO-GO** because 14 token/lifecycle-dependent browser scenarios, the real private-proof upload path and live ACS delivery remain blocked. See [[FLOW_4_RELEASE_ENVIRONMENT_VALIDATION_EVIDENCE_2026-08-05]].
+Safe live execution against isolated PostgreSQL/ClamAV/Azurite found and corrected a JSONB onboarding-history defect, a development business-code data defect and a real PostgreSQL queue translation defect. The final backend solution passes **1,461/1,461** tests and EF reports no pending model changes. Overall production remains **NO-GO** because 14 token/lifecycle-dependent browser scenarios, the real private-proof upload path and live ACS delivery remain blocked. See [[FLOW_4_RELEASE_ENVIRONMENT_AND_E2E_VALIDATION_EVIDENCE_2026-08-04]].
 
 - Backend implementation: complete for the approved manual-payment phase.
 - Database implementation: forward migration generated, inspected and verified on representative and clean PostgreSQL databases.

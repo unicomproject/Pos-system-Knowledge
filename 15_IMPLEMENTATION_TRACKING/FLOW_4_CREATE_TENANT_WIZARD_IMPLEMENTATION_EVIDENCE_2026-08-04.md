@@ -1,10 +1,12 @@
 <!-- title: Flow 4 Create Tenant Wizard Implementation Evidence -->
 <!-- status: Runtime Implemented and Automated Gates Passing - Overall Production NO-GO -->
-<!-- last_updated: 2026-08-04 -->
+<!-- last_updated: 2026-08-05 -->
 
 # Flow 4 - Create Tenant Wizard implementation evidence
 
 ## Executive result
+
+Release-environment update (2026-08-05): isolated PostgreSQL/ClamAV/Azurite and the real Angular/backend path were executed. Six distinct browser scenarios pass, fourteen purpose-token/lifecycle scenarios remain blocked, all 1,461 backend and 453 Angular tests pass, and production remains NO-GO. See [[FLOW_4_RELEASE_ENVIRONMENT_AND_E2E_VALIDATION_EVIDENCE_2026-08-04]].
 
 The durable seven-step onboarding foundation and the approved current-release manual-payment backend and Angular surfaces are implemented. Backend commits `db9d579d94ad5fb41355fa8aeaf01d55d0ea481a` and `994f19b211150745e77b231cfedff1b71721a839` provide secure recipient access, UI-complete projections, evidence submission and correction, immutable payment review, outbox notifications, payment-to-pending-activation, separate idempotent activation, activation-gated invitation handoff and a provider-neutral future IPG boundary. Angular commits `90d85f3` and `8bbfb3977b3c9afb0847fcd8974a6737d143d853` provide the recipient and Platform Billing runtime plus automated and Playwright coverage.
 
