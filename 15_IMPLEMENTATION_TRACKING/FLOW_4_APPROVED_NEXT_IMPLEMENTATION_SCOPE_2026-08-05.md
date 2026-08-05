@@ -69,3 +69,7 @@ Orders 1-2 are complete at their stated decision/contract level. Implement Order
 - [[FLOW_4_SECOND_BRAIN_DOCUMENT_READ_MANIFEST_2026-08-05]]
 - [[FLOW_4_REQUIREMENT_TRACEABILITY_MATRIX_2026-08-05]]
 - [[FLOW_4_DOCUMENT_CONFLICT_AND_GAP_REGISTER_2026-08-05]]
+
+## Chunk 3 execution update — 2026-08-05
+
+Order 3 is runtime-complete with the conditional browser-consumption item recorded in [[FLOW_4_DETERMINISTIC_FIXTURE_RUNTIME_EVIDENCE_2026-08-05]]. Proceeding to Chunk 4 is conditional on retaining that honest browser gap; Chunk 4 must not reinterpret database/launcher mapping tests as private-proof browser evidence. Live ACS and final 20/20 remain outside Chunk 4.

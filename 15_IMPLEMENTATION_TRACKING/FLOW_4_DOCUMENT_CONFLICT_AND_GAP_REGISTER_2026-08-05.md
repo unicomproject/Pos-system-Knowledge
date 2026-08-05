@@ -97,3 +97,7 @@ The lifecycle/product requirements, production migration disposition and test-fi
 - [[FLOW_4_SECOND_BRAIN_DOCUMENT_READ_MANIFEST_2026-08-05]]
 - [[FLOW_4_REQUIREMENT_TRACEABILITY_MATRIX_2026-08-05]]
 - [[FLOW_4_APPROVED_NEXT_IMPLEMENTATION_SCOPE_2026-08-05]]
+
+## Chunk 3 gap disposition — 2026-08-05
+
+The deterministic fixture-runtime and cleanup gaps are resolved. The CLI, guard chain, 17-scenario allow-list, manifest transport, production separation and owner-bound cleanup have executable evidence. Focused browser consumption was prepared and mapped but could not be executed because the environment rejected background service launch after the approval/usage limit was reached. The live-browser item remains an explicit condition; private Blob/ClamAV, live ACS and final 20/20 remain intentionally open. See [[FLOW_4_DETERMINISTIC_FIXTURE_RUNTIME_EVIDENCE_2026-08-05]].

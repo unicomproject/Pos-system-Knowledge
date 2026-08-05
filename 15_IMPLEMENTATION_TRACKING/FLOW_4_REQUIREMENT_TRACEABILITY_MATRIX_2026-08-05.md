@@ -176,3 +176,7 @@ The migration disposition is approved and verified. The secret-safe test-host/to
 - [[FLOW_4_SECOND_BRAIN_DOCUMENT_READ_MANIFEST_2026-08-05]]
 - [[FLOW_4_DOCUMENT_CONFLICT_AND_GAP_REGISTER_2026-08-05]]
 - [[FLOW_4_APPROVED_NEXT_IMPLEMENTATION_SCOPE_2026-08-05]]
+
+## Chunk 3 runtime delta — 2026-08-05
+
+This section supersedes the pre-Chunk-3 status for F4-REQ-070–072. F4-REQ-070 and F4-REQ-071 are now `IMPLEMENTED_VERIFIED` through guard/security tests plus an isolated PostgreSQL run of all 17 typed scenarios. F4-REQ-072 is now `IMPLEMENTED_VERIFIED` through ownership-ledger, foreign-handle, parallel-run, revocation-before-delete, repeated-cleanup and final-row-absence evidence. The focused real-browser consumption attempt remains `BLOCKED_ENVIRONMENT`; no 20/20 release claim is made. See [[FLOW_4_DETERMINISTIC_FIXTURE_RUNTIME_EVIDENCE_2026-08-05]].
