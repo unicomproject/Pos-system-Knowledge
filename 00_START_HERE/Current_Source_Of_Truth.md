@@ -24,6 +24,8 @@ Runtime implementation evidence is recorded in [[../15_IMPLEMENTATION_TRACKING/F
 
 The 2026-08-05 documentation audit is the current traceability layer: [[../15_IMPLEMENTATION_TRACKING/FLOW_4_SECOND_BRAIN_DOCUMENT_READ_MANIFEST_2026-08-05]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_REQUIREMENT_TRACEABILITY_MATRIX_2026-08-05]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_DOCUMENT_CONFLICT_AND_GAP_REGISTER_2026-08-05]] and [[../15_IMPLEMENTATION_TRACKING/FLOW_4_APPROVED_NEXT_IMPLEMENTATION_SCOPE_2026-08-05]]. It does not replace the canonical requirements above. It records 72 atomic requirements, five non-verified P0 requirements and a `CONDITIONAL_GO_FOR_IMPLEMENTATION` limited to the remaining approved gap-closing scope; production remains NO-GO. Migration authority is the approved [[../13_DECISIONS_AND_CHANGES/FLOW_4_RETAIL_BUSINESS_CODE_MIGRATION_DISPOSITION_2026-08-05]].
 
+Chunk 2 security authority is the approved [[../13_DECISIONS_AND_CHANGES/FLOW_4_SECURE_TEST_HOST_TOKEN_AND_FIXTURE_CONTRACT_2026-08-05]], with threat model [[../09_SECURITY_AND_COMPLIANCE/FLOW_4_TEST_FIXTURE_TOKEN_THREAT_MODEL_2026-08-05]] and implementation contract [[../10_TESTING_QA/FLOW_4_SECURE_LIFECYCLE_FIXTURE_IMPLEMENTATION_CONTRACT_2026-08-05]]. Chunk 3 must use a separate non-HTTP test CLI/hybrid, production token/hash primitives, cumulative environment/database/credential guards, one-time process-local secret handoff and ownership-bound cleanup. No production fixture endpoint, DI registration or Swagger route is authorized. This approval does not increase the 59/64 verified P0 count; fixture runtime and security proof remain pending.
+
 ## Highest Priority Decision
 
 The current scope is TM-EPOS MVP.
