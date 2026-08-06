@@ -1,13 +1,13 @@
 <!-- title: Product Media, Attributes & Channel Visibility Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
+<!-- last_updated: 2026-08-01 -->
 
 # Product Media, Attributes & Channel Visibility Functional Rules
 
 ## Purpose
 
-Defines business and UX rules for `Product_Media_Attributes_Channel_Visibility` in the new TM-EPOS MVP scope.
+Defines business and UX rules for `Product_Media_Attributes_Channel_Visibility` in the new OneVerz POS MVP scope.
 These rules must be applied before creating backend APIs, Flutter screens,
 responsive online store screens, Angular/admin screens, tests, or database changes.
 
@@ -18,6 +18,7 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Images are metadata records; binary files live in object storage.
 - Barcode lookup must resolve to an active product or variant.
 - Attribute values support filtering and variant display but do not replace option templates.
+- Cashier variant selection resolves exactly one image slot by active POS-channel variant primary, global variant primary, POS-channel product primary, global product primary, then placeholder. Shared product-media management continues to support multiple images for other surfaces. See [[../21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 
 ## User Rules
 

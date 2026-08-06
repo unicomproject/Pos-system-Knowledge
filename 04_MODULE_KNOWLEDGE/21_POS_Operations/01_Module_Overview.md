@@ -1,7 +1,7 @@
 <!-- title: POS Operations Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 # POS Operations Module Overview
 
@@ -9,7 +9,7 @@
 
 Support mobile POS and desktop POS workflows: held sales, receipts, receipt templates, print logs, till summaries, payment summaries, session events, and till cash movements.
 
-This module is part of the new TM-EPOS MVP scope: mobile and desktop EPOS,
+This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device
 support, and low-cost hardware usage for events, stalls, food and beverage,
 merchandising, attractions, and temporary retail locations.
@@ -53,6 +53,7 @@ merchandising, attractions, and temporary retail locations.
 - Backend Holds is implemented, but current Flutter held-sale authority is local
   secure storage and therefore disconnected.
 - Customer display is future unless explicitly enabled.
+- Cashier New Sale includes the Product Variant Selection Popup with one image, optional line note and manual Frequently Bought Together. This is distinct from the history-derived Frequently Sold discovery segment. See [[04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 
 ## Access Summary
 
@@ -83,3 +84,7 @@ merchandising, attractions, and temporary retail locations.
 
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/02_Functional_Rules]]
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/03_Technical_Contract]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/04_Popular_Product_Discovery_Feature]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/05_Frequently_Sold_Product_Discovery_Feature]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/06_Offers_Product_Discovery_Feature]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]]

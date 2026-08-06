@@ -1,6 +1,6 @@
 <!-- title: Brands Management Screen Specification -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP / OneVerz POS -->
+<!-- system: OneVerz POS MVP POS -->
 <!-- last_updated: 2026-07-29 -->
 <!-- doc_type: Screen specification — shared shell composition -->
 

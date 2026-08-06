@@ -1,6 +1,6 @@
 <!-- title: Tenant Onboarding Email Flows -->
 <!-- status: APPROVED -->
-<!-- system: TM-EPOS MVP / OneVerz -->
+<!-- system: OneVerz POS MVP -->
 <!-- owner: Platform Architecture / Product (OneVerz) -->
 <!-- last_updated: 2026-08-04 -->
 <!-- decision_date: 2026-07-27 -->

@@ -1,14 +1,14 @@
 <!-- title: Product Media, Attributes & Channel Visibility Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
+<!-- last_updated: 2026-08-01 -->
 
 # Product Media, Attributes & Channel Visibility Technical Contract
 
 ## Purpose
 
 Defines the implementation contract for `Product_Media_Attributes_Channel_Visibility`. This contract is based on
-new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
+new OneVerz POS MVP scope images and the uploaded Unified Commerce database design.
 
 ## API Contract
 
@@ -49,6 +49,8 @@ unique constraints, CHECK constraints, hash-only token rules, and append-only
 history/ledger behavior where applicable.
 
 ## Frontend Contract
+
+- POS product detail projects one resolved image reference for the Cashier popup; it does not weaken or remove shared multi-image storage/APIs.
 
 - Use feature-owned folders and typed services/providers.
 - Widgets/components must not call HTTP APIs directly.
@@ -96,7 +98,7 @@ Test coverage must include:
 5. Build frontend route/screen/component/provider/service.
 6. Add loading, empty, error, denied, feature-disabled, offline, and conflict states.
 7. Add unit/integration/API/widget tests.
-8. Review against new TM-EPOS MVP module boundaries.
+8. Review against new OneVerz POS MVP module boundaries.
 
 ## Out Of Scope
 

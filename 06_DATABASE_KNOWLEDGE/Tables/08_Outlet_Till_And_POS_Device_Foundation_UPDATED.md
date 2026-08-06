@@ -1,6 +1,6 @@
 <!-- title: 08. Outlet, Till & POS Device Foundation -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-06 -->
 <!-- source: Updated from uploaded ERD image -->
 
@@ -303,8 +303,19 @@ Blank Reference / Note cells: 0
 - Active rule from the ERD: 1 Till ↔ 1 active POS Device.
 - Enum/domain names shown in the ERD image are represented as varchar(40) plus notes; no database enum datatype is used.
 
+## Till Monitoring UI Data Mapping
+
+| UI Element | Database Mapping |
+|---|---|
+| Till Name / Code | `tills.till_name`, `tills.till_code` |
+| Outlet | `outlets.outlet_name` (via `tills.outlet_id`) |
+| Lifecycle Status | `tills.status` |
+| Online / Offline | Derived. Requires `pos_devices.status = 'ACTIVE'`, active `till_device_assignments`, and `pos_devices.last_seen_at` within heartbeat threshold. |
+| Last Activity | Primarily `pos_devices.last_seen_at` of the assigned device. |
+
 ## Related Files
 
 - [[../Database_Overview]]
 - [[../Status_And_Type_Check_Rules]]
 - [[../Migration_Rules]]
+

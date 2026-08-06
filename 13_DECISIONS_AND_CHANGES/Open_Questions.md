@@ -1,6 +1,6 @@
 <!-- title: Open Questions -->
 <!-- status: Draft -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Open Questions

@@ -1,6 +1,6 @@
 <!-- title: SA-P1-02 Platform Admin Stub Navigation Cleanup -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-20 -->
 
 # SA-P1-02 — Platform Admin Stub Navigation Cleanup

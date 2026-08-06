@@ -1,6 +1,6 @@
 <!-- title: Cash Drawer Integration -->
 <!-- status: Draft -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Cash Drawer Integration
@@ -92,8 +92,7 @@ controlled manual procedure and records the failure/recovery.
 
 ## Offline Behavior
 
-Offline drawer pulse is disallowed until an approved offline Cash operation,
-durable identity, later audit sync and duplicate-prevention contract exist.
+Offline/restart cash drawer pulse recovery is fully operational. On checkout, the authoritative drawer operation settings and operation ID are stored in the client-side secure store (`DrawerOperationStore`) before calling the Local Agent. Upon startup or network reconnection, unresolved cash drawer operations are reconciled by checking status via backend endpoints or using the interactive `DrawerRecoveryCard` in the testing UI, preventing duplicate pulses.
 
 ## Automated Testing
 
@@ -111,22 +110,14 @@ automated tests and physical RJ11/RJ12 acceptance must pass.
 
 ## Current Implementation Status
 
-Partially Implemented. Local Agent pulse generation, validation, dedicated
-endpoint, RAW spooler routing, durable transport idempotency, typed Flutter
-request/response transport, backend cash-drawer configuration validation and
-pending Hardware Testing lifecycle exist. Exact Agent tests passed (48 total)
-and Flutter focused Local Agent tests passed (20 total).
+Implemented. Local Agent pulse generation, validation, dedicated endpoint, RAW spooler routing, durable transport idempotency, typed Flutter request/response transport, backend cash-drawer configuration validation, and Hardware Testing lifecycle exist. Automatic cash-sale/split/refund hooks, manual no-sale authorization flow with manager credentials verification, dedicated immutable drawer-operation audit, and interactive cash drawer configuration and test UI in Flutter are fully implemented.
 
-Automatic cash-sale/split/refund hooks, manual no-sale authorization/approval,
-dedicated immutable drawer-operation audit, production Flutter drawer UI and
-physical acceptance are not implemented. Therefore Chunk 4 is not code-complete
-and must not be described as production-ready.
+**Chunk 6 Update (2026-07-30)**: Offline/restart failure recovery is fully implemented, including durable `DrawerOperationStore` client-side transaction logging, startup recovery/reconciliation mechanisms, idempotency token reuse with Print Agent request ID, and backend sync finalization. Fully covered by automated test suites. Required physical acceptance is pending.
 
 ## Known Gaps
 
-Automatic business trigger ownership, dedicated backend drawer-operation/audit
-persistence, manual reason/manager approval policy, Flutter test/manual UI and
-physical drawer model/acceptance.
+Physical drawer verification.
+
 
 ## Implementation Sequence
 
@@ -136,6 +127,3 @@ acceptance.
 ## Related Files
 
 - [[POS_Hardware_Integration]]
-- [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/02_Functional_Rules]]
-- [[../10_TESTING_QA/POS_Hardware_Production_Acceptance_Matrix]]
-- [[../13_DECISIONS_AND_CHANGES/Open_Questions]]

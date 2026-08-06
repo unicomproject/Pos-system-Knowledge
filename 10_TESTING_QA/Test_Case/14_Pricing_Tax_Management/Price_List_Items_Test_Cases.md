@@ -16,7 +16,7 @@
 
 ## Purpose
 
-Defines validation, access, and database unique index testing for Price List Items in TM-EPOS MVP.
+Defines validation, access, and database unique index testing for Price List Items in OneVerz POS MVP.
 
 ## Preconditions
 

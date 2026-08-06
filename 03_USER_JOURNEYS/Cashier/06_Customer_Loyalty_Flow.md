@@ -1,6 +1,6 @@
 <!-- title: Customer Loyalty Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-23 -->
 
 # Customer Loyalty Flow

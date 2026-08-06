@@ -1,6 +1,6 @@
 <!-- title: Flutter Security Guardrails -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines Flutter security guardrails for TM-EPOS MVP.
+This file defines Flutter security guardrails for OneVerz POS MVP.
 
 The app handles tenant data, staff actions, customer/order data, device trust,
 and payment-related workflows.

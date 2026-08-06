@@ -1,6 +1,6 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Hardware Operations, Till Session & Cash Control Module Overview
@@ -9,7 +9,7 @@
 
 Control hardware devices, hardware assignments, hardware tests, till sessions, cash movements, cash reconciliation, and denomination counts.
 
-This module is part of the new TM-EPOS MVP scope: mobile and desktop EPOS,
+This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device
 support, and low-cost hardware usage for events, stalls, food and beverage,
 merchandising, attractions, and temporary retail locations.
@@ -21,7 +21,7 @@ merchandising, attractions, and temporary retail locations.
 | Module | `Hardware_Till_Cash_Control` |
 | Module number | 08 |
 | Primary users | Cashier, Store Manager, Tenant Admin |
-| Frontend surfaces | Till open/close, Cash in/out, Hardware testing, Printer/scanner/drawer/card reader status |
+| Frontend surfaces | Till open/close, Cash in/out, Hardware testing, Printer/scanner/drawer/card reader status, Hardware readiness monitoring |
 | API groups | Verified Cashier APIs: `/api/v1/tills/current-session`, `/api/v1/tills/open`, `/api/v1/tills/close`; hardware/cash-movement test APIs are not implemented |
 
 ## Main Tables
@@ -78,3 +78,10 @@ merchandising, attractions, and temporary retail locations.
 
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/02_Functional_Rules]]
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/03_Technical_Contract]]
+
+
+## Tenant Admin Monitoring Surface (2026-08-01)
+
+Tenant Admin Till right-side hardware card is an approved monitoring surface for this module. It reads Backend readiness/assignment status; it does not perform physical device I/O.
+
+See [[../../12_INTEGRATIONS/POS_Hardware_Integration]] and [[../../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Till_Monitoring_UI]].

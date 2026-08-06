@@ -1,13 +1,13 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Hardware Operations, Till Session & Cash Control Functional Rules
 
 ## Purpose
 
-Defines business and UX rules for `Hardware_Till_Cash_Control` in the new TM-EPOS MVP scope.
+Defines business and UX rules for `Hardware_Till_Cash_Control` in the new OneVerz POS MVP scope.
 These rules must be applied before creating backend APIs, Flutter screens,
 responsive online store screens, Angular/admin screens, tests, or database changes.
 
@@ -16,15 +16,22 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Till session is required for POS sale, payment, receipt, and cash movements.
 - Cash movement amount is positive and uses a movement type.
 - Cash reconciliation records expected cash, counted cash, and variance.
-- Physical communication is handled by Flutter/local device code. A hardware
-  test must not be reported as logged because no complete Cashier test-log API
-  chain is currently implemented.
+- Physical communication is handled by Flutter/local device code. A hardware test must not be reported as logged because no complete Cashier test-log API chain is currently implemented.
 - Cash drawer open requires permission, till context, and audit.
 - Local printer access must be device-configured, API-key authenticated, CIDR
   allow-listed, and limited to the trusted private LAN.
 - A timeout after print submission is an unknown outcome. Do not silently resend.
 - Manual printer tests must be labelled non-sale and must not create a sale,
   payment, receipt record, or completed-sale print audit.
+
+## Hardware Readiness Rules
+
+- **Assignment Source**: Hardware assignments must target exactly one Till or POS device via normalized `hardware_device_assignments`.
+- **Last-seen Source**: The live monitoring Last Activity should primarily come from the assigned POS device activity (`pos_devices.last_seen_at`), not static Till timestamps.
+- **Latest Test Result**: Hardware test success/failure must be derived from `hardware_test_logs`.
+- **Warning/Error Rules**: A hardware device in warning (e.g., low paper) or error (e.g., disconnected) state contributes to the "Needs Attention" status of the Till.
+- **Alert Limitation**: Do not invent a `hardware_alerts` table. Alerts must be derived from missing assignments, offline devices, or failed `hardware_test_logs`.
+- **Current vs Planned Implementation**: The current backend implementation relies mostly on flat Till fields (`printerName`, `scannerName`). The planned implementation requires proper assignment checks, heartbeats, and test log resolution to support live readiness monitoring.
 
 ## User Rules
 
@@ -86,3 +93,26 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/03_Technical_Contract]]
+
+
+## Tenant Admin Till Hardware Functional Rules Addendum (2026-08-01)
+
+### Monitoring vs physical I/O
+
+Tenant Admin is monitoring/management only. Physical I/O is native POS / local agent only.
+
+### Assignment models
+
+Model A (Hardware → Till) and Model B (Hardware → POS Device → Till) are both approved. Lookup must merge active assignments and exclude released/cross-tenant rows.
+
+### Status honesty
+
+Configured, assigned, connected, and healthy are separate. Do not treat flat Till `printerName`/`scannerName` strings as connection proof.
+
+**Correction to "Current vs Planned" above:** Backend now exposes `GET .../hardware-readiness` over normalized assignment tables for **direct Till assignments**. Flat fields still exist on Till create/update/detail and remain non-authoritative for readiness. Inventory/assignment mutation APIs, POS-device merge, peripheral heartbeat, and derived alerts remain incomplete.
+
+### MVP alerts
+
+Derived only — no `hardware_alerts` table for MVP.
+
+Canonical architecture: [[../../12_INTEGRATIONS/POS_Hardware_Integration]].

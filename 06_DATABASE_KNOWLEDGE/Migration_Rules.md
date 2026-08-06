@@ -1,6 +1,6 @@
 <!-- title: Migration Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 <!-- source: Unified_Commerce_Databse_Design.docx -->
 
@@ -9,7 +9,7 @@
 
 ## Purpose
 
-This file defines migration rules for TM-EPOS MVP database changes.
+This file defines migration rules for OneVerz POS MVP database changes.
 
 ## Core Rules
 

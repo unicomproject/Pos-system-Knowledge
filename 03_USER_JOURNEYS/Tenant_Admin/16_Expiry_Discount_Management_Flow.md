@@ -1,13 +1,13 @@
 <!-- title: Tenant Admin Expiry Discount Management Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-07-31 -->
 
 # Tenant Admin Expiry Discount Management Flow
 
 ## Purpose
 
-Defines creation and activation of expiry-based discounts for near-expiry products or batches.
+Defines creation and activation of expiry-based discounts, general discount policies, and price lists that populate the Cashier POS "Offers" discovery segment.
 
 ## Actor
 
@@ -15,7 +15,7 @@ Tenant Admin
 
 ## Source
 
-Derived from `Slide 16 - Expiry Discount Management Flow` in `tenant-full-journey.pptx` and aligned to TM-EPOS MVP Second Brain scope.
+Derived from `Slide 16 - Expiry Discount Management Flow` in `tenant-full-journey.pptx` and aligned to OneVerz POS MVP Second Brain scope.
 
 ## Trigger
 
@@ -41,6 +41,16 @@ Tenant Admin opens expiry discount management.
 | 9 | Confirm discount rules | System validates rule. |
 | 10 | Apply discount | System activates discount for eligible products/batches. |
 
+## POS Offer Configuration Flow (Discount Policies & Special Prices)
+
+| Step | Action | System Behavior |
+|---:|---|---|
+| 1 | Open Discount Policy / Price List management | System opens discount/pricing config. |
+| 2 | Create/Edit policy or special price | Admin defines percentage, fixed discount, or compare-at prices. |
+| 3 | Select target products/variants/categories | Admin links targets (using include/exclude targets). |
+| 4 | Assign outlet and channel limits | System validates outlet and POS channel mappings. |
+| 5 | Save and Activate | Active configuration is immediately indexed by the backend POS catalog and becomes discoverable under the Cashier New Sale "Offers" segment. |
+
 ## Data Used Or Captured
 
 - Product/batch
@@ -49,6 +59,8 @@ Tenant Admin opens expiry discount management.
 - Discount percentage/value
 - Valid period
 - Outlet/POS screen
+- Targeted products, categories, brands, or collections
+- Compare-at and selling prices (for special price list items)
 
 ## Access And Security Rules
 
@@ -65,17 +77,21 @@ Tenant Admin opens expiry discount management.
 - Expired product/batch not eligible
 - Permission denied
 - Overlapping discount rule
+- Cross-tenant policy targeting (fails validation)
 
 ## Outcome
 
-Expiry discount is applied and visible where configured.
+Expiry discount or general promotional offer is applied, and the product becomes visible under the Cashier POS Offers segment.
 
 ## Related Modules
 
 - 15_Discount_Expiry_Discount_Management
 - 10_Product_Core
+- 14_Pricing_Tax_Management
 - 16_Inventory_Foundation_Stock_Availability
+- 21_POS_Operations
 
 ## Related Files
 
-- 06_DATABASE_KNOWLEDGE/Tables/15_Discount_And_Expiry_Discount_Management.md
+- [[../../06_DATABASE_KNOWLEDGE/Tables/15_Discount_And_Expiry_Discount_Management]]
+- [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/06_Offers_Product_Discovery_Feature]]

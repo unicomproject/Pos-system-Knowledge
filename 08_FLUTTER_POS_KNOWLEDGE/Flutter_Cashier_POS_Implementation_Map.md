@@ -1,7 +1,7 @@
 <!-- title: Flutter Cashier POS Implementation Map -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 
 # Flutter Cashier POS Implementation Map
@@ -32,12 +32,17 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 |---|---|---|---|
 | Product grid | UI complete | `GET /api/v1/pos/products` | Wired; real DB only |
 | Catalog fallback mock | Removed 2026-07-10 | N/A | No mock products |
-| Product detail / variants | UI expects API | Not implemented | Blocked |
+| Product detail / variants | Older `PosProductVariantSheet` and direct-add evidence exist | Production target pending verification/implementation | Partial; full popup pending |
+| Product-line note / Frequently Bought Together | Specification only | Target contracts pending | Implementation Pending |
 | Category chips API | Datasource exists | Not implemented | UI uses static chips |
 | Local cart | In-memory Riverpod | N/A | UI only |
 | Checkout summary | Wired | `POST /api/v1/pos/checkout/summary` | Integrated for current online cash flow |
 | Cash payment | Wired | Checkout summary/start-payment | Testing |
 | Receipt print audit | Wired | `POST /api/v1/pos/receipts/{saleId}/print` | Testing |
+| Discovery segments | Toggle buttons styled | `GET /api/v1/pos/products?segment=` | Planned (Not Started) |
+| Popular Products | Curation UI planned | Bootstraps `POS_POPULAR` reserved collection | Planned (Not Started) |
+| Frequently Sold | UI chip disabled | Aggregates completed order lines on the fly | Planned (Not Started) |
+| Offers / Promotions | Card badges planned | Checks active targeted policies and special price lists | Planned (Not Started) |
 
 ## POS Home Card Status
 
@@ -88,6 +93,10 @@ a 56 logical-pixel pastel circular container and a 30 logical-pixel glyph.
 - Products must exist via Tenant Admin / `POST /api/v1/products` and price list.
 - Empty catalog shows **No products found**, not demo items.
 
+## Product Variant Popup Target
+
+The production popup adds dynamic ID-based option resolution, one image slot, quantity/UOM validation, optional product-line note, manual Frequently Bought Together, atomic authoritative cart response, responsive/error/conflict/accessibility behaviour and duplicate-tap protection. Existing variant-sheet and scanner/direct-add code must be preserved as partial evidence, not marked complete. See [[Flutter_Product_Variant_Popup_Implementation_Specification]].
+
 ## Payment And Receipt Map (2026-07-29)
 
 | Area | Active ownership | Status |
@@ -116,6 +125,11 @@ a 56 logical-pixel pastel circular container and a 30 logical-pixel glyph.
 - [[../15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/Pos_Products_List_Implementation_Status]]
 - [[../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]]
 - [[../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Cashier_POS_Second_Brain_vs_Code_Comparison_Implementation_Status]]
+- [[../04_MODULE_KNOWLEDGE/21_POS_Operations/04_Popular_Product_Discovery_Feature]]
+- [[../04_MODULE_KNOWLEDGE/21_POS_Operations/05_Frequently_Sold_Product_Discovery_Feature]]
+- [[../04_MODULE_KNOWLEDGE/21_POS_Operations/06_Offers_Product_Discovery_Feature]]
+- [[../04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]]
+- [[Flutter_Product_Variant_Popup_Implementation_Specification]]
 
 ### Hardware Chunk 3 scanner map
 

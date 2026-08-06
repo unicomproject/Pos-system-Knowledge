@@ -1,6 +1,6 @@
 <!-- title: Project Glossary -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This glossary defines the terms used across the TM-EPOS MVP Second Brain.
+This glossary defines the terms used across the OneVerz POS MVP Second Brain.
 Use these terms consistently in documentation, API names, UI labels, database
 discussion, and AI prompts.
 Do not introduce alternate names unless a later architecture decision approves
@@ -18,7 +18,7 @@ them.
 
 | Term | Meaning |
 |---|---|
-| TM-EPOS | Current MVP product/scope name for the updated EPOS system |
+| OneVerz POS | Current MVP product/scope name for the updated EPOS system |
 | MVP | Current delivery scope for mobile/desktop EPOS, online store, click and collect, and offline operation |
 | SCS-TIX EPOS | Older/previous naming found in existing Second Brain files |
 | Second Brain | Structured knowledge base used by developers and AI assistants |
@@ -30,7 +30,7 @@ them.
 
 | Term | Meaning |
 |---|---|
-| Target Business | Event, stall, temporary retail, food and beverage, merchandise, or small business using TM-EPOS |
+| Target Business | Event, stall, temporary retail, food and beverage, merchandise, or small business using OneVerz POS |
 | Event Merchandise Shop | Shop selling event, stadium, festival, or branded merchandise |
 | Pop-up Shop | Temporary selling location used for seasonal or short-term retail |
 | Market Trader | Seller operating from a market stall or temporary trading location |

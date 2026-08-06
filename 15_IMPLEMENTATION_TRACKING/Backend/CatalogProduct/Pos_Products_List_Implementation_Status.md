@@ -1,7 +1,7 @@
 <!-- title: POS Products List Implementation Status -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-11 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 
 # POS Products List Implementation Status
@@ -66,6 +66,7 @@ tests/E_POS.IntegrationTests/CatalogProduct/PosProductCatalogRepositoryTests.cs
 ## Pending Work
 
 - `GET /api/v1/pos/products/{id}` and `GET /api/v1/pos/catalog/categories`
+- Verify/implement the full popup detail projection and manual Frequently Bought Together endpoint tracked in [[Pos_Product_Variant_Detail_Implementation_Status]].
 - Development product seed is intentionally excluded; use Tenant Admin product CRUD
 - Merge branch, apply migrations, verify on seeded tenant with real products
 

@@ -1,6 +1,6 @@
 <!-- title: DTO And Mapping Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines DTO and mapping rules for TM-EPOS backend APIs.
+This file defines DTO and mapping rules for OneVerz POS backend APIs.
 
 DTOs protect the domain model and prevent internal database structure from being
 leaked to clients.

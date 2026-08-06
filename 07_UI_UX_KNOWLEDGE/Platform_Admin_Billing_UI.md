@@ -1,7 +1,7 @@
 <!-- title: Platform Admin Billing UI -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-08-04 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-06 -->
 
 # Platform Admin Billing UI
 

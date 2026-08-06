@@ -1,7 +1,7 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -1010,6 +1010,18 @@ See [[../99_Archive/04_MODULE_KNOWLEDGE/Subscription/04_Subscription_Catalog_Mod
 
 # POS Payment And Receipt API Endpoints
 
+## Product Variant Selection Popup Targets (Pending)
+
+The production popup contract is **Documentation Ready; implementation remains pending verification/implementation**. Authority: [[../04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
+
+| Method | Route | Target purpose | Status |
+|---|---|---|---|
+| GET | `/api/v1/pos/products/{productId}?deviceId={deviceId}` | Dynamic option/value/variant detail, authoritative price/stock and one resolved image | Pending verification/implementation |
+| GET | `/api/v1/pos/products/{productId}/recommendations?deviceId={deviceId}&type=frequently-bought-together&limit=3` | Up to three manually configured recommendations | Implementation Pending |
+| POST | `/api/v1/pos/cart/calculate` | Validate main/recommendation lines and return authoritative cart lines/totals | Implementation Pending for full popup contract |
+
+Product detail uses ID-based option mappings and one resolved image, not a popup gallery. Cart request lines target `clientLineId`, `variantId`, `quantity`, `uomId`, nullable normalized `lineNote`, `source` and optional `recommendationParentReference`; responses return product/variant snapshots, SKU/name, quantity/UOM, unit price, discount, tax, total, stock status, conflict code and normalized `lineNote`. Preserve the line contract through checkout, supported hold/recall, completed sale and receipt. Do not log note text.
+
 > **Unified-Commerce status (2026-07-10):** The routes below are the **target
 > contract** carried forward from legacy `SCS.Api` documentation. They are
 > **not implemented** in `E_POS.Api` yet. Flutter datasources still reference
@@ -1031,8 +1043,7 @@ Base routes: `/api/v1/pos/cart`, `/api/v1/pos/checkout`,
 | GET | `/api/v1/pos/receipts/{saleId}` | `receipts.view` or `receipts.print` | Receipt preview data with `barcodeValue` |
 | POST | `/api/v1/pos/receipts/{saleId}/print` | `receipts.print` | Receipt print audit row |
 
-Cash checkout writes `sales`, `sale_lines`, `payments`,
-`sale_payment_allocations`, and `receipts`. Print audit writes
+The Unified Commerce target writes `sales_orders`, `sales_order_lines`, payment/allocation records and `receipts`. Print audit writes
 `receipt_print_logs`.
 
 Cash checkout request includes `cashReceived`. Successful cash checkout response
@@ -1045,6 +1056,30 @@ saved sale/payment outcome.
 `Sale_Screen` (see implementation status file). It exposes `variantId` for
 simple/non-variant products so Flutter can send `{ variantId, qty }` to checkout
 summary/start-payment without substituting product IDs.
+
+Additionally, this endpoint supports a planned `segment` query parameter to filter and rank products (Implementation Target):
+- `all` (default): Returns all active, sellable products in the outlet.
+- `popular`: Returns manually curated products mapped to the tenant-scoped reserved collection code `POS_POPULAR` sorted by `sort_order`.
+- `frequently-sold`: Dynamically aggregates and ranks products based on net completed sales ($max(qty - cancelled - returned, 0)$) at the current outlet over a rolling 30-day window.
+- `offers`: Dynamically aggregates products with active targeted discount policies or special prices (compare-at price > selling price).
+
+Query parameters:
+- `deviceId` (Guid, required): Resolves the trusted tenant, outlet, and POS channel context.
+- `segment` (string, optional): One of `all`, `popular`, `frequently-sold`, `offers`. Invalid values return HTTP 400.
+- `categoryId` (Guid, optional): Filters results within the selected segment.
+- `search` (string, optional): Text search query evaluated within the selected segment.
+
+Computed offer projection properties in `PosProductSummaryResponseDto` (Planned):
+- `hasOffer` (bool): Indicates if an active offer or special price is available.
+- `offerType` (string): Promotion type (e.g. `percentage`, `fixed_amount`, `special_price`, `conditional`).
+- `offerPolicyId` (Guid, nullable): Unique identifier for the discount policy or price list.
+- `offerName` (string): Human-readable campaign/policy name.
+- `originalPrice` (decimal): Original selling price before the offer.
+- `sellingPrice` (decimal): Effective resolved selling price.
+- `offerPrice` (decimal, nullable): Unconditionally calculated unit price under the offer.
+- `discountLabel` (string): Badge label text (e.g., "15% OFF" or "Offer available").
+- `requiresCartValidation` (bool): True if qualification depends on cart totals or items.
+- `requiresManagerApproval` (bool): True if manager approval is required to apply the discount.
 
 `GET /api/v1/pos/products` product summaries expose variant search metadata for
 New Sale filtering. Product name remains the primary search key; variant terms

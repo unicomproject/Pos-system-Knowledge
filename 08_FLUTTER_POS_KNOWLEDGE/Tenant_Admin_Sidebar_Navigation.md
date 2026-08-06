@@ -1,6 +1,6 @@
 <!-- title: Tenant Admin Sidebar Navigation -->
 <!-- status: Active — white sidebar + menu order approved; implementation not complete -->
-<!-- system: TM-EPOS MVP / OneVerz POS -->
+<!-- system: OneVerz POS MVP POS -->
 <!-- last_updated: 2026-07-29 -->
 <!-- doc_type: Architecture approval — documentation only -->
 

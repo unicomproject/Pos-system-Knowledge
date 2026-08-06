@@ -1,6 +1,6 @@
 <!-- title: Authentication Email Flows -->
 <!-- status: APPROVED -->
-<!-- system: TM-EPOS MVP / OneVerz -->
+<!-- system: OneVerz POS MVP -->
 <!-- owner: Platform Architecture / Product (OneVerz) -->
 <!-- last_updated: 2026-07-27 -->
 <!-- applies_to: Platform and tenant authentication emails -->

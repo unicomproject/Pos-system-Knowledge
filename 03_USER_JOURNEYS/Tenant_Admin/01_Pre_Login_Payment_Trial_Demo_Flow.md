@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin Pre-Login Payment Trial Demo Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP / OneVerz -->
-<!-- last_updated: 2026-08-04 -->
+<!-- system: OneVerz POS MVP / OneVerz -->
+<!-- last_updated: 2026-08-06 -->
 <!-- decision_date: 2026-07-27 -->
 
 # Tenant Admin Pre-Login Payment Trial Demo Flow
@@ -24,13 +24,13 @@ Platform Admin creates tenant and selects subscription type: `PAID`, `TRIAL`, or
 
 | Step | Paid | Trial / Demo |
 |---:|---|---|
-| 1 | Tenant created → `PENDING_PAYMENT` | Tenant created |
+| 1 | Tenant created â†’ `PENDING_PAYMENT` | Tenant created |
 | 2 | Email `tenant.paid_created` with invoice summary/manual instructions, `invoiceUrl` and secure `paymentStatusUrl`; `checkoutUrl` null; no set-password | Email `tenant.trial_created` or `tenant.demo_created` (type, start, expiry, next steps; no set-password) |
 | 3 | Recipient views status and submits method/reference/amount/currency/date/private proof and optional note | Payment skipped |
-| 4 | Platform Admin reviews and approves, rejects or requests information; recipient corrects/resubmits when eligible | — |
+| 4 | Platform Admin reviews and approves, rejects or requests information; recipient corrects/resubmits when eligible | â€” |
 | 5 | Super Admin **manually activates** | System **auto-activates** after provisioning |
 | 6 | Email activated + set-password | Email activated + set-password (second email) |
-| 7 | Set password → login | Set password → login |
+| 7 | Set password â†’ login | Set password â†’ login |
 
 ### Trial/Demo email count
 
@@ -54,7 +54,7 @@ Before activation, the recipient can view the authorized invoice, instructions, 
 
 Approved journeys **NOT IMPLEMENTED** for manual payment access/submission/review notifications and tenant onboarding emails. Platform password-reset ACS is unrelated and already complete.
 
-## Decision history — superseded
+## Decision history â€” superseded
 
 | Obsolete claim | Replacement |
 |---|---|

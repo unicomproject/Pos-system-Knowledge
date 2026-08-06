@@ -1,13 +1,13 @@
 <!-- title: API Standards -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-13 -->
 
 # API Standards
 
 ## Purpose
 
-This file defines Release 1 API standards for the TM-EPOS MVP.
+This file defines Release 1 API standards for the OneVerz POS MVP.
 
 APIs must be predictable for Flutter POS and Angular Platform Admin.
 
@@ -77,7 +77,7 @@ Release 1 API groups include:
 - `/api/v1/files`
 - `/api/v1/notifications`
 
-E-commerce and offline operation/sync are approved TM-EPOS MVP areas under
+E-commerce and offline operation/sync are approved OneVerz POS MVP areas under
 [[../00_START_HERE/Current_Source_Of_Truth]]. Add their API groups only in work
 explicitly scoped to those areas. Supplier, delivery, kiosk, AI, and coupon API
 groups remain reserved until separately confirmed.
@@ -91,7 +91,7 @@ and reactivation.
 
 This branch does not include Tenant Audit History viewing, Flutter POS or Tenant
 Admin Flutter work, checkout, inventory, returns/refunds, e-commerce, or offline
-sync. These branch exclusions do not remove separately approved TM-EPOS MVP
+sync. These branch exclusions do not remove separately approved OneVerz POS MVP
 scope. No tenant audit-history endpoint or placeholder UI is required for this
 release.
 

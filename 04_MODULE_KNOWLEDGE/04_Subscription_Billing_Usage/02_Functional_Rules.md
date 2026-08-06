@@ -1,7 +1,7 @@
 <!-- title: Subscription Billing, Payments & Usage Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-04 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-06 -->
 
 # Subscription Billing, Payments & Usage Functional Rules
 
@@ -9,7 +9,7 @@
 
 ## Purpose
 
-Defines business and UX rules for `Subscription_Billing_Usage` in the new TM-EPOS MVP scope.
+Defines business and UX rules for `Subscription_Billing_Usage` in the new OneVerz POS MVP scope.
 These rules must be applied before creating backend APIs, Flutter screens,
 responsive online store screens, Angular/admin screens, tests, or database changes.
 

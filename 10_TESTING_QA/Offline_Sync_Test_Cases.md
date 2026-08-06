@@ -1,13 +1,13 @@
 ﻿<!-- title: Offline Sync Test Cases -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-30 -->
 
 # Offline Sync Test Cases
 
 ## Purpose
 
-This file defines test cases for offline operation and sync behavior in TM-EPOS MVP.
+This file defines test cases for offline operation and sync behavior in OneVerz POS MVP.
 
 ## Offline Safety Rule
 

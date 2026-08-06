@@ -1,6 +1,6 @@
 <!-- title: Audit Log Standards -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines audit logging rules for TM-EPOS MVP backend.
+This file defines audit logging rules for OneVerz POS MVP backend.
 
 Audit logs record business-sensitive and security-sensitive actions.
 

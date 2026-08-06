@@ -1,7 +1,7 @@
 <!-- title: Product Option Templates & Variant Configuration -->
 <!-- status: ERD aligned -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-04 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 <!-- source: 12_Product Option Templates & Variant Configuration(2).png -->
 
 # 12. Product Option Templates & Variant Configuration
@@ -212,4 +212,6 @@ FK(updated_by_tenant_user_id) REFERENCES tenant_users(id)
 UNIQUE(tenant_id, product_variant_id, product_option_id)
 Full duplicate variant-combination prevention is enforced via product_variants.option_combination_hash.
 ```
+
+POS popup matching uses these IDs and mappings; display names are never identity. See [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 

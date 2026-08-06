@@ -1,6 +1,6 @@
 <!-- title: Pricing & Tax Management -->
 <!-- status: ERD aligned -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-04 -->
 <!-- source: 14_Pricing & Tax Management(1).png -->
 

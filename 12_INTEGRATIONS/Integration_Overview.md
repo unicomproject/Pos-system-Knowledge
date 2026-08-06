@@ -1,13 +1,13 @@
 <!-- title: Integration Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Integration Overview
 
 ## Purpose
 
-Index the external service and POS peripheral boundaries used by TM-EPOS MVP.
+Index the external service and POS peripheral boundaries used by OneVerz POS MVP.
 
 ## Integration Ownership
 

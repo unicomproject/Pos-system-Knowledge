@@ -1,6 +1,6 @@
 <!-- title: 05. Tenant Subscription, Billing, Payments & Usage -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- source: Updated from uploaded ERD image: 05_Subscription, Billing, Payments & Usage.png -->
 
 # 05. Tenant Subscription, Billing, Payments & Usage

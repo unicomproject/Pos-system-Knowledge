@@ -1,9 +1,15 @@
-﻿<!-- title: Full Feature Status Index -->
+<!-- title: Full Feature Status Index -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-08-05 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-06 -->
 
 # Full Feature Status Index
+
+> 2026-08-02 correction: Payment Method target rearrangement is **partially
+> implemented**. Source composition and automated verification are present, but
+> the earlier runtime screenshot did not match the approved target. A new device
+> launch reached the login screen because no authenticated session was available,
+> so target-route runtime visual sign-off remains pending.
 
 ## Purpose
 
@@ -61,6 +67,7 @@ PR/commit reference is recorded.
 | Cross-platform | Platform Tenant | Flow 4 Live ACS Mailbox/Playwright Completion (Chunk 5E) | Conditional; production NO-GO | 2026-08-05 | [[FLOW_4_LIVE_ACS_MAILBOX_AND_PLAYWRIGHT_COMPLETION_EVIDENCE_2026-08-05]] | Isolated DB + safety marker provisioned then cleaned; mailbox/allow-list/HTTPS still BLOCKED; no live ACS send; Playwright 21 skipped; regressions 1,501/454; `CONDITIONAL_GO_TO_CHUNK_6` |
 | Cross-platform | Platform Tenant | Flow 4 Internal 21-Scenario E2E Preflight (Chunk 6A) | Internal PASS; production NO-GO | 2026-08-05 | [[FLOW_4_INTERNAL_21_SCENARIO_E2E_PREFLIGHT_EVIDENCE_2026-08-05]] | Playwright **21/21** internal PASS (20 canonical + 14b); EmailMode SUPPRESSED; no live ACS; F4-GAP-005 internal closed; F4-GAP-004 external still open; backend 1,501 / Angular 454 |
 | Cross-platform | Platform Tenant | Flow 4 Docker Dependency and Merge Readiness (2026-08-06) | Merge-ready with external release block; production NO-GO | 2026-08-06 | [[FLOW_4_DOCKER_DEPENDENCY_AND_MERGE_READINESS_AUDIT_2026-08-06]] | Docker optional/test-only; docker-off build/unit green; no Testcontainers; compose kept for E2E owner; ACS safe defaults; `MERGE_READY_WITH_EXTERNAL_RELEASE_BLOCK` |
+| Backend | Platform Tenant | Flow 4 Backend main integration | Internal complete; production NO-GO | 2026-08-06 | Backend merge commit on `feat/flow4-create-tenant-runtime` | After `origin/main` merge: backend tests **1,647/1,647**; internal Playwright 21/21 retained; live ACS/mailbox/HTTPS still BLOCKED_EXTERNAL |
 | Cross-platform | Platform Tenant | Flow 4 Second Brain Traceability Audit | Conditionally approved next implementation scope; production NO-GO | 2026-08-05 | [[FLOW_4_REQUIREMENT_TRACEABILITY_MATRIX_2026-08-05]] | 54 relevant documents fully read; 72 atomic requirements; 59/64 P0 verified; Retail migration resolved; fixture/token authority, 20/20 E2E, private proof and live ACS remain P0 |
 | Backend | Platform Tenant | Flow 4 Retail Business-Code Migration | Implemented and verified; Chunk 1 GO | 2026-08-05 | [[FLOW_4_RETAIL_BUSINESS_CODE_MIGRATION_RESOLUTION_EVIDENCE_2026-08-05]] | Guarded original + forward history correction; 9/9 PostgreSQL cases, 1,470/1,470 backend tests, no pending model changes; F4-GAP-006 closed |
 | Cross-platform | Platform Tenant | Flow 4 Secure Test-Host Token and Fixture Contract | Documented and approved; Chunk 3 GO; production NO-GO | 2026-08-05 | [[FLOW_4_SECURE_TEST_HOST_CONTRACT_EVIDENCE_2026-08-05]] | Separate non-HTTP CLI/hybrid approved; 15-threat model, typed scenarios, pipe/fallback secret transport and ownership cleanup defined; runtime builder/tests pending; P0 remains 59/64 |
@@ -77,10 +84,13 @@ PR/commit reference is recorded.
 | Flutter | Till | Open Till Layout | Completed | 2026-07-10 | `Sale_Screen` | Full-screen tablet layout |
 | Flutter | Sales | End Shift + Close Till | Completed | 2026-07-09 | `d04ecf0` | Close till API + logout |
 | Flutter | Sales | Start Sale UI | In Progress | - | `Sale_Screen` | Catalog API wired; no mock fallback; checkout blocked |
+| Backend | CatalogProduct | POS Product Variant Detail / Frequently Bought Together | In Progress | - | Current working tree | Chunk 1 persistence and Chunk 2 backend/API contracts implemented; backend regression 1,491/1,491. Fractional POS quantity, exhaustive integration fixtures, Flutter/E2E and production validation pending. [[Backend/CatalogProduct/Pos_Product_Variant_Detail_Implementation_Status]] |
+| Flutter | Sales | Product Variant Selection Popup | Partial | 2026-08-02 | Current working tree | Target-screen adaptive UI aligned with single-image rule; production validation bypass, rounding/category and currency fallbacks removed. Analysis clean; 16/16 focused tests pass; full suite 703 passed/11 unrelated baseline failures. Authenticated real-backend emulator, configurable recommendation, fractional quantity and physical-device validation remain pending. [[Flutter/Sales/Product_Variant_Popup_Implementation_Status]] |
 | Flutter | Sales | Cashier POS Second Brain vs Code Comparison | Completed | 2026-07-02 | - | Audit note; see delta in same file |
 | Angular | Tenant | Tenant List Page | In Progress | - | - | Wired to platform-admin tenants API |
 | Backend | Tenant / Outlet | Outlet Create | Completed | 2026-06-18 | dashboard_tenant | `POST /api/v1/tenant-admin/outlets` |
 | Flutter | Tenant Admin / Outlet | Outlet Create UI | Completed | 2026-06-18 | tenant-dashboard | Add/Edit outlet screens |
+| Flutter | Tenant Admin / Till | Till Monitoring UI | Partially Implemented | - | - | Implementation tracking added. See [[Flutter/Tenant_Admin/Till_Monitoring_UI_Implementation_Status]] |
 | Flutter | Sales | Discount | Testing | - | `scanner_inte` | API-backed list/validate/apply flow; manager approval is permission-dependent |
 | Flutter | Sales | Customer Management | Testing | - | `scanner_inte` | List/create/update/select/attach implemented; loyalty is separate and incomplete |
 | Flutter | Sales | Loyalty Earn / Redeem | Not Started | - | - | No verified cashier Flutter-to-backend loyalty flow |
@@ -100,6 +110,13 @@ PR/commit reference is recorded.
 | Flutter | Hardware | HID / Camera Barcode Scanner | Testing | - | Current working tree | Chunk 3 code and automation implemented; TB-00D/camera/POS80 physical matrix pending |
 | Flutter | Hardware | Hardware Testing Workflow | Testing | - | Current working tree | Authoritative versioned printer config and backend test-log lifecycle wired; scanner screen and physical matrix pending |
 | Flutter | Sales | Offline Cash Sale / Outbox | Not Started | - | - | Included MVP scope; no verified end-to-end cashier implementation |
+| Backend | CatalogProduct | POS Popular Products | Completed | 2026-07-31 | - | Manual Popular product list curation and default segment |
+| Backend | CatalogProduct | POS Frequently Sold | Completed | 2026-07-31 | Current working tree | Dynamic sales aggregation lookback calculation |
+| Backend | CatalogProduct | POS Offers Product List | Completed | 2026-07-31 | Current working tree | Dynamic targeted discount and special price retrieval |
+| Flutter | Sales | POS Popular Products | Completed | 2026-07-31 | - | Popular segment toggle and admin reorder UI |
+| Flutter | Sales | POS Frequently Sold | Completed | 2026-07-31 | Current working tree | Frequently Sold segment grid |
+| Flutter | Sales | POS Offers Product List | Completed | 2026-07-31 | Current working tree | Offers segment grid and product card badges |
+
 
 | Backend | ECommerce / CustomerAuth | Storefront Customer Authentication | Testing | - | - | Implementation tracking added; latest regression and commit evidence pending. See [[Backend/ECommerce/Customer_Auth_Implementation_Status]] |
 | Backend | ECommerce / Storefront | Public Storefront Browse APIs | Testing | - | - | Implementation tracking added; search/category-by-slug focused evidence pending. See [[Backend/ECommerce/Storefront_Browse_Implementation_Status]] |

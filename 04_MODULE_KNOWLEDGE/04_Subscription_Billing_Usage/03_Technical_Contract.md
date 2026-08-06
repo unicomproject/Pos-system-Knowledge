@@ -1,7 +1,7 @@
 <!-- title: Subscription Billing, Payments & Usage Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-04 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-06 -->
 
 # Subscription Billing, Payments & Usage Technical Contract
 
@@ -18,7 +18,7 @@
 ## Purpose
 
 Defines the implementation contract for `Subscription_Billing_Usage`. This contract is based on
-new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
+new OneVerz POS MVP scope images and the uploaded Unified Commerce database design.
 
 ## Target Architecture API Contract
 
@@ -107,7 +107,7 @@ Test coverage must include:
 5. Build frontend route/screen/component/provider/service.
 6. Add loading, empty, error, denied, feature-disabled, offline, and conflict states.
 7. Add unit/integration/API/widget tests.
-8. Review against new TM-EPOS MVP module boundaries.
+8. Review against new OneVerz POS MVP module boundaries.
 
 ## Out Of Scope
 

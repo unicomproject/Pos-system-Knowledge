@@ -1,13 +1,13 @@
 <!-- title: Tenant Admin UI Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP / OneVerz POS -->
+<!-- system: OneVerz POS MVP POS -->
 <!-- last_updated: 2026-07-29 -->
 
 # Tenant Admin UI Rules
 
 ## Purpose
 
-Tenant Admin UI rules for OneVerz POS / TM-EPOS MVP.
+Tenant Admin UI rules for OneVerz POS MVP.
 
 Tenant Admin works inside the same Flutter POS app, but uses a separate operational admin layout.
 
@@ -61,6 +61,17 @@ Older Release 1 menu lists in this note (Discounts, Loyalty, Reports as primary 
 - Shared fixed black header on all Tenant Admin pages
 - Shared fixed black footer: Home, New Sale, Orders, Customers, Settings
 - On Settings screens: sidebar Settings + footer Settings both active
+
+## Till Monitoring UI Layout
+
+The approved Till Monitoring screen operates within the TenantAdminSharedShell.
+- **Header**: Standard black header. Do not hardcode dynamic values (like outlet name, notification count).
+- **Sidebar**: "Tills" is the active item.
+- **Footer**: Active item must be route-aware, do not hardcode "Settings" as active.
+- **Desktop/Tablet Layout**: Uses a Master-Detail pattern. The Till list on the left, and a selected Till detail panel on the right displaying hardware readiness and alerts.
+- **Mobile Layout**: Stacks vertically. Shows the Till list first. Selecting a Till navigates to a separate detail route/screen. Do not force a squished two-column layout.
+- **Summary Cards**: Show Total, Online, and Offline percentages/counts.
+- **Search & Filters**: Support filtering by status (Online, Offline, Needs Attention, Inactive).
 
 ## Permission Rules
 

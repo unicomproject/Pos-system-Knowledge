@@ -1,13 +1,13 @@
 ﻿<!-- title: Testing Strategy -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-30 -->
 
 # Testing Strategy
 
 ## Purpose
 
-This file defines the testing approach for TM-EPOS MVP across backend APIs, application services, repositories, database behavior, POS workflows, offline sync, permissions, and tenant isolation.
+This file defines the testing approach for OneVerz POS MVP across backend APIs, application services, repositories, database behavior, POS workflows, offline sync, permissions, and tenant isolation.
 
 ## Testing Principles
 

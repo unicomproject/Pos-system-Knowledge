@@ -1,6 +1,6 @@
 <!-- title: Platform Admin Permission Catalogue Alignment -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-20 -->
 
 # Platform Admin Permission Catalogue Alignment

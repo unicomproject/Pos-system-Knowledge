@@ -1,13 +1,13 @@
 <!-- title: Reporting & Analytics Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-06-29 -->
 
 # Reporting & Analytics Functional Rules
 
 ## Purpose
 
-Defines business and UX rules for `Reporting_Analytics` in the new TM-EPOS MVP scope.
+Defines business and UX rules for `Reporting_Analytics` in the new OneVerz POS MVP scope.
 These rules must be applied before creating backend APIs, Flutter screens,
 responsive online store screens, Angular/admin screens, tests, or database changes.
 

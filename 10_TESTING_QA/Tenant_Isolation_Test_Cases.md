@@ -1,13 +1,13 @@
-﻿<!-- title: Tenant Isolation Test Cases -->
+<!-- title: Tenant Isolation Test Cases -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-07-31 -->
 
 # Tenant Isolation Test Cases
 
 ## Purpose
 
-This file defines tenant isolation tests for TM-EPOS MVP backend features.
+This file defines tenant isolation tests for OneVerz POS MVP backend features.
 
 ## Tenant Isolation Rule
 
@@ -48,3 +48,6 @@ Platform-owned reference data may be global only when documented as platform-own
 - [[../05_BACKEND_ARCHITECTURE/Multi_Tenant_Handling]]
 - [[../06_DATABASE_KNOWLEDGE/Tenant_Id_Rules]]
 - [[Testing_Strategy]]
+- [[Test_Case/21_POS_Operations/POS_Popular_Product_Discovery_Test_Cases]]
+- [[Test_Case/21_POS_Operations/POS_Frequently_Sold_Product_Discovery_Test_Cases]]
+- [[Test_Case/21_POS_Operations/POS_Offers_Product_Discovery_Test_Cases]]

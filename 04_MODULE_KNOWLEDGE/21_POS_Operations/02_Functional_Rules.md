@@ -1,13 +1,13 @@
 <!-- title: POS Operations Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 # POS Operations Functional Rules
 
 ## Purpose
 
-Defines business and UX rules for `POS_Operations` in the new TM-EPOS MVP scope.
+Defines business and UX rules for `POS_Operations` in the new OneVerz POS MVP scope.
 These rules must be applied before creating backend APIs, Flutter screens,
 responsive online store screens, Angular/admin screens, tests, or database changes.
 
@@ -32,6 +32,11 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Cash movement schema is not a successful cashier movement without a mutation
   API and persistence result.
 - Customer display is future unless explicitly enabled.
+- **Product Discovery Segments**: Cashier New Sale supports filtering products by segments: Popular, Frequently Sold, and Offers. Selecting these segments updates only the catalog grid and preserves cart, customer, and totals.
+- **Popular Products Configuration**: Uses a tenant-scoped reserved collection code `POS_POPULAR` and type `POS_QUICK_LIST` for manual product assignments and sorting order.
+- **Frequently Sold Calculation**: Aggregates net sold quantities ($max(quantity - cancelled - returned, 0)$) for completed sales at the current outlet over a rolling 30-day window.
+- **Offers & Special Pricing**: Dynamically lists active targeted discount policies and price lists. The lowest effective unit price is selected when multiple offers apply.
+- **Variant Popup**: When direct-add cannot resolve one eligible variant, use the one-image Product Variant Selection Popup. It supports dynamic ID-based options, quantity, optional line note and manual Frequently Bought Together. Frequently Bought Together is not Frequently Sold. Full rules: [[04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 
 ## User Rules
 
@@ -88,3 +93,7 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/03_Technical_Contract]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/04_Popular_Product_Discovery_Feature]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/05_Frequently_Sold_Product_Discovery_Feature]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/06_Offers_Product_Discovery_Feature]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]]

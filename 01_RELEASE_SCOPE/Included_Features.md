@@ -1,27 +1,27 @@
 <!-- title: Included Features -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-27 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 
 
 # Included Features
 
 ## Purpose
 
-This file lists features that may be implemented for the TM-EPOS MVP.
+This file lists features that may be implemented for the OneVerz POS MVP.
 
 If a feature is not listed here, check [[Excluded_Features]] before building it.
 
 ## Inclusion Rule
 
-A feature is included only when it supports the updated TM-EPOS MVP scope.
+A feature is included only when it supports the updated OneVerz POS MVP scope.
 Do not add modules, APIs, screens, tables, or flows only because they are common
 in other EPOS or e-commerce products.
 
 ## Application Surfaces
 
 | Surface | Included | Notes |
-|---|---:|---|
+|---|---|---|
 | Mobile POS | Yes | Phone/tablet selling flow |
 | Desktop EPOS | Yes | Laptop/desktop business operation |
 | Online Store | Yes | Customer product browsing and ordering |
@@ -65,7 +65,7 @@ and audit visibility.
 
 Included: business setup, outlet/till management, device and hardware profile
 setup, user management, role/permission management, product and variant
-management, category/attribute/image/barcode management, inventory visibility,
+management, category/attribute/image/barcode management, Popular Products list curation and manual reordering (under Collection management), inventory visibility,
 stock in, stock adjustment, alerts, movement history, and reports.
 
 ## POS Operations
@@ -76,7 +76,9 @@ Included:
 - Device activation and trusted device validation.
 - Outlet and till selection.
 - Till open, current till session, cash count, and cash movements.
+- Product discovery segment filtering (Popular by default, Frequently Sold, Offers).
 - Product lookup, barcode scan, basket/cart, quantity changes, and item removal.
+- Product Variant Selection Popup with one displayed image, dynamic options, optional product-line note and manually configured Frequently Bought Together recommendations.
 - Price, tax, discount, and receipt calculation.
 - Cash payment.
 - Card/QR payment where online/backend/provider validation is available.
@@ -84,6 +86,8 @@ Included:
 - Park/hold and recall sale.
 - Return, refund, exchange, and related audit.
 - Close till and reconciliation with backend validation.
+
+Frequently Bought Together is separate from the Frequently Sold discovery segment. See [[../04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 
 ## Online Store
 

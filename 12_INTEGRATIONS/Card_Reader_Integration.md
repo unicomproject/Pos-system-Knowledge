@@ -1,6 +1,6 @@
 <!-- title: Card Reader Integration -->
 <!-- status: Draft -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Card Reader Integration
@@ -137,3 +137,12 @@ Status:
 - [[../03_USER_JOURNEYS/Cashier/07_Payment_Flow]]
 - [[../10_TESTING_QA/POS_Hardware_Production_Acceptance_Matrix]]
 - [[../13_DECISIONS_AND_CHANGES/Open_Questions]]
+
+
+## Tenant Admin Monitoring Boundary (2026-08-01)
+
+Card-reader status on Till monitoring is provider-derived (PAIRED/ONLINE/OFFLINE/UNPAIRED/UNKNOWN/NEEDS_ATTENTION). Never store PAN/CVV. Tenant Admin only displays Backend-safe status.
+
+Status: **NOT IMPLEMENTED** / **PHYSICAL VERIFICATION PENDING**.
+
+See [[POS_Hardware_Integration]].

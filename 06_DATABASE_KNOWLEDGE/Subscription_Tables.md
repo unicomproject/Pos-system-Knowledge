@@ -1,6 +1,6 @@
 <!-- title: Subscription Tables -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 <!-- source: Unified_Commerce_Databse_Design.docx -->
 

@@ -1,13 +1,13 @@
 <!-- title: Product Option Templates & Variant Configuration Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
+<!-- last_updated: 2026-08-01 -->
 
 # Product Option Templates & Variant Configuration Functional Rules
 
 ## Purpose
 
-Defines business and UX rules for `Product_Option_Variant_Configuration` in the new TM-EPOS MVP scope.
+Defines business and UX rules for `Product_Option_Variant_Configuration` in the new OneVerz POS MVP scope.
 These rules must be applied before creating backend APIs, Flutter screens,
 responsive online store screens, Angular/admin screens, tests, or database changes.
 
@@ -18,6 +18,7 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Business type defaults can speed setup for stalls, beverage counters, and merchandise shops.
 - Option values shown online must match sellable variant configuration.
 - Do not use option templates for combo choice groups; combos have their own module.
+- POS variant resolution uses option and option-value IDs, completes required groups, disables values that cannot yield an eligible variant, clears incompatible choices, and requires exactly one match. See [[../21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 
 ## User Rules
 

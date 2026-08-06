@@ -1,6 +1,6 @@
 <!-- title: Flutter Testing -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines Flutter testing rules for TM-EPOS MVP.
+This file defines Flutter testing rules for OneVerz POS MVP.
 
 Testing must cover POS speed, offline behavior, sync safety, permissions, cache,
 hardware state, and staff pickup workflows.

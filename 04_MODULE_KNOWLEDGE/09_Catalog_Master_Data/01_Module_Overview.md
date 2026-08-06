@@ -1,6 +1,6 @@
 <!-- title: Catalog Master Data Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-07-03 -->
 
 # Catalog Master Data Module Overview
@@ -9,7 +9,7 @@
 
 Manage the common catalog setup used before product creation: departments, categories, brands, collections, units of measure, business type mapping, and return policies.
 
-This module is part of the new TM-EPOS MVP scope: mobile and desktop EPOS,
+This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device
 support, and low-cost hardware usage for events, stalls, food and beverage,
 merchandising, attractions, and temporary retail locations.

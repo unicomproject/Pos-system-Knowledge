@@ -1,6 +1,6 @@
 <!-- title: Platform Administration Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-07-29 -->
 <!-- note: Platform Dashboard contract added; journey SoT is 02_Platform_Dashboard_Flow -->
 
@@ -9,7 +9,7 @@
 ## Purpose
 
 Defines the implementation contract for `Platform_Administration`. This contract is based on
-new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
+new OneVerz POS MVP scope images and the uploaded Unified Commerce database design.
 
 ## Email and tenant lifecycle (approved 2026-07-27)
 
@@ -419,7 +419,7 @@ Tenant lifecycle alignment minimum future tests:
 5. Build frontend route/screen/component/provider/service.
 6. Add loading, empty, error, denied, feature-disabled, offline, and conflict states.
 7. Add unit/integration/API/widget tests.
-8. Review against new TM-EPOS MVP module boundaries.
+8. Review against new OneVerz POS MVP module boundaries.
 
 ## Out Of Scope
 

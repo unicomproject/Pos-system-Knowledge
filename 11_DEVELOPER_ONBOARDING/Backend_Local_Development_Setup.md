@@ -1,6 +1,6 @@
 <!-- title: Backend Local Development Setup -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP / Unified Commerce -->
+<!-- system: OneVerz POS MVP / Unified Commerce -->
 <!-- last_updated: 2026-07-01 -->
 
 
@@ -9,7 +9,7 @@
 ## Purpose
 
 This guide explains how to clone, build, migrate, and run the **Unified Commerce**
-backend (`E_POS.*`) used by TM-EPOS MVP development.
+backend (`E_POS.*`) used by OneVerz POS MVP development.
 
 It replaces the archived **SCS / Nytroz-POS-Backend** setup
 (`SCS.Api`, port **5052**). See

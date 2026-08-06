@@ -1,6 +1,6 @@
 <!-- title: Platform Admin User Flow Analysis -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-27 -->
 
 # Platform Admin User Flow Analysis
@@ -11,7 +11,7 @@ Analyzed `SYSTEM_USER_JOURNEY.pptx`, slides 1 to 9.
 
 ## Deck Finding
 
-The deck labels the actor as `Super Admin`, but the Second Brain should use `Platform Admin` for TM-EPOS MVP. The updated Markdown files use `Platform Admin` consistently.
+The deck labels the actor as `Super Admin`, but the Second Brain should use `Platform Admin` for OneVerz POS MVP. The updated Markdown files use `Platform Admin` consistently.
 
 ## Platform Admin Flows Created
 
@@ -37,7 +37,7 @@ The deck labels the actor as `Super Admin`, but the Second Brain should use `Pla
 
 ## Scope Alignment
 
-- Online store/e-commerce status from the deck is treated as active TM-EPOS MVP online store scope.
+- Online store/e-commerce status from the deck is treated as active OneVerz POS MVP online store scope.
 - Collection point setup is aligned to Click & Collect.
 - Platform user management is kept separate from tenant user management.
 - Tenant user login/invitation is kept separate from customer login.
@@ -51,4 +51,4 @@ Replace or add these files under:
 03_USER_JOURNEYS/Platform_Admin/
 ```
 
-The older Platform Admin journey files can be retained only if they do not conflict with these updated TM-EPOS MVP flows.
+The older Platform Admin journey files can be retained only if they do not conflict with these updated OneVerz POS MVP flows.

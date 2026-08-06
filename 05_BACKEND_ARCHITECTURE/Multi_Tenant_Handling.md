@@ -1,6 +1,6 @@
 <!-- title: Multi Tenant Handling -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines multi-tenant handling rules for TM-EPOS MVP backend.
+This file defines multi-tenant handling rules for OneVerz POS MVP backend.
 
 Tenant isolation must protect platform admin data, business admin data, POS data,
 online store data, orders, payments, fulfilment, notifications, integrations, and

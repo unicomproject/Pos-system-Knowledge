@@ -5,6 +5,11 @@
 
 # POS App UI Rules
 
+> Payment Method screen decision (2026-08-02): the active release surface shows
+> Cash, Card, QR Pay and Split Payment only. Its reusable equal-card component
+> derives 1/2/3/4/5-card layouts from count; the four-method release is 2 x 2.
+> Pay Later is not a fifth method.
+
 ## Purpose
 
 This file defines the Release 1 POS app UI rules for SCS-TIX.

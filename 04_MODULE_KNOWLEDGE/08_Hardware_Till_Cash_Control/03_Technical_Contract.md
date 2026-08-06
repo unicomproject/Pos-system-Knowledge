@@ -1,6 +1,6 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Hardware Operations, Till Session & Cash Control Technical Contract
@@ -8,7 +8,7 @@
 ## Purpose
 
 Defines the implementation contract for `Hardware_Till_Cash_Control`. This contract is based on
-new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
+new OneVerz POS MVP scope images and the uploaded Unified Commerce database design.
 
 ## API Contract
 
@@ -41,6 +41,17 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 | `till_cash_movements` | Defined in schema source; live application and Cashier API use not verified |
 | `cash_reconciliations` | Used by this module |
 | `cash_count_denominations` | Used by this module |
+
+## Hardware Readiness UI Mapping
+
+| UI Field | Source / Derivation |
+|---|---|
+| Hardware Type | `hardware_devices.type` (e.g. Scanner, Printer, Cash Drawer) |
+| Device Name | `hardware_devices.name` |
+| Connection Status | Derived from heartbeat logic, `pos_devices.last_seen_at`, and `hardware_test_logs.status`. |
+| Last Seen | `pos_devices.last_seen_at` of the POS device hosting the hardware. |
+| Warning / Error | Derived from missing assignments, offline host device, or failed `hardware_test_logs`. |
+| Latest Test Result | Latest `hardware_test_logs` entry for the device. |
 
 Entity mappings must preserve exact table names, column names, tenant foreign keys,
 unique constraints, CHECK constraints, hash-only token rules, and append-only
@@ -105,7 +116,7 @@ Test coverage must include:
 5. Build frontend route/screen/component/provider/service.
 6. Add loading, empty, error, denied, feature-disabled, offline, and conflict states.
 7. Add unit/integration/API/widget tests.
-8. Review against new TM-EPOS MVP module boundaries.
+8. Review against new OneVerz POS MVP module boundaries.
 
 ## Out Of Scope
 
@@ -129,3 +140,43 @@ trusted-device, outlet/till and active-session audit rules apply.
 
 Scanner tests reuse `hardware_test_logs`; `result_payload_json` stores only
 privacy-safe typed evidence and `(tenant_id, request_id)` remains idempotent.
+
+## Tenant Admin Till Hardware Technical Contract Addendum (2026-08-01)
+
+### API groups (actual Tenant Admin Till routes)
+
+| Method | Route | Status |
+|---|---|---|
+| GET | `/api/v1/tenant-admin/tills` | List with monitoring fields (`currentCashierName`, `lastDeviceSeenAt`, `operationalStatus`, `displayStatus`, `needsAttention`, …) — **PARTIALLY COMPLETED** |
+| GET | `/api/v1/tenant-admin/tills/summary` | Summary counts — **COMPLETED** (verify Offline mapping vs product intent; code currently maps offline count to inactive in repository — known risk) |
+| GET | `/api/v1/tenant-admin/tills/{id}` | Detail including flat legacy hardware name fields — **PARTIALLY COMPLETED** |
+| GET | `/api/v1/tenant-admin/tills/{id}/hardware-readiness` | Normalized connections for Till — **PARTIALLY COMPLETED** (direct Till assignments only; no alertCount) |
+| POST | `/api/v1/devices/heartbeat` | POS device heartbeat — **COMPLETED** |
+| POST | hardware peripheral heartbeat | **NOT IMPLEMENTED** |
+| GET/POST | `/api/v1/tenant-admin/hardware-devices` | **NOT IMPLEMENTED** (approved capability when built) |
+| POST | `/api/v1/tenant-admin/tills/{tillId}/hardware-assignments` | **NOT IMPLEMENTED** (approved capability) |
+| POST | `/api/v1/tenant-admin/hardware-assignments/{assignmentId}/release` | **NOT IMPLEMENTED** (approved capability) |
+
+Do not document a new endpoint when an existing route already performs the same action. Prefer extending `GET .../tills/{id}` **or** keeping `.../hardware-readiness` as the related read without a second incompatible JSON contract.
+
+### Hardware connection read model (actual DTO fields)
+
+`TenantAdminHardwareConnectionResponse`:
+
+- `hardwareDeviceId`, `hardwareDeviceName`, `hardwareDeviceType`, `hardwareDeviceCode`
+- `operationalStatus` (currently hardware lifecycle/status string)
+- `connectionStatus`, `lastTestStatus`, `lastTestAt`, `lastSeenAt`
+
+Approved future additive fields where needed: assignment ID, connection type, manufacturer, model, health status, warning code/message, alertCount on parent response.
+
+### Database tables used
+
+Unchanged module tables: `hardware_devices`, `hardware_device_assignments`, `hardware_test_logs`, `till_sessions`, plus foundation `tills`, `pos_devices`, `till_device_assignments`.
+
+No MVP requirement for dedicated `hardware_alerts` table.
+
+### Frontend monitoring rule
+
+Tenant Admin Flutter must bind real readiness data; empty list is valid; never mock connections from the reference image.
+
+Canonical architecture: [[../../12_INTEGRATIONS/POS_Hardware_Integration]].

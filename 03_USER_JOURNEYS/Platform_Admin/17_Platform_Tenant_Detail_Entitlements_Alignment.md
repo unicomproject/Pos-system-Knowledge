@@ -1,6 +1,6 @@
 <!-- title: Platform Tenant Detail Entitlements Alignment -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-03 -->
 
 # Platform Tenant Detail Entitlements Alignment

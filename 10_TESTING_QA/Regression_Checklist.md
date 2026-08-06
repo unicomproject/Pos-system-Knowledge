@@ -1,7 +1,7 @@
-﻿<!-- title: Regression Checklist -->
+<!-- title: Regression Checklist -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-07-31 -->
 
 # Regression Checklist
 
@@ -64,3 +64,6 @@ A backend change is regression-safe only when:
 - [[API_Testing_Standards]]
 - [[Permission_Test_Cases]]
 - [[Tenant_Isolation_Test_Cases]]
+- [[Test_Case/21_POS_Operations/POS_Popular_Product_Discovery_Test_Cases]]
+- [[Test_Case/21_POS_Operations/POS_Frequently_Sold_Product_Discovery_Test_Cases]]
+- [[Test_Case/21_POS_Operations/POS_Offers_Product_Discovery_Test_Cases]]

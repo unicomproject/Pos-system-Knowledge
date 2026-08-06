@@ -1,6 +1,6 @@
 <!-- title: Till CRUD Implementation Status -->
 <!-- status: Completed -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-02 -->
 
 # Till CRUD Implementation Status
@@ -50,3 +50,15 @@ dotnet test E_POS.sln -m:1 --no-restore
 
 
 
+
+
+## Related Till Monitoring / Hardware (2026-08-01)
+
+This note remains the SoT for **Till CRUD** completion (2026-07-02).
+
+Tenant Admin Till **monitoring**, **hardware-readiness**, inventory, assignment, peripheral heartbeat, and derived alerts are tracked separately and are **not** claimed complete by this CRUD status:
+
+- [[../HardwareCash/Tenant_Admin_Hardware_Read_Assignment_Status_Implementation]]
+- [[../../../12_INTEGRATIONS/POS_Hardware_Integration]]
+
+Tenant Admin monitoring routes live under `/api/v1/tenant-admin/tills` (distinct from `/api/v1/tills` CRUD).

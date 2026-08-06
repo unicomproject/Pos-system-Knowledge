@@ -1,6 +1,6 @@
 <!-- title: Return, Inspection & Exchange Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-23 -->
 
 # Return, Inspection & Exchange Module Overview
@@ -9,7 +9,7 @@
 
 Manage return reasons, sales returns, return lines, inspections, return events, sales exchanges, exchange lines, and exchange events.
 
-This module is part of the new TM-EPOS MVP scope: mobile and desktop EPOS,
+This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device
 support, and low-cost hardware usage for events, stalls, food and beverage,
 merchandising, attractions, and temporary retail locations.

@@ -1,15 +1,15 @@
 <!-- title: Platform Administration Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-06-29 -->
 
 # Platform Administration Module Overview
 
 ## Purpose
 
-Manage platform users, platform roles, platform permissions, platform sessions, platform settings, and platform audit needed to operate the TM-EPOS SaaS business.
+Manage platform users, platform roles, platform permissions, platform sessions, platform settings, and platform audit needed to operate the OneVerz POS SaaS business.
 
-This module is part of the new TM-EPOS MVP scope: mobile and desktop EPOS,
+This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device
 support, and low-cost hardware usage for events, stalls, food and beverage,
 merchandising, attractions, and temporary retail locations.

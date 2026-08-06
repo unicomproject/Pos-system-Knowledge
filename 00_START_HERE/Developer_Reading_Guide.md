@@ -1,6 +1,6 @@
 <!-- title: Developer Reading Guide -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This guide tells each developer what to read before starting TM-EPOS MVP work.
+This guide tells each developer what to read before starting OneVerz POS MVP work.
 It is designed for backend, Flutter, desktop/mobile EPOS, online store, admin,
 UI/UX, QA, and AI-assisted implementation.
 Do not start coding from a journey file alone.

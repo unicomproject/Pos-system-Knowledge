@@ -1,6 +1,6 @@
 <!-- title: 24. Payment & Refund -->
 <!-- status: ERD aligned -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-05 -->
 <!-- source: 24_Payment & Refund ERD(3).png -->
 

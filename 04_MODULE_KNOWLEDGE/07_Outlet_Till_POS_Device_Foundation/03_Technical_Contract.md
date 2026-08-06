@@ -1,6 +1,6 @@
 <!-- title: Outlet, Till & POS Device Foundation Technical Contract -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # Outlet, Till & POS Device Foundation Technical Contract
@@ -8,7 +8,7 @@
 ## Purpose
 
 Defines the implementation contract for `Outlet_Till_POS_Device_Foundation`. This contract is based on
-new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
+new OneVerz POS MVP scope images and the uploaded Unified Commerce database design.
 
 ## API Contract
 
@@ -34,13 +34,64 @@ new TM-EPOS MVP scope images and the uploaded Unified Commerce database design.
 
 | Table | Contract |
 |---|---|
-| `outlets` | Used by this module |
-| `outlet_addresses` | Used by this module |
-| `outlet_business_hours` | Used by this module |
-| `tills` | Used by this module |
-| `pos_devices` | Used by this module |
-| `till_device_assignments` | Used by this module |
-| `hardware_profiles` | Used by this module |
+| `outlets` | Main entity. |
+| `outlet_addresses` | Physical address. |
+| `outlet_business_hours` | Operating hours. |
+| `tills` | POS sessions start here. |
+| `pos_devices` | Device registration. |
+| `till_device_assignments` | Linking devices to tills. |
+| `hardware_profiles` | Peripherals config. |
+
+## Outlet Field Mapping & Gap Analysis
+
+| UI Field | Domain Property | Database Column | API Field | Flutter Model Field | Current Status | Required Change |
+|---|---|---|---|---|---|---|
+| Outlet Code | `OutletCode` | `outlet_code` | `outletCode` | `code` | Implemented | None |
+| Outlet Name | `OutletName` | `outlet_name` | `outletName` | `name` | Implemented | None |
+| Type | `OutletType` | `outlet_type` | `outletType` | `outletType` | Implemented | None |
+| Manager | **N/A** | **N/A** | **N/A** | **N/A** | **Missing** | Future Scope. Map via `OutletUserRole`. Pending product decision. |
+| City | `OutletAddress.City` | `city` | `address.city` | `city` | Implemented | None (Derived from address in UI model) |
+| Tills | (Collection) | (Foreign Key) | `tillCount` | `tillCount` | Implemented | None |
+| Status | `Status` | `status` | `status` | `status` | Implemented | None (Active/Inactive) |
+| Attention | **N/A** | **N/A** | **N/A** | **N/A** | **Missing** | UI derived state. Requires backend aggregation logic. |
+
+## Confirmed Outlet API Contracts
+
+### `OutletsController` (Tenant Admin / Base CRUD)
+- `GET /api/v1/outlets/create-options`: Returns lookup data for dropdowns (types, timezones).
+- `GET /api/v1/outlets`: Paginated list of outlets. Supports `search`, `pageNumber`, `pageSize`. Returns `OutletListResponse`.
+- `POST /api/v1/outlets`: Creates new outlet. Expects `OutletCreateRequest`.
+- `GET /api/v1/outlets/{id}`: Gets single outlet detail.
+- `PUT /api/v1/outlets/{id}`: Updates outlet. Expects `OutletUpdateRequest`.
+- `DELETE /api/v1/outlets/{id}`: Soft deletes outlet.
+
+### `TenantAdminOutletsController` (Tenant Admin Specific)
+- `GET /api/v1/tenant-admin/outlets/options`: Tenant-specific outlet options.
+- `GET /api/v1/tenant-admin/outlets/{id}`: Specific tenant admin detail view.
+- `GET /api/v1/tenant-admin/outlets/{id}/revenue-summary`: Revenue KPI data.
+- `GET /api/v1/tenant-admin/outlets/{id}/users`: Assigned users list.
+- `GET /api/v1/tenant-admin/outlets/{id}/tills`: Assigned tills list.
+
+### Known API Gaps
+- **Outlet Summary Dashboard**: Missing dedicated `/api/v1/tenant-admin/outlets/overview` (or similar) returning total, active, attention, inactive.
+- **Top Performing Outlet**: No global endpoint aggregating the top performing outlet over a period. Currently pending.
+- **Till Monitoring Data**:
+  - Current Till list (`GET /api/v1/tenant-admin/tills`) does not return `currentCashierName`, `currentSessionId`, `currentSessionStatus`, `lastDeviceSeenAt`, `operationalStatus`, `needsAttention`, `attentionReasonCount`.
+  - Current search does not support searching by cashier name.
+  - Current Till detail response (`GET /api/v1/tenant-admin/tills/{id}`) lacks normalized hardware connection rows (`hardwareConnections[]`), `alertCount`, `attentionReasons[]`, `currentCashier`, and `currentSession`.
+  - Current implementation relies on flat hardware name fields (`deviceName`, `printerName`, etc.) which do not prove connection readiness.
+
+### Proposed Till Monitoring API Contracts
+
+**Proposed Planned Till List Item (To support Desktop Master-Detail panel):**
+Requires extending the existing list item response to include:
+- `currentCashierId`, `currentCashierName`, `currentSessionId`, `currentSessionStatus`, `lastDeviceSeenAt`, `operationalStatus`, `needsAttention`, `attentionReasonCount`.
+
+**Proposed Planned Till Detail Item (To support Selected Till panel):**
+Requires extending the existing detail response to include:
+- `currentCashier`, `currentSession`, `assignedPosDevice`, `hardwareConnections[]` (normalized array of hardware statuses), `alertCount`, `attentionReasons[]`.
+
+**Note:** Any hardware alert or hardware readiness field not currently implemented is marked as *Proposed / Not Implemented*. Do not treat flat fields (e.g. `printerName`) as proof of connection.
 
 Hardware assignment records must identify tenant, outlet, POS device, hardware
 device/type, active range, configuration version and change actor/time. Existing
@@ -100,7 +151,7 @@ Test coverage must include:
 5. Build frontend route/screen/component/provider/service.
 6. Add loading, empty, error, denied, feature-disabled, offline, and conflict states.
 7. Add unit/integration/API/widget tests.
-8. Review against new TM-EPOS MVP module boundaries.
+8. Review against new OneVerz POS MVP module boundaries.
 
 ## Out Of Scope
 
@@ -113,3 +164,34 @@ Test coverage must include:
 
 - [[04_MODULE_KNOWLEDGE/07_Outlet_Till_POS_Device_Foundation/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/07_Outlet_Till_POS_Device_Foundation/02_Functional_Rules]]
+
+
+## Till Monitoring Contract Correction (2026-08-01)
+
+### Supersedes outdated "Known API Gaps" for monitoring fields
+
+The following fields **are present** on `TenantAdminTillListItemResponse` / detail in Unified-Commerce (verify in `TenantAdminTillDtos.cs`):
+
+- `currentCashierName`
+- `lastDeviceSeenAt`
+- `operationalStatus`
+- `displayStatus`
+- `needsAttention`
+- `hasActiveAssignment`
+
+Still missing / incomplete relative to approved panel:
+
+- Normalized `hardwareConnections[]` on detail (available via related `GET .../hardware-readiness` instead)
+- `alertCount` / `attentionReasons[]` on detail/readiness responses
+- POS-device-merged hardware assignments
+- Hardware inventory and assignment mutation APIs
+
+Flat `printerName` / `scannerName` / `cashDrawerName` / `cardReaderName` remain legacy display fields and **do not** prove connection readiness.
+
+### Final desktop UI
+
+Approved split-view — see [[../../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Till_Monitoring_UI]]. List-only desktop is not the final design.
+
+### Entitlement
+
+Till management feature code: `till_management`.

@@ -1,6 +1,6 @@
 <!-- title: Platform Admin Login Flow -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-30 -->
 
 # Platform Admin Login Flow
@@ -15,7 +15,7 @@ Platform Admin
 
 ## Source
 
-Derived from `Slide 2 - Super Admin Login Flow` in `SYSTEM_USER_JOURNEY.pptx` and aligned to TM-EPOS MVP Second Brain scope.
+Derived from `Slide 2 - Super Admin Login Flow` in `SYSTEM_USER_JOURNEY.pptx` and aligned to OneVerz POS MVP Second Brain scope.
 
 ## Trigger
 

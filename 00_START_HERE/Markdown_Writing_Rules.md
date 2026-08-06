@@ -1,6 +1,6 @@
 <!-- title: Markdown Writing Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines how TM-EPOS Second Brain Markdown files must be written.
+This file defines how OneVerz POS Second Brain Markdown files must be written.
 The goal is to make every file readable by developers, reviewers, and AI
 assistants.
 Do not use generic SaaS, generic POS, or unsupported commerce documentation when
@@ -33,7 +33,7 @@ Do not place a heading before metadata.
 ```html
 <!-- title: File Title -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 ```
 
@@ -50,7 +50,7 @@ Do not place a heading before metadata.
 
 ## Content Source Rules
 
-Use only uploaded TM-EPOS/SCS-TIX documents, scope images, journeys, UI files,
+Use only uploaded OneVerz POS/SCS-TIX documents, scope images, journeys, UI files,
 backend architecture, frontend architecture, database design, and confirmed
 project decisions.
 

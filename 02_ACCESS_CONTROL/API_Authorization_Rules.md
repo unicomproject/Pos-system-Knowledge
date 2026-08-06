@@ -1,6 +1,6 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # API Authorization Rules

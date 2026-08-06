@@ -1,6 +1,6 @@
 <!-- title: Flutter Hardware Payment Receipt -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 # Flutter Hardware Payment Receipt
 
@@ -8,7 +8,7 @@
 
 This file defines Flutter hardware, payment, and receipt rules.
 
-TM-EPOS supports low-cost POS devices and peripherals where supported by the app
+OneVerz POS supports low-cost POS devices and peripherals where supported by the app
 platform and hardware integration.
 
 ## Hardware Scope

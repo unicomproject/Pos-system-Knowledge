@@ -1,13 +1,13 @@
 ﻿<!-- title: Pricing & Tax Management Functional Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-07-04 -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
+<!-- last_updated: 2026-08-01 -->
 
 # Pricing & Tax Management Functional Rules
 
 ## Purpose
 
-Defines business and UX rules for `Pricing_Tax_Management` in the new TM-EPOS MVP scope.
+Defines business and UX rules for `Pricing_Tax_Management` in the new OneVerz POS MVP scope.
 These rules must be applied before creating backend APIs, Flutter screens,
 responsive online store screens, Angular/admin screens, tests, or database changes.
 
@@ -25,6 +25,7 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Checkout snapshots price and tax on order lines.
 - Cached price/tax is only a reference; backend validates final totals.
 - Do not store gateway fees or accounting tax journals here.
+- Cashier variant changes re-resolve the active variant/UOM price; the popup is display-only for money and the backend cart-calculation response remains authoritative. Preserve decimal precision.
 
 ## User Rules
 

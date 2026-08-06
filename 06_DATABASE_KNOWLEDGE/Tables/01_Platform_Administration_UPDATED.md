@@ -1,6 +1,6 @@
 <!-- title: 01. Platform Administration -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- source: Updated from uploaded ERD image: 01_Platform Adminstration.png -->
 
 # 01. Platform Administration

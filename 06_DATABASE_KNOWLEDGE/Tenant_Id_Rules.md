@@ -1,6 +1,6 @@
 <!-- title: Tenant Id Rules -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 <!-- source: Unified_Commerce_Databse_Design.docx -->
 
@@ -9,7 +9,7 @@
 
 ## Purpose
 
-This file defines tenant isolation rules for the TM-EPOS database.
+This file defines tenant isolation rules for the OneVerz POS database.
 
 ## Core Rule
 

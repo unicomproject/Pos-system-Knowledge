@@ -1,6 +1,6 @@
 <!-- title: Seed Data Standards -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 
 
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This file defines seed data standards for TM-EPOS MVP backend.
+This file defines seed data standards for OneVerz POS MVP backend.
 
 Seed data must be deterministic, safe, reviewable, and aligned with the current
 MVP scope.

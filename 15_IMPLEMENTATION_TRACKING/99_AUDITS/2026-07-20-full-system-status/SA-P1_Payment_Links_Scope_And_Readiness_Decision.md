@@ -2,7 +2,7 @@
 <!-- status: Superseded -->
 <!-- superseded_by: SA-P1_Payment_Links_Release_1_Scope_And_Sequencing -->
 <!-- superseded_date: 2026-07-20 -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-20 -->
 
 # SA-P1 — Platform Admin Payment Links Scope And Readiness Decision

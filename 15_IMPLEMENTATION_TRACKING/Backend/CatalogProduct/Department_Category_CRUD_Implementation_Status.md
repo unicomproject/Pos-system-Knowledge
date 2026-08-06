@@ -1,6 +1,6 @@
 <!-- title: Department Category CRUD Implementation Status -->
 <!-- status: Completed -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- module: CatalogProduct -->
 <!-- feature: Department CRUD / Category CRUD -->
 <!-- last_updated: 2026-07-03 -->

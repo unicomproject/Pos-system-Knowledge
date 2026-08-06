@@ -1,6 +1,6 @@
 <!-- title: POS Hardware Production Acceptance Matrix -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-29 -->
 
 # POS Hardware Production Acceptance Matrix

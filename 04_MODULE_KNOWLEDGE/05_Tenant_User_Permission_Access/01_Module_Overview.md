@@ -1,6 +1,6 @@
 <!-- title: Tenant Users, Roles, Permissions & Outlet Access Module Overview -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP Unified Commerce Scope -->
+<!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-06-29 -->
 
 # Tenant Users, Roles, Permissions & Outlet Access Module Overview
@@ -9,7 +9,7 @@
 
 Manage tenant staff, role templates, tenant roles, role permissions, direct permissions, outlet-scoped roles, and outlet-scoped permissions.
 
-This module is part of the new TM-EPOS MVP scope: mobile and desktop EPOS,
+This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device
 support, and low-cost hardware usage for events, stalls, food and beverage,
 merchandising, attractions, and temporary retail locations.

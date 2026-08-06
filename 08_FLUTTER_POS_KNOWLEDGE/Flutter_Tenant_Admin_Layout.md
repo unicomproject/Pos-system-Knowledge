@@ -1,13 +1,13 @@
 <!-- title: Flutter Tenant Admin Layout -->
 <!-- status: Active — shared shell + white sidebar approved -->
-<!-- system: TM-EPOS MVP / OneVerz POS -->
+<!-- system: OneVerz POS MVP POS -->
 <!-- last_updated: 2026-07-29 -->
 
 # Flutter Tenant Admin Layout
 
 ## Purpose
 
-Flutter Tenant Admin layout guidance for TM-EPOS MVP / OneVerz POS.
+Flutter Tenant Admin layout guidance for OneVerz POS MVP POS.
 
 ## Layout Rule
 

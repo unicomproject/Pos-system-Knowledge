@@ -1,6 +1,6 @@
 <!-- title: Table Naming Standards -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
+<!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
 <!-- source: Unified_Commerce_Databse_Design.docx -->
 
@@ -9,7 +9,7 @@
 
 ## Purpose
 
-This file defines database naming standards for TM-EPOS MVP.
+This file defines database naming standards for OneVerz POS MVP.
 
 ## Table Rule
 

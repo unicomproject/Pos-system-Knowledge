@@ -1,7 +1,7 @@
 <!-- title: Product Mapping, Media, Attributes & Channel Visibility -->
 <!-- status: Active -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-05 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 <!-- source: Updated from uploaded ERD image: 11_Product Mapping, Media, Attributes & Channel Visibility(3).png -->
 
 # 11. Product Mapping, Media, Attributes & Channel Visibility
@@ -27,6 +27,33 @@ This markdown version follows the uploaded ERD image as the source of truth. Ent
 | `product_attribute_values` | Stores product/variant attribute values. |
 | `product_attribute_value_options` | Maps multi/select attribute values to selected options. |
 | `product_channel_visibility` | Controls product/variant visibility and orderability per sales channel. |
+| `product_recommendation_links` | Pending manual product-to-product recommendation relationships. |
+
+## `product_recommendation_links` (Target - Migration Pending)
+
+Purpose: Tenant-configured Frequently Bought Together relationships; this is not sales-history-derived Frequently Sold and contains no AI score/ML fields.
+
+| Attribute | Type | Key | Null | Reference / Note |
+|---|---|---|---|---|
+| `id` | uuid | PK | NOT NULL | Primary key |
+| `tenant_id` | uuid | FK | NOT NULL | References tenants(id) |
+| `source_product_id` | uuid | FK | NOT NULL | References products(id) |
+| `source_variant_id` | uuid | FK | NULL | Optional source variant |
+| `recommended_product_id` | uuid | FK | NOT NULL | References products(id) |
+| `recommended_variant_id` | uuid | FK | NULL | Optional recommendation variant |
+| `recommendation_type` | varchar(40) | CHECK | NOT NULL | `FREQUENTLY_BOUGHT_TOGETHER` for Release 1 |
+| `outlet_id` | uuid | FK | NULL | Optional outlet restriction |
+| `sales_channel_id` | uuid | FK | NULL | Optional channel restriction |
+| `sort_order` | int | CHECK | NOT NULL DEFAULT 0 | Display order |
+| `valid_from` | timestamptz | | NULL | Inclusive effective start |
+| `valid_until` | timestamptz | | NULL | Inclusive effective end |
+| `status` | varchar(40) | CHECK | NOT NULL | Project-standard record status |
+| `created_at` | timestamptz | | NOT NULL | Standard audit timestamp |
+| `created_by_tenant_user_id` | uuid | FK | NULL | Standard audit user |
+| `updated_at` | timestamptz | | NOT NULL | Standard audit timestamp |
+| `updated_by_tenant_user_id` | uuid | FK | NULL | Standard audit user |
+
+Target rules: same-tenant composite FKs; source product differs from recommended product; variants belong to their corresponding products; `valid_until >= valid_from`; non-negative sort order; project-standard type/status CHECKs; partial uniqueness prevents duplicate active relationship identity; and an efficient tenant/source/type/status/effective-date lookup index. No migration is created here.
 
 ## `product_categories`
 
@@ -130,6 +157,8 @@ CHECK(sort_order >= 0)
 One primary image per scope: product global, product channel, variant global, or variant channel.
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 ```
+
+Cashier popup resolution uses one active primary image in this order: POS-channel variant, global variant, POS-channel product, global product, placeholder. Shared media continues to support multiple images elsewhere.
 
 ## `product_barcodes`
 

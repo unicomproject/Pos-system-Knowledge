@@ -1,7 +1,7 @@
 <!-- title: Unified Order & Sales -->
 <!-- status: Updated -->
-<!-- system: TM-EPOS MVP -->
-<!-- last_updated: 2026-07-04 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-01 -->
 <!-- source: Final fixed Unified Order & Sales ERD design -->
 
 # 20. Unified Order & Sales
@@ -171,6 +171,7 @@ CHECK(refunded_amount >= 0)
 | `sku_snapshot` | varchar(100) |  | NULL | SKU snapshot. |
 | `product_name_snapshot` | varchar(200) |  | NOT NULL | Product name snapshot. |
 | `variant_name_snapshot` | varchar(200) |  | NULL | Variant name snapshot. |
+| `line_note` | varchar(500) |  | NULL | Target normalized product-line note; migration pending. |
 | `uom_code_snapshot` | varchar(50) |  | NOT NULL | UOM code snapshot. |
 | `uom_name_snapshot` | varchar(100) |  | NOT NULL | UOM name snapshot. |
 | `product_type_snapshot` | varchar(40) |  | NOT NULL | Product type snapshot. |
@@ -211,8 +212,11 @@ CHECK(line_subtotal_amount >= 0)
 CHECK(line_discount_amount >= 0)
 CHECK(line_tax_amount >= 0)
 CHECK(line_total_amount >= 0)
+CHECK(line_note IS NULL OR char_length(line_note) <= 500)
 CHECK(line_status IN ('ACTIVE', 'PARTIALLY_FULFILLED', 'FULFILLED', 'CANCELLED', 'RETURNED'))
 ```
+
+`line_note` is pending schema/implementation work and is distinct from order-level notes. Its text must not be written to normal logs.
 
 ---
 
