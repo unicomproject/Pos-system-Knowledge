@@ -1,95 +1,44 @@
-# Product CRUD Test Cases
+# Product CRUD & Wizard Test Cases
 
 ## Feature Summary
 
 | Field | Value |
 |---|---|
 | Module | 10_Product_Core |
-| Feature | Product CRUD |
-| Feature Type | Create / Update / Delete / Read / Workflow |
-| API Endpoint | `/api/v1/products` |
-| Application Service | `ProductService` |
-| Required Permission | `catalog.products.create`, `catalog.products.view`, `catalog.products.update`, `catalog.products.delete` |
+| Feature | Product Wizard Setup Flow |
+| Feature Type | End-to-End / API / Unit / Integration |
+| API Endpoint | `/api/v1/tenant-admin/products` |
+| Required Permission | `catalog.products.*` |
 | Tenant Scoped | Yes |
-| Idempotency Required | No |
-| Criticality | High |
 
-## Purpose
+---
 
-Defines validation, access, and database tests for the Product CRUD functionality in OneVerz POS MVP.
+## 1. Wizard Setup & Validation Tests
 
-## Preconditions
+- **PROD-WIZ-001**: Basic Details Step. Verifies Product Name validation, Category assignment, Brand mapping, and transactional image replacement (rollback on error).
+- **PROD-WIZ-002**: Product Type & Tracking. Checks that changing product types warning prompts correctly, Track Inventory ON allows Batch/Expiry/Serial rules, and Track Inventory OFF locks child tracking settings.
+- **PROD-WIZ-003**: Units & Conversion. Validates Single UOM vs conversion factors for multiple UOMs (maintained in base unit). Ensures step auto-skips for bundles.
+- **PROD-WIZ-004**: Product Configuration. Variant generator Cartesian combination verification. Persists excluded combinations.
+- **PM-UJ-003**: Bundle candidates eligibility. Disallows drafts, inactive items, or nested bundles. Validates stock calculation formula: `Min(Floor(Component Stock / Required Qty))`.
+- **PROD-WIZ-005**: SKU & Barcodes. Enforces unique SKU and primary barcode constraints. Conflict detail drawer launches and displays conflicting owner info without resetting wizard state.
+- **PROD-WIZ-006**: Pricing & Tax. margin calculation validation for tax-inclusive and tax-exclusive items. Outlet and variant pricing overrides.
+- **PROD-WIZ-007**: Channel Visibility. Toggles POS and Online storefront availability. Clicking click-and-collect requires online storefront visibility enabled.
+- **PROD-WIZ-008**: Atomic Publish. Verifies that all steps validation checks must pass before saving active state. Ensures rollback of partial updates on publish failure.
 
-- Tenant exists and is active.
-- User is authenticated.
-- User has required permissions.
+---
 
-## Planned Test Cases
+## 2. Post-Create & Operations Tests
 
-| Test Case ID | Scenario | Test Type | Priority | Expected Result |
-|---|---|---|---|---|
-| PROD-CRUD-001 | Valid request to create product succeeds | API / Integration | High | Product created with default variant and default price mapping |
-| PROD-CRUD-002 | Required name or SKU is missing | API / Unit | High | 400 validation response |
-| PROD-CRUD-003 | User does not have create permission | API / Unit | High | 403 forbidden |
-| PROD-CRUD-004 | Cross-tenant access attempted | API / Integration | High | Data isolation prevents access to other tenant's products |
-| PROD-CRUD-005 | Duplicate SKU or barcode | Unit / Integration | Medium | 409 conflict |
+- **PROD-OP-001**: Save Draft on step change. Checks that incomplete wizard data can be saved as DRAFT.
+- **PROD-OP-002**: Resume Draft. Verifies wizard state restoration to the exact `current_setup_step` and pre-filling fields.
+- **PROD-OP-003**: Duplicate product. Verifies duplicating copies metadata but resets SKU, Barcode, Stock quantities, and Audit logs.
+- **PROD-OP-004**: Soft Archive. Verifies product is hidden from POS searches and Online stores, but historical references, orders, and ledgers are preserved.
+- **PROD-OP-005**: Restore Product. Restores archived product to INACTIVE state.
+- **PROD-OP-006**: Product Audit Trail. Immutable logging of creation, variant updates, component changes, pricing modifications, and archiving.
 
-## Success Test Cases
+---
 
-| Test Case ID | Scenario | Preconditions | Input | Steps | Expected Result | Automated |
-|---|---|---|---|---|---|---|
-| PROD-CRUD-SUCCESS-001 | Create simple product with price | Default price list exists | Product name, SKU, price | Call CreateAsync | Product created and price item added to default price list | Passed |
+## 3. Current Test Coverage & Gaps
+- **Legacy Product CRUD**: Passed (deprecating).
+- **Tenant Admin Product Wizard validation tests**: In Progress.
 
-## Validation Test Cases
-
-| Test Case ID | Scenario | Invalid Input | Expected Error | Automated |
-|---|---|---|---|---|
-| PROD-CRUD-VALIDATION-001 | Missing product code | Empty product code | 400 validation response | Passed |
-| PROD-CRUD-VALIDATION-002 | Duplicate product code | Existing product code | 409 duplicate code | Passed |
-
-## Permission Test Cases
-
-| Test Case ID | Scenario | User Permission State | Expected Result | Automated |
-|---|---|---|---|---|
-| PROD-CRUD-PERMISSION-001 | User has required create permission | catalog.products.create | Product created successfully | Passed |
-| PROD-CRUD-PERMISSION-002 | User missing create permission | None | 403 forbidden | Passed |
-
-## Tenant Isolation Test Cases
-
-| Test Case ID | Scenario | Setup | Expected Result | Automated |
-|---|---|---|---|---|
-| PROD-CRUD-TENANT-001 | Access other tenant product | Tenant B product exists | 404 not found or empty response | Passed |
-
-## Database / Integration Test Cases
-
-| Test Case ID | Scenario | Database Assertion | Automated |
-|---|---|---|---|
-| PROD-CRUD-DB-001 | Product details persisted correctly | products table has name, slug, code, and auditing fields | Passed |
-| PROD-CRUD-DB-002 | Default variant is persisted | product_variants has default variant linked to product | Passed |
-
-## Current Automated Test Coverage
-
-| Test Project | Test File | Test Name | Status |
-|---|---|---|---|
-| E_POS.UnitTests | ProductServiceTests.cs | CreateAsync_WithoutCreatePermission_ReturnsPermissionDenied | Passed |
-| E_POS.UnitTests | ProductServiceTests.cs | CreateAsync_WithCreatePermission_NormalizesCodeAndPersists | Passed |
-| E_POS.IntegrationTests | ProductRepositoryTests.cs | ProductCodeExistsAsync_ReturnsTrue_WhenCodeExistsForTenant | Passed |
-| E_POS.IntegrationTests | ProductRepositoryTests.cs | SkuExistsAsync_ReturnsTrue_WhenSkuExistsForTenant | Passed |
-| E_POS.IntegrationTests | ProductRepositoryTests.cs | ListAsync_ReturnsPaginatedProductsWithDetails | Passed |
-
-## Test Commands
-
-```powershell
-dotnet test --filter "FullyQualifiedName~ProductServiceTests"
-dotnet test --filter "FullyQualifiedName~ProductRepositoryTests"
-```
-
-## Result Summary
-
-| Result Item | Value |
-|---|---|
-| Unit Tests | Passed |
-| Integration Tests | Passed |
-| API Tests | Passed |
-| Manual Verification | Done |
-| Known Gaps | None |

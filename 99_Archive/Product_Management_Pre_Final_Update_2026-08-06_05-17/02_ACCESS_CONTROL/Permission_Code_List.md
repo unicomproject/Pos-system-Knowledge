@@ -309,24 +309,12 @@ permission rows for aliases.
 | catalog.return_policies.delete | Delete/deactivate tenant return policies |
 | catalog.return_policies.manage | Manage all tenant return policy actions |
 | catalog.products.view | View products |
-| catalog.products.create | Create product drafts |
-| catalog.products.update | Update product drafts/fields |
-| catalog.products.delete | Archive products |
-| catalog.products.publish | Publish completed drafts to POS/storefront |
-| catalog.products.restore | Restore archived products to inactive |
-| catalog.products.duplicate | Duplicate product settings to draft |
-| catalog.variants.manage | Manage variant configuration combinations |
-| catalog.barcodes.manage | Manage SKU and barcode identifiers |
-| catalog.product_media.manage | Manage product images and uploads |
-| catalog.product_pricing.manage | Manage price lists and overrides |
-| catalog.product_cost.view | View sensitive cost details |
-| catalog.product_channels.manage | Manage channel visibility matrices |
-| catalog.product_audit.view | View standard product audit histories |
-| catalog.product_audit_sensitive.view | View sensitive product audit details |
-| catalog.bundle_components.manage | Manage bundle kits and component rules |
-| catalog.tax_classes.view | Read tax classes |
-| catalog.price_lists.view | Read price list setups |
-| inventory.stock.view | View stock levels |
+| catalog.products.create | Create products |
+| catalog.products.update | Update products |
+| catalog.products.delete | Delete/deactivate products |
+| catalog.variants.manage | Manage product variants |
+| catalog.barcodes.manage | Manage product barcodes |
+| inventory.stock.view | View stock |
 | inventory.stock.adjust | Adjust stock |
 | inventory.movements.view | View movement history |
 | inventory.alerts.view | View low/expiry stock alerts |
