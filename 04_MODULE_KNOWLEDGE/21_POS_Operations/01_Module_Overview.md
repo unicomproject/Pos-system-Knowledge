@@ -1,7 +1,7 @@
 <!-- title: POS Operations Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-06 -->
 
 # POS Operations Module Overview
 
@@ -52,6 +52,7 @@ merchandising, attractions, and temporary retail locations.
 - Till summary uses completed sales, payments, refunds, and cash movements.
 - Backend Holds is implemented, but current Flutter held-sale authority is local
   secure storage and therefore disconnected.
+- Backend-authoritative Park/Recall with PS reference and server-time 24-hour expiry is the approved target; implementation remains in progress. See [[08_Park_Recall_Sale_Feature]].
 - Customer display is future unless explicitly enabled.
 - Cashier New Sale includes the Product Variant Selection Popup with one image, optional line note and manual Frequently Bought Together. This is distinct from the history-derived Frequently Sold discovery segment. See [[04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 
@@ -88,3 +89,4 @@ merchandising, attractions, and temporary retail locations.
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/05_Frequently_Sold_Product_Discovery_Feature]]
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/06_Offers_Product_Discovery_Feature]]
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/04_Multi_Tenant_Receipt_Template_Resolution]]

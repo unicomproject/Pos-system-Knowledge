@@ -1,108 +1,96 @@
 <!-- title: Park Recall Sale Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-08-06 -->
 
 # Park Recall Sale Flow
 
 ## Purpose
 
-Captures the uploaded parked-sale journey as a distinct cashier flow.
-
-## Source Basis
-
-This journey is based on the uploaded SCS-TIX Release 1 user journey files, UI
-screens, backend architecture, database design, and confirmed project decisions.
-
-It must not be expanded into e-commerce, offline sync, supplier, delivery, kiosk,
-coupon, AI, or accounting scope.
-
-## Actors
-
-| Actor | Responsibility |
-|---|---|
-| Cashier | Parks and recalls a sale |
-| Backend | Exposes a held-sale API that is not currently called by Flutter |
-| POS App | Shows recall list |
+Defines the approved backend-authoritative cashier flow for **Park Sale**, **Parked Sales**, and **Recall Sale**. Backend internal names and `/pos/holds` routes may remain unchanged.
 
 ## Preconditions
 
-- Cart has items for park.
-- Till session is open.
-- Cashier has sale permission.
+- Authenticated cashier, valid POS entitlement, trusted active device, eligible till assignment, and open till session.
+- Park requires `sales.park.create` and at least one valid cart line.
+- List requires `sales.park.view`; recall requires `sales.park.recall`.
+- Customer and discount context, when present, come from the active cart.
 
-## Main Flow
+## Park Sale
 
-| Step | User/System Action | Expected Result |
+| Step | Action | Result |
 |---:|---|---|
-| 1 | Click Park Sale | Current Flutter cart is serialized to device secure storage |
-| 2 | Enter reference details | Device-local park details are saved |
-| 3 | Open recall dialog | Device-local parked sales are shown |
-| 4 | Select parked sale | Cart is restored and local parked record is removed |
-| 5 | Continue checkout | Cart returns to active sale flow |
+| 1 | Cashier selects Park Sale | Modal opens immediately; cart is unchanged |
+| 2 | Modal loads | Reference reads `Generated automatically after parking`; 24-hour message is shown |
+| 3 | Cashier optionally enters a short note | Trimmed note accepts at most 250 characters |
+| 4 | Cashier confirms | Button is disabled/loading; one stable idempotency key is dispatched |
+| 5 | Backend validates context and recalculates | Client prices, totals, expiry, tenant, user and till are not authoritative |
+| 6 | API returns `201 Created` | Returned Park Reference is displayed and list/count refreshes |
+| 7 | Success is accepted | Cart/customer/discount clear and clean New Sale opens |
 
-## Journey Diagram
+Cancel or X closes the modal without changing the cart. Any timeout or `4xx/5xx` result preserves the cart.
+
+## Parked Sales, Recall and Cancel
+
+- The active list contains only accessible `HELD`, non-expired records for the current tenant, till and holding user.
+- Recall revalidates device, till session, stock, price, tax, discount and totals, then atomically changes `HELD` to `RELEASED` once.
+- Successful recall restores the backend response into the active cart. Failed recall leaves both cart and hold recoverable.
+- Cancel uses the current DELETE contract and atomically changes an eligible hold to `CANCELLED`.
+- Expired, released or cancelled records cannot be recalled and do not appear in the active list.
 
 ```mermaid
 flowchart TD
-    S1[Click Park Sale]
-    S1 --> S2[Enter reason if required]
-    S2 --> S3[Open recall list]
-    S3 --> S4[Select parked sale]
-    S4 --> S5[Continue checkout]
-    S5 --> Done[Journey completed]
+  A[Active cart] --> B[Open Park Sale]
+  B --> C{Cancel or X?}
+  C -->|Yes| A
+  C -->|No| D[POST /api/v1/pos/holds]
+  D -->|Failure| A
+  D -->|201| E[Show returned PS reference]
+  E --> F[Clear cart and refresh Parked Sales]
+  F --> G[Clean New Sale]
+  H[Open Parked Sales] --> I[GET active holds]
+  I --> J{Recall or Cancel}
+  J -->|Recall| K[Revalidate and atomically release]
+  K -->|Success| A
+  J -->|Cancel| L[Atomically cancel]
 ```
 
-## Business Rules
+## Approved Rules
 
-- Current Flutter parked records are device-local and are not cross-device
-  backend records.
-- Backend Holds provides tenant/outlet/till-scoped create/list/recall/cancel
-  operations, but Flutter does not currently call it.
-- Current local recall is not proof of backend release/expiry/cancel handling.
-- Cart totals must be recalculated after recall.
+- Target reference: `PS-{YYYY}-{NNNNN}`, generated only by the backend after success.
+- Standard expiry: `expires_at = held_at + 24 hours`, using backend server time.
+- Park creates/uses a draft unpaid POS order; it creates no completed sale, payment or receipt and triggers no printer or drawer.
+- Current scope is tenant + till + holding user. No manager or cross-cashier override is implied.
+- Same idempotency key plus same payload replays safely; a changed payload conflicts.
+- Backend online persistence is authoritative. Offline outbox/sync is a separate pending contract.
 
-## Access-Control Rules
+## Failure States
 
-| Control | Required Rule |
+| State | Expected behaviour |
 |---|---|
-| Authentication | Required |
-| Feature entitlement | POS enabled |
-| Permission | Sale park/recall permission |
-| Open till session | Required |
+| Empty cart or invalid line | Modal/action blocked with validation guidance |
+| Permission denied | Action hidden for UX; backend returns final denial |
+| Invalid device/session/till | Request fails; cart remains intact |
+| Expired/not recallable/wrong till | Conflict state; active cart remains unchanged |
+| Network/timeout/unknown result | Preserve key and cart; reconcile before retry |
+| Empty list | Explain that no active parked sales are available |
 
-## Data and API References
+## Current Implementation Gap
 
-| Area | References |
-|---|---|
-| Current Flutter authority | Secure-storage key `pos.parked_sales`; local save/list/recall/delete |
-| Existing backend API | `POST|GET /api/v1/pos/holds`, `POST .../{holdId}/recall`, `DELETE .../{holdId}` |
-| Backend table | `pos_order_holds` |
-
-Current classification is `PARTIALLY_IMPLEMENTED` and disconnected. Backend
-Holds controller/service/repository and tests exist, but the Flutter provider
-uses only local secure storage.
-
-## Edge Cases
-
-- Empty cart cannot be parked.
-- Sale already completed cannot be recalled.
-- Different outlet/till access must be blocked.
-
-## Out of Scope
-
-- Offline parked-sale operation is MVP scope, but backend sync and cross-device
-  recall are not implemented in the current Flutter flow.
+Flutter currently saves independent device-local records under secure-storage key `pos.parked_sales`, creates labels such as `Parked Sale #1`, accepts reference name/phone/note, removes the local record during recall, and does not call the backend Holds API. The UI still contains `Hold Sale`. Backend currently generates `HOLD-000001` style references and accepts optional client `ExpiresAt`. These are verified current behaviours, not the approved target.
 
 ## Completion Criteria
 
-- The user reaches the expected final state without bypassing access control.
-- Tenant-owned data remains inside the resolved tenant context.
-- Sensitive actions write audit records where required.
-- UI state and backend state stay consistent after completion.
+- Backend contract produces PS reference and server-controlled 24-hour expiry.
+- Canonical permissions are seeded, assigned and enforced.
+- Flutter uses typed backend create/list/recall/cancel flows and has no competing authority.
+- Cart clears only after confirmed create success; recall/cancel are atomic and retry-safe.
+- Automated tenant, permission, lifecycle, idempotency and failure tests pass.
+- Authenticated runtime proves list/count, park, recall, cancel and expiry without duplicates or cart loss.
 
 ## Related Files
 
-- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/08_Park_Recall_Sale_Feature]]
+- [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Park_Recall_Sale_Implementation_Specification]]
+- [[../../10_TESTING_QA/Test_Case/21_POS_Operations/POS_Park_Recall_Sale_Test_Cases]]
+- [[../../13_DECISIONS_AND_CHANGES/ADR/ADR_008_Park_Recall_Sale_Authority_And_Expiry]]

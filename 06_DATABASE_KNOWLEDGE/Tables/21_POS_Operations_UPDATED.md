@@ -1,10 +1,29 @@
 <!-- title: POS Operations -->
 <!-- status: Updated -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-08-06 -->
 <!-- source: 21_POS Operations ERD image -->
 
 # 21. POS Operations
+
+## Parked sale persistence
+
+`pos_order_holds` is the backend source of truth for Park / Recall Sale. It
+stores the tenant, till, device, holding user, generated hold number, cart
+snapshot, status, optional expiry, release metadata, idempotency key, request
+hash, and timestamps. Status is constrained to `HELD`, `RELEASED`, `EXPIRED`,
+or `CANCELLED`; `hold_reason` is limited to 250 characters.
+
+The model has a primary key, tenant/hold-number and tenant/id uniqueness,
+foreign keys to tenant, order, held-by user and released-by user, and nullable
+expiry. Create and recall use database transactions. The migration source and
+model snapshot contain this table. On 2026-08-06, a read-only Local Development
+query confirmed both `public.pos_order_holds` and migration-history entry
+`20260629203129_InitialCreate`; other environments remain unverified. Flutter's
+secure-storage parked-sale list is only
+a temporary local implementation and is not authoritative.
+
+Contract: [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/08_Park_Recall_Sale_Feature]].
 
 ## Purpose
 
@@ -13,7 +32,10 @@ This file documents POS hold, receipt, receipt template, till closing summary, t
 `pos_order_holds` and `till_cash_movements` are defined schema foundations.
 Current Flutter Park/Recall uses device-local secure storage rather than the
 backend Holds API, and no Cashier Cash In/Out mutation API was verified. Defined
-in migration source; live applied state not verified.
+in migration source. Local Development application was verified read-only on
+2026-08-06; application in other environments is not proven by this document.
+
+**Implementation Note (2026-08-05)**: The backend reuses the existing `receipt_templates`, `receipt_template_versions`, `receipts` tables and the `receipt_data_json`, `receipt_template_version_id` columns. No new tables, columns, or migrations were introduced for the receipt template resolution feature. Currently, the backend constructs legacy JSON for `receipt_data_json` but does not yet populate `receipt_template_version_id`.
 
 ## Design Rules Applied
 

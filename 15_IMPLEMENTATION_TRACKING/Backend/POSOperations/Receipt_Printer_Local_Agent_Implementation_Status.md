@@ -156,3 +156,7 @@ Code status: `IMPLEMENTED`. Physical status: `PENDING`.
 - [[../../../12_INTEGRATIONS/POS_Hardware_Integration]]
 - [[../../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Hardware_Payment_Receipt]]
 - [[../../../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Payment_Receipt_Contract_Implementation_Status]]
+
+## Chunk 3 Runtime Continuation (2026-08-06)
+
+Agent process and POS80 host printer were available, but backend receipt routing returned `PRINTER_NOT_CONFIGURED` for `RCP-000091`. Two failed audit rows exist: one unwanted automatic checkout attempt and one explicit Print Receipt tap. Flutter automatic printing has been removed. No physical receipt was produced and no retry occurred. Hardware assignment/routing must be corrected before acceptance; status remains `IMPLEMENTED / PHYSICAL PENDING`.

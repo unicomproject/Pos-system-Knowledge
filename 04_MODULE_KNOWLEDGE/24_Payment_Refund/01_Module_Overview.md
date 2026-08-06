@@ -39,6 +39,7 @@ merchandising, attractions, and temporary retail locations.
 ## Core Business Rules
 
 - Cash, card, QR, and split payments are supported by configured payment methods.
+- The POS Cash Payment Screen manages exact cash entry and dynamic Quick Amounts.
 - Sensitive card data must never be stored.
 - Payment event history records provider and device outcomes safely.
 - Refund amount cannot exceed allowed refundable amount.
@@ -77,3 +78,5 @@ merchandising, attractions, and temporary retail locations.
 
 - [[04_MODULE_KNOWLEDGE/24_Payment_Refund/02_Functional_Rules]]
 - [[04_MODULE_KNOWLEDGE/24_Payment_Refund/03_Technical_Contract]]
+- [[04_MODULE_KNOWLEDGE/24_Payment_Refund/04_Cash_Payment_Screen_Feature]]
+- [[04_MODULE_KNOWLEDGE/24_Payment_Refund/05_Payment_Success_Receipt_Preview_Feature]]

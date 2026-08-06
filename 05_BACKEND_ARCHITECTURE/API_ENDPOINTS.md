@@ -1,9 +1,33 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-06 -->
 
 # Platform Subscription Plan API Endpoints
+
+## POS Park / Recall Sale
+
+Base route: `/api/v1/pos/holds` · Controller: `PosCheckoutController`.
+
+| Method | Route | Current permission | Purpose |
+|---|---|---|---|
+| POST | `/api/v1/pos/holds` | `sales.park.create` | Persist a priced cart as a parked sale |
+| GET | `/api/v1/pos/holds` | `sales.park.view` | List active holds for the authenticated user and till |
+| POST | `/api/v1/pos/holds/{holdId}/recall` | `sales.park.recall` | Revalidate and atomically release a hold for sale |
+| DELETE | `/api/v1/pos/holds/{holdId}?reason=...` | `sales.park.create` | Cancel an active hold; permission alignment remains open |
+
+Create accepts `deviceId`, `saleType`, optional `customerId`, cart `lines`,
+optional `reason`, `discountApplicationId`, required stable `idempotencyKey`, and
+optional future `expiresAt`. The service creates a `HOLD-######` reference.
+Create/list items return hold/sale/till/session/customer identifiers, reference,
+reason, status, item count, money totals, currency, timestamps and typed lines;
+the list envelope returns `holds` and `totalCount`. Recall additionally returns
+`deviceId`, `saleType`, `recalledAt`, request-shaped lines and
+`checkoutSummary`. Cancel has no response body.
+Recall recalculates price, discount, tax, and stock before changing `HELD` to
+`RELEASED`. Current list scope is tenant + till + holding user; manager-wide
+visibility is not implemented. See
+[[../04_MODULE_KNOWLEDGE/21_POS_Operations/08_Park_Recall_Sale_Feature]].
 
 ## Platform Authentication (Unified Commerce)
 
@@ -1284,7 +1308,37 @@ Same rule for `GET .../sales/search` and `GET .../sales/{saleId}/eligibility`:
 - Cash/QR/non-card: no fabricated card mask.
 - Provider transaction ids remain server-side only.
 
-> **Checkout write path (2026-07-17):** Cash persists without card tips. Card production
-> authorization still requires provider integration (`pos_checkout.payment_provider_required`).
 > Domain factory `PosCompletedPaymentPersistence.CreateProviderCapture` maps successful
 > provider outcomes into the fields above when provider support is enabled.
+
+---
+
+# POS Receipts API Endpoints (2026-08-05)
+
+Controller: `PosReceiptsController`
+Base: `/api/v1/pos/receipts`
+
+All endpoints require tenant JWT authentication (`TenantOnly` policy).
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/api/v1/pos/receipts` | Search receipts (paginated) |
+| GET | `/api/v1/pos/receipts/{receiptId}` | Get receipt detail by `receiptId` (NOT `saleId`) |
+| POST | `/api/v1/pos/receipts/{receiptId}/reprint/authorize` | Authorize reprint |
+| POST | `/api/v1/pos/receipts/{saleId}/print` | Record print audit |
+
+Receipt detail uses `receiptId` (not `saleId`). Do not document or implement the GET detail route as `{saleId}`.
+
+## Checkout Success Response Contract Decision
+
+The existing `POST /api/v1/pos/checkout/start-payment` response (`PosCheckoutStartPaymentResponseDto`) contains:
+- `SaleId`, `SaleNumber`, `ReceiptNumber`, `ReceiptId`, `PaymentId`
+- `MerchantName`, `OutletName`, `TillId`, `TillName`, `CashierId`, `CashierName`
+- `Subtotal`, `DiscountTotal`, `TaxTotal`, `GrandTotal`, `CashReceived`, `ChangeDue`
+- `PaymentMethod`, `Currency`, `CompletedAt`, `BarcodeValue`
+- `Items[]`, `Tenders[]`, `DiscountLines[]`, `TaxLines[]`, `CopyPolicy`
+- `TaxRegistrationNumber`, `TaxInvoiceLabel`
+- `ReceiptDataJson` (Added recently. Currently contains legacy snapshot, missing dynamic template support)
+- `receiptTemplateVersionId` is NOT exposed.
+
+**API Contract Decision**: Existing endpoints (`POST /api/v1/pos/checkout/start-payment` and `GET /api/v1/pos/receipts/{receiptId}`) are reused. The response DTOs (`PosCheckoutStartPaymentResponseDto` and `PosReceiptDetailDto`) have been successfully extended to include `ReceiptDataJson`. Currently the resolved receipt snapshot (`receipt_data_json`) is generated statically during checkout; dynamic template merging is pending. See [[Receipt_Template_Resolution_And_Snapshot_Contract]].

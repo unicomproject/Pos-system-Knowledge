@@ -1,7 +1,7 @@
 <!-- title: POS Operations Technical Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-06 -->
 
 # POS Operations Technical Contract
 
@@ -60,6 +60,7 @@ history/ledger behavior where applicable.
   effect. Local Agent transport must not fall back to direct TCP.
 - `PosParkedSaleNotifier` persists `pos.parked_sales` in secure storage and does
   not call `PosHoldsController`.
+- This is a current implementation gap. The approved target is typed Flutter Holds integration, stable create idempotency, backend PS reference, backend 24-hour expiry, and backend recall recalculation. See [[08_Park_Recall_Sale_Feature]].
 - Cash Drawer/Cash In/Cash Drop routes and forms exist, but no backend
   cash-movement datasource is wired.
 - Use DTOs in data layer, domain/view models in UI layer.
@@ -165,3 +166,13 @@ Barcode identity remains a string. Tenant uniqueness prevents random
 selection; zero matches are not-found, multiple matches ambiguous, and
 inactive product/variant or unavailable price is rejected. Only a successful
 authoritative response reaches existing cart rules.
+
+## Checkout persistence conflict classification (2026-08-03)
+
+Checkout returns `pos_checkout.idempotency_conflict` only when PostgreSQL names
+the tenant/payment idempotency unique constraint. After that race, rollback and
+perform authoritative replay lookup: identical committed request returns its
+existing result; different hash remains conflict. Other `DbUpdateException`
+constraints return `pos_checkout.persistence_failed` (HTTP 500), not a false
+409. Structured logs include only one-way correlation, database state and
+constraint, never the raw key.

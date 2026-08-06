@@ -167,3 +167,16 @@ injection—remain `Not Run`.
 | Backend Hardware Testing lifecycle | Pending |
 
 No physical measurements were inferred from automated tests.
+
+## Chunk 3 Attempt (2026-08-06)
+
+| Check | Result |
+|---|---|
+| Local Print Agent listening on 9101 | Pass |
+| POS80 host printer available | Pass |
+| Sale receipt routing assignment | Fail — `PRINTER_NOT_CONFIGURED` |
+| Explicit print physical output | Not produced |
+| Cash drawer operation | Fail — `INVALIDCONFIGURATION` |
+| Duplicate financial transaction | None |
+
+Physical hardware acceptance remains pending; no print or sale retry was made.

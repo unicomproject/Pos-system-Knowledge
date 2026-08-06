@@ -1,7 +1,7 @@
 <!-- title: POS Operations Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-06 -->
 
 # POS Operations Functional Rules
 
@@ -29,6 +29,7 @@ responsive online store screens, Angular/admin screens, tests, or database chang
   backend-held or cross-device.
 - `pos_order_holds` and `/api/v1/pos/holds` are backend foundations not yet wired
   to the Flutter parked-sale provider.
+- Approved Park/Recall uses backend reference/totals/status and server-time 24-hour expiry. Cart clears only after 201; recall/cancel transition atomically; no payment, receipt, print or drawer action is created. See [[08_Park_Recall_Sale_Feature]].
 - Cash movement schema is not a successful cashier movement without a mutation
   API and persistence result.
 - Customer display is future unless explicitly enabled.
