@@ -63,7 +63,7 @@ merchandising, attractions, and temporary retail locations.
 
 - [[../02_Tenant_Foundation/01_Module_Overview]]
 - [[../03_Subscription_Catalog_Entitlements/01_Module_Overview]]
-- [[../07_Outlet_Till_POS_Device_Foundation/01_Module_Overview]]
+- [[../07_Outlet_Till_POS_Device_Foundation/01_Outlet_Management_Overview]]
 
 ## Out Of Scope
 

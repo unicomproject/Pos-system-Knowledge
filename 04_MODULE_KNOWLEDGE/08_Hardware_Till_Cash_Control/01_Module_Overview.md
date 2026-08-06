@@ -63,7 +63,7 @@ merchandising, attractions, and temporary retail locations.
 
 ## Dependencies
 
-- [[../07_Outlet_Till_POS_Device_Foundation/01_Module_Overview]]
+- [[../07_Outlet_Till_POS_Device_Foundation/01_Outlet_Management_Overview]]
 - [[../24_Payment_Refund/01_Module_Overview]]
 - [[../21_POS_Operations/01_Module_Overview]]
 

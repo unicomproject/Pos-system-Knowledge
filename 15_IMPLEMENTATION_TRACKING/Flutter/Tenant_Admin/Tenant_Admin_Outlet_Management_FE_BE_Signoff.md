@@ -20,6 +20,12 @@
 | Top performing outlet | ✅ | ✅ (UI) | ❌ | N/A | N/A | ✅ (Report) | N/A | **API Gap** |
 | Mobile responsive view | ✅ | ✅ | N/A | N/A | N/A | N/A | N/A | Implemented |
 
+## Task 4A Backend Contract Completion (Implemented 2026-08-04)
+
+- Tenant Admin paginated outlet list, server-side search, combined type/status/health filters, safe manager/image preview, till summary, and operational-health preview are implemented at `GET /api/v1/tenant-admin/outlets`.
+- The lifecycle action is `PUT /api/v1/tenant-admin/outlets/{outletId}/status`; it supports `ACTIVE` and `INACTIVE`, is permission-enforced and audit-logged, and does not use delete for disable.
+- Flutter integration remains a separate Task 4B. It must use this dedicated route and must not make overview calls for each list item.
+
 ## Signoff Notes
 - The `Needs Attention` status requested in UI is a derived operational state, not a persisted DB state. Logic needs product definition.
 - `Manager` assignment is currently missing from Domain and DB, documented as a pending product decision/future scope.

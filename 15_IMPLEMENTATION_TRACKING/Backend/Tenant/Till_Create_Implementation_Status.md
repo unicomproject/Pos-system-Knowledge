@@ -34,3 +34,5 @@
 - Duplicate tenant + outlet + code returns 409 conflict (code normalized to uppercase)
 - Invalid or cross-tenant outlet returns 404
 - Cashier `POST /api/v1/tills/open` unchanged
+- **GAP:** `DefaultCashier` is required by the new single-page Add Till UI but the backend does not yet support a `default_cashier_id`.
+- **Hardware Orchestration (Strategy B):** Add Till single-page UI orchestrates Till Create first, then makes sequential calls to assign hardware using the hardware modules.

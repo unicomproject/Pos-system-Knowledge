@@ -1464,3 +1464,70 @@ The existing `POST /api/v1/pos/checkout/start-payment` response (`PosCheckoutSta
 - `receiptTemplateVersionId` is NOT exposed.
 
 **API Contract Decision**: Existing endpoints (`POST /api/v1/pos/checkout/start-payment` and `GET /api/v1/pos/receipts/{receiptId}`) are reused. The response DTOs (`PosCheckoutStartPaymentResponseDto` and `PosReceiptDetailDto`) have been successfully extended to include `ReceiptDataJson`. Currently the resolved receipt snapshot (`receipt_data_json`) is generated statically during checkout; dynamic template merging is pending. See [[Receipt_Template_Resolution_And_Snapshot_Contract]].
+# Tenant Admin Outlets API Endpoints
+
+Controller: `TenantAdminOutletsController`
+Base: `/api/v1/tenant-admin/outlets`
+
+All endpoints require tenant JWT authentication and `TenantOnly` policy.
+
+| Method | Route | Permission | Purpose | Status |
+|---|---|---|---|---|
+| GET | `/api/v1/tenant-admin/outlets` | `tenant.outlets.view` | List outlets with pagination, sort, and filters (Type, Status, Needs Attention) | Existing |
+| GET | `/api/v1/tenant-admin/outlets/create-options` | `tenant.outlets.manage` | Load outlet creation lookup options | Proposed |
+| GET | `/api/v1/tenant-admin/outlets/{outletId}` | `tenant.outlets.view` | Outlet detail | Existing |
+| GET | `/api/v1/tenant-admin/outlets/{outletId}/overview` | `tenant.outlets.view` | Aggregate summary (Tills, Sales, Orders, Inventory, Health, Manager) | Proposed |
+| POST | `/api/v1/tenant-admin/outlets` | `tenant.outlets.manage` | Create new outlet | Existing |
+| PUT | `/api/v1/tenant-admin/outlets/{outletId}` | `tenant.outlets.manage` | Update outlet details | Existing |
+| PUT | `/api/v1/tenant-admin/outlets/{outletId}/activate` | `tenant.outlets.manage` | Set status to ACTIVE | Existing |
+| PUT | `/api/v1/tenant-admin/outlets/{outletId}/disable` | `tenant.outlets.manage` | Set status to INACTIVE | Existing |
+| PUT | `/api/v1/tenant-admin/outlets/{outletId}/manager` | `tenant.outlets.manage` | Assign primary manager | Proposed |
+| PUT | `/api/v1/tenant-admin/outlets/{outletId}/image` | `tenant.outlets.manage` | Upload or replace outlet image | Proposed |
+| DELETE | `/api/v1/tenant-admin/outlets/{outletId}/image` | `tenant.outlets.manage` | Remove outlet image | Proposed |
+| GET | `/api/v1/tenant-admin/outlets/{outletId}/alerts` | `tenant.outlets.view` | Get operational alerts | Proposed |
+
+## Canonical Aggregate Overview (`GET .../overview`)
+
+This endpoint prevents multiple API calls from the UI right-side detail panel.
+
+Response structure (Proposed):
+```json
+{
+  "outlet": {
+    "id": "guid",
+    "name": "Main Store",
+    "code": "S001",
+    "type": "STORE",
+    "status": "ACTIVE",
+    "imageUrl": "https://media.oneverz.local/...",
+    "address": {}
+  },
+  "manager": {
+    "tenantUserId": "guid",
+    "name": "Jane Doe"
+  },
+  "tills": {
+    "totalCount": 5,
+    "activeCount": 4,
+    "onlineCount": 3
+  },
+  "sales": {
+    "todayNetSales": 125000.50,
+    "yesterdayComparisonPercentage": 5.2
+  },
+  "inventory": {
+    "stockValue": 4500000.00
+  },
+  "orders": {
+    "openOrderCount": 12
+  },
+  "health": {
+    "status": "NEEDS_ATTENTION",
+    "offlineTills": 1,
+    "lastActivityAt": "2026-08-04T12:00:00Z",
+    "lastSyncAt": "2026-08-04T11:55:00Z"
+  }
+}
+```
+
+*Note*: `stockValue` reuses the canonical Inventory valuation logic (Sum of `remaining_quantity * unit_cost`). Open orders rely on canonical `SalesOrder` statuses (Not `COMPLETED` and not `CANCELLED`).

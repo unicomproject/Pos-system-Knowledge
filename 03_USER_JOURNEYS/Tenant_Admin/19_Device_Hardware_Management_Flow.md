@@ -32,7 +32,7 @@ Tenant Admin opens device/hardware management or views hardware details on the T
 |---:|---|---|
 | 1 | Open Till Monitoring / Hardware | System displays Till details and assigned hardware list. |
 | 2 | View registered hardware | System shows hardware assigned to the Till (Scanner, Printer, Drawer, Card Reader). |
-| 3 | View hardware readiness | System displays connection status, latest test result, and warnings/errors for each item. |
+| 3 | View hardware readiness | System displays connection status, latest test result, and warnings/errors for each item. Status (e.g., CONNECTED) requires a trusted fresh heartbeat and active assignment; it is never inferred simply because a device is assigned. |
 | 4 | Open Alerts | Tenant Admin clicks "View Alerts" on the Till to see detailed hardware alerts. |
 | 5 | Run test | Tenant Admin with `tenant.hardware.manage` runs device test. |
 | 6 | Validate result | System checks success/failure, logs the test, and updates the latest test state. |
@@ -81,9 +81,10 @@ Device/hardware readiness is verified, and the Tenant Admin is aware of any warn
 
 - [[09_Hardware_Operations_Till_Session_And_Cash_Control_UPDATED]]
 - [[Tenant_Admin_Till_Monitoring_UI]]
-- 12_INTEGRATIONS/POS_Hardware_Integration.md
-- 12_INTEGRATIONS/Receipt_Printer_Integration.md
-- 12_INTEGRATIONS/Card_Reader_Integration.md
+- [[../../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Add_Till_Single_Page_UI]]
+- [[../../12_INTEGRATIONS/POS_Hardware_Integration.md]]
+- [[../../12_INTEGRATIONS/Receipt_Printer_Integration.md]]
+- [[../../12_INTEGRATIONS/Card_Reader_Integration.md]]
 
 
 ## Documentation Update 2026-08-01 — Monitoring vs Physical Integration

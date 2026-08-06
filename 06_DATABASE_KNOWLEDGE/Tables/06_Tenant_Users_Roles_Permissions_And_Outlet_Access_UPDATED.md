@@ -326,6 +326,7 @@ Purpose: Stores outlet-scoped role assignments for users.
 | `revoked_by_tenant_user_id` | uuid | FK | NULL | References `tenant_users(id)`. |
 | `assigned_at` | timestamp |  | NULL | Assigned timestamp. |
 | `revoked_at` | timestamp |  | NULL | Revoked timestamp. |
+| `is_primary_manager` | boolean | | NOT NULL DEFAULT false | **[IMPLEMENTED]** Indicates if user is the primary manager for this outlet. |
 
 Indexes / Constraints / Notes:
 
@@ -338,6 +339,7 @@ FK(role_id) REFERENCES tenant_roles(id)
 FK(assigned_by_tenant_user_id) REFERENCES tenant_users(id)
 FK(revoked_by_tenant_user_id) REFERENCES tenant_users(id)
 UNIQUE(tenant_id, outlet_id, user_id, role_id)
+UNIQUE INDEX uq_outlet_user_roles_tenant_outlet_primary_manager(tenant_id, outlet_id) WHERE is_primary_manager = true AND revoked_at IS NULL
 CHECK(revoked_at IS NULL OR revoked_at > assigned_at)
 -- ERD note: OR effective_from or revoked_at
 ```

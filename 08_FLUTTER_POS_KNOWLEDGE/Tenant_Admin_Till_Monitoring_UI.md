@@ -227,7 +227,7 @@ Preferred long-term: embed hardware connections into `GET /api/v1/tenant-admin/t
 - [[07_Tenant_Admin_UI_Rules]]
 - [[../03_USER_JOURNEYS/Tenant_Admin/05_Till_Management_Flow]]
 - [[../03_USER_JOURNEYS/Tenant_Admin/19_Device_Hardware_Management_Flow]]
-- [[../04_MODULE_KNOWLEDGE/07_Outlet_Till_POS_Device_Foundation/03_Technical_Contract]]
+- [[../04_MODULE_KNOWLEDGE/07_Outlet_Till_POS_Device_Foundation/01_Outlet_Management_Overview]]
 - [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/03_Technical_Contract]]
 - [[../12_INTEGRATIONS/POS_Hardware_Integration]]
 - [[../15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin/Till_Monitoring_UI_Implementation_Status]]

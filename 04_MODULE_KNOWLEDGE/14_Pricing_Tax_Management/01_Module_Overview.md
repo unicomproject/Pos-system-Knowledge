@@ -1,4 +1,4 @@
-﻿<!-- title: Pricing & Tax Management Module Overview -->
+<!-- title: Pricing & Tax Management Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-07-04 -->
@@ -62,7 +62,7 @@ merchandising, attractions, and temporary retail locations.
 ## Dependencies
 
 - [[../10_Product_Core/01_Module_Overview]]
-- [[../07_Outlet_Till_POS_Device_Foundation/01_Module_Overview]]
+- [[../07_Outlet_Till_POS_Device_Foundation/01_Outlet_Management_Overview]]
 - [[../22_Online_Store_Cart_Checkout/01_Module_Overview]]
 
 ## Out Of Scope

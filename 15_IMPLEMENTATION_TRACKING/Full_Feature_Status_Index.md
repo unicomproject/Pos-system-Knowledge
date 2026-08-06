@@ -155,8 +155,8 @@ PR/commit reference is recorded.
 | Flutter | Sales | Product Variant Selection Popup | Partial | 2026-08-02 | Current working tree | Target-screen adaptive UI aligned with single-image rule; production validation bypass, rounding/category and currency fallbacks removed. Analysis clean; 16/16 focused tests pass; full suite 703 passed/11 unrelated baseline failures. Authenticated real-backend emulator, configurable recommendation, fractional quantity and physical-device validation remain pending. [[Flutter/Sales/Product_Variant_Popup_Implementation_Status]] |
 | Flutter | Sales | Cashier POS Second Brain vs Code Comparison | Completed | 2026-07-02 | - | Audit note; see delta in same file |
 | Angular | Tenant | Tenant List Page | In Progress | - | - | Wired to platform-admin tenants API |
-| Backend | Tenant / Outlet | Outlet Create | Completed | 2026-06-18 | dashboard_tenant | `POST /api/v1/tenant-admin/outlets` |
-| Flutter | Tenant Admin / Outlet | Outlet Create UI | Completed | 2026-06-18 | tenant-dashboard | Add/Edit outlet screens |
+| Backend | Tenant / Outlet | Outlet Create | Partial (P0) | 2026-08-06 | - | See [[../04_MODULE_KNOWLEDGE/07_Outlet_Till_POS_Device_Foundation/01_Outlet_Management_Overview]] |
+| Flutter | Tenant Admin / Outlet | Outlet Create UI | Partial (P0) | 2026-08-06 | - | See [[../04_MODULE_KNOWLEDGE/07_Outlet_Till_POS_Device_Foundation/01_Outlet_Management_Overview]] |
 | Flutter | Tenant Admin / Till | Till Monitoring UI | Partially Implemented | - | - | Implementation tracking added. See [[Flutter/Tenant_Admin/Till_Monitoring_UI_Implementation_Status]] |
 | Flutter | Sales | Discount | Testing | - | `scanner_inte` | Existing APIs include approval/POLICY/LINE-Fixed; current target is MANUAL-only, one Discount, above-limit reject, Item Percentage only; offline/responsive gaps pending |
 | Flutter | Sales | Customer Management | Partially Implemented | - | Current working tree | Core API-backed UI and authenticated 2560×1600 master/detail runtime verified; controlled mutation and remaining tablet E2E are pending. See [[Flutter/Sales/Customer_Management_Implementation_Status]] |

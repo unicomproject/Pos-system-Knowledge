@@ -44,12 +44,14 @@ Purpose: Stores tenant outlet/store/collection-point master records.
 | `created_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id). Tenant user who created the outlet. |
 | `updated_at` | timestamptz |  | NOT NULL | Last update timestamp. |
 | `updated_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id). Tenant user who last updated the outlet. |
+| `media_asset_id` | uuid | FK | NULL | **[IMPLEMENTED]** References media_assets(id). Stores outlet profile image. |
 
 
 Constraints / Notes:
 
 ```text
 UNIQUE(tenant_id, outlet_code)
+FK(tenant_id, media_asset_id) REFERENCES media_assets(tenant_id, id) ON DELETE RESTRICT
 ```
 
 Relationships:
@@ -313,9 +315,17 @@ Blank Reference / Note cells: 0
 | Online / Offline | Derived. Requires `pos_devices.status = 'ACTIVE'`, active `till_device_assignments`, and `pos_devices.last_seen_at` within heartbeat threshold. |
 | Last Activity | Primarily `pos_devices.last_seen_at` of the assigned device. |
 
+## Proposed Schema Extensions (P0/P1)
+
+To fully support the Create Outlet wizard requirements:
+- **`outlet_addresses.contact_email`**: Add `contact_email` (varchar(255), NULL) to store target operational email.
+- **`outlet_special_hours` Table**: Proposed table to track calendar override dates (e.g. holidays).
+  - Columns: `id` (uuid, PK), `tenant_id` (uuid, FK), `outlet_id` (uuid, FK), `special_date` (date, UNIQUE per outlet), `name` (varchar(100)), `is_closed` (boolean), `opening_time` (timeonly), `closing_time` (timeonly), `spans_next_day` (boolean).
+
 ## Related Files
 
 - [[../Database_Overview]]
 - [[../Status_And_Type_Check_Rules]]
 - [[../Migration_Rules]]
+- [[../../04_MODULE_KNOWLEDGE/07_Outlet_Till_POS_Device_Foundation/07_Create_Outlet_Database_Design_and_Mapping]]
 

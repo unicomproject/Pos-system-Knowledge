@@ -38,7 +38,7 @@ Tenant Admin navigates to the Tills monitoring page from the sidebar.
 | 6 | View Current Cashier | System resolves and displays the current cashier from the active, open till session. |
 | 7 | View Hardware Readiness | System displays connected hardware (scanner, printer, drawer, card reader) and their status. |
 | 8 | View Alerts | Tenant Admin clicks "View Alerts" to see a complete list of hardware warnings and system alerts for the till. |
-| 9 | Add New Till | Tenant Admin clicks "New Till" to open the creation flow. System validates unique code and assigns to an outlet. |
+| 9 | Add New Till | Tenant Admin clicks "New Till" to open the single-page creation flow. (See [[05A_Add_Till_And_Hardware_Setup_Flow]]). |
 | 10 | Edit Till | Tenant Admin edits till details or lifecycle status (Active/Inactive/Maintenance). |
 
 ## Mobile Behavior
@@ -74,7 +74,7 @@ Tenant Admin navigates to the Tills monitoring page from the sidebar.
 - Stale heartbeat (triggers "Offline").
 - Hardware disconnected or failed test (triggers "Needs Attention" or hardware warning).
 - No current open till session (Current cashier displays as "—").
-- Duplicate till code during creation.
+- Duplicate till code during creation. (Till code is manually entered, not auto-generated).
 - Invalid outlet.
 - Permission denied.
 
@@ -91,6 +91,8 @@ Tenant Admin has a real-time overview of all tills, their operational status, cu
 
 - [[08_Outlet_Till_And_POS_Device_Foundation_UPDATED]]
 - [[Tenant_Admin_Till_Monitoring_UI]]
+- [[05A_Add_Till_And_Hardware_Setup_Flow]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Add_Till_Single_Page_UI]]
 
 
 ## Documentation Update 2026-08-01 — Final Till Split-View + Hardware Monitoring Architecture
