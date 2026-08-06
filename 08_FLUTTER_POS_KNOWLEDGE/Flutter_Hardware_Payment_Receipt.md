@@ -177,3 +177,23 @@ Scanner configuration/tests reuse Hardware Chunk 1 APIs. Hardware Testing never
 calls cart state. Receipt barcode acceptance must compare the exact POS80
 printed value with TB-00D and camera where available; generated-byte tests are
 not physical acceptance for scanner or printer.
+
+## Cash Checkout Correlation Boundary
+
+Flutter and API compute the same first 12 lowercase hexadecimal characters of
+SHA-256 over the existing Cash idempotency key. Flutter records submit/dispatch,
+response or failure, success-state and navigation timing. API/repository records
+arrival, validation, transaction start, SaveChanges, commit or rollback, and
+returns the safe value in `X-POS-Correlation-Id`. Never log the raw idempotency
+key, authorization data, secrets, claims, request payloads or full identity
+values. Logging failure must never alter the checkout result.
+
+Cash intent state is provider-owned with draft, in-flight, known-rejected,
+unknown and succeeded phases. Unknown is a reconciliation gate and cannot mint
+a replacement key. Editing after a known rejection is the explicit new-attempt
+transition. Start-payment opts out of shared authentication-interceptor replay,
+so a financial POST is never silently dispatched again after 401.
+
+## Runtime Note (2026-08-06)
+
+Controlled sale `SO-000091` proved checkout persistence and one stock deduction. The receipt print endpoint recorded two failed audits because checkout still auto-invoked printing and the operator then tapped Print Receipt once. Automatic printing was removed; the explicit button is now the only initial-print trigger. Both audits failed `PRINTER_NOT_CONFIGURED`; drawer operation failed `INVALIDCONFIGURATION`. Hardware assignment must be corrected before another approved acceptance run.

@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-30 -->
+<!-- last_updated: 2026-08-06 -->
 
 # Permission Code List
 
@@ -387,7 +387,9 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `customers.update` | Edit customer on POS Customer Management (`77777777-0338-4000-8000-000000000001`; Cashier seed assignment) |
 | `sales.discount.apply` | List/validate/apply a permitted POS discount |
 | `sales.discount.approve` | Approve/reject above-authority POS discounts; never assigned to cashier by default |
-| `sales.park.create` | Permit current Flutter device-local Park action; backend Hold integration remains disconnected |
+| `sales.park.create` | Create Park Sale; current backend also uses it for cancel |
+| `sales.park.view` | View active Parked Sales and count |
+| `sales.park.recall` | Recall an eligible Parked Sale |
 | `sales.checkout` | Proceed to Payment button |
 | `payments.cash.accept` | Cash in payment sheet |
 | `payments.card.accept` | Show Card method when granted; current payment route is still a placeholder |

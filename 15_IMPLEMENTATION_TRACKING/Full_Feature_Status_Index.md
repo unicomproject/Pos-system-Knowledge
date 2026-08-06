@@ -1,9 +1,18 @@
 <!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-06 -->
 
 # Full Feature Status Index
+
+## Park / Recall Sale
+
+| Area | Status | Evidence |
+|---|---|---|
+| Approved feature contract | Documented | [[../04_MODULE_KNOWLEDGE/21_POS_Operations/08_Park_Recall_Sale_Feature]] |
+| Backend | Partial; target changes pending | [[Backend/POSOperations/Pos_Park_Recall_Sale_Implementation_Status]] |
+| Flutter | Local-only; API migration not started | [[Flutter/Sales/Park_Recall_Sale_Implementation_Status]] |
+| QA | Cases documented; not executed | [[../10_TESTING_QA/Test_Case/21_POS_Operations/POS_Park_Recall_Sale_Test_Cases]] |
 
 > 2026-08-02 correction: Payment Method target rearrangement is **partially
 > implemented**. Source composition and automated verification are present, but
@@ -83,7 +92,8 @@ PR/commit reference is recorded.
 | Flutter | Sales | Discount | Testing | - | `scanner_inte` | API-backed list/validate/apply flow; manager approval is permission-dependent |
 | Flutter | Sales | Customer Management | Testing | - | `scanner_inte` | List/create/update/select/attach implemented; loyalty is separate and incomplete |
 | Flutter | Sales | Loyalty Earn / Redeem | Not Started | - | - | No verified cashier Flutter-to-backend loyalty flow |
-| Flutter | Sales | Cash Checkout | Testing | - | `scanner_inte` | Summary, tender, change, start-payment and success flow implemented |
+| Flutter | Sales | Cash Checkout | Completed | 2026-08-04 | scanner_inte | Full flow completed. Hardware integration deferred. See [[Flutter/Sales/Cashier_UJ7_Payment_Flow_Final_Signoff]] |
+| Flutter | Sales | Cash Payment Screen Redesign | Complete | 2026-08-05 | - | Chunks 1–3 complete; target UI, dynamic Quick Amount, Cash payment submission, authoritative success handling and database persistence validated. Physical printer/drawer status recorded separately. |
 | Flutter | Sales | Card Payment | Blocked | - | Current working tree | Provider-neutral backend safety exists; real provider/terminal absent |
 | Flutter | Sales | QR Payment | Not Started | - | - | Current route renders payment placeholder |
 | Flutter | Sales | Split Payment | Not Started | - | - | Current route renders payment placeholder |
@@ -116,6 +126,8 @@ PR/commit reference is recorded.
 | Backend | ECommerce / ProductReviews | Product Reviews APIs | Testing | - | - | Implementation tracking added; current regression/commit evidence pending. See [[Backend/ECommerce/Product_Review_Implementation_Status]] |
 | Backend | ECommerce / Customer | POS Customer Profile And Attach To Sale | Testing | - | - | Implementation tracking added; latest regression and entitlement review pending. See [[Backend/ECommerce/Customer_Profile_Pos_Customer_Implementation_Status]] |
 | Full Stack | E-Commerce | Web Storefront & Tracking | Testing | - | e-commerce | Core flows are tracked across auth, browse, media, cart, checkout, wishlist, reviews, orders, fulfillment, and POS customer docs. See [[Online_Store/01_ECommerce_Implementation_Status]] |
+| Backend | POS Operations | Receipt Template Resolution | Testing | - | Current working tree | Resolution service and dynamic snapshot merge fully implemented and verified via tests/API. Template management API remains pending. See [[Backend/POSOperations/Receipt_Template_Resolution_Implementation_Status]] |
+| Flutter | Sales | Payment Success Receipt Screen | In Progress | - | - | Backend dependency (snapshot generation) fully implemented. Flutter data layer updated to accept snapshot. UI implementation pending. See [[Flutter/Sales/Payment_Success_Receipt_Screen_Implementation_Status]] |
 The `Completed` row for the 2026-07-02 Cashier comparison is historical. The
 comparison document itself is now `In Progress â€” Re-audit Required` until its
 remaining findings and documentation updates are closed.
@@ -154,3 +166,7 @@ table file, architecture file, and PR/commit reference where available.
 - [[../11_DEVELOPER_ONBOARDING/Code_Review_Checklist]]
 
 | Tenant Roles & Access | Flutter Frontend | Completed | 2026-07-22 | `15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin/Roles_Access_Frontend_Implementation_Status.md` |
+
+## Payment Success Chunk 3 Runtime Status (2026-08-06)
+
+**BLOCKED — CHUNK 3 REMAINS IN PROGRESS.** One authenticated Cash sale persisted and reset correctly, but runtime found corrected-yet-unrevalidated Payment Success mapping defects plus unresolved printer/drawer configuration. Physical print did not occur. See `15_IMPLEMENTATION_TRACKING/Flutter/Sales/Payment_Success_Receipt_Screen_Implementation_Status.md`.

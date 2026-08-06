@@ -1,10 +1,21 @@
 <!-- title: Cashier POS Second Brain vs Code Comparison Status -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-08-06 -->
 
 
 # Cashier POS Second Brain vs Code Comparison
+
+## Park / Recall Sale reconciliation
+
+The historical local implementation is not the approved final contract.
+Flutter currently persists parked sales under `pos.parked_sales`, creates local
+`Parked Sale #N` references, and recalls by deleting local data before cart
+restoration. The backend already exposes persistent hold create/list/recall/
+cancel routes backed by `pos_order_holds`, but the Flutter feature does not call
+them. Park / Recall therefore remains **In progress — contract documented,
+implementation not started**. Current evidence and remaining work are tracked
+in [[Park_Recall_Sale_Implementation_Status]].
 
 ## Purpose
 

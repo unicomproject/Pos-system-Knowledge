@@ -72,6 +72,17 @@ flowchart TD
   pulse the drawer.
 - Printer failure is post-payment and never rolls back completed payment.
 
+### Cash Payment Screen
+
+The Cash Payment screen enforces these rules:
+- **Checkout Summary**: Loaded authoritatively from `POST /api/v1/pos/checkout/summary`.
+- **Dynamic Quick Amounts**: Generated strictly as Exact Total Due and the next LKR 1000 boundary (e.g. 1700 -> 1700, 2000).
+- **Amount Entry**: Cashier selects a Quick Amount, uses **Exact Cash**, or uses **Other Amount** for manual keypad entry.
+- **Validation**: Submission is blocked for insufficient amounts.
+- **Complete Sale**: Uses idempotent submission to `POST /api/v1/pos/checkout/start-payment`.
+- **Success/Failure**: Backend values are authoritative. Cart clears only after success. Intent state is preserved on failure for safe retry.
+- Detailed rules are in the authoritative feature specification: [[../../04_MODULE_KNOWLEDGE/24_Payment_Refund/04_Cash_Payment_Screen_Feature]].
+
 ## Access-Control Rules
 
 | Control | Required Rule |
@@ -149,3 +160,19 @@ Email delivery remains unverified.
 
 Status: `PARTIALLY COMPLETE` — card safety and receipt integrity are implemented;
 real card provider and real split-payment completion are pending.
+
+## Payment Success Screen (2026-08-05)
+
+After confirmed backend payment success, the cashier is navigated to the Payment Success screen:
+- Backend-authoritative values are displayed (Receipt Number, Payment Method, Total Paid, Cash Received, Change Due).
+- Receipt preview uses the immutable `receipt_data_json` snapshot resolved at checkout; never reconstructed from the current cart or catalogue.
+- **Print Receipt** sends the original snapshot to the Local Print Agent. Print failure does not roll back the sale or affect Payment Status.
+- **Start New Sale** clears cart, customer, discount, amount received, quick amount, and payment intent. It does not delete the completed sale, payment, receipt, or stock movements.
+- **Email Receipt** and **SMS Receipt** are excluded from the current release.
+- Receipt-detail recovery uses `GET /api/v1/pos/receipts/{receiptId}` when in-memory state is unavailable.
+- Multi-tenant receipt preview uses resolved versioned template snapshots. See [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/04_Multi_Tenant_Receipt_Template_Resolution]].
+- Authoritative feature specification: [[../../04_MODULE_KNOWLEDGE/24_Payment_Refund/05_Payment_Success_Receipt_Preview_Feature]].
+
+## Chunk 3 Runtime Continuation (2026-08-06)
+
+One authenticated Cash sale completed (`SO-000091` / `RCP-000091`) and Start New Sale returned to an empty cart while preserving the session. Runtime found incorrect summary amount scaling, a blank tender label, an automatic print attempt before the explicit Print Receipt tap, and unavailable printer/drawer backend configuration. Targeted Flutter fixes were applied for the first three defects; no second sale or print retry was performed. Chunk 3 remains **BLOCKED — CHUNK 3 REMAINS IN PROGRESS** pending one newly approved validation transaction after hardware assignment is corrected.

@@ -109,6 +109,10 @@ flowchart TD
 
 Cashier New Sale includes the production Product Variant Selection Popup before cart addition when direct-add rules cannot resolve a sellable variant. It uses one image slot, supports an optional product-line note and up to three manually configured Frequently Bought Together products. Popup image browsing and AI/ML recommendations are excluded; shared product-media multi-image capability remains available elsewhere. See [[../04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 
+## Payment Success Screen Scope
+
+Payment Success screen, Receipt Preview, Print Receipt and Start New Sale are included Release 1 scope. Email Receipt delivery and SMS Receipt delivery are excluded for now. See [[../04_MODULE_KNOWLEDGE/24_Payment_Refund/05_Payment_Success_Receipt_Preview_Feature]].
+
 ## Offline Boundary
 
 Offline operation is included for safe minimum EPOS continuity.

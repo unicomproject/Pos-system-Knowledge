@@ -55,3 +55,7 @@ record exists. Test filenames alone are not pass evidence.
 
 - [[Test_Case/21_POS_Operations/POS_Product_Variant_Selection_Popup_Test_Cases]]
 
+
+## Cash Payment Screen Redesign
+
+- [[Test_Case/24_Payment_Refund/POS_Cash_Payment_Screen_Test_Cases]]

@@ -1,9 +1,22 @@
 <!-- title: Scope Change Log -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-06 -->
 
 # Scope Change Log
+
+## 2026-08-06 — Park / Recall Sale contract alignment
+
+- Approved backend `pos_order_holds` and `/api/v1/pos/holds` as authority.
+- Approved a required reason, backend-generated reference, 24-hour default
+  expiry, backend-user/till visibility, transactional recall revalidation, and
+  idempotent park creation as the implementation target.
+- Recorded that the current backend accepts an optional reason and optional
+  client expiry, generates `HOLD-######`, and scopes lists to the holding user.
+- Recorded that Flutter remains local secure-storage only.
+- Documentation phase only; backend and Flutter implementation remain pending.
+
+Decision: [[ADR/ADR_008_Park_Recall_Sale_Authority_And_Expiry]].
 
 ## [2026-08-02] POS Payment Method Screen
 

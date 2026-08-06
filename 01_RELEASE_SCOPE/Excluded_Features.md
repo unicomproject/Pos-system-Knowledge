@@ -50,6 +50,8 @@ must be treated as outdated until updated.
 | CQRS/MediatR | Excluded unless approved |
 | Multi-image browsing in the Cashier variant popup | Excluded; the popup uses one resolved image slot |
 | AI/ML Frequently Bought Together | Excluded; Release 1 uses manual relationships |
+| Email Receipt delivery | Excluded; future capability |
+| SMS Receipt delivery | Excluded; future capability |
 
 These popup exclusions do not remove shared multi-image product-media management or the included manual Frequently Bought Together feature.
 
