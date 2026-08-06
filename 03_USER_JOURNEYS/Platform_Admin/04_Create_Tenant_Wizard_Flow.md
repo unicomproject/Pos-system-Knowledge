@@ -1,9 +1,12 @@
 <!-- title: Create Tenant Wizard Flow -->
-<!-- status: Active -->
-<!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-27 -->
+<!-- status: Historical / Superseded -->
+<!-- system: OneVerz POS MVP / OneVerz -->
+<!-- last_updated: 2026-08-06 -->
+<!-- superseded: true -->
 
 # Create Tenant Wizard Flow
+
+> **SUPERSEDED — DO NOT IMPLEMENT FROM THIS FILE.** The approved replacement is [[FLOW_4_CREATE_TENANT_WIZARD_CANONICAL_SPEC]]. This file is retained as evidence of the pre-2026-07-31 implementation baseline.
 
 ## Purpose
 
@@ -85,7 +88,7 @@ Subscription type (`PAID`/`TRIAL`/`DEMO`), billing cycle, subscription status, a
 | `tenants.status` CHECK constraint | Approved | **IMPLEMENTED** |
 | `lifecycleStatus` API transition | Approved | **IMPLEMENTED** (compat aliases **DEPRECATED**) |
 | Frontend lifecycle badge/filter alignment | Approved | **IMPLEMENTED** |
-| Wizard FE hint “email not wired” | Temporary until emails ship | Matches current code; superseded as product SOT by [[18_Tenant_Onboarding_Email_Flows]] |
+| Wizard FE hint â€œemail not wiredâ€ | Temporary until emails ship | Matches current code; superseded as product SOT by [[18_Tenant_Onboarding_Email_Flows]] |
 | Post-merge smoke verification | Required | **PASSED** — [[../../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Post_Merge_Smoke_Verification]] |
 
 ### Decision history — superseded statements
@@ -114,7 +117,7 @@ Each wizard step validates before Next is enabled. The Review step shows a valid
 - Mapper: `platform-tenant-create.mapper.ts`
 - API: `platform-tenant-api.service.ts`
 
-See [[16_Platform_Tenant_Create_Wizard_Alignment]] for request shape. Align that doc’s email notes to [[18_Tenant_Onboarding_Email_Flows]] when implementing.
+See [[16_Platform_Tenant_Create_Wizard_Alignment]] for request shape. Align that docâ€™s email notes to [[18_Tenant_Onboarding_Email_Flows]] when implementing.
 
 ## Related Files
 

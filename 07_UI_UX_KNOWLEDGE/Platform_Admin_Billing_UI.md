@@ -1,9 +1,13 @@
 <!-- title: Platform Admin Billing UI -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-17 -->
+<!-- last_updated: 2026-08-06 -->
 
 # Platform Admin Billing UI
+
+> Flow 4 extension target (2026-08-04): the existing invoice UI remains implemented and release-ready for its original scope. Manual tenant onboarding additionally requires a payment review queue/detail, private proof preview/download, expected-versus-submitted comparison, approve/reject/request-information, review history, activation/invitation status, and retry/resend actions. These additions are not implemented and do not change the status of the narrower existing Billing UI.
+
+Target views must include loading, empty, error, stale-version, permission-denied and terminal states; keyboard/focus/error-summary/live-region behavior; and desktop, tablet and supported small viewport layouts. `platform.billing.view` controls queue/detail/proof/history, `platform.billing.manage` controls review/retry/resend, and `platform.tenants.activate` remains separate. Manual `checkoutUrl` is null.
 
 ## Current Frontend Baseline
 

@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-01 -->
+<!-- last_updated: 2026-08-06 -->
 
 
 # Current Source Of Truth
@@ -13,6 +13,18 @@ It prevents developers and AI assistants from mixing old POS-first scope, future
 ideas, and current MVP delivery work.
 Use this file before writing, implementing, reviewing, or generating any module
 documentation.
+
+## Flow 4 Tenant Onboarding Authority
+
+Platform Admin tenant creation is governed by [[../03_USER_JOURNEYS/Platform_Admin/FLOW_4_CREATE_TENANT_WIZARD_CANONICAL_SPEC]] and its linked API, database, permission, test, decision and readiness documents. Older tenant-wizard flows, state notes and prompts are historical evidence only.
+
+The approved current-release Flow 4 collection model is **manual payment verification**. `invoiceUrl` and secure `paymentStatusUrl` are supported target concepts; manual `checkoutUrl` is null. Prepaid payment approval reaches `PENDING_ACTIVATION`, followed by separate activation and Tenant Admin invitation. Future Stripe/PayHere support uses provider adapters and signed idempotent callbacks. Authority: [[../05_BACKEND_ARCHITECTURE/FLOW_4_MANUAL_PAYMENT_AND_FUTURE_IPG_ARCHITECTURE]]; alignment evidence: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/FLOW_4_MANUAL_PAYMENT_SECOND_BRAIN_ALIGNMENT_2026-08-04]].
+
+Runtime implementation evidence is recorded in [[../15_IMPLEMENTATION_TRACKING/FLOW_4_MANUAL_PAYMENT_BACKEND_IMPLEMENTATION_EVIDENCE_2026-08-04]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_MANUAL_PAYMENT_ANGULAR_IMPLEMENTATION_EVIDENCE_2026-08-04]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_CREATE_TENANT_WIZARD_IMPLEMENTATION_EVIDENCE_2026-08-04]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_RELEASE_ENVIRONMENT_AND_E2E_VALIDATION_EVIDENCE_2026-08-04]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_RETAIL_BUSINESS_CODE_MIGRATION_RESOLUTION_EVIDENCE_2026-08-05]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_LIVE_ACS_CREDENTIALED_EXTERNAL_RERUN_EVIDENCE_2026-08-05]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_LIVE_ACS_MAILBOX_AND_PLAYWRIGHT_COMPLETION_EVIDENCE_2026-08-05]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_INTERNAL_21_SCENARIO_E2E_PREFLIGHT_EVIDENCE_2026-08-05]] and [[../15_IMPLEMENTATION_TRACKING/FLOW_4_DOCKER_DEPENDENCY_AND_MERGE_READINESS_AUDIT_2026-08-06]]. Latest regression baselines: backend **1,501/1,501** before Backend `main` integration and **1,647/1,647** after; Angular **454/454**. Chunk 6A closed the **internal** 21-scenario Playwright preflight (20 canonical + E2E 14b security regression) with EmailMode SUPPRESSED — **no live ACS delivery claimed**. Docker is **optional/test-only** for normal development (merge readiness: `MERGE_READY_WITH_EXTERNAL_RELEASE_BLOCK`). Controlled mailbox, recipient allow-list and approved HTTPS payment/setup hosts remain unavailable (**BLOCKED_EXTERNAL**). Production remains **NO-GO** until live ACS/mailbox/HTTPS external closure completes. The Retail business-code migration P0 is resolved. Overall Flow 4 remains NO-GO for production release.
+
+The 2026-08-05 documentation audit is the current traceability layer: [[../15_IMPLEMENTATION_TRACKING/FLOW_4_SECOND_BRAIN_DOCUMENT_READ_MANIFEST_2026-08-05]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_REQUIREMENT_TRACEABILITY_MATRIX_2026-08-05]], [[../15_IMPLEMENTATION_TRACKING/FLOW_4_DOCUMENT_CONFLICT_AND_GAP_REGISTER_2026-08-05]] and [[../15_IMPLEMENTATION_TRACKING/FLOW_4_APPROVED_NEXT_IMPLEMENTATION_SCOPE_2026-08-05]]. It does not replace the canonical requirements above. It records 72 atomic requirements, five non-verified P0 requirements and a `CONDITIONAL_GO_FOR_IMPLEMENTATION` limited to the remaining approved gap-closing scope; production remains NO-GO. Migration authority is the approved [[../13_DECISIONS_AND_CHANGES/FLOW_4_RETAIL_BUSINESS_CODE_MIGRATION_DISPOSITION_2026-08-05]].
+
+Chunk 2 security authority is the approved [[../13_DECISIONS_AND_CHANGES/FLOW_4_SECURE_TEST_HOST_TOKEN_AND_FIXTURE_CONTRACT_2026-08-05]], with threat model [[../09_SECURITY_AND_COMPLIANCE/FLOW_4_TEST_FIXTURE_TOKEN_THREAT_MODEL_2026-08-05]] and implementation contract [[../10_TESTING_QA/FLOW_4_SECURE_LIFECYCLE_FIXTURE_IMPLEMENTATION_CONTRACT_2026-08-05]]. Chunk 3 must use a separate non-HTTP test CLI/hybrid, production token/hash primitives, cumulative environment/database/credential guards, one-time process-local secret handoff and ownership-bound cleanup. No production fixture endpoint, DI registration or Swagger route is authorized. This approval does not increase the 59/64 verified P0 count; fixture runtime and security proof remain pending.
 
 ## Highest Priority Decision
 
@@ -114,8 +126,8 @@ Do not invent unsupported modules, APIs, roles, permissions, integrations,
 tables, screens, or flows.
 ## Active Backend Setup (read first)
 
-- [[../11_DEVELOPER_ONBOARDING/Backend_Local_Development_Setup]] — Unified Commerce (`E_POS.Api`, port **5187**)
-- [[../11_DEVELOPER_ONBOARDING/Unified_Commerce_Backend_Known_Limitations]] — tenant-login gap
+- [[../11_DEVELOPER_ONBOARDING/Backend_Local_Development_Setup]] â€” Unified Commerce (`E_POS.Api`, port **5187**)
+- [[../11_DEVELOPER_ONBOARDING/Unified_Commerce_Backend_Known_Limitations]] â€” tenant-login gap
 - Latest Cashier POS documentation-vs-code comparison: [[../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Cashier_POS_Second_Brain_vs_Code_Comparison_Implementation_Status]]
 
 ## Related Files

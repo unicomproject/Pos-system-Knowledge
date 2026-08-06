@@ -2,7 +2,7 @@
 <!-- status: APPROVED -->
 <!-- system: OneVerz POS MVP -->
 <!-- owner: Platform Architecture / Product (OneVerz) -->
-<!-- last_updated: 2026-07-27 -->
+<!-- last_updated: 2026-08-04 -->
 <!-- applies_to: Release 1 email events and templates -->
 <!-- related: Email_Architecture_And_Provider_Decisions -->
 
@@ -30,7 +30,7 @@ Parent architecture: [[Email_Architecture_And_Provider_Decisions]].
 | Event code | Trigger | Recipient | Template | CTA | R1 status | Implementation status |
 |---|---|---|---|---|---|---|
 | `platform.password_reset_requested` | Platform Admin initiates password reset | Platform user email | `platform_password_reset` | Open set-password / reset page | APPROVED | **IMPLEMENTED** (ACS E2E PASSED) |
-| `tenant.paid_created` | Paid tenant created → `PENDING_PAYMENT` | Tenant Admin email | `tenant_paid_created_payment_required` | Pay via payment link | APPROVED | **NOT IMPLEMENTED** (BLOCKED on payment-link API/UI) |
+| `tenant.paid_created` | Prepaid paid tenant created -> `PENDING_PAYMENT` | Tenant Admin or approved billing contact | `tenant_paid_created_payment_required` | Open secure payment status | APPROVED | **NOT IMPLEMENTED** (blocked on manual-payment API/UI) |
 | `tenant.paid_activated` | Paid tenant manually activated after verified payment or approved waiver → `ACTIVE` | Tenant Admin email | `tenant_activated_set_password` | Set password | APPROVED | **NOT IMPLEMENTED** |
 | `tenant.trial_created` | Trial tenant created | Tenant Admin email | `tenant_trial_created` | Read next steps | APPROVED | **NOT IMPLEMENTED** |
 | `tenant.trial_activated` | Trial auto-activated after provisioning | Tenant Admin email | `tenant_activated_set_password` | Set password | APPROVED | **NOT IMPLEMENTED** |
@@ -40,7 +40,10 @@ Parent architecture: [[Email_Architecture_And_Provider_Decisions]].
 | `tenant.user_invited` | Tenant user invited | Invitee email | `tenant_user_invite` | Accept invite / set password | APPROVED (product) | **NOT IMPLEMENTED** / often **DEFERRED** until after tenant-admin onboarding |
 | `tenant.password_reset_requested` | Tenant-user password reset | Tenant user email | `tenant_password_reset` | Reset password | **DEFERRED** | **NOT IMPLEMENTED** |
 | `user.password_changed` | Password changed successfully | Account email | `password_changed_alert` | Sign in / secure account | **FUTURE** | **NOT IMPLEMENTED** |
-| `tenant.payment_received` | Payment verified | Tenant Admin | `tenant_payment_received` | — | **DEFERRED** (R1) | **NOT IMPLEMENTED** |
+| `tenant.manual_payment_submitted` | Evidence accepted | Payer/payment recipient | `tenant_manual_payment_submitted` | View payment status | APPROVED | **NOT IMPLEMENTED** |
+| `tenant.payment_information_requested` | Reviewer requests correction/details | Payer/payment recipient | `tenant_payment_information_requested` | Update submission | APPROVED | **NOT IMPLEMENTED** |
+| `tenant.payment_rejected` | Reviewer rejects submitted evidence | Payer/payment recipient | `tenant_payment_rejected` | View reason/resubmit when eligible | APPROVED | **NOT IMPLEMENTED** |
+| `tenant.payment_received` | Manual payment approved | Tenant Admin or approved billing contact | `tenant_payment_received` | View activation status | APPROVED | **NOT IMPLEMENTED** |
 
 ## Event detail cards
 
@@ -65,15 +68,15 @@ Parent architecture: [[Email_Architecture_And_Provider_Decisions]].
 |---|---|
 | Trigger | Super Admin / Platform Admin creates **paid** tenant; lifecycle → `PENDING_PAYMENT` |
 | Recipients | Tenant Admin email |
-| Required data | Plan name, amount, currency, billing frequency, due date, **payment link** |
+| Required data | Tenant identity/reference/status, plan/cycle, subtotal/tax/total/currency, invoice number/due date, versioned manual instructions/reference format, support contact, `invoiceUrl`, secure `paymentStatusUrl`; `checkoutUrl` null |
 | Template | `tenant_paid_created_payment_required` |
 | Subject intent | Tenant created — payment required |
-| CTA | Open payment link |
+| CTA | Open secure payment status |
 | Must not include | Password, set-password link |
-| Idempotency key | `tenant.paid_created:{tenantId}:{invoiceId|paymentLinkId}` |
-| Resend rules | Authorized Platform Admin resend; same link if still valid or rotate per payment-link rules |
+| Idempotency key | `tenant.paid_created:{tenantId}:{invoiceId}:{paymentAccessId}` |
+| Resend rules | Authorized Platform Admin resend; same unexpired access grant or rotate/revoke according to secure-access rules |
 | Audit event | `TENANT_PAID_CREATED` / email outbox recorded |
-| R1 / Impl | APPROVED / **NOT IMPLEMENTED** (**BLOCKED** on payment-link generation) |
+| R1 / Impl | APPROVED / **NOT IMPLEMENTED** (**BLOCKED** on manual-payment access/notification) |
 
 ### `tenant.paid_activated` / `tenant.trial_activated` / `tenant.demo_activated` / `tenant.password_setup_requested`
 
@@ -135,8 +138,14 @@ Parent architecture: [[Email_Architecture_And_Provider_Decisions]].
 
 | Field | Value |
 |---|---|
-| Trigger | Payment verified |
-| R1 / Impl | **DEFERRED** for Release 1 / **NOT IMPLEMENTED** |
+| Trigger | Authorized manual review approves payment and tenant becomes `PENDING_ACTIVATION` |
+| Required data | Tenant/invoice reference, approved amount/currency/date, current activation status, support information |
+| Must not include | Setup token/password, proof URL, bank details, reviewer-private note |
+| R1 / Impl | **APPROVED** for manual-payment Release 1 / **NOT IMPLEMENTED** |
+
+### Manual payment submission/review outcomes
+
+`tenant.manual_payment_submitted`, `tenant.payment_information_requested`, and `tenant.payment_rejected` use separate templates. They include only safe tenant/invoice references, current status, required next action, secure `paymentStatusUrl`, and support information. They never contain proof URLs/storage keys, full bank details, access tokens, passwords or account setup links. Resends are permissioned, rate-limited and outbox-idempotent.
 
 ## Template inventory
 
@@ -144,13 +153,16 @@ Parent architecture: [[Email_Architecture_And_Provider_Decisions]].
 |---|---|---|
 | `platform_password_reset` | `platform.password_reset_requested` | Implemented composer |
 | `tenant_paid_created_payment_required` | `tenant.paid_created` | Not built |
+| `tenant_manual_payment_submitted` | `tenant.manual_payment_submitted` | Not built |
+| `tenant_payment_information_requested` | `tenant.payment_information_requested` | Not built |
+| `tenant_payment_rejected` | `tenant.payment_rejected` | Not built |
 | `tenant_trial_created` | `tenant.trial_created` | Not built |
 | `tenant_demo_created` | `tenant.demo_created` | Not built |
 | `tenant_activated_set_password` | `*.activated`, `tenant.password_setup_requested` | Not built |
 | `tenant_user_invite` | `tenant.user_invited` | Not built |
 | `tenant_password_reset` | `tenant.password_reset_requested` | Deferred |
 | `password_changed_alert` | `user.password_changed` | Future |
-| `tenant_payment_received` | `tenant.payment_received` | Deferred R1 |
+| `tenant_payment_received` | `tenant.payment_received` | Approved manual-payment target; not built |
 
 ## Related
 

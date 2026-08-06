@@ -1,7 +1,7 @@
 <!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-06 -->
 
 # Full Feature Status Index
 
@@ -62,6 +62,17 @@ PR/commit reference is recorded.
 
 | Platform | Module | Feature | Status | Completed Date | PR / Commit | Notes |
 |---|---|---|---|---|---|---|
+| Cross-platform | Platform Tenant | Flow 4 Create Tenant Wizard | Testing (production NO-GO) | 2026-08-05 | [[FLOW_4_RELEASE_ENVIRONMENT_AND_E2E_VALIDATION_EVIDENCE_2026-08-04]] | Isolated PostgreSQL/ClamAV/Azurite and real browser executed; 6 distinct scenarios pass, 14 token/lifecycle scenarios plus live ACS/private proof remain blocked |
+| Cross-platform | Platform Tenant | Flow 4 Live ACS Credentialed External Rerun (Chunk 5D) | Conditional; production NO-GO | 2026-08-05 | [[FLOW_4_LIVE_ACS_CREDENTIALED_EXTERNAL_RERUN_EVIDENCE_2026-08-05]] | ACS User Secrets + endpoint reachability + sender PASS; mailbox/allow-list/HTTPS/live DB BLOCKED; Playwright 21/21 skipped; backend 1,501 and Angular 454 pass; `CONDITIONAL_GO_TO_CHUNK_6` |
+| Cross-platform | Platform Tenant | Flow 4 Live ACS Mailbox/Playwright Completion (Chunk 5E) | Conditional; production NO-GO | 2026-08-05 | [[FLOW_4_LIVE_ACS_MAILBOX_AND_PLAYWRIGHT_COMPLETION_EVIDENCE_2026-08-05]] | Isolated DB + safety marker provisioned then cleaned; mailbox/allow-list/HTTPS still BLOCKED; no live ACS send; Playwright 21 skipped; regressions 1,501/454; `CONDITIONAL_GO_TO_CHUNK_6` |
+| Cross-platform | Platform Tenant | Flow 4 Internal 21-Scenario E2E Preflight (Chunk 6A) | Internal PASS; production NO-GO | 2026-08-05 | [[FLOW_4_INTERNAL_21_SCENARIO_E2E_PREFLIGHT_EVIDENCE_2026-08-05]] | Playwright **21/21** internal PASS (20 canonical + 14b); EmailMode SUPPRESSED; no live ACS; F4-GAP-005 internal closed; F4-GAP-004 external still open; backend 1,501 / Angular 454 |
+| Cross-platform | Platform Tenant | Flow 4 Docker Dependency and Merge Readiness (2026-08-06) | Merge-ready with external release block; production NO-GO | 2026-08-06 | [[FLOW_4_DOCKER_DEPENDENCY_AND_MERGE_READINESS_AUDIT_2026-08-06]] | Docker optional/test-only; docker-off build/unit green; no Testcontainers; compose kept for E2E owner; ACS safe defaults; `MERGE_READY_WITH_EXTERNAL_RELEASE_BLOCK` |
+| Backend | Platform Tenant | Flow 4 Backend main integration | Internal complete; production NO-GO | 2026-08-06 | Backend merge commit on `feat/flow4-create-tenant-runtime` | After `origin/main` merge: backend tests **1,647/1,647**; internal Playwright 21/21 retained; live ACS/mailbox/HTTPS still BLOCKED_EXTERNAL |
+| Cross-platform | Platform Tenant | Flow 4 Second Brain Traceability Audit | Conditionally approved next implementation scope; production NO-GO | 2026-08-05 | [[FLOW_4_REQUIREMENT_TRACEABILITY_MATRIX_2026-08-05]] | 54 relevant documents fully read; 72 atomic requirements; 59/64 P0 verified; Retail migration resolved; fixture/token authority, 20/20 E2E, private proof and live ACS remain P0 |
+| Backend | Platform Tenant | Flow 4 Retail Business-Code Migration | Implemented and verified; Chunk 1 GO | 2026-08-05 | [[FLOW_4_RETAIL_BUSINESS_CODE_MIGRATION_RESOLUTION_EVIDENCE_2026-08-05]] | Guarded original + forward history correction; 9/9 PostgreSQL cases, 1,470/1,470 backend tests, no pending model changes; F4-GAP-006 closed |
+| Cross-platform | Platform Tenant | Flow 4 Secure Test-Host Token and Fixture Contract | Documented and approved; Chunk 3 GO; production NO-GO | 2026-08-05 | [[FLOW_4_SECURE_TEST_HOST_CONTRACT_EVIDENCE_2026-08-05]] | Separate non-HTTP CLI/hybrid approved; 15-threat model, typed scenarios, pipe/fallback secret transport and ownership cleanup defined; runtime builder/tests pending; P0 remains 59/64 |
+| Backend | Platform Billing | Flow 4 Manual Payment + Future IPG | Backend implemented and verified | 2026-08-05 | [[FLOW_4_MANUAL_PAYMENT_BACKEND_IMPLEMENTATION_EVIDENCE_2026-08-04]] | Real execution defects fixed; 1,461 backend tests pass; EF model current; current release manual and `checkoutUrl` null; Stripe/PayHere deferred |
+| Angular | Platform Billing | Flow 4 Manual Payment | Testing; partial browser acceptance; production NO-GO | 2026-08-05 | [[FLOW_4_MANUAL_PAYMENT_ANGULAR_IMPLEMENTATION_EVIDENCE_2026-08-04]] | 453 tests and production audit pass; responsive 5-viewport queue passes; 6 distinct Playwright scenarios pass and 14 remain blocked |
 | Backend | Auth | Tenant Login | Completed | 2026-07-01 | Tenant auth module | `POST /api/v1/tenant-auth/login` |
 | Backend | OutletTillDevice | Device Context | Completed | 2026-07-09 | `5c99b66` | `devices/current`, `devices/activate` |
 | Backend | OutletTillDevice | Till Session Open/Close | Completed | 2026-07-09 | `06048db` | current-session, open, close |

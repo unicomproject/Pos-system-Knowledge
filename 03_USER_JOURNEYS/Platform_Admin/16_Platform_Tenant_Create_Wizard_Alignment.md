@@ -1,9 +1,12 @@
 <!-- title: Platform Tenant Create Wizard Alignment -->
-<!-- status: Active -->
-<!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-27 -->
+<!-- status: Historical / Superseded -->
+<!-- system: OneVerz POS MVP / OneVerz -->
+<!-- last_updated: 2026-08-06 -->
+<!-- superseded: true -->
 
 # Platform Tenant Create Wizard Alignment
+
+> **SUPERSEDED — DO NOT IMPLEMENT FROM THIS FILE.** Use [[FLOW_4_CREATE_TENANT_WIZARD_CANONICAL_SPEC]]. This document remains historical evidence of the one-shot wizard alignment completed before the canonical Flow 4 audit.
 
 ## Email and lifecycle alignment (2026-07-27)
 
@@ -20,10 +23,10 @@ Approved create/activation emails and lifecycle statuses: [[18_Tenant_Onboarding
 | Uploaded Super Admin step | Angular route step | Backend endpoint / tables |
 |---|---|---|
 | Business Information | 1 | `POST /tenants` basics + `tenant_profiles` + `tenant_addresses` + `tenants.default_locale` / `operating_mode` |
-| Plan Selection | 2 | `subscriptionPlanId` → `tenant_subscriptions` |
+| Plan Selection | 2 | `subscriptionPlanId` â†’ `tenant_subscriptions` |
 | Limits & Add-ons | 3 | `limits` overrides + `tenant_subscription_addons` |
-| Feature Entitlements | 4 | `enabledFeatureIds/Codes` → `tenant_feature_entitlements` |
-| Tenant Admin | 5 | `tenantAdmin` → `tenant_users`, roles, invites |
+| Feature Entitlements | 4 | `enabledFeatureIds/Codes` â†’ `tenant_feature_entitlements` |
+| Tenant Admin | 5 | `tenantAdmin` â†’ `tenant_users`, roles, invites |
 | Billing & Subscription | 6 | `billingStatus`, `subscription` billing fields, draft invoice |
 | Review & Create | 7 | Same `POST /tenants` transaction |
 
@@ -35,7 +38,7 @@ Approved create/activation emails and lifecycle statuses: [[18_Tenant_Onboarding
 - `addons[]` with `limitIncrementByKey`
 - `catalogModules[]` with nested `features[]`
 - lookup arrays: `billingStatuses`, `paymentMethods`, `currencies`, `timezones`, `locales`, `businessTypes`, `operatingModes`, `subscriptionStatuses`, `billingCycles` — each item is `{ value, label }`
-- `countryCodes[]` — each item is `{ code, name }` (not `{ value, label }`); Angular maps `code` → dropdown value and `name` → label
+- `countryCodes[]` — each item is `{ code, name }` (not `{ value, label }`); Angular maps `code` â†’ dropdown value and `name` â†’ label
 
 Permission: `platform.tenants.create`.
 
@@ -49,7 +52,7 @@ Dropdowns bind to lookup `value` (API code), not `label` (display text).
 | Address country | Sri Lanka | `address.countryCode: "LK"` | `tenant_addresses.country_code` char(2) |
 | Locale | English (United Kingdom) | `defaultLocale: "en-GB"` | `tenants.default_locale` varchar(20) |
 | Operating mode | POS Only | `operatingMode: "pos_only"` | `tenants.operating_mode` varchar(40) |
-| Business type | Retail | `businessType: "retail"` | `tenant_profiles.business_type_id` → `business_types` |
+| Business type | Retail | `businessType: "retail"` | `tenant_profiles.business_type_id` â†’ `business_types` |
 | Currency | LKR - Sri Lankan Rupee | `baseCurrency: "LKR"` | `tenants.base_currency_code` char(3) |
 | Billing status | Pending | `billingStatus: "pending"` | billing fields on subscription / invoice domain only |
 | Subscription status | Trial | `subscription.subscriptionStatus: "trial"` | `tenant_subscriptions.subscription_status` |
@@ -147,7 +150,7 @@ See [[SA-P0-01_Tenant_Wizard_Field_Persistence_Fix]].
 - Branches: BE/FE `fix/platform-admin-tenant-wizard-field-persistence`; docs `docs/platform-admin-tenant-wizard-persistence-verification`
 - Migration: `20260720053000_AddTenantLocaleOperatingModeColumns` applied to local Development `UnifiedCommerceDb` (nullable columns). Production not applied.
 - Country rules: equal codes OK; top-level-only creates primary address; conflicting codes rejected.
-- Runtime: create `en-GB` / `pos_only` / `retail` / `GB` → details + name-only update + reload preserved values; DB matched.
+- Runtime: create `en-GB` / `pos_only` / `retail` / `GB` â†’ details + name-only update + reload preserved values; DB matched.
 - Status: **COMPLETE**
 
 ## Lifecycle alignment implementation status (2026-07-28)
