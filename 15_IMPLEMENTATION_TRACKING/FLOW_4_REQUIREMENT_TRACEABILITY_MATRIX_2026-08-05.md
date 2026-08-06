@@ -122,10 +122,10 @@ Atomic requirements were extracted before code inspection. The short mappings be
 | F4-REQ-057 | Backend build, unit, API and PostgreSQL integration suites must pass with no Flow 4 failure. | TESTING | DOC-022,052,054 | release gate/evidence | P0 | Entire solution | PostgreSQL tests | — | auth suites | security suites | 743+341+377 | 1,461/1,461 pass | IMPLEMENTED_VERIFIED | — |
 | F4-REQ-058 | Angular production build, strict TypeScript and unit/component tests must pass. | TESTING | DOC-022,053,054 | Angular evidence | P0 | — | — | entire app | guards/masking | interceptor tests | 453 tests | Build + 453/453 pass | IMPLEMENTED_VERIFIED | — |
 | F4-REQ-059 | Full migration chain, rollback/reapply and no-pending-model-change checks must pass on PostgreSQL. | TESTING | DOC-020,022,052,054 | migration evidence | P0 | EF migrations | DB-F4/current snapshot | — | — | data constraints | 9 focused PostgreSQL migration tests | Clean/history/rollback/reapply pass on PostgreSQL 17.10; no pending model changes | IMPLEMENTED_VERIFIED | F4-GAP-006 closed |
-| F4-REQ-060 | All twenty real-path Playwright scenarios must pass without HTTP mocks, fake gateway success or uncontrolled DB mutation. | RELEASE | DOC-022,054 | browser matrix | P0 | Real API | isolated PostgreSQL | PW | real identities | real scoped tokens | E2E 1–20 | 6 distinct pass; 14 blocked | BLOCKED_ENVIRONMENT | F4-GAP-005 |
-| F4-REQ-061 | Private Blob upload/download/proof-stream flow must pass through a real recipient submission and authorized review path. | RELEASE | DOC-018,022,054 | proof gate | P0 | Azure storage adapter | evidence/blob metadata | recipient/reviewer pages | grant/billing.view | private/no-store | E2E 3,6,15,17 | Azurite reachable; full path blocked | BLOCKED_ENVIRONMENT | F4-GAP-003 |
+| F4-REQ-060 | All twenty real-path Playwright scenarios must pass without HTTP mocks, fake gateway success or uncontrolled DB mutation. | RELEASE | DOC-022,054 | browser matrix | P0 | Real API | isolated PostgreSQL | PW | real identities | real scoped tokens | E2E 1–20 + 14b | Chunk 6A: **21/21** internal PASS (20 canonical + security regression); EmailMode SUPPRESSED; no live ACS claimed | IMPLEMENTED_VERIFIED | F4-GAP-005 internal closed; external live-email remains F4-GAP-004 |
+| F4-REQ-061 | Private Blob upload/download/proof-stream flow must pass through a real recipient submission and authorized review path. | RELEASE | DOC-018,022,054 | proof gate | P0 | Azure storage adapter | evidence/blob metadata | recipient/reviewer pages | grant/billing.view | private/no-store | E2E 3,6,15,17 | Chunk 6A: Azurite + ClamAV private proof browser path PASS | IMPLEMENTED_VERIFIED | F4-GAP-003 internal closed |
 | F4-REQ-062 | ClamAV must accept a valid proof, detect EICAR and preserve scan-before-availability/fail-closed behavior. | SECURITY | DOC-018,022,054 | malware gate | P0 | ClamAV adapter | scan result | safe progress/error | grant/manage | positive rejected | F4-T46/E2E15 | Local PDF OK and EICAR found | IMPLEMENTED_VERIFIED | — |
-| F4-REQ-063 | Live ACS must prove payment/invitation send acceptance, recipient routing, provider ID, retry/resend and redacted telemetry; inbox delivery is reported separately from `WaitUntil.Started`. | RELEASE | DOC-048–050,054 | provider/operations block | P0 | ACS email adapter/worker | outbox delivery state | operation UI | authorized resend | secrets/log redaction | live service cases | Chunk 5E: ACS secrets PASS; isolated DB + safety marker provisioned then cleaned; mailbox/allow-list/HTTPS still BLOCKED; no provider acceptance or inbox evidence | BLOCKED_ENVIRONMENT | F4-GAP-004 |
+| F4-REQ-063 | Live ACS must prove payment/invitation send acceptance, recipient routing, provider ID, retry/resend and redacted telemetry; inbox delivery is reported separately from `WaitUntil.Started`. | RELEASE | DOC-048–050,054 | provider/operations block | P0 | ACS email adapter/worker | outbox delivery state | operation UI | authorized resend | secrets/log redaction | live service cases | Chunk 6A: internal outbox SUPPRESSED PASS; live ACS/mailbox/HTTPS still **BLOCKED_EXTERNAL** | BLOCKED_ENVIRONMENT | F4-GAP-004 |
 | F4-REQ-064 | Recipient and reviewer surfaces must pass keyboard, focus, labelled-error, live-region and screen-reader-oriented acceptance. | ACCESSIBILITY | DOC-013,018,022,054 | accessibility gates | P1 | safe errors | — | FE-MP | denied states | no restricted disclosure | accessibility E2E | Queue focus passed; recipient pending | PARTIALLY_IMPLEMENTED | F4-GAP-007 |
 | F4-REQ-065 | Recipient/reviewer surfaces must pass 360/tablet/desktop responsive acceptance with no global clipping/scroll. | RESPONSIVE | DOC-013,018,022,054 | responsive gates | P1 | — | — | FE-MP SCSS/card-table | — | — | responsive E2E | Queue five viewports passed; recipient pending | PARTIALLY_IMPLEMENTED | F4-GAP-007 |
 | F4-REQ-066 | Cross-tenant/token/object-ID substitution must be privacy-safe and public recipient requests must not receive platform bearer tokens. | SECURITY | DOC-018,021,022,054 | isolation/privacy | P0 | BE-SEC/BE-MP | exact associations | auth-token interceptor exclusion | view/manage/grant | safe 403/404 | F4-T33,T41,T46,T50 | E2E 14/17 pass + tests | IMPLEMENTED_VERIFIED | — |
@@ -140,12 +140,12 @@ Atomic requirements were extracted before code inspection. The short mappings be
 
 | Status | Count | Requirement IDs | Release impact |
 |---|---:|---|---|
-| IMPLEMENTED_VERIFIED | 61 | F4-REQ-001–008, 010–055, 057–059, 062, 066–067, 069 | Strong automated implementation baseline; not a production release by itself |
+| IMPLEMENTED_VERIFIED | 63 | F4-REQ-001–008, 010–055, 057–062, 066–067, 069 | Strong automated + internal E2E baseline; not a production release by itself |
 | IMPLEMENTED_NOT_RUNTIME_VERIFIED | 2 | F4-REQ-009, 056 | Full browser/live handoff evidence absent |
 | PARTIALLY_IMPLEMENTED | 2 | F4-REQ-064–065 | Recipient accessibility/responsive acceptance incomplete |
 | DOCUMENTED_APPROVED | 1 | F4-REQ-070 | Security authority approved; Chunk 3 runtime and negative-test evidence pending |
 | DOCUMENTED_ONLY | 1 | F4-REQ-072 | Cleanup contract not implemented end to end |
-| BLOCKED_ENVIRONMENT | 3 | F4-REQ-060–061, 063 | Prevents release gate |
+| BLOCKED_ENVIRONMENT | 1 | F4-REQ-063 | Live ACS/mailbox/HTTPS prevents final release gate |
 | MISSING_IMPLEMENTATION | 1 | F4-REQ-071 | Prevents deterministic 20/20 execution |
 | CONFLICTING_REQUIREMENT | 0 | — | F4-CONFLICT-007 and F4-GAP-006 resolved by the guarded/history-safe migration decision |
 | NOT_APPLICABLE_CURRENT_RELEASE | 1 | F4-REQ-068 | Future IPG only |
@@ -155,7 +155,7 @@ Atomic requirements were extracted before code inspection. The short mappings be
 
 | Priority | Total | Verified | Non-verified/blocked |
 |---|---:|---:|---:|
-| P0 | 64 | 59 | 5 (F4-REQ-060,061,063,070,071) |
+| P0 | 64 | 61 | 3 (F4-REQ-063,070,071) — F4-REQ-060/061 internal closed in Chunk 6A |
 | P1 | 7 | 2 | 5 (F4-REQ-009,056,064,065,072) |
 | P2 | 1 | 0 applicable | F4-REQ-068 is future/not applicable |
 | P3 | 0 | 0 | — |
@@ -163,20 +163,25 @@ Atomic requirements were extracted before code inspection. The short mappings be
 ### Ratios
 
 - Documentation coverage: **72 / 72 = 100%** have an identified authoritative or explicitly conflicting source.
-- Full implementation coverage: **63 / 71 = 88.7%** applicable requirements are implemented (verified plus implemented-not-runtime-verified; partial is not counted as complete).
-- Verified coverage: **61 / 71 = 85.9%** applicable requirements have implementation plus passing automated/runtime evidence.
-- Release-critical coverage: **59 / 64 = 92.2%** P0 requirements are verified. This ratio does not waive the five remaining P0 requirements.
+- Full implementation coverage: **65 / 71 = 91.5%** applicable requirements are implemented (verified plus implemented-not-runtime-verified; partial is not counted as complete).
+- Verified coverage: **63 / 71 = 88.7%** applicable requirements have implementation plus passing automated/runtime evidence.
+- Release-critical coverage: **61 / 64 = 95.3%** P0 requirements are verified. Live ACS (F4-REQ-063) and any superseded fixture notes below still block production GO.
 
 ## Gate interpretation
 
-The migration disposition is approved and verified. The secret-safe test-host/token authority is also approved by the 2026-08-05 Chunk 2 contract, so Chunk 3 may implement it without changing production security. Verified P0 coverage remains 59/64 because F4-REQ-070 still lacks runtime/negative-test proof and F4-REQ-071 is not built. The implementation is not production-ready: fixture runtime, 20/20 browser, real proof path and live ACS remain P0 gates.
+Chunk 6A closed the **internal** 21-scenario Playwright preflight (F4-REQ-060/061). Production remains **NO-GO** until live ACS/mailbox/HTTPS (F4-REQ-063 / F4-GAP-004) closes. Do not treat internal SUPPRESSED email as live ACS. See [[FLOW_4_INTERNAL_21_SCENARIO_E2E_PREFLIGHT_EVIDENCE_2026-08-05]].
 
 ## Related
 
 - [[FLOW_4_SECOND_BRAIN_DOCUMENT_READ_MANIFEST_2026-08-05]]
 - [[FLOW_4_DOCUMENT_CONFLICT_AND_GAP_REGISTER_2026-08-05]]
 - [[FLOW_4_APPROVED_NEXT_IMPLEMENTATION_SCOPE_2026-08-05]]
+- [[FLOW_4_INTERNAL_21_SCENARIO_E2E_PREFLIGHT_EVIDENCE_2026-08-05]]
 
 ## Chunk 3 runtime delta — 2026-08-05
 
 This section supersedes the pre-Chunk-3 status for F4-REQ-070–072. F4-REQ-070 and F4-REQ-071 are now `IMPLEMENTED_VERIFIED` through guard/security tests plus an isolated PostgreSQL run of all 17 typed scenarios. F4-REQ-072 is now `IMPLEMENTED_VERIFIED` through ownership-ledger, foreign-handle, parallel-run, revocation-before-delete, repeated-cleanup and final-row-absence evidence. The focused real-browser consumption attempt remains `BLOCKED_ENVIRONMENT`; no 20/20 release claim is made. See [[FLOW_4_DETERMINISTIC_FIXTURE_RUNTIME_EVIDENCE_2026-08-05]].
+
+## Chunk 6A runtime delta — 2026-08-05
+
+Supersedes the Chunk 3 “no 20/20” browser note for **internal** execution: Playwright **21/21** PASS (20 canonical + E2E 14b) with EmailMode SUPPRESSED. F4-REQ-060 and F4-REQ-061 are `IMPLEMENTED_VERIFIED` for internal fixture-token paths. Live ACS (F4-REQ-063) remains `BLOCKED_ENVIRONMENT`. Production remains **NO-GO**. See [[FLOW_4_INTERNAL_21_SCENARIO_E2E_PREFLIGHT_EVIDENCE_2026-08-05]].
