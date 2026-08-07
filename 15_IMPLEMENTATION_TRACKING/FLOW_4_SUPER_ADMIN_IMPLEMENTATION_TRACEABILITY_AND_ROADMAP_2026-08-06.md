@@ -319,7 +319,7 @@ Closure evidence:
 - Implementation report: `99_AUDITS/ONEVERZ_PHASE_4_DEFAULT_TENANT_SETTINGS_IMPLEMENTATION_REPORT_2026-08-07.md`
 - Verification audit: `99_AUDITS/ONEVERZ_PHASE_4_DEFAULT_TENANT_SETTINGS_VERIFICATION_AUDIT_2026-08-07.md`
 - Platform Admin / Flutter: **NO CHANGE**
-- Phase 5: **authorized** — implementation delivered on feature branches; **READY FOR VERIFICATION WITH EXTERNAL ACS GAP** (not closed)
+- Phase 5: **code verified** (`6f1b6fb`) but **not merged to main** — controlled merge blocked (gh auth / main publication authorization). See `99_AUDITS/ONEVERZ_PHASE_5_POST_MERGE_VALIDATION_AND_PHASE_6_READINESS_2026-08-07.md`.
 
 ### Phase 5 — Production Invitation Closure
 
@@ -329,26 +329,38 @@ Closure evidence:
 | Validate + accept invitation APIs (hash authority) | P0 | Phase 4 closed | Phase 5 audit + plan | setup screens aligned | `TenantAdminOnboardingInvitationController` | `user_invites` (no DDL) | unit + PG concurrent accept | code ready @ Backend `6fd24b8` |
 | Flutter setup contract alignment | P0 | Validate/accept APIs | Phase 5 plan | `/tenant-admin/setup/:token` | matching public APIs | n/a | DTO tests | Flutter `3945119` |
 | Platform Admin invitation copy | P2 | ACS send path live | Phase 5 audit | create-tenant hint | n/a | n/a | copy-only | PA `18e7851` |
+| Controlled merge to main + post-merge validation | P0 | Independent audit `6f1b6fb` | Post-merge report | feature→main PRs | feature→main PRs | n/a | re-run on main | **BLOCKED** — gh/`main` auth |
 
-**Phase 5 implementation status (2026-08-07):**
+**Phase 5 status (2026-08-07 closure attempt):**
 
 ```text
-PHASE 5 READY FOR VERIFICATION WITH EXTERNAL ACS GAP
-PHASE 5 NOT CLOSED
+PHASE 5 CODE VERIFIED
+PHASE 5 CODE CLOSED (feature branches)
+PHASE 5 NOT MERGED TO MAIN
+PRODUCTION ACS / HTTPS RELEASE GATE PENDING
+PHASE 5 POST-MERGE VALIDATION BLOCKED
+PHASE 6 NOT AUTHORIZED
 ```
 
-- Tracking: `ONEVERZ_PHASE_5_PRODUCTION_INVITATION_TRACKING_2026-08-07.md`
+- Verification audit: `99_AUDITS/ONEVERZ_PHASE_5_PRODUCTION_INVITATION_VERIFICATION_AUDIT_2026-08-07.md` @ `6f1b6fb`
 - Implementation report: `99_AUDITS/ONEVERZ_PHASE_5_PRODUCTION_INVITATION_IMPLEMENTATION_REPORT_2026-08-07.md`
-- Migration: **NOT REQUIRED**
-- Cashier: **NO CHANGE**
-- External ACS production evidence: **PENDING**
-- Next: independent read-only verification audit
+- Post-merge attempt: `99_AUDITS/ONEVERZ_PHASE_5_POST_MERGE_VALIDATION_AND_PHASE_6_READINESS_2026-08-07.md`
+- Non-blocking findings preserved: F-P5V-01 … F-P5V-05
+- External gate: F-P5V-06 pending
+- Process finding: F-P5C-01 controlled merge blocked
+- Next: authenticate `gh` / merge verified PRs to each `main`, then re-run post-merge validation
 
 ### Phase 6 — End-to-End Pilot Validation
 
 | Task | Priority | Dependency | SB doc | FE inspect | BE inspect | DB area | Tests | DoD |
 |---|---|---|---|---|---|---|---|---|
-| Full create→pay→activate→invite→login flow validation | P0 | Phases 1-5 | All canonical docs | wizard + billing + tenant detail | finalize/payment/activate/invite | all Flow 4 tables | scenarios 1-12 | pilot checklist signed |
+| Full create→pay→activate→invite→login flow validation | P0 | Phases 1-5 **on main** | All canonical docs | wizard + billing + tenant detail | finalize/payment/activate/invite | all Flow 4 tables | scenarios 1-12 | pilot checklist signed |
+
+```text
+PHASE 6 AUTHORIZATION: NOT AUTHORIZED
+```
+
+Reason: Phase 5 verified tips are not integrated into repository `main` branches; production ACS/HTTPS gate also pending.
 
 ## 4) Unresolved Decisions That Can Block Code
 
