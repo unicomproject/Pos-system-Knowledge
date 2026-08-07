@@ -34,6 +34,7 @@ Errors must be safe, consistent, and useful without exposing sensitive internals
 | 422 | Business rule validation failure where useful |
 | 429 | Rate limit or abuse protection |
 | 500 | Unexpected server error with safe message |
+| 503 | Required system configuration/service dependency is unavailable |
 
 ## Common Error Codes
 
@@ -52,6 +53,7 @@ Errors must be safe, consistent, and useful without exposing sensitive internals
 | ORDER_STATE_CONFLICT | Order status transition is invalid |
 | SYNC_CONFLICT | Offline sync item has conflict |
 | SYNC_BATCH_INVALID | Sync batch is invalid or rejected |
+| pos_holds.system_pos_channel_unavailable | Canonical system POS sales-channel configuration is unavailable; cashier payload is not at fault |
 
 ## Security Rule
 

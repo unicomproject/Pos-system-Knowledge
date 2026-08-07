@@ -1,7 +1,21 @@
 <!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-06 -->
+<!-- last_updated: 2026-08-07 -->
+
+> Park / Recall Sale update (2026-08-06): Flutter Chunk 2 data integration is code complete with typed backend create/list/recall/cancel, stable idempotency, canonical permissions, safe cart rules, and 791 passing Flutter tests. Authenticated Flutter-backend verification and final UI/E2E acceptance remain pending; the full feature is not Completed.
+
+> Park / Recall Sale Chunk 3 update (2026-08-06): the approved compact Park Sale modal is code complete, responsive widget evidence passes, and the full Flutter suite has 798 passing tests. Authenticated Park Sale UI verification and Chunk 4 Parked Sales/Recall/Cancel UI remain pending; the full feature is not Completed.
+
+> Park / Recall Sale Chunk 4 update (2026-08-06): final Parked Sales, Recall, active-cart safety and Cancel UI code is complete; 805 Flutter tests pass and analysis is clean. Local API/emulator are available, but no approved authenticated Cashier session was available, so E2E, read-only DB and screenshot acceptance remain blocked. Full feature status is Runtime Verification Pending, not Completed.
+
+> Park / Recall product-contract update (2026-08-06): Second Brain recorded Decisions A–D (Park/Recall visibility, product-name summary, mandatory Cancel Reason target, current-till list scope). Documentation-only; does not mark the feature Completed. Flutter Decision A/B evidence, backend mandatory cancel reason, and till-filter proof remain pending/unverified.
+
+> Park / Recall gap closure (2026-08-06): DB idempotency + events migration, soft stock (no reserve), partial-pay reject, lazy EXPIRED, mandatory cancel reason, home `PosParkedSalesScreen`, cart-clear-before-success, deviceId current-till list, and aligned home count are **Implemented** with automated evidence (Flutter sale/cart/pos/pos_shell **250 passed**; Unit PosHold **24**; API PosHold **14**; Integration PosHold **7**). Authenticated full cashier E2E remains **Runtime Verification Pending** (no usable Cashier password in seed). Not Fully Completed.
+
+> Parked Sales backend/API Chunk 1 update (2026-08-07): existing GET now implements Today/current-shift/all-active, controlled pagination and authoritative pre-pagination count/value/currency metadata. Build passed; affected Unit/API/Integration suites passed 46/19/8. No migration or new endpoint. Flutter Chunk 2/3 and authenticated E2E remain pending.
+
+> Parked Sales Flutter Chunk 2 update (2026-08-07): the existing screen/provider stack now consumes backend scope, pagination and aggregate metadata and renders filters, responsive headings/list, typed View, Recall/Cancel actions, summary and Start New Sale. Focused analysis and automated tests pass. Authenticated Chunk 3 visual/E2E acceptance remains pending; the full feature is not Completed.
 
 # Full Feature Status Index
 
@@ -9,10 +23,16 @@
 
 | Area | Status | Evidence |
 |---|---|---|
-| Approved feature contract | Documented | [[../04_MODULE_KNOWLEDGE/21_POS_Operations/08_Park_Recall_Sale_Feature]] |
-| Backend | Partial; target changes pending | [[Backend/POSOperations/Pos_Park_Recall_Sale_Implementation_Status]] |
-| Flutter | Local-only; API migration not started | [[Flutter/Sales/Park_Recall_Sale_Implementation_Status]] |
-| QA | Cases documented; not executed | [[../10_TESTING_QA/Test_Case/21_POS_Operations/POS_Park_Recall_Sale_Test_Cases]] |
+| Approved feature contract | Documented (Decisions A–J) | [[../04_MODULE_KNOWLEDGE/21_POS_Operations/08_Park_Recall_Sale_Feature]] |
+| Backend | Completed for approved Park/Recall API scope; code + PosHold suites + authenticated Flutter flow verified | [[Backend/POSOperations/Pos_Park_Recall_Sale_Implementation_Status]] |
+| Flutter | Completed — authenticated mandatory Chunk 3 acceptance verified | [[Flutter/Sales/Park_Recall_Sale_Implementation_Status]] |
+| QA | Automated PosHold/Flutter suites and authenticated cashier mandatory E2E verified | [[../10_TESTING_QA/Test_Case/21_POS_Operations/POS_Park_Recall_Sale_Test_Cases]] |
+
+Exact Parked Sales list-screen documentation is complete:
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Parked_Sales_Recall_Screen_Implementation_Specification]].
+Its filter/table/summary/pagination Flutter target is implemented with automated
+evidence; authenticated Chunk 3 runtime acceptance remains pending. This does not
+mark the full feature complete.
 
 > 2026-08-02 correction: Payment Method target rearrangement is **partially
 > implemented**. Source composition and automated verification are present, but
@@ -86,6 +106,7 @@ PR/commit reference is recorded.
 | Backend | OutletTillDevice | Device Context | Completed | 2026-07-09 | `5c99b66` | `devices/current`, `devices/activate` |
 | Backend | OutletTillDevice | Till Session Open/Close | Completed | 2026-07-09 | `06048db` | current-session, open, close |
 | Backend | POSOperations | POS Home Dashboard API | Testing | 2026-07-08 | Current working tree | Branding + explicit current-session sales/refund/discount/net metrics added; focused API/repository tests pass |
+| Backend | POSOperations | Park / Recall Sale contract | Testing | 2026-08-07 | Current working tree | Parked Sales API Chunk 1 implemented: authoritative scopes, pagination, count/value/currency; affected Unit 46 / API 19 / Integration 8 passed. Authenticated full E2E pending. Not Completed. [[Backend/POSOperations/Pos_Park_Recall_Sale_Implementation_Status]] |
 | Backend | CatalogProduct | POS Products List | Completed | 2026-07-23 | Current `main` audit | `GET /api/v1/pos/products`, categories, detail and exact barcode lookup exist |
 | Backend | Sales | POS Checkout / Cash Payment APIs | Testing | - | Current working tree | Cash complete; Card safe unavailable-by-default; QR/Split incomplete |
 | Backend | POSOperations | Windows Local Print Agent | Testing | - | Current working tree | [[Backend/POSOperations/Receipt_Printer_Local_Agent_Implementation_Status]] |
@@ -116,7 +137,7 @@ PR/commit reference is recorded.
 | Flutter | Sales | Return / Refund | Testing | - | `scanner_inte` + backend `main` | Full authoritative workflow and broad automated coverage exist |
 | Flutter | Sales | Exchange | Testing | - | `scanner_inte` + backend `main` | Implemented as Return resolution branch with preview/completion |
 | Flutter | Cash Drawer | Cash In / Cash Out | In Progress | - | `scanner_inte` | Flutter forms exist; backend mutation wiring is absent |
-| Flutter | Sales | Park / Recall | In Progress | - | `scanner_inte` | Device-local secure storage; backend Holds API is disconnected |
+| Flutter | Sales | Park / Recall | Completed | 2026-08-07 | Current working tree | Chunk 3 authenticated E2E accepted on the existing route/provider: filters, authoritative summaries, View, Recall, non-empty-cart safety, Cancel/no-hard-delete, responsive runtime and 44/44 focused tests passed; safe runtime pagination-volume/role-switch/fault-injection limits are documented. |
 | Flutter | Hardware | HID / Camera Barcode Scanner | Testing | - | Current working tree | Chunk 3 code and automation implemented; TB-00D/camera/POS80 physical matrix pending |
 | Flutter | Hardware | Hardware Testing Workflow | Testing | - | Current working tree | Authoritative versioned printer config and backend test-log lifecycle wired; scanner screen and physical matrix pending |
 | Flutter | Sales | Offline Cash Sale / Outbox | Not Started | - | - | Included MVP scope; no verified end-to-end cashier implementation |

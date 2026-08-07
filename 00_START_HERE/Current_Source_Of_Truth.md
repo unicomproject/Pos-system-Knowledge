@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-06 -->
+<!-- last_updated: 2026-08-07 -->
 
 
 # Current Source Of Truth
@@ -129,6 +129,7 @@ tables, screens, or flows.
 - [[../11_DEVELOPER_ONBOARDING/Backend_Local_Development_Setup]] â€” Unified Commerce (`E_POS.Api`, port **5187**)
 - [[../11_DEVELOPER_ONBOARDING/Unified_Commerce_Backend_Known_Limitations]] â€” tenant-login gap
 - Latest Cashier POS documentation-vs-code comparison: [[../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Cashier_POS_Second_Brain_vs_Code_Comparison_Implementation_Status]]
+- Parked Sales exact screen target: [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Parked_Sales_Recall_Screen_Implementation_Specification]]; documentation complete, implementation pending.
 
 ## Related Files
 

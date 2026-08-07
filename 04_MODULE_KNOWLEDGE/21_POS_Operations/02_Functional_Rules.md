@@ -1,7 +1,7 @@
 <!-- title: POS Operations Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-06 -->
+<!-- last_updated: 2026-08-07 -->
 
 # POS Operations Functional Rules
 
@@ -23,13 +23,26 @@ responsive online store screens, Angular/admin screens, tests, or database chang
   physical retry is prohibited.
 - A Receipt History reprint preserves the original snapshot and uses a new
   authorized reprint operation identity.
-- Parked/held sale must remain tenant, outlet, till, and user scoped.
+- Parked/held sale must remain tenant, outlet, till, and holding-cashier scoped.
 - Till summary uses completed sales, payments, refunds, and cash movements.
-- Current Flutter parked sales are device-local; do not describe them as
-  backend-held or cross-device.
-- `pos_order_holds` and `/api/v1/pos/holds` are backend foundations not yet wired
-  to the Flutter parked-sale provider.
-- Approved Park/Recall uses backend reference/totals/status and server-time 24-hour expiry. Cart clears only after 201; recall/cancel transition atomically; no payment, receipt, print or drawer action is created. See [[08_Park_Recall_Sale_Feature]].
+- Approved Park/Recall: backend reference/totals/status; server-time 24-hour
+  expiry; cart clears only after 201; atomic recall/cancel; no payment, receipt,
+  print or drawer. See [[08_Park_Recall_Sale_Feature]].
+- Approved visibility: non-empty cart shows Park Sale and hides Recall Sale;
+  empty cart (no valid lines) shows Recall Sale and hides Park Sale. Recall must
+  not overwrite a non-empty cart.
+- Approved Parked Sales cards: product-name summary (first two + `+N more`) plus
+  separate `itemCount`.
+- Approved Cancel Reason is mandatory in the product target; current backend
+  DELETE reason remains optional until enforced. No new cancel permission.
+- Approved list scope is current till from trusted device/open session. Mark
+  missing till filtering as an implementation gap, not Completed.
+- Approved list-screen target uses Today/This Shift/All Parked Sales, no Cashier
+  column, backend-filtered count/value, View/Recall/Cancel and existing theme/
+  shell components. Current card screen is not target completion. See
+  [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Parked_Sales_Recall_Screen_Implementation_Specification]].
+- Implementation tracking records chunk evidence separately; do not treat docs as
+  feature Completed.
 - Cash movement schema is not a successful cashier movement without a mutation
   API and persistence result.
 - Customer display is future unless explicitly enabled.

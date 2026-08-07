@@ -1,7 +1,7 @@
 <!-- title: Developer Reading Guide -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-07 -->
 
 
 # Developer Reading Guide
@@ -60,6 +60,8 @@ Always read source-of-truth and scope rules first.
 6. Read POS, order, checkout, and payment journeys before UI work.
 7. Read permission UI rules before showing action buttons.
 8. Read hardware integration files before printer/scanner/drawer/card work.
+9. For the Dashboard Recall Sale list, read
+   [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Parked_Sales_Recall_Screen_Implementation_Specification]].
 
 ## Online Store Developer Reading Path
 

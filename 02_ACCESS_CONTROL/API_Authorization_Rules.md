@@ -1,7 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-06 -->
+<!-- last_updated: 2026-08-07 -->
 
 # API Authorization Rules
 
@@ -97,10 +97,18 @@ Do not use umbrella-only checks such as `platform.subscriptions.manage` where gr
 |---|---|
 | Create sale | POS entitlement, sale permission, outlet, trusted device, assigned till, open session |
 | Park Sale | POS entitlement, `sales.park.create`, tenant context, trusted device, assigned till, open session |
-| List Parked Sales | POS entitlement, `sales.park.view`, tenant + holding-user scope |
+| List Parked Sales | POS entitlement, `sales.park.view`; tenant + current till + holding cashier + HELD + non-expired (home count same predicate) |
 | Recall Sale | POS entitlement, `sales.park.recall`, trusted device, same till, open session |
+| Cancel Parked Sale | POS entitlement, `sales.park.create`; Cancel Reason mandatory at service |
 
-Legacy aliases `pos.sale.park`, `pos.sale.park.view`, and `pos.sale.recall` are compatibility codes, not the canonical contract. Frontend hiding is UX only; backend authorization is final. Current cancel uses `sales.park.create`; no separate cancel permission is approved. Constant definitions and service checks are verified, while catalogue insertion and development Cashier assignment remain unproven implementation gaps.
+Canonical codes: `sales.park.create`, `sales.park.view`, `sales.park.recall`.
+Legacy aliases `pos.sale.park`, `pos.sale.park.view`, and `pos.sale.recall` are
+demoted compatibility codes and must not authorize Flutter home/Park actions.
+Frontend hiding is UX only; backend authorization is final. Cancel uses
+`sales.park.create`; no separate cancel permission is approved.
+Parked-sale detail uses `sales.park.view`; Start New Sale uses verified
+`sales.create`. The exact list-screen mapping is documented in
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Parked_Sales_Recall_Screen_Implementation_Specification]].
 | Apply discount | Discount entitlement, discount permission, policy check |
 | Approve discount | Discount permission and manager PIN where required |
 | Take payment | Payment entitlement, permission, open till session |
