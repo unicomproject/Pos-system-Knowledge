@@ -140,7 +140,14 @@ Tip `e597355` includes verified `3945119`.
 
 Flutter SDK path used: repo-bundled `Nytroz-POS-App/flutter/bin/flutter.bat` (session PATH lacked `flutter`).
 
-> Tooling note: analyze/test results for this revalidation session are recorded if/when the bundled SDK run completes; known Windows symlink/Developer Mode issues remain classified as tooling, not automatic source regression.
+| Check | Result |
+| ----- | ------ |
+| `dart analyze lib/features/auth` | PASS — no issues |
+| `flutter analyze` | PASS — no issues |
+| Targeted invitation DTO tests | PASS — 2 passed, 0 failed |
+| `flutter test` (full suite on merge-prep tip) | PASS — **840** passed, 0 failed |
+
+> Tooling note: `flutter pub get` emitted Windows symlink/Developer Mode warning for plugins. Dependencies still resolved and tests ran; classified as local tooling, **not** source regression.
 
 ### F-P5V-03 reassessment (token in URI)
 
