@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-06 -->
+<!-- last_updated: 2026-08-07 -->
 
 # Permission Code List
 
@@ -356,8 +356,8 @@ Verified through real backend APIs, not mock data:
 |---|---|
 | `pos.sale.create` | Start sale |
 | `pos.sale.complete` | Complete sale |
-| `pos.sale.park` | Park sale |
-| `pos.sale.recall` | Recall sale |
+| `pos.sale.park` | Legacy / demoted — use `sales.park.create` |
+| `pos.sale.recall` | Legacy / demoted — use `sales.park.recall` |
 | `pos.sale.discount.apply` | Apply POS discount |
 | `pos.payment.capture` | Take payment |
 | `pos.receipt.print` | Print receipt |
@@ -387,8 +387,8 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `customers.update` | Edit customer on POS Customer Management (`77777777-0338-4000-8000-000000000001`; Cashier seed assignment) |
 | `sales.discount.apply` | List/validate/apply a permitted POS discount |
 | `sales.discount.approve` | Approve/reject above-authority POS discounts; never assigned to cashier by default |
-| `sales.park.create` | Create Park Sale; current backend also uses it for cancel |
-| `sales.park.view` | View active Parked Sales and count |
+| `sales.park.create` | Create Park Sale; also authorizes cancel (no separate cancel code) |
+| `sales.park.view` | View active Parked Sales and home/list count |
 | `sales.park.recall` | Recall an eligible Parked Sale |
 | `sales.checkout` | Proceed to Payment button |
 | `payments.cash.accept` | Cash in payment sheet |
@@ -412,6 +412,15 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `pos.hardware.settings` | Configure/test Local Print Agent for the activated POS device |
 | `tenant.till.manage` | Device activation gate (`canActivatePosDevice`) |
 | `till.session.view` | Home header till status chip |
+
+Park/Recall: canonical trio `sales.park.create|view|recall` is required for
+Flutter home and New Sale Park actions. Legacy `pos.sale.park*` aliases are
+demoted and must not authorize those UI paths. Seed/catalogue evidence
+(2026-08-06): definitions present in `DevelopmentPosNewSalePermissionsSeedData`,
+Cashier assignment, and seed tests.
+`sales.park.view` also covers the read-only View action; `sales.create` protects
+Start New Sale. No `sales.park.cancel` is approved. Screen mapping:
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Parked_Sales_Recall_Screen_Implementation_Specification]].
 
 Implementation map: [[../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Cashier_New_Sale_Implementation]].
 

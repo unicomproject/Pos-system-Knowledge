@@ -1,33 +1,68 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-06 -->
+<!-- last_updated: 2026-08-07 -->
 
 # Platform Subscription Plan API Endpoints
 
 ## POS Park / Recall Sale
 
-Base route: `/api/v1/pos/holds` · Controller: `PosCheckoutController`.
+Base route: `/api/v1/pos/holds` · Controller: `PosHoldsController`.
 
 | Method | Route | Current permission | Purpose |
 |---|---|---|---|
 | POST | `/api/v1/pos/holds` | `sales.park.create` | Persist a priced cart as a parked sale |
-| GET | `/api/v1/pos/holds` | `sales.park.view` | List active holds for the authenticated user and till |
-| POST | `/api/v1/pos/holds/{holdId}/recall` | `sales.park.recall` | Revalidate and atomically release a hold for sale |
-| DELETE | `/api/v1/pos/holds/{holdId}?reason=...` | `sales.park.create` | Cancel an active hold; permission alignment remains open |
+| GET | `/api/v1/pos/holds` | `sales.park.view` | List active holds (tenant + current till + holding cashier + HELD + non-expired) |
+| POST | `/api/v1/pos/holds/{holdId}/recall` | `sales.park.recall` | Soft-revalidate and atomically release a hold for sale |
+| DELETE | `/api/v1/pos/holds/{holdId}?reason=...` | `sales.park.create` | Cancel an active hold; reason mandatory at service |
 
 Create accepts `deviceId`, `saleType`, optional `customerId`, cart `lines`,
-optional `reason`, `discountApplicationId`, required stable `idempotencyKey`, and
-optional future `expiresAt`. The service creates a `HOLD-######` reference.
+optional park `reason` (short note), `discountApplicationId`, required stable
+`idempotencyKey`, optional `sourceSaleId`, and optional compatibility
+`expiresAt`. The compatibility `expiresAt` property is ignored: the service
+captures server UTC once and persists expiry exactly 24 hours later. New
+references use `PS-{UTC_YEAR}-{5 digit}` under a tenant/year PostgreSQL
+transaction advisory lock. Historical `HOLD-######` rows remain readable only.
+Idempotency is DB-backed (`idempotency_key` + `request_fingerprint`; unique per
+tenant when key is not null): same fingerprint replays; different fingerprint
+conflicts. Optional `sourceSaleId` rejects partially paid sales with
+`pos_holds.sale_partially_paid_cannot_be_parked`.
+Park soft-validates stock only — it does **not** reserve or deduct inventory.
+Park creation resolves or provisions the tenant channel through the deterministic
+global platform POS definition. If that required system definition is missing,
+the API returns HTTP 503 with code
+`pos_holds.system_pos_channel_unavailable`; it does not classify the cashier
+request as invalid and does not persist partial Park data.
 Create/list items return hold/sale/till/session/customer identifiers, reference,
 reason, status, item count, money totals, currency, timestamps and typed lines;
-the list envelope returns `holds` and `totalCount`. Recall additionally returns
-`deviceId`, `saleType`, `recalledAt`, request-shaped lines and
-`checkoutSummary`. Cancel has no response body.
-Recall recalculates price, discount, tax, and stock before changing `HELD` to
-`RELEASED`. Current list scope is tenant + till + holding user; manager-wide
-visibility is not implemented. See
-[[../04_MODULE_KNOWLEDGE/21_POS_Operations/08_Park_Recall_Sale_Feature]].
+the list envelope returns `holds`, `totalCount`, `totalValue`, `currency`, `page`
+and `pageSize`. Home count uses the same
+active-hold predicate. List/count/recall/cancel invoke `ExpireDueHolds`, which
+persists `EXPIRED`. Recall additionally returns `deviceId`, `saleType`,
+`recalledAt`, request-shaped lines, `checkoutSummary`, and optional
+`StockWarnings`. Recalled SalesOrder remains `DRAFT`. Cancel has no response
+body; blank/whitespace reason is rejected. Audit events land on
+`pos_order_hold_events` (`PARK_CREATED`, `PARK_IDEMPOTENT_REPLAY`,
+`PARK_RECALLED`, `PARK_CANCELLED`, `PARK_EXPIRED`). Migration:
+`20260806190000_AddPosHoldIdempotencyAndEvents`.
+
+**List scope (implemented):** current tenant + current till (trusted device /
+open session) + holding cashier + `HELD` + non-expired. Manager-wide visibility
+is not approved. Checkout remains hard stock authority after recall.
+**Cancel Reason:** mandatory at service (trim; max 250).
+Code + automated tests Implemented; authenticated full cashier E2E remains
+Runtime Verification Pending.
+
+**Parked Sales list contract (implemented):** `GET /api/v1/pos/holds` accepts
+required `deviceId`, `scope=today|current-shift|all-active` (default `today`),
+`page` (default 1) and `pageSize` (default 25, maximum 100). Today uses the open
+till session business date; current-shift uses its session ID; all-active removes
+only that date/session restriction. All retain the server-derived tenant,
+current-till, holding-cashier and active/non-expired scope. Filtered count/value
+and session currency are calculated before ordering/pagination. `itemCount` is
+the sum of quantities. Current typed lines remain sufficient for View; no second
+summary/detail endpoint was added.
+See [[../04_MODULE_KNOWLEDGE/21_POS_Operations/08_Park_Recall_Sale_Feature]].
 
 ## Platform Authentication (Unified Commerce)
 

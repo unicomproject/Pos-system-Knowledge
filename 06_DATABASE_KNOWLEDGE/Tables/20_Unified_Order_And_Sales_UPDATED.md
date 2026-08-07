@@ -66,6 +66,12 @@ Constraints:
 PK(id)
 FK(tenant_id) REFERENCES tenants(id)
 FK(sales_channel_id) REFERENCES sales_channels(id)
+
+For POS Park creation, `sales_channel_id` must resolve to the tenant's active
+channel linked to canonical global `platform_sales_channels.id =
+d0000000-0000-4000-8000-000000000003` (`channel_code = POS`,
+`channel_type = POS`). The deterministic platform definition is provisioned by
+EF migration seed; tenant channel creation/reuse remains transaction-scoped.
 FK(outlet_id) REFERENCES outlets(id)
 FK(created_by_tenant_user_id) REFERENCES tenant_users(id)
 FK(updated_by_tenant_user_id) REFERENCES tenant_users(id)
