@@ -319,13 +319,30 @@ Closure evidence:
 - Implementation report: `99_AUDITS/ONEVERZ_PHASE_4_DEFAULT_TENANT_SETTINGS_IMPLEMENTATION_REPORT_2026-08-07.md`
 - Verification audit: `99_AUDITS/ONEVERZ_PHASE_4_DEFAULT_TENANT_SETTINGS_VERIFICATION_AUDIT_2026-08-07.md`
 - Platform Admin / Flutter: **NO CHANGE**
-- Phase 5: **authorized after this closure branch is reviewed/merged** (implementation **NOT STARTED**)
+- Phase 5: **authorized** — implementation delivered on feature branches; **READY FOR VERIFICATION WITH EXTERNAL ACS GAP** (not closed)
 
 ### Phase 5 — Production Invitation Closure
 
 | Task | Priority | Dependency | SB doc | FE inspect | BE inspect | DB area | Tests | DoD |
 |---|---|---|---|---|---|---|---|---|
 | ACS verified sender + HTTPS host closure | P0 (production) | Phase 0 | Payment lifecycle canonical | invitation status copy | invitation/outbox services | invite + outbox records | scenario 9 + external proof | external run evidence approved |
+| Validate + accept invitation APIs (hash authority) | P0 | Phase 4 closed | Phase 5 audit + plan | setup screens aligned | `TenantAdminOnboardingInvitationController` | `user_invites` (no DDL) | unit + PG concurrent accept | code ready @ Backend `6fd24b8` |
+| Flutter setup contract alignment | P0 | Validate/accept APIs | Phase 5 plan | `/tenant-admin/setup/:token` | matching public APIs | n/a | DTO tests | Flutter `3945119` |
+| Platform Admin invitation copy | P2 | ACS send path live | Phase 5 audit | create-tenant hint | n/a | n/a | copy-only | PA `18e7851` |
+
+**Phase 5 implementation status (2026-08-07):**
+
+```text
+PHASE 5 READY FOR VERIFICATION WITH EXTERNAL ACS GAP
+PHASE 5 NOT CLOSED
+```
+
+- Tracking: `ONEVERZ_PHASE_5_PRODUCTION_INVITATION_TRACKING_2026-08-07.md`
+- Implementation report: `99_AUDITS/ONEVERZ_PHASE_5_PRODUCTION_INVITATION_IMPLEMENTATION_REPORT_2026-08-07.md`
+- Migration: **NOT REQUIRED**
+- Cashier: **NO CHANGE**
+- External ACS production evidence: **PENDING**
+- Next: independent read-only verification audit
 
 ### Phase 6 — End-to-End Pilot Validation
 
