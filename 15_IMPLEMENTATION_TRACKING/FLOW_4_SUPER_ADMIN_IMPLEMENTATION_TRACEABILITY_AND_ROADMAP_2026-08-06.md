@@ -297,13 +297,29 @@ Closure-fix test evidence:
 **Status (2026-08-07):**
 
 ```text
-PHASE 4 READY FOR READ-ONLY VERIFICATION
+PHASE 4 VERIFIED
+PHASE 4 CLOSED
 ```
 
-- Backend branch: `feature/flow4-phase4-default-tenant-settings` @ `81c7296`
+Closure evidence:
+
+- Verdict: `VERIFIED WITH NON-BLOCKING GAPS — PHASE 4 CLOSED`
+- Backend audited implementation: `81c7296900fd7c1c1c0e321a0c0044def9f47a43`
+- Backend merge on main: PR #73 → `b8ac165`
+- Verification audit: `9316a95fa2a9c19b7b4af1528c8bea72bc85ef47` (merged via PR #38)
+- Phase 4 unit: **35 passed**
+- Phase 4 integration: **7 passed**
+- Unit regression: **366 passed**
+- Integration regression: **235 passed**
+- Seed-only migration verified: `20260807120000_SeedPhase4DefaultTenantSettingDefinitions`
+- Scenario 11 verified (pre-persist fail-closed)
+- Idempotency / tenant isolation verified
+- No Critical/High blockers
+- Non-blocking gaps remain documented (locale DB nullability; thin dedicated tests; Online Store skip assert; deferred TA/Cashier UI, templates, sequences, backfill)
 - Implementation report: `99_AUDITS/ONEVERZ_PHASE_4_DEFAULT_TENANT_SETTINGS_IMPLEMENTATION_REPORT_2026-08-07.md`
+- Verification audit: `99_AUDITS/ONEVERZ_PHASE_4_DEFAULT_TENANT_SETTINGS_VERIFICATION_AUDIT_2026-08-07.md`
 - Platform Admin / Flutter: **NO CHANGE**
-- Phase 5: **NOT STARTED**
+- Phase 5: **authorized after this closure branch is reviewed/merged** (implementation **NOT STARTED**)
 
 ### Phase 5 — Production Invitation Closure
 
