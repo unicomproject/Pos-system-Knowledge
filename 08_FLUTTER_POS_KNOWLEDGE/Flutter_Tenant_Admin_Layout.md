@@ -1,68 +1,57 @@
 <!-- title: Flutter Tenant Admin Layout -->
-<!-- status: Active — shared shell + white sidebar approved -->
-<!-- system: OneVerz POS MVP POS -->
-<!-- last_updated: 2026-07-29 -->
+<!-- status: Active — shared shell + black sidebar approved -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-06 -->
 
 # Flutter Tenant Admin Layout
 
 ## Purpose
 
-Flutter Tenant Admin layout guidance for OneVerz POS MVP POS.
+Define the unified application layout rules for all operational Tenant Admin screens.
 
-## Layout Rule
+---
 
-Use one shared reusable shell for all Tenant Admin pages. Responsive behaviour changes presentation; business logic stays shared.
+## Layout Structure
 
-Canonical architecture: [[Tenant_Admin_Settings_Shared_Layout_Architecture]]
-
-## Shared Shell (Locked 2026-07-29)
+All Tenant Admin views must load inside a single shared reusable shell layout. Responsive behavior handles device scaling; the shell structure remains identical.
 
 ```text
 TenantAdminSharedShell
 ├── Shared Fixed Black Header
-├── Shared White Tenant Admin Sidebar
-├── Responsive Dynamic Content Area
+├── Shared Black Tenant Admin Sidebar (White text, Orange active item)
+├── Responsive Dynamic Content Area (White rounded canvas on dark background)
 └── Shared Fixed Black Footer Navigation
 ```
 
-| Piece | Rule |
-|---|---|
-| Header | Required on all TA pages; provider-driven; no hardcoded context |
-| Sidebar | Required; **white/light**; approved order; Products nested |
-| Footer | Required on all TA pages; Home / New Sale / Orders / Customers / Settings |
+### Shared Shell Components
 
-Detail notes:
+| Layout Piece | Approved Rule / Visual Style |
+| :--- | :--- |
+| **Header** | Fixed black bar displaying session context. Same across all pages. |
+| **Sidebar** | Solid black background, white text, orange rounded background active indicator. |
+| **Content Area** | White rounded canvas enclosing screen content, framed by a dark outer shell. |
+| **Footer** | Shared fixed black footer navigation bar. |
 
-- [[Tenant_Admin_Sidebar_Navigation]]
-- [[Tenant_Admin_Product_Management_Navigation]]
-- [[Tenant_Admin_Inventory_Navigation]]
-- [[Tenant_Admin_Settings_Responsive_Design]]
-- [[Tenant_Admin_Settings_Component_Catalogue]]
+---
 
-## Permission Rule
+## Behavior Rules
 
-Menu items depend on backend feature entitlement + permission. Do not hardcode role names. Do not invent permission keys.
+- **No Duplication**: Individual feature pages (such as Product List, Categories, or Brands) must never instantiate their own sidebars, headers, footers, or outer shell scaffolds. They must sit within the dynamic content area of the shared shell.
+- **Entitlements & Permissions**: Sidebars must conditionally render parent and child items based on the user's active permissions. Denied routes are hidden entirely (no greyed-out or empty spaces).
 
-## Online Store Boundary
+---
 
-Online Store is an approved **top-level sidebar item**. Customer-facing storefront UI is not part of Flutter POS. Route is currently a **gap** — see sidebar navigation note.
+## Superseded Layout Rules
 
-## Offline UI Rule
+The following visual rules are superseded and must not be documented or implemented:
+- White or light sidebars.
+- Dark text on sidebars.
+- Light-purple active highlights or purple icons.
+- Dark-blue/navy gradient layouts.
 
-Tenant admin write operations should clearly show when action requires online connection.
-
-## Superseded
-
-- Dark-blue full sidebar as final shared layout
-- Footer Settings-area-only / footer excluded
-- Products without nested children
-- Settings inside Products
-- Inventory under Hardware
+---
 
 ## Related Files
-
-- [[Tenant_Admin_Settings_Shared_Layout_Architecture]]
 - [[Tenant_Admin_Sidebar_Navigation]]
-- [[Tenant_Admin_Settings_Layout_Implementation_Status]]
-- [[Flutter_Permission_Based_UI_Rendering]]
-- [[Flutter_Routing_Guards]]
+- [[Tenant_Admin_Product_Management_Navigation]]
+- [[../07_UI_UX_KNOWLEDGE/Tenant_Admin_UI_Rules]]

@@ -85,7 +85,7 @@ Do not use umbrella-only checks such as `platform.subscriptions.manage` where gr
 | Role/permission management | Tenant active, entitlement, permission |
 | Permission catalog read | Tenant active, `roles.permissions.view`; catalog filtered by tenant entitlements |
 | Role permission update | Tenant active, `roles.permissions.update`; assigned codes must stay within entitlements |
-| Product management | Catalog entitlement and product permission |
+| Product management | Catalog entitlement and permission `catalog.products.view`, `catalog.products.create`, `catalog.products.update`, `catalog.products.delete`, `catalog.products.publish`, `catalog.products.restore`, or `catalog.products.duplicate` (Note: `catalog.products.import` remains in schema but is deferred and excluded from the active Tenant Admin UI scope). Legacy permission codes starting with `tenant.products.*` must be mapped to their canonical `catalog.products.*` equivalents in the Flutter client per ADR 007. |
 | Catalog master data | Catalog entitlement and respective department, category, brand, collection, or return-policy permission |
 | Inventory management | Inventory entitlement and inventory permission |
 | Loyalty setup | Loyalty entitlement and loyalty permission |
