@@ -22,16 +22,14 @@ merchandising, attractions, and temporary retail locations.
 | Module number | 10 |
 | Primary users | Tenant Admin, Store Manager, Cashier consumer |
 | Frontend surfaces | Product list, Product form, Variant management, POS product grid/search |
-| API groups | `/api/v1/tenant-admin/products`, `/api/v1/tenant-admin/products/imports`, `/api/v1/pos/products`, `/api/v1/storefront/products` |
+| API groups | `/api/v1/products`, `/api/v1/products/{id}/variants`, `/api/v1/pos/products`, `/api/v1/storefront/products` |
 
 ## Main Tables
 
 | Table | Role |
 |---|---|
-| `products` | Stores parent product records, setup steps, status, and audit parameters. |
-| `product_variants` | Stores sellable variant details, SKU, and barcode links. |
-| `product_import_batches` | Stores metadata for CSV product import runs. |
-| `product_import_rows` | Stores row-level parsed and validated import records. |
+| `products` | Used by this module |
+| `product_variants` | Used by this module |
 
 ## Core Business Rules
 
@@ -69,4 +67,3 @@ merchandising, attractions, and temporary retail locations.
 
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/02_Functional_Rules]]
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/03_Technical_Contract]]
-- [[04_MODULE_KNOWLEDGE/10_Product_Core/04_Tenant_Admin_Product_List_And_Import_Contract]]

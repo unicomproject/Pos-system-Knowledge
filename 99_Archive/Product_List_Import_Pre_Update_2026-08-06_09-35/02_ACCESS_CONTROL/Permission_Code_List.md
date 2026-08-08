@@ -315,7 +315,6 @@ permission rows for aliases.
 | catalog.products.publish | Publish completed drafts to POS/storefront |
 | catalog.products.restore | Restore archived products to inactive |
 | catalog.products.duplicate | Duplicate product settings to draft |
-| catalog.products.import | Import products from CSV templates |
 | catalog.variants.manage | Manage variant configuration combinations |
 | catalog.barcodes.manage | Manage SKU and barcode identifiers |
 | catalog.product_media.manage | Manage product images and uploads |
