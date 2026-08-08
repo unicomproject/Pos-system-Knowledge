@@ -2,7 +2,7 @@
 <!-- status: APPROVED -->
 <!-- system: OneVerz POS MVP -->
 <!-- owner: Platform Architecture / Product (OneVerz) -->
-<!-- last_updated: 2026-07-27 -->
+<!-- last_updated: 2026-08-04 -->
 <!-- decision_date: 2026-07-27 -->
 <!-- applies_to: Release 1 paid + trial/demo tenant onboarding emails -->
 <!-- related: Email_Architecture_And_Provider_Decisions, Email_Event_And_Template_Catalog -->
@@ -37,10 +37,10 @@ Current code may write billing values into `tenants.status` and block `CanActiva
 1. Super Admin creates a **paid** tenant.
 2. Tenant lifecycle status → **`PENDING_PAYMENT`**.
 3. System sends **`tenant.paid_created`** (Tenant Created / Subscription Confirmation / Payment Required).
-4. Email contains: plan, amount, currency, billing frequency, due date, **payment link**.
+4. Email contains tenant/reference/status, plan, billing cycle, subtotal/tax/total/currency, invoice/due date, approved manual instructions/reference format, support contact, authorized `invoiceUrl`, and secure `paymentStatusUrl`. Manual `checkoutUrl` is null.
 5. Email does **not** contain password or set-password link.
-6. Tenant pays via payment link.
-7. Super Admin **manually verifies** payment (Release 1), or records an approved payment waiver.
+6. Recipient submits manual method/reference/amount/currency/date/private proof and optional note through the secure payment-status experience.
+7. An authorized Platform Admin reviews with current version and command idempotency, then approves, rejects, or requests information. Approval or an approved waiver satisfies the payment gate.
 8. After verification/waiver and before activation, tenant lifecycle status → **`PENDING_ACTIVATION`**.
 9. Super Admin **manually activates** the tenant (Release 1). Paid activation **requires verified payment or approved waiver**.
 10. Tenant lifecycle status → **`ACTIVE`**.
@@ -48,9 +48,9 @@ Current code may write billing values into `tenants.status` and block `CanActiva
 12. Activation email contains: Tenant Admin username/email, tenant login URL, single-use set-password link, expiry.
 13. Tenant Admin sets password and logs in.
 
-**Deferred R1:** separate Payment Received email (`tenant.payment_received`).
+Payment-submitted confirmation and approved/rejected/request-information outcome notifications are part of the manual-payment workflow. They never contain account-setup credentials.
 
-**Current gaps:** payment-link generation/persistence/API/UI/email **NOT IMPLEMENTED**; onboarding emails **NOT IMPLEMENTED**.
+**Current gaps:** secure manual-payment access, proof submission/review/history, payment notifications and activation handoff are **NOT IMPLEMENTED**. A real gateway is intentionally not part of this release.
 
 ---
 
@@ -87,10 +87,11 @@ Current code may write billing values into `tenants.status` and block `CanActiva
 
 | Mode | Payment | Verification | Activation |
 |---|---|---|---|
-| Paid | Payment link **required** | **Manual** Super Admin verify, or approved waiver record | **Manual** activate after verified payment / waiver |
+| Prepaid paid | Manual instructions, invoice and secure payment-status access; no checkout URL | Authorized evidence review/approval, or approved waiver record | Separate activation after approval / waiver |
 | Trial / Demo | Not required | N/A | **Automatic** after successful create/provisioning |
+| Deferred / invoice-later | Plan policy; payment status `DEFERRED` | Per plan policy | `PENDING_ACTIVATION` or `ACTIVE` only as policy allows |
 
-Payment-link Application/API/UI/email are currently **missing** even though R1 mandates payment links for paid collection.
+Manual payment Application/API/UI/email are currently **missing**. Future Stripe/PayHere must use provider adapters and signed idempotent callbacks without changing this lifecycle or invitation sequence.
 
 ## Lifecycle alignment implementation status
 
@@ -102,7 +103,7 @@ Payment-link Application/API/UI/email are currently **missing** even though R1 m
 | `tenants.status` CHECK constraint | **IMPLEMENTED** |
 | `lifecycleStatus` API transition | **IMPLEMENTED** |
 | Frontend badge/filter alignment | **IMPLEMENTED** |
-| Onboarding emails / payment links | **NOT IMPLEMENTED** (deferred) |
+| Onboarding/manual-payment emails and secure status access | **NOT IMPLEMENTED** |
 | Post-merge smoke verification | **PASSED** — [[../../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Post_Merge_Smoke_Verification]] |
 
 ---
@@ -114,6 +115,13 @@ Target: domain change + outbox + ACS worker + bounded retry + idempotency + rese
 Until outbox exists: no duplicate tenants on email failure; record failure; allow authorized resend.
 
 ---
+
+## Mandatory communication separation
+
+1. `tenant_paid_created_payment_required`: invoice/manual-payment instructions and status access only; no setup token or password.
+2. `tenant_activated_set_password`: sent only after `ACTIVE`; secure single-use account setup link only.
+
+Additional manual-payment templates: submission received, payment approved, payment rejected, more information requested, and resubmission received. Payment proof URLs, bank details, access tokens and token-bearing URLs are never written to audit/logs or unrelated templates.
 
 ## Related journeys (aligned)
 

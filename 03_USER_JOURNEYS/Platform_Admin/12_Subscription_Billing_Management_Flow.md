@@ -1,9 +1,11 @@
 <!-- title: Subscription And Billing Management Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-20 -->
+<!-- last_updated: 2026-08-06 -->
 
 # Subscription And Billing Management Flow
+
+> Flow 4 alignment (2026-08-04): current tenant onboarding collection uses manual payment evidence and Platform Admin review. Existing invoice Issue/Mark Paid behavior is a compatibility bridge, not the full Flow 4 contract. Review approval advances only to `PENDING_ACTIVATION`; gateway checkout is future work.
 
 ## Purpose
 
@@ -33,7 +35,7 @@ Platform Admin opens subscriptions or billing management.
 ## Final Verdict
 
 ```text
-BILLING PHASE 6 COMPLETED — RELEASE READY
+BILLING PHASE 6 COMPLETED â€” RELEASE READY
 ```
 
 ## Supported Current Management Scope
@@ -157,7 +159,7 @@ Do not describe unsupported future capabilities as implemented.
 | `lifecycleStatus` API transition | **IMPLEMENTED** |
 | Frontend badge/filter alignment | **IMPLEMENTED** |
 | Payment waiver persistence/API/UI | **NOT IMPLEMENTED** (deferred) |
-| Post-merge smoke verification | **PASSED** — [[../../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Post_Merge_Smoke_Verification]] |
+| Post-merge smoke verification | **PASSED** â€” [[../../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Post_Merge_Smoke_Verification]] |
 
 ## Platform Admin Invite Flow
 
@@ -179,7 +181,7 @@ part of Billing completion.
 
 - Subscription upgrade, downgrade, renewal, expiry, and history workflows.
 - Add-on and trial/demo lifecycle actions.
-- **Payment links (PayHere), public checkout, webhook settlement, revoke, history** — Release 1 mandatory; not yet implemented; final major Super Admin feature. [[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]]
+- **Payment links (PayHere), public checkout, webhook settlement, revoke, history** â€” Release 1 mandatory; not yet implemented; final major Super Admin feature. [[SA-P1_Payment_Links_Release_1_Scope_And_Sequencing]]
 - Reminders, automatic collection, and retry handling.
 - Cancellation, voiding, credit notes, and partial-payment workflows after their
   backend contracts and audit requirements are approved.
@@ -218,7 +220,7 @@ part of Billing completion.
 | `platform_billing.invoice_not_found` | Invalidates stale detail and refreshes list. |
 | Safe API errors with retry | Summary, invoices, detail, and payment history. |
 | `platform_billing.invalid_transition` | Distinct message; reload latest data. |
-| `platform_billing.concurrency_conflict` | “Updated elsewhere”; no automatic retry; reload latest data. |
+| `platform_billing.concurrency_conflict` | â€œUpdated elsewhereâ€; no automatic retry; reload latest data. |
 | `platform_billing.access_denied` | Safe permission message for unauthorized mutation attempts. |
 
 ## Accepted Release Verification Limitations
@@ -272,7 +274,7 @@ Super Admin regression: Verified
 ### Final verdict
 
 ```text
-BILLING PHASE 6 COMPLETED — RELEASE READY
+BILLING PHASE 6 COMPLETED â€” RELEASE READY
 ```
 
 ## Outcome

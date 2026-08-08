@@ -104,6 +104,15 @@ Device context must clearly show trusted/untrusted status.
 
 Device not trusted must block POS actions and show a clear activation path.
 
+## Persistent Payment Error Rule
+
+Payment failure feedback must remain visible and accessible after transient
+notifications disappear. Show a safe message, backend code when present and the
+short correlation reference. For an unknown transaction outcome, explicitly
+warn against retrying until reconciliation. Preserve the cart and tender and
+avoid layout overflow at supported POS widths. Never expose the raw idempotency
+key or credentials in the UI.
+
 ## Portable POS Rule
 
 Portable POS is not a separate queue-busting module.
@@ -139,3 +148,11 @@ flowchart TD
 - [[Empty_Error_Loading_States]]
 - [[../03_USER_JOURNEYS/Cashier/04_Start_Sale_Flow]]
 - [[../03_USER_JOURNEYS/Cashier/07_Payment_Flow]]
+
+## Cash Persistent Payment Errors
+
+Persistent Cash errors belong inside the Cash card's scrollable content region;
+totals, tender and bottom actions keep their layout ownership. Full message,
+backend code and correlation remain accessible at 1280x800 landscape and 1200,
+900 and 600 logical widths, with keyboard insets and supported increased text
+scale. Never truncate the support reference or hide a RenderFlex overflow.

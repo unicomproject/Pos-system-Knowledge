@@ -1,7 +1,7 @@
 <!-- title: POS Operations Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-07 -->
 
 # POS Operations Module Overview
 
@@ -23,7 +23,7 @@ merchandising, attractions, and temporary retail locations.
 | Primary users | Cashier, Stall Operator, Store Manager |
 | Frontend surfaces | Mobile POS, Desktop POS, Park/recall sale, Receipt print/reprint, Till close summary |
 | API groups | `/api/v1/pos/home`, `/api/v1/pos/holds`, `/api/v1/pos/receipts`, `/api/v1/pos/till-summary`, `/api/v1/pos/events` |
-| Current implementation note | Flutter park/recall is device-local and does not call `/api/v1/pos/holds`; Cash In/Out has no mutation API |
+| Current implementation note | Park/Recall tracking records Holds API chunks with runtime pending; Decisions A–D are documented targets. Cash In/Out has no mutation API |
 
 ## Main Tables
 
@@ -48,10 +48,18 @@ merchandising, attractions, and temporary retail locations.
   line, tender, discount, tax, and copy-policy values available at completion.
 - Original and reprint operations use stable request identity and separate
   authorized print-audit records; reprint never creates another sale/payment.
-- Parked/held sale must remain tenant, outlet, till, and user scoped.
+- Parked/held sale must remain tenant, outlet, till, and holding-cashier scoped
+  (approved current-till list target; verify till filter before claiming complete).
 - Till summary uses completed sales, payments, refunds, and cash movements.
-- Backend Holds is implemented, but current Flutter held-sale authority is local
-  secure storage and therefore disconnected.
+- Park/Recall tracking records Flutter Holds API chunks with authenticated runtime
+  still pending. Decisions A–D are documented product targets, not completion.
+  See [[08_Park_Recall_Sale_Feature]].
+- Backend-authoritative Park/Recall with PS reference and server-time 24-hour
+  expiry remains the approved target; feature is not Completed.
+- Dashboard Parked Sales exact list-screen target (filters, table, summary and
+  responsive reuse) is documented in
+  [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Parked_Sales_Recall_Screen_Implementation_Specification]];
+  implementation remains pending.
 - Customer display is future unless explicitly enabled.
 - Cashier New Sale includes the Product Variant Selection Popup with one image, optional line note and manual Frequently Bought Together. This is distinct from the history-derived Frequently Sold discovery segment. See [[04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 
@@ -88,3 +96,4 @@ merchandising, attractions, and temporary retail locations.
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/05_Frequently_Sold_Product_Discovery_Feature]]
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/06_Offers_Product_Discovery_Feature]]
 - [[04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]]
+- [[04_MODULE_KNOWLEDGE/21_POS_Operations/04_Multi_Tenant_Receipt_Template_Resolution]]

@@ -12,7 +12,7 @@
 >
 > Current sources of truth:
 >
-> - [[../03_USER_JOURNEYS/Platform_Admin/04_Create_Tenant_Wizard_Flow]]
+> - [[../03_USER_JOURNEYS/Platform_Admin/FLOW_4_CREATE_TENANT_WIZARD_CANONICAL_SPEC]]
 > - [[../03_USER_JOURNEYS/Platform_Admin/18_Tenant_Onboarding_Email_Flows]]
 > - [[../12_INTEGRATIONS/Email_Event_And_Template_Catalog]]
 >

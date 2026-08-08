@@ -1,10 +1,12 @@
 <!-- title: Tenant Activation Flow -->
 <!-- status: Active -->
-<!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-27 -->
+<!-- system: OneVerz POS MVP / OneVerz -->
+<!-- last_updated: 2026-08-06 -->
 <!-- decision_date: 2026-07-27 -->
 
 # Tenant Activation Flow
+
+> Flow 4 payment alignment (2026-08-04): the current release uses manual payment verification. Payment approval moves a prepaid tenant from `PENDING_PAYMENT` to `PENDING_ACTIVATION`; it never directly marks the tenant `ACTIVE`. The separate activation command then validates eligibility, activates idempotently and queues the Tenant Admin setup invitation.
 
 ## Purpose
 
@@ -30,11 +32,11 @@ Platform Admin (manual paid activation); system (automatic trial/demo activation
 | Step | Action | System behavior |
 |---:|---|---|
 | 1 | Open tenant detail | Status expected `PENDING_PAYMENT` until payment is resolved |
-| 2 | Confirm payment resolved | Manual Mark Paid / verify payment (R1) or approved payment waiver recorded |
-| 3 | Prepare for activation | Lifecycle → `PENDING_ACTIVATION` |
+| 2 | Confirm payment resolved | Authorized, versioned and idempotent manual review approves submitted evidence, or an approved payment waiver is recorded |
+| 3 | Prepare for activation | Lifecycle â†’ `PENDING_ACTIVATION` |
 | 4 | Click Activate Tenant | Requires verified payment or approved waiver |
-| 5 | Confirm | Lifecycle → `ACTIVE` |
-| 6 | Send activation email | `tenant.paid_activated` — username/email, login URL, single-use set-password link, expiry |
+| 5 | Confirm | Lifecycle â†’ `ACTIVE` |
+| 6 | Send activation email | `tenant.paid_activated` â€” username/email, login URL, single-use set-password link, expiry |
 | 7 | Tenant Admin sets password | Completes setup; can log in |
 
 ### Trial / Demo
@@ -50,7 +52,9 @@ Platform Admin (manual paid activation); system (automatic trial/demo activation
 
 - Never email a plain password.
 - Set-password link **only** on activation email.
-- `tenants.status` uses lifecycle values only — see [[../../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]].
+- Before payment approval there is no setup token or setup invitation; payment and account-setup communications are separate.
+- Current manual payment uses invoice/payment-status links and has no provider checkout URL.
+- `tenants.status` uses lifecycle values only â€” see [[../../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]].
 
 ## Implementation status
 
@@ -68,13 +72,13 @@ Platform Admin (manual paid activation); system (automatic trial/demo activation
 | `tenants.status` CHECK constraint | **IMPLEMENTED** |
 | `lifecycleStatus` API transition | **IMPLEMENTED** |
 | Frontend lifecycle badge/filter alignment | **IMPLEMENTED** |
-| Post-merge smoke verification | **PASSED** — [[../../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Post_Merge_Smoke_Verification]] |
+| Post-merge smoke verification | **PASSED** â€” [[../../15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_Lifecycle_Post_Merge_Smoke_Verification]] |
 
-## Decision history — superseded
+## Decision history â€” superseded
 
 > ~~System sends tenant admin invite/password setup email and marks tenant active~~ as a single vague step without distinguishing paid vs trial/demo and without payment verification.
 
-> ~~Trial/Demo use one combined setup email only~~ — superseded by two emails: Created + Activated.
+> ~~Trial/Demo use one combined setup email only~~ â€” superseded by two emails: Created + Activated.
 
 ## Related
 

@@ -1,9 +1,68 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-07 -->
 
 # Platform Subscription Plan API Endpoints
+
+## POS Park / Recall Sale
+
+Base route: `/api/v1/pos/holds` · Controller: `PosHoldsController`.
+
+| Method | Route | Current permission | Purpose |
+|---|---|---|---|
+| POST | `/api/v1/pos/holds` | `sales.park.create` | Persist a priced cart as a parked sale |
+| GET | `/api/v1/pos/holds` | `sales.park.view` | List active holds (tenant + current till + holding cashier + HELD + non-expired) |
+| POST | `/api/v1/pos/holds/{holdId}/recall` | `sales.park.recall` | Soft-revalidate and atomically release a hold for sale |
+| DELETE | `/api/v1/pos/holds/{holdId}?reason=...` | `sales.park.create` | Cancel an active hold; reason mandatory at service |
+
+Create accepts `deviceId`, `saleType`, optional `customerId`, cart `lines`,
+optional park `reason` (short note), `discountApplicationId`, required stable
+`idempotencyKey`, optional `sourceSaleId`, and optional compatibility
+`expiresAt`. The compatibility `expiresAt` property is ignored: the service
+captures server UTC once and persists expiry exactly 24 hours later. New
+references use `PS-{UTC_YEAR}-{5 digit}` under a tenant/year PostgreSQL
+transaction advisory lock. Historical `HOLD-######` rows remain readable only.
+Idempotency is DB-backed (`idempotency_key` + `request_fingerprint`; unique per
+tenant when key is not null): same fingerprint replays; different fingerprint
+conflicts. Optional `sourceSaleId` rejects partially paid sales with
+`pos_holds.sale_partially_paid_cannot_be_parked`.
+Park soft-validates stock only — it does **not** reserve or deduct inventory.
+Park creation resolves or provisions the tenant channel through the deterministic
+global platform POS definition. If that required system definition is missing,
+the API returns HTTP 503 with code
+`pos_holds.system_pos_channel_unavailable`; it does not classify the cashier
+request as invalid and does not persist partial Park data.
+Create/list items return hold/sale/till/session/customer identifiers, reference,
+reason, status, item count, money totals, currency, timestamps and typed lines;
+the list envelope returns `holds`, `totalCount`, `totalValue`, `currency`, `page`
+and `pageSize`. Home count uses the same
+active-hold predicate. List/count/recall/cancel invoke `ExpireDueHolds`, which
+persists `EXPIRED`. Recall additionally returns `deviceId`, `saleType`,
+`recalledAt`, request-shaped lines, `checkoutSummary`, and optional
+`StockWarnings`. Recalled SalesOrder remains `DRAFT`. Cancel has no response
+body; blank/whitespace reason is rejected. Audit events land on
+`pos_order_hold_events` (`PARK_CREATED`, `PARK_IDEMPOTENT_REPLAY`,
+`PARK_RECALLED`, `PARK_CANCELLED`, `PARK_EXPIRED`). Migration:
+`20260806190000_AddPosHoldIdempotencyAndEvents`.
+
+**List scope (implemented):** current tenant + current till (trusted device /
+open session) + holding cashier + `HELD` + non-expired. Manager-wide visibility
+is not approved. Checkout remains hard stock authority after recall.
+**Cancel Reason:** mandatory at service (trim; max 250).
+Code + automated tests Implemented; authenticated full cashier E2E remains
+Runtime Verification Pending.
+
+**Parked Sales list contract (implemented):** `GET /api/v1/pos/holds` accepts
+required `deviceId`, `scope=today|current-shift|all-active` (default `today`),
+`page` (default 1) and `pageSize` (default 25, maximum 100). Today uses the open
+till session business date; current-shift uses its session ID; all-active removes
+only that date/session restriction. All retain the server-derived tenant,
+current-till, holding-cashier and active/non-expired scope. Filtered count/value
+and session currency are calculated before ordering/pagination. `itemCount` is
+the sum of quantities. Current typed lines remain sufficient for View; no second
+summary/detail endpoint was added.
+See [[../04_MODULE_KNOWLEDGE/21_POS_Operations/08_Park_Recall_Sale_Feature]].
 
 ## Platform Authentication (Unified Commerce)
 
@@ -1309,7 +1368,37 @@ Same rule for `GET .../sales/search` and `GET .../sales/{saleId}/eligibility`:
 - Cash/QR/non-card: no fabricated card mask.
 - Provider transaction ids remain server-side only.
 
-> **Checkout write path (2026-07-17):** Cash persists without card tips. Card production
-> authorization still requires provider integration (`pos_checkout.payment_provider_required`).
 > Domain factory `PosCompletedPaymentPersistence.CreateProviderCapture` maps successful
 > provider outcomes into the fields above when provider support is enabled.
+
+---
+
+# POS Receipts API Endpoints (2026-08-05)
+
+Controller: `PosReceiptsController`
+Base: `/api/v1/pos/receipts`
+
+All endpoints require tenant JWT authentication (`TenantOnly` policy).
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/api/v1/pos/receipts` | Search receipts (paginated) |
+| GET | `/api/v1/pos/receipts/{receiptId}` | Get receipt detail by `receiptId` (NOT `saleId`) |
+| POST | `/api/v1/pos/receipts/{receiptId}/reprint/authorize` | Authorize reprint |
+| POST | `/api/v1/pos/receipts/{saleId}/print` | Record print audit |
+
+Receipt detail uses `receiptId` (not `saleId`). Do not document or implement the GET detail route as `{saleId}`.
+
+## Checkout Success Response Contract Decision
+
+The existing `POST /api/v1/pos/checkout/start-payment` response (`PosCheckoutStartPaymentResponseDto`) contains:
+- `SaleId`, `SaleNumber`, `ReceiptNumber`, `ReceiptId`, `PaymentId`
+- `MerchantName`, `OutletName`, `TillId`, `TillName`, `CashierId`, `CashierName`
+- `Subtotal`, `DiscountTotal`, `TaxTotal`, `GrandTotal`, `CashReceived`, `ChangeDue`
+- `PaymentMethod`, `Currency`, `CompletedAt`, `BarcodeValue`
+- `Items[]`, `Tenders[]`, `DiscountLines[]`, `TaxLines[]`, `CopyPolicy`
+- `TaxRegistrationNumber`, `TaxInvoiceLabel`
+- `ReceiptDataJson` (Added recently. Currently contains legacy snapshot, missing dynamic template support)
+- `receiptTemplateVersionId` is NOT exposed.
+
+**API Contract Decision**: Existing endpoints (`POST /api/v1/pos/checkout/start-payment` and `GET /api/v1/pos/receipts/{receiptId}`) are reused. The response DTOs (`PosCheckoutStartPaymentResponseDto` and `PosReceiptDetailDto`) have been successfully extended to include `ReceiptDataJson`. Currently the resolved receipt snapshot (`receipt_data_json`) is generated statically during checkout; dynamic template merging is pending. See [[Receipt_Template_Resolution_And_Snapshot_Contract]].

@@ -1,7 +1,7 @@
 <!-- title: Scope Change Log -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-06 -->
 
 # Scope Change Log
 

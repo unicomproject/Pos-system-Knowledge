@@ -1,7 +1,7 @@
 <!-- title: POS Operations Technical Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-07 -->
 
 # POS Operations Technical Contract
 
@@ -58,8 +58,18 @@ history/ledger behavior where applicable.
   a typed domain receipt before invoking printer orchestration.
 - Durable print-operation state is persisted before the external print side
   effect. Local Agent transport must not fall back to direct TCP.
-- `PosParkedSaleNotifier` persists `pos.parked_sales` in secure storage and does
-  not call `PosHoldsController`.
+- Approved Flutter Park/Recall target: typed Holds integration, stable create
+  idempotency, backend PS reference, server 24-hour expiry, cart-derived Park/
+  Recall visibility, product-name card summary, mandatory Cancel Reason (client
+  target), and current-till list refresh. See [[08_Park_Recall_Sale_Feature]].
+- Current verified implementation and remaining gaps (including optional backend
+  cancel reason and till-filter proof) live in implementation tracking — do not
+  treat this contract as Completed evidence.
+- Exact Parked Sales screen target extends the current GET rather than inventing
+  a route: backend Today/current-shift/all-active scope, pagination and
+  pre-pagination count/value/currency metadata are implemented. Flutter
+  must reuse current POS shell/theme/components. See
+  [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Parked_Sales_Recall_Screen_Implementation_Specification]].
 - Cash Drawer/Cash In/Cash Drop routes and forms exist, but no backend
   cash-movement datasource is wired.
 - Use DTOs in data layer, domain/view models in UI layer.
@@ -165,3 +175,13 @@ Barcode identity remains a string. Tenant uniqueness prevents random
 selection; zero matches are not-found, multiple matches ambiguous, and
 inactive product/variant or unavailable price is rejected. Only a successful
 authoritative response reaches existing cart rules.
+
+## Checkout persistence conflict classification (2026-08-03)
+
+Checkout returns `pos_checkout.idempotency_conflict` only when PostgreSQL names
+the tenant/payment idempotency unique constraint. After that race, rollback and
+perform authoritative replay lookup: identical committed request returns its
+existing result; different hash remains conflict. Other `DbUpdateException`
+constraints return `pos_checkout.persistence_failed` (HTTP 500), not a false
+409. Structured logs include only one-way correlation, database state and
+constraint, never the raw key.

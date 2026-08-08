@@ -1,19 +1,64 @@
 <!-- title: POS Operations -->
 <!-- status: Updated -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-08-07 -->
 <!-- source: 21_POS Operations ERD image -->
 
 # 21. POS Operations
 
+## Parked sale persistence
+
+`pos_order_holds` is the backend lifecycle source of truth for Park / Recall
+Sale. It stores tenant, sales-order relation, holding user, generated hold
+number, status, expiry, release/cancel metadata, `idempotency_key`,
+`request_fingerprint`, and timestamps. Status is constrained to `HELD`,
+`RELEASED`, `EXPIRED`, or `CANCELLED`; `hold_reason` / cancellation reason are
+limited to 250 characters.
+
+The model has a primary key, tenant/hold-number uniqueness, partial unique
+`(tenant_id, idempotency_key) WHERE idempotency_key IS NOT NULL`, foreign keys
+to tenant, order, held-by user and released-by user, and nullable expiry.
+Create and recall use database transactions. Migration
+`20260806190000_AddPosHoldIdempotencyAndEvents` adds idempotency columns and
+`pos_order_hold_events`. New cashier references use `PS-{UTC_YEAR}-{5 digit}`
+under a tenant/year advisory lock. Flutter uses the Holds API; any historical
+local secure-storage list is non-authoritative and must not be merged.
+
+Contract: [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/08_Park_Recall_Sale_Feature]].
+
+Chunk 1 retained nullable `expires_at` for historical compatibility. New
+cashier holds always receive service-controlled server UTC plus 24 hours.
+`ExpireDueHolds` persists `EXPIRED` when list/count/recall/cancel run.
+Park does not reserve or deduct stock.
+
+### Parked Sales list-screen database decision
+
+No new business table or mandatory attribute is required solely for this
+screen. Till/till-session, customer snapshot, totals and currency come from
+`sales_orders`; items and quantity-sum item count come from `sales_order_lines`;
+device/till authority comes through `pos_devices`, `till_device_assignments`,
+`tills` and `till_sessions`; holding identity uses `tenant_users`. Do not
+duplicate these values or calculated `canRecall`/`canCancel` on
+`pos_order_holds`. Current conditional status updates provide exactly one
+successful recall/cancel transition, so a new row-version column is not
+mandatory. Existing indexes do not provide one composite active-list index over
+tenant + holding user + status + held time + expiry; assess query plans before
+adding one. Chunk 1 required no migration: Today uses the existing
+`sales_orders.business_date`, populated from the authoritative open till session
+when a Park order is created; This Shift uses the existing `till_session_id`;
+summary currency uses the current `till_sessions.currency_code`. No speculative
+index was added without a production-representative query plan.
+
 ## Purpose
 
-This file documents POS hold, receipt, receipt template, till closing summary, till event, and cash movement tables.
+This file documents POS hold, hold events, receipt, receipt template, till
+closing summary, till event, and cash movement tables.
 
-`pos_order_holds` and `till_cash_movements` are defined schema foundations.
-Current Flutter Park/Recall uses device-local secure storage rather than the
-backend Holds API, and no Cashier Cash In/Out mutation API was verified. Defined
-in migration source; live applied state not verified.
+`pos_order_holds` and `pos_order_hold_events` are the Park/Recall persistence
+foundation. Local Development schema application was verified for holds history;
+application in other environments is not proven by this document.
+
+**Implementation Note (2026-08-05)**: The backend reuses the existing `receipt_templates`, `receipt_template_versions`, `receipts` tables and the `receipt_data_json`, `receipt_template_version_id` columns. No new tables, columns, or migrations were introduced for the receipt template resolution feature. Currently, the backend constructs legacy JSON for `receipt_data_json` but does not yet populate `receipt_template_version_id`.
 
 ## Design Rules Applied
 
@@ -27,6 +72,7 @@ in migration source; live applied state not verified.
 | # | Table | Purpose |
 |---|---|---|
 | 1 | `pos_order_holds` | POS order hold lifecycle. |
+| 1b | `pos_order_hold_events` | Park/Recall audit events. |
 | 2 | `receipts` | Receipt immutable header and totals. |
 | 3 | `receipt_print_logs` | Receipt print attempts. |
 | 4 | `receipt_templates` | Receipt template master records. |
@@ -53,9 +99,11 @@ in migration source; live applied state not verified.
 | `held_at` | timestamptz |  | NOT NULL | Held timestamp. |
 | `released_by_tenant_user_id` | uuid | FK | NULL | User who released hold. |
 | `released_at` | timestamptz |  | NULL | Released timestamp. |
-| `expires_at` | timestamptz |  | NULL | Hold expiry. |
+| `expires_at` | timestamptz |  | NULL | Hold expiry (server UTC +24h for new parks). |
 | `cancelled_at` | timestamptz |  | NULL | Cancelled timestamp. |
-| `cancellation_reason` | varchar(250) |  | NULL | Cancellation reason. |
+| `cancellation_reason` | varchar(250) |  | NULL | Cancellation reason (mandatory on cancel path). |
+| `idempotency_key` | varchar(100) | UNIQUE (partial) | NULL | Client stable create key. |
+| `request_fingerprint` | varchar(128) |  | NULL | Hash of create intent for replay/conflict. |
 | `created_at` | timestamptz |  | NOT NULL | Creation timestamp. |
 | `updated_at` | timestamptz |  | NOT NULL | Last update timestamp. |
 
@@ -68,7 +116,43 @@ FK(sales_order_id) REFERENCES sales_orders(id)
 FK(held_by_tenant_user_id) REFERENCES tenant_users(id)
 FK(released_by_tenant_user_id) REFERENCES tenant_users(id)
 UNIQUE(tenant_id, hold_number)
+UNIQUE(tenant_id, idempotency_key) WHERE idempotency_key IS NOT NULL
 CHECK(hold_status IN ('HELD', 'RELEASED', 'EXPIRED', 'CANCELLED'))
+```
+
+Idempotency behaviour: same `idempotency_key` + same `request_fingerprint` →
+replay existing hold; same key + different fingerprint → conflict. Migration:
+`20260806190000_AddPosHoldIdempotencyAndEvents`.
+
+---
+
+## 1b. `pos_order_hold_events`
+
+| Attribute | Type | Key | Null | Reference / Note |
+|---|---|---|---|---|
+| `id` | uuid | PK | NOT NULL | Primary key. |
+| `tenant_id` | uuid | FK | NOT NULL | References `tenants(id)`. |
+| `pos_order_hold_id` | uuid | FK | NOT NULL | References `pos_order_holds(id)`. |
+| `event_type` | varchar(40) | CHECK | NOT NULL | Audit event type. |
+| `event_at` | timestamptz |  | NOT NULL | Event timestamp (UTC). |
+| `actor_tenant_user_id` | uuid | FK | NULL | Acting user when applicable. |
+| `payload_json` | jsonb |  | NULL | Optional structured context. |
+| `created_at` | timestamptz |  | NOT NULL | Creation timestamp. |
+
+Constraints:
+
+```text
+PK(id)
+FK(tenant_id) REFERENCES tenants(id)
+FK(pos_order_hold_id) REFERENCES pos_order_holds(id)
+FK(actor_tenant_user_id) REFERENCES tenant_users(id)
+CHECK(event_type IN (
+  'PARK_CREATED',
+  'PARK_IDEMPOTENT_REPLAY',
+  'PARK_RECALLED',
+  'PARK_CANCELLED',
+  'PARK_EXPIRED'
+))
 ```
 
 ---
