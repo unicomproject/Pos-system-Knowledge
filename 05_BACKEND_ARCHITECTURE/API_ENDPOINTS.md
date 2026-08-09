@@ -230,6 +230,31 @@ Query notes:
 See [[../15_IMPLEMENTATION_TRACKING/Backend/POSOperations/Pos_Home_Dashboard_Implementation_Status]]
 and [[../15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/Pos_Products_List_Implementation_Status]].
 
+---
+
+## Tenant Admin Product Management APIs
+
+Base route: `/api/v1/tenant-admin/products` · Controller: `TenantAdminProductsController` · Auth Policy: `TenantOnly`.
+
+| Method | Canonical Endpoint | Permission | Purpose |
+| :--- | :--- | :--- | :--- |
+| GET | `/api/v1/tenant-admin/products` | `catalog.products.view` | Paginated product list with search and filters |
+| GET | `/api/v1/tenant-admin/products/filter-options` | `catalog.products.view` | Dropdown values for category, brand, and status filters |
+| POST | `/api/v1/tenant-admin/products` | `catalog.products.create` | Create a product wizard graph (DRAFT or published) |
+| GET | `/api/v1/tenant-admin/products/{id}` | `catalog.products.view` | Get complete details of a specific product |
+| PUT | `/api/v1/tenant-admin/products/{id}` | `catalog.products.update` | Update product details |
+| DELETE | `/api/v1/tenant-admin/products/{id}` | `catalog.products.delete` | Perform soft delete (ARCHIVE status mutation) |
+| GET | `/api/v1/tenant-admin/products/imports/template` | `catalog.products.import` | Download UTF-8 CSV import template |
+| POST | `/api/v1/tenant-admin/products/imports` | `catalog.products.import` | Upload CSV and create batch row logs |
+| GET | `/api/v1/tenant-admin/products/imports/{importId}` | `catalog.products.import` | Read batch upload status and stats |
+| GET | `/api/v1/tenant-admin/products/imports/{importId}/rows` | `catalog.products.import` | Read paginated valid or invalid row validation errors |
+| POST | `/api/v1/tenant-admin/products/imports/{importId}/commit` | `catalog.products.import` | Commit valid rows in batch to database |
+| GET | `/api/v1/tenant-admin/products/imports/{importId}/errors.csv` | `catalog.products.import` | Export validation failures CSV log |
+
+Note: Legacy route `/api/v1/products` is maintained as compatibility alias pointing to the same application layer logic. Duplicate controller implementation must be retired.
+
+---
+
 Base route: `/api/v1/platform/subscription-plans`
 
 All endpoints require platform JWT authentication.

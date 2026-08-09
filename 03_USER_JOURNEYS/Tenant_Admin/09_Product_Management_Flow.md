@@ -1,21 +1,17 @@
 <!-- title: Tenant Admin Product Management Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-31 -->
+<!-- last_updated: 2026-08-06 -->
 
 # Tenant Admin Product Management Flow
 
 ## Purpose
 
-Defines manual product creation, setup for sale readiness, and manual curation of the default POS Popular products list.
+Defines the manual product management flows for the Tenant Admin, including the 8-step wizard, draft saving, details overview, editing, duplicating, archiving, and manual popular product curation. Product import workflows are removed from this active interface scope.
 
 ## Actor
 
 Tenant Admin
-
-## Source
-
-Derived from `Slide 9 - Tenant Admin Product Management Flow` in `tenant-full-journey.pptx` and aligned to OneVerz POS MVP Second Brain scope.
 
 ## Trigger
 
@@ -23,79 +19,52 @@ Tenant Admin opens product management.
 
 ## Preconditions
 
-- Tenant Admin has product management permission.
-- Category/brand may exist.
+- Tenant Admin has product management permissions (`catalog.products.*`).
+- Categories and brands are seeded and available.
 
-## Main Flow
+---
 
-| Step | Action | System Behavior |
+## Main Flow: 8-Step Product Creation Wizard
+
+| Step | Wizard Step Name | System & User Behavior |
 |---:|---|---|
-| 1 | Open product management | System opens product module. |
-| 2 | View product list | System displays product list. |
-| 3 | Click add product | System opens product form. |
-| 4 | Enter product basic details | Tenant Admin enters product name, SKU/barcode, category, brand, description, price, tax, attributes, variants, and image. |
-| 5 | Add initial stock if needed | Tenant Admin enters stock quantity for outlet if required. |
-| 6 | Validate product details | System checks product data. |
-| 7 | If invalid | System shows validation error and user corrects details. |
-| 8 | Save product | System saves product. |
-| 9 | Product ready for sale | Product can be used in POS/online store according to visibility. |
+| 1 | **Step 1 — Basic Details** | User inputs Name, Category (mandatory), Brand, Short Name, Internal Code, Description, and Images (Max 5MB per file). Primary Image assignment is verified. |
+| 2 | **Step 3 — Product Type & Tracking** | User selects Product Type (SIMPLE, VARIANT, BUNDLE) and Tracking. ON enables Batch, Expiry, Serial combinations. OFF disables them. |
+| 3 | **Step 4 — Units & Pack Conversion** | Configures base unit and conversion factors. |
+| 4 | **Step 5 — Product Configuration** | Auto-skips for Simple Products. Generates Cartesian options for Variants. Controls Component candidate search for Bundles. |
+| 5 | **Step 6 — Barcode & SKU** | User inputs SKU and Barcodes. System enforces uniqueness tenant-wide. |
+| 6 | **Step 7 — Pricing & Tax** | Inputs Cost Price, Standard Selling Price, promotional pricing, tax classes. Calculates margins. |
+| 7 | **Step 8 — Channel Visibility** | Sets availability for POS and Online Store. |
+| 8 | **Step 9 — Review & Create** | Displays verification summary of all sections. User clicks Create to publish. |
 
-## Popular Products Configuration Flow
+---
 
-| Step | Action | System Behavior |
-|---:|---|---|
-| 1 | Open Popular Products management | System opens Popular Products screen under Collection management. |
-| 2 | View currently assigned popular products | System displays list in current `sort_order` sequence. |
-| 3 | Add product to list | User searches active products and appends to selection list (no duplicates allowed). |
-| 4 | Drag/drop or button click to reorder | User updates sequence of popular products. |
-| 5 | Click Save | System transactionally deletes old `POS_POPULAR` mappings, inserts new mappings with updated `sort_order` values, and writes audit records. |
+## Post-Create Journey
 
-## Data Used Or Captured
+Once created, the user is redirected to the **Product Details Overview**.
+- **Overview**: Displays Product Info, Selling/Cost Prices, Channel Visibility, Stock Summary, and Outlets.
+- **Actions**: Edit (prefilled wizard), Duplicate (resets identifiers/quantities, opens as DRAFT), and Archive.
+- **Archive Action**: Marks the product status as `ARCHIVED`, setting `archived_at` and `archived_by_tenant_user_id` in the database. The product disappears from the default list view.
 
-- Product name
-- Description
-- Category
-- Brand
-- Attributes
-- Variants
-- Product image
-- Barcode/SKU
-- Price
-- Tax
-- Initial stock quantity
-- Popular products selection list and order sequence
+---
 
-## Access And Security Rules
+## Product List View States
 
-- Tenant Admin must be authenticated unless the flow is a setup/payment link flow before first login.
-- Tenant status, feature entitlement, permission, and outlet access must be enforced where applicable.
-- Tenant-owned data must be isolated by tenant context resolved server-side.
-- All create/update/status actions should be audit logged.
-- Product is tenant-owned.
-- Final stock is backend authority.
-- Product visibility must respect channel/feature settings.
+- **First-Use Empty State**: Triggered when `catalogTotalCount = 0` and no filters are active. Renders the empty state illustration with a single primary "Add Product" CTA button. **No CSV or import buttons are displayed**.
+- **Filtered Empty State**: Triggered when `catalogTotalCount > 0` but current active filters or searches return zero records. Displays "No matching products found" and a "Reset Filters" action button.
+- **Populated List State**: Renders a Filter Toolbar and a data table displaying Product Name, SKU, Category, Variants, Price/Range, Stock, Product Status, Stock Status, and Actions (View/Edit/Archive).
 
-## Validation And Error Cases
+---
 
-- Duplicate SKU/barcode
-- Invalid price/tax
-- Missing required details
-- Invalid stock quantity
-- Cross-tenant product assignment (fails validation)
+## Access and Security Rules
 
-## Outcome
+- Strict server-side enforcement of tenant-isolation contexts.
+- Hiding UI elements is a convenience for cashier/admin role UX; backend validation checks are always mandatory.
+- Stock and pricing calculations are evaluated server-side.
 
-Product is ready for sale, and/or the popular products configuration is updated and sorted.
-
-## Related Modules
-
-- 10_Product_Core
-- 11_Product_Media_Attributes_Channel_Visibility
-- 12_Product_Option_Variant_Configuration
-- 16_Inventory_Foundation_Stock_Availability
-- 21_POS_Operations
+---
 
 ## Related Files
-
-- [[../../06_DATABASE_KNOWLEDGE/Tables/10_Catalog_Master_Data_And_Product_Core_UPDATED]]
-- [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/04_Popular_Product_Discovery_Feature]]
+- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/04_Tenant_Admin_Product_List_Contract]]
+- [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Product_List_UI_UX_Specification]]
+- [[../../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Product_List_Flutter_Implementation_Specification]]

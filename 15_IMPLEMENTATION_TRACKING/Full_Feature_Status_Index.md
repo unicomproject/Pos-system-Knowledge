@@ -141,7 +141,9 @@ PR/commit reference is recorded.
 | Backend | OutletTillDevice | Device Context | Completed | 2026-07-09 | `5c99b66` | `devices/current`, `devices/activate` |
 | Backend | OutletTillDevice | Till Session Open/Close | Completed | 2026-07-09 | `06048db` | current-session, open, close |
 | Backend | POSOperations | POS Home Dashboard API | Testing | 2026-07-08 | Current working tree | Branding + explicit current-session sales/refund/discount/net metrics added; focused API/repository tests pass |
-| Backend | POSOperations | Park / Recall Sale contract | Testing | 2026-08-07 | Current working tree | Parked Sales API Chunk 1 implemented: authoritative scopes, pagination, count/value/currency; affected Unit 46 / API 19 / Integration 8 passed. Authenticated full E2E pending. Not Completed. [[Backend/POSOperations/Pos_Park_Recall_Sale_Implementation_Status]] |
+| Backend | CatalogProduct | Tenant Admin Product Setup Wizard | In Progress | - | - | Legacy Product CRUD completed (but deprecated); final 8-step wizard setup flow, APIs and validations in progress. |
+| Backend | CatalogProduct | Tenant Admin Product List & Filters | In Progress | - | - | Added API, filter options, lifecycle/stock calculations, and pagination details. |
+| Backend | CatalogProduct | Tenant Admin Product CSV Import | In Progress | - | - | CSV batch upload, row parsing validations, template, and commit logic details. |
 | Backend | CatalogProduct | POS Products List | Completed | 2026-07-23 | Current `main` audit | `GET /api/v1/pos/products`, categories, detail and exact barcode lookup exist |
 | Backend | Sales | POS Checkout / Cash Payment APIs | Testing | - | Current working tree | Cash complete; Card safe unavailable-by-default; QR/Split incomplete |
 | Backend | POSOperations | Windows Local Print Agent | Testing | - | Current working tree | [[Backend/POSOperations/Receipt_Printer_Local_Agent_Implementation_Status]] |

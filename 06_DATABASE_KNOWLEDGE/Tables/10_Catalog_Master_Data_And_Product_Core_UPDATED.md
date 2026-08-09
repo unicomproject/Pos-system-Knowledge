@@ -285,6 +285,13 @@ Purpose: Stores tenant product master records.
 | `is_sellable`               | boolean      |     | NOT NULL DEFAULT true | Sellable flag                  |
 | `is_taxable`                | boolean      |     | NOT NULL DEFAULT true | Taxable flag                   |
 | `status`                    | varchar(40)  |     | NOT NULL              | Product status                 |
+| `current_setup_step`        | int          |     | NOT NULL DEFAULT 1    | Wizard setup step progress     |
+| `draft_saved_at`            | timestamptz  |     | NULL                  | Draft creation timestamp       |
+| `published_at`              | timestamptz  |     | NULL                  | Timestamp of publication       |
+| `published_by_tenant_user_id`| uuid        | FK  | NULL                  | References tenant_users(id)    |
+| `archived_at`               | timestamptz  |     | NULL                  | Timestamp of soft delete       |
+| `archived_by_tenant_user_id` | uuid        | FK  | NULL                  | References tenant_users(id)    |
+| `row_version`               | bigint       |     | NOT NULL DEFAULT 1    | Optimistic concurrency token   |
 | `created_at`                | timestamptz  |     | NOT NULL              | Created timestamp              |
 | `created_by_tenant_user_id` | uuid         | FK  | NULL                  | References tenant_users(id)    |
 | `updated_at`                | timestamptz  |     | NOT NULL              | Updated timestamp              |
@@ -298,12 +305,16 @@ FK(tenant_id) REFERENCES tenants(id)
 FK(business_type_id) REFERENCES business_types(id)
 FK(tenant_id, brand_id) REFERENCES brands(tenant_id, id)
 FK(tenant_id, return_policy_id) REFERENCES return_policies(tenant_id, id)
+FK(published_by_tenant_user_id) REFERENCES tenant_users(id)
+FK(archived_by_tenant_user_id) REFERENCES tenant_users(id)
 FK(created_by_tenant_user_id) REFERENCES tenant_users(id)
 FK(updated_by_tenant_user_id) REFERENCES tenant_users(id)
 UNIQUE(tenant_id, product_code)
 UNIQUE(tenant_id, product_slug)
 UNIQUE(tenant_id, id)
-CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
+CHECK(status IN ('DRAFT', 'ACTIVE', 'INACTIVE', 'ARCHIVED'))
+CHECK(current_setup_step BETWEEN 1 AND 8)
+CHECK(row_version >= 0)
 ```
 
 ## `product_variants`
@@ -345,7 +356,7 @@ UNIQUE(tenant_id, id)
 UNIQUE(tenant_id, product_id, id)
 One active default variant per product.
 UNIQUE(tenant_id, product_id, option_combination_hash) WHERE option_combination_hash IS NOT NULL
-CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
+CHECK(status IN ('DRAFT', 'ACTIVE', 'INACTIVE', 'ARCHIVED'))
 ```
 
 ## `product_reviews`
@@ -417,6 +428,7 @@ Indexes / Constraints / Notes:
 - [[12_Product_Option_Templates_And_Variant_Configuration]]
 - [[14_Pricing_And_Tax_Management]]
 - [[16_Inventory_Foundation_Product_Tracking_And_Stock_Availability]]
+- [[15_Product_Import_Batches_And_Rows]]
 # Product barcode POS lookup note (2026-07-22)
 
 `product_barcodes` supports tenant-scoped exact POS lookup through the unique

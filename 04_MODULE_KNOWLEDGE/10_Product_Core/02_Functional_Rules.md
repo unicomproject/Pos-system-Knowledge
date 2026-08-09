@@ -74,3 +74,5 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/03_Technical_Contract]]
+- [[04_MODULE_KNOWLEDGE/10_Product_Core/04_Tenant_Admin_Product_List_And_Import_Contract]]
+- [[../../06_DATABASE_KNOWLEDGE/Tables/15_Product_Import_Batches_And_Rows]]

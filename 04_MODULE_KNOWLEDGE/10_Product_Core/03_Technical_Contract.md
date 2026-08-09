@@ -14,7 +14,7 @@ new OneVerz POS MVP scope images and the uploaded Unified Commerce database desi
 
 | Area | Contract |
 |---|---|
-| API groups | `/api/v1/products`, `/api/v1/products/{id}/variants`, `/api/v1/pos/products`, `/api/v1/storefront/products` |
+| API groups | `/api/v1/tenant-admin/products`, `/api/v1/tenant-admin/products/imports`, `/api/v1/pos/products`, `/api/v1/storefront/products` |
 | Request format | Typed request DTOs; no raw map payloads in application layer |
 | Response format | Typed response DTOs with safe fields only |
 | Error format | Standard API error response |
@@ -25,17 +25,19 @@ new OneVerz POS MVP scope images and the uploaded Unified Commerce database desi
 
 | API Group | Purpose |
 |---|---|
-| `/api/v1/products` | Module API group |
-| `/api/v1/products/{id}/variants` | Module API group |
-| `/api/v1/pos/products` | Module API group |
-| `/api/v1/storefront/products` | Module API group |
+| `/api/v1/tenant-admin/products` | Tenant Admin Product CRUD and List filters |
+| `/api/v1/tenant-admin/products/imports` | CSV batch upload, validation, and commit |
+| `/api/v1/pos/products` | Cashier POS product search and segments |
+| `/api/v1/storefront/products` | Storefront public product browse |
 
 ## Database Contract
 
 | Table | Contract |
 |---|---|
-| `products` | Used by this module |
-| `product_variants` | Used by this module |
+| `products` | Stores parent product records, setup steps, status, and audit parameters. |
+| `product_variants` | Stores sellable variant details, SKU, and barcode links. |
+| `product_import_batches` | Stores metadata for CSV product import runs. |
+| `product_import_rows` | Stores row-level parsed and validated import records. |
 
 Entity mappings must preserve exact table names, column names, tenant foreign keys,
 unique constraints, CHECK constraints, hash-only token rules, and append-only
@@ -102,3 +104,5 @@ Test coverage must include:
 
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/02_Functional_Rules]]
+- [[04_MODULE_KNOWLEDGE/10_Product_Core/04_Tenant_Admin_Product_List_And_Import_Contract]]
+- [[../../06_DATABASE_KNOWLEDGE/Tables/15_Product_Import_Batches_And_Rows]]
