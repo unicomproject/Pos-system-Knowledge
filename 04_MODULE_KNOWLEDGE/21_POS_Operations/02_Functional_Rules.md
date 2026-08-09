@@ -45,7 +45,22 @@ responsive online store screens, Angular/admin screens, tests, or database chang
   feature Completed.
 - Cash movement schema is not a successful cashier movement without a mutation
   API and persistence result.
-- Customer display is future unless explicitly enabled.
+- Checkout customer selection is optional. Walk-in/guest checkout remains valid
+  with nullable `customerId` and must never be blocked.
+- The Payment Method Customer card opens a dedicated full-screen checkout
+  selection/add flow. It must not open a popup/modal/dialog or reuse the
+  bottom-navigation `/pos/customers` Customer Management screen.
+- Existing selection and successful Add Customer creation automatically
+  associate the customer with the active cart/checkout and automatically return
+  to Payment Method. No Attach or Save/Attach step is part of cashier checkout.
+- When selected, `customerId` remains attached through checkout/payment and is
+  stored on the completed sale.
+- The complete normative contract is
+  [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Checkout_Customer_Selection_Implementation_Specification]].
+- Every walk-in/customer transition and customer replacement uses the existing
+  checkout/discount revalidation engine. Preserve valid discounts; remove or
+  reject invalid ones, recalculate totals, and show a cashier-safe message. Do
+  not hardcode customer discount rules in the selector.
 - **Product Discovery Segments**: Cashier New Sale supports filtering products by segments: Popular, Frequently Sold, and Offers. Selecting these segments updates only the catalog grid and preserves cart, customer, and totals.
 - **Popular Products Configuration**: Uses a tenant-scoped reserved collection code `POS_POPULAR` and type `POS_QUICK_LIST` for manual product assignments and sorting order.
 - **Frequently Sold Calculation**: Aggregates net sold quantities ($max(quantity - cancelled - returned, 0)$) for completed sales at the current outlet over a rolling 30-day window.

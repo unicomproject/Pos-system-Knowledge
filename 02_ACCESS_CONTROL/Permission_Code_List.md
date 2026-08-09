@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-07 -->
+<!-- last_updated: 2026-08-09 -->
 
 # Permission Code List
 
@@ -209,7 +209,7 @@ must be seeded and stored in the database.
 | Sales | `SalesPermissionCodes.cs` |
 | Returns | `ReturnsPermissionCodes.cs` |
 | Customer | `CustomerPermissionCodes.cs` |
-| Loyalty | `LoyaltyPermissionCodes.cs` |
+| Loyalty (future/deferred; not Release 1) | `LoyaltyPermissionCodes.cs` |
 | Reports | `ReportPermissionCodes.cs` |
 | Hardware | `HardwarePermissionCodes.cs` |
 
@@ -224,7 +224,7 @@ must be seeded and stored in the database.
 | Sales | `pos.sale.create` | Create POS sale |
 | Sales | `pos.sale.discount.apply` | Apply discount |
 | Refund | `pos.refund.approve` | Approve refund |
-| Loyalty | `loyalty.redeem` | Redeem loyalty points |
+| Loyalty (future/deferred; not Release 1) | `loyalty.redeem` | Reserved future code; not a Release 1 Cashier Customer Management permission |
 | Platform catalog | `platform.permissions.view` | View platform permission catalog (Angular `/admin/roles-permissions`) |
 | Tenant roles | `roles.permissions.view` | View tenant permission catalog and role assignments |
 | Tenant roles | `roles.permissions.update` | Update role permission assignments |
@@ -253,7 +253,7 @@ permission rows for aliases.
 | Receipt | Generate, print, reprint |
 | Return/refund | Return, refund, approval |
 | Exchange | Exchange creation and completion |
-| Loyalty | Earn, redeem, membership |
+| Loyalty (future/deferred; not Release 1) | Reserved earn, redeem, and membership architecture only |
 | Reports | Dashboard, report, export |
 | Cash drawer | Cash in/out and till close |
 
@@ -396,10 +396,10 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `sales.cart.remove_item` | Remove cart line |
 | `sales.cart.clear` | Clear cart |
 | `customers.view` | Customers nav / action visibility |
-| `customers.create` | Add customer button visibility |
+| `customers.create` | Create customer from POS/Customer Management. Approved for the normal Cashier New Sale flow, but the current definition/role seed was removed and must be restored before checkout Add Customer can be enabled. **APPROVED REQUIREMENT — IMPLEMENTATION/PERMISSION SEED FIX PENDING.** |
 | `customers.update` | Edit customer on POS Customer Management (`77777777-0338-4000-8000-000000000001`; Cashier seed assignment) |
-| `sales.discount.apply` | List/validate/apply a permitted POS discount |
-| `sales.discount.approve` | Approve/reject above-authority POS discounts; never assigned to cashier by default |
+| `sales.discount.apply` | Current Release MANUAL list/context, validate, apply and cancel; offline snapshot is provisional |
+| `sales.discount.approve` | Existing/deferred approval capability; not used by current Cashier Discount flow |
 | `sales.park.create` | Create Park Sale; also authorizes cancel (no separate cancel code) |
 | `sales.park.view` | View active Parked Sales and home/list count |
 | `sales.park.recall` | Recall an eligible Parked Sale |

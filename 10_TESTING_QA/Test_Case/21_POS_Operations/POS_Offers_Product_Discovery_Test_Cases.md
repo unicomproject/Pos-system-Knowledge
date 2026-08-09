@@ -1,7 +1,7 @@
 <!-- title: POS Offers Product Discovery Test Cases -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-31 -->
+<!-- last_updated: 2026-08-09 -->
 
 # POS Offers Product Discovery Test Cases
 
@@ -42,7 +42,7 @@
 | POS-OFFERS-006 | Future or expired policies are excluded | Unit | High | Only currently active policies are returned |
 | POS-OFFERS-007 | Multiple offers display priority resolution | Unit | High | Lowest effective price policy resolved as display offer |
 | POS-OFFERS-008 | Conditional offer formatting | Unit | High | Sets `requiresCartValidation = true` and neutral label |
-| POS-OFFERS-009 | Manager approval offer formatting | Unit | High | Sets `requiresManagerApproval = true` |
+| POS-OFFERS-009 | Existing policy approval metadata formatting | Unit | High | DTO may set `requiresManagerApproval`; current MANUAL cashier popup must not start approval |
 | POS-OFFERS-010 | Tenant isolation | Integration | High | Tenant A cannot view Tenant B's active offers |
 
 ---

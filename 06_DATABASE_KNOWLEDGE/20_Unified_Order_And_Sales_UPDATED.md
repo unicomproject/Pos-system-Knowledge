@@ -1,7 +1,7 @@
 <!-- title: Unified Order & Sales -->
 <!-- status: Updated -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-17 -->
+<!-- last_updated: 2026-08-09 -->
 <!-- source: Final fixed Unified Order & Sales ERD design -->
 
 # 20. Unified Order & Sales
@@ -304,6 +304,13 @@ CHECK(
 ---
 
 ## 6. `sales_order_discounts`
+
+Current Release snapshots exactly one cashier Discount. For Order,
+`sales_order_line_id = null`; for Item Percentage it references the exact
+selected line. `calculation_method_snapshot`, `discount_value`,
+`discount_amount`, optional `manual_discount_reason`, applying user, and time
+preserve the applied facts. The schema can represent wider historical/future
+discounts; that does not expand current cashier UI scope.
 
 | Attribute | Type | Key | Null | Reference / Note |
 |---|---|---|---|---|

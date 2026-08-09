@@ -1,7 +1,7 @@
 <!-- title: Subscription UI Implementation Status -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-25 -->
+<!-- last_updated: 2026-08-08 -->
 
 # Subscription UI Implementation Status
 
@@ -173,7 +173,7 @@ Commercial modules returned to UI:
 - Core POS: locked included.
 - Tenant Operations: locked included.
 - Inventory: optional.
-- Customers & Loyalty: optional.
+- Customers: optional; Loyalty is future/deferred and not Release 1.
 - Returns & Exchanges: optional.
 - Reports: optional.
 

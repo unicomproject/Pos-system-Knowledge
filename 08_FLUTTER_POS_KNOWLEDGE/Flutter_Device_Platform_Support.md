@@ -1,7 +1,7 @@
 <!-- title: Flutter Device Platform Support -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-09 -->
 
 
 # Flutter Device Platform Support
@@ -34,6 +34,13 @@ Design screens to adapt to:
 - Desktop/laptop widths.
 
 Do not duplicate feature logic per platform.
+
+Discount-specific behavior follows
+[[../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]]:
+tablet-first two-column when readable, proportional smaller-tablet adaptation,
+and stacked near-full-width/full-height narrow layout. Keyboard/viewInsets,
+safe areas, increased text scale, bounded product scrolling, reachable actions,
+and no overflow/clipping are mandatory. Screen width never changes Discount rules.
 
 ## Hardware Platform Rule
 

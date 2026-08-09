@@ -1,7 +1,7 @@
 <!-- title: Payment Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-07 -->
 
 # Payment Flow
 
@@ -42,10 +42,17 @@ coupon, AI, or accounting scope.
 | Step | User/System Action | Expected Result |
 |---:|---|---|
 | 1 | Open payment screen | Totals and payment methods appear |
-| 2 | Select an available method | Cash continues; Card requires a configured provider; QR/Split remain unavailable |
-| 3 | Enter cash tendered amount | Backend validates payable total and sufficient tender |
-| 4 | Confirm cash payment | Order, payment, stock and receipt are committed by backend |
-| 5 | Show success and receipt actions | Authoritative sale/payment/receipt values are displayed |
+| 2 | Optionally tap the Customer card | Dedicated full-screen checkout customer selection/add opens and auto-returns after selection/create |
+| 3 | Select an available method | Cash continues; Card requires a configured provider; QR/Split remain unavailable |
+| 4 | Enter cash tendered amount | Backend validates payable total and sufficient tender |
+| 5 | Confirm cash payment | Order, payment, stock and receipt are committed by backend, including nullable `customerId` |
+| 6 | Show success and receipt actions | Authoritative sale/payment/receipt values are displayed |
+
+Customer may be changed only while on Payment Method. Every select, replace, or
+Use Walk-in transition must revalidate/recalculate checkout and discounts before
+return. Once payment execution begins, return to Payment Method and restart
+validation before changing the customer. Back from the selector preserves the
+same cart, customer, discount, totals, till, and checkout context.
 
 ## Journey Diagram
 
@@ -61,6 +68,10 @@ flowchart TD
 
 ## Business Rules
 
+- Customer association is optional and must never block walk-in/guest payment.
+- The Payment Method Customer card opens the dedicated full-screen checkout
+  selector, not a popup and not the `/pos/customers` management screen. Existing
+  selection or successful creation auto-associates and auto-returns.
 - Payment total must satisfy sale total.
 - Split allocation must be valid.
 - Card payment should use real reader/provider integration where configured.

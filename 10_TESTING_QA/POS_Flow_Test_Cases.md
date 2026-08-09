@@ -1,7 +1,7 @@
 <!-- title: POS Flow Test Cases -->
 <!-- status: Draft -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-08 -->
 
 # POS Flow Test Cases
 
@@ -34,7 +34,7 @@
 | Cash In / Out | Form/provider behavior | Mutation API, persistence, permission and audit tests |
 | Park / Recall | Flutter local storage tests and backend Holds tests separately | Flutter-to-backend contract, outlet isolation and concurrent recall |
 | Till close / logout | Close form/provider/API/repository tests | Full End Shift close-to-logout and logout-failure recovery |
-| Loyalty | Customer tests only | Earn/redeem/ledger/store-credit flow |
+| Loyalty | Deferred / not Release 1 | Future earn/redeem/ledger/store-credit flow; no active Cashier UI |
 | Email receipt | Form/UI only | Send, retry, idempotency and delivery failure |
 | Return / Refund | Broad Flutter/API/unit/integration coverage | Physical receipt-print result remains separate |
 | Exchange | Broad preview/settlement/completion coverage | Physical settlement/provider verification where non-cash is required |

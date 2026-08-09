@@ -1,7 +1,7 @@
 <!-- title: OneVerz POS MVP Scope -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-09 -->
 
 
 # OneVerz POS MVP Scope
@@ -105,6 +105,21 @@ flowchart TD
     H --> I
 ```
 
+## Customer Management Scope
+
+Cashier Customer Management at `/pos/customers` is included in Release 1. It
+covers API-backed search, status/source filtering, pagination, dynamic
+master-detail selection, profile and purchase history, add, edit, deactivate,
+and ACTIVE-customer attachment to a sale.
+
+Loyalty and customer membership functionality are deferred and are not part of
+OneVerz POS Release 1. Loyalty points, earn/redeem, membership tiers,
+Gold/Silver/VIP/Bronze concepts, rewards, loyalty ledger, and store-credit
+loyalty UI must not appear as active Cashier Release 1 functionality.
+
+Future loyalty/store-credit architecture references describe backend-final
+boundaries only; they do not place those capabilities in active Release 1 scope.
+
 ## Cashier Product Configuration Scope
 
 Cashier New Sale includes the production Product Variant Selection Popup before cart addition when direct-add rules cannot resolve a sellable variant. It uses one image slot, supports an optional product-line note and up to three manually configured Frequently Bought Together products. Popup image browsing and AI/ML recommendations are excluded; shared product-media multi-image capability remains available elsewhere. See [[../04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
@@ -115,6 +130,16 @@ Payment Success screen, Receipt Preview, Print Receipt and Start New Sale are in
 
 ## Offline Boundary
 
+### Cashier Discount
+
+Release scope includes one MANUAL cashier discount per cart/sale: Order
+Percentage or Fixed Amount, or Item Percentage against an exact cart variant.
+Item Fixed, POLICY selection, stacking, and manager approval are deferred.
+Above user authority is directly rejected. Online validation is immediate;
+offline eligible capture is provisional/pending sync using safe cached authority
+and reference data. Backend revalidation remains final and conflicts are visible.
+See [[../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
+
 Offline operation is included for safe minimum EPOS continuity.
 The system may cache product, price, tax, permission, outlet, till, hardware,
 receipt template, cart, held sale, and recent customer reference data.
@@ -122,12 +147,12 @@ receipt template, cart, held sale, and recent customer reference data.
 Allowed offline actions include product lookup, barcode scan, product grid/search,
 price and tax calculation, active basket save/restore, cash sale, receipt print,
 park/hold sale, current till session usage, basic customer lookup, pending
-inventory movement, and sync outbox.
+inventory movement, eligible provisional manual Discount, and sync outbox.
 
 ## Backend Final Validation Boundary
 
 The backend remains final authority for final inventory quantity, card and QR
-payment, refund, exchange, loyalty/store credit, till final close, final sale
+payment, refund, exchange, future/deferred loyalty or store credit, till final close, final sale
 total, tenant isolation, permission, and audit.
 
 Offline records must be synced and revalidated before becoming final system truth.

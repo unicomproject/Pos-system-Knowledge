@@ -1,7 +1,7 @@
 <!-- title: Module Based Folder Structure -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-08-08 -->
 
 
 # Module Based Folder Structure
@@ -236,7 +236,7 @@ The modules are organized into four macro Bounded Contexts: Platform, Tenant (Co
 | Module | Purpose |
 |---|---|
 | CustomerAuth | Storefront consumer registration, OTP, and login authentication |
-| Customer | Customer profiles, address books, and CRM loyalty tier data |
+| Customer | Customer profiles and address books; CRM loyalty tiers are future/deferred, not Release 1 |
 | Storefront | Optimized customer catalog read-only browsing |
 | CartCheckout | Customer shopping carts and online checkout sessions |
 | FulfilmentPickup | Click & collect slots, pickup methods, and pickup order tracking |

@@ -1,7 +1,7 @@
 <!-- title: Flutter Offline Operation Sync -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-09 -->
 
 
 # Flutter Offline Operation Sync
@@ -35,6 +35,7 @@ Backend = final validation
 | Current till session | Continue current local session state |
 | Recent customer lookup | Limited cached lookup |
 | Inventory movement | Queue pending movement |
+| Manual cashier Discount | Capture one eligible provisional Discount using safe cached authority/cart data |
 | Sync outbox | Store pending operations |
 
 ## Blocked Offline Finalization
@@ -45,10 +46,23 @@ Do not finalize offline:
 - QR payment.
 - Refund.
 - Exchange.
-- Loyalty/store credit.
+- Future/deferred loyalty or store credit; not Release 1.
 - Till final close.
 - Final stock.
-- Final sale total.
+- Final synchronized sale/Discount total; local preview remains provisional.
+
+## Discount Pending Sync
+
+Current Release offline Discount is MANUAL only: Order Percentage/Fixed or Item
+Percentage with an exact cached cart target. Validate locally against the latest
+safe authority/reference snapshot, persist a stable idempotent outbox intent,
+update the local cart as pending sync, and restore it after restart.
+
+Reconnect submits through generic sync. Backend revalidates ownership, permission,
+authority, currency, cart/hash, target, one-discount rule, and calculation. Show
+pending, failed, conflict, and last-successful-sync states. A rejection must not
+silently rewrite local receipt/sale audit facts. See
+[[../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
 
 ## Sync Outbox
 

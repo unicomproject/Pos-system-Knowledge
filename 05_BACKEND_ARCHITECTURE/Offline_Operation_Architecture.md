@@ -1,7 +1,7 @@
 <!-- title: Offline Operation Architecture -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-09 -->
 
 
 # Offline Operation Architecture
@@ -43,6 +43,7 @@ tables.
 | Till session | Continue current till session state |
 | Customer | Recent basic customer lookup where allowed |
 | Inventory | Pending inventory movement |
+| Manual cashier Discount | Provisional eligible intent using safe cached authority/cart reference; backend revalidates |
 | Sync | Queue operations in outbox/pending sync queue |
 
 ## Backend-Final Actions
@@ -54,9 +55,26 @@ The following cannot be finalized offline:
 - QR payment.
 - Refund.
 - Exchange.
-- Loyalty/store credit.
+- Future/deferred loyalty or store credit; not Release 1.
 - Till final close.
-- Final sale total.
+- Final synchronized sale/Discount total (offline preview remains provisional).
+
+## Discount Offline Operation
+
+Current Release permits one provisional MANUAL Discount: Order Percentage/Fixed
+or Item Percentage with exact cached cart target. Item Fixed, POLICY selection,
+stacking, and above-cached-authority requests are blocked locally.
+
+The generic outbox payload retains local operation/type, tenant/outlet/till/
+session/device/requester, scope/method/value/target/reason, authority and cart
+snapshots, cart hash, currency, idempotency key, timestamp, status, retries, and
+last error. Exact operation enum naming is not yet canonical.
+
+Sync validates ownership/client/device/session, permission, feature, authority,
+currency, cart/target, scope matrix, one-discount rule, calculation, idempotency,
+and related offline cash sale. Rejections use existing sync conflict/error
+infrastructure; they are never silently accepted or overwritten. See
+[[../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
 
 ## Offline Client Rule
 

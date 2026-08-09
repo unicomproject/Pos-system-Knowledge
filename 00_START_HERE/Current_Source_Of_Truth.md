@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-07 -->
+<!-- last_updated: 2026-08-09 -->
 
 
 # Current Source Of Truth
@@ -27,6 +27,19 @@ The 2026-08-05 documentation audit is the current traceability layer: [[../15_IM
 Chunk 2 security authority is the approved [[../13_DECISIONS_AND_CHANGES/FLOW_4_SECURE_TEST_HOST_TOKEN_AND_FIXTURE_CONTRACT_2026-08-05]], with threat model [[../09_SECURITY_AND_COMPLIANCE/FLOW_4_TEST_FIXTURE_TOKEN_THREAT_MODEL_2026-08-05]] and implementation contract [[../10_TESTING_QA/FLOW_4_SECURE_LIFECYCLE_FIXTURE_IMPLEMENTATION_CONTRACT_2026-08-05]]. Chunk 3 must use a separate non-HTTP test CLI/hybrid, production token/hash primitives, cumulative environment/database/credential guards, one-time process-local secret handoff and ownership-bound cleanup. No production fixture endpoint, DI registration or Swagger route is authorized. This approval does not increase the 59/64 verified P0 count; fixture runtime and security proof remain pending.
 
 ## Highest Priority Decision
+
+Current Release cashier Discount authority is
+[[../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
+It requires MANUAL-only cashier UI, one active discount, Order Percentage/Fixed,
+Item Percentage only, direct rejection above user authority, no manager approval,
+and provisional offline capture with backend revalidation and visible conflicts.
+Older generic POLICY/approval/LINE-Fixed statements are existing/deferred
+capability only and do not control the current cashier flow.
+
+Release 1 includes Cashier Customer Management at `/pos/customers`. Loyalty,
+membership tiers, loyalty points, earn/redeem, rewards, and store-credit loyalty
+UI are deferred and are not active Release 1 functionality. The canonical
+screen contract is [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_POS_Customer_Management]].
 
 The current scope is OneVerz POS MVP.
 
@@ -99,8 +112,9 @@ grid/search, price/tax calculation, active cart save/restore, cash sale, receipt
 print, park/hold sale, current till session, recent customer basic lookup,
 pending inventory movement, and sync outbox.
 
-Backend-final areas include final inventory quantity, card/QR payment, refund,
-exchange, loyalty/store credit, till final close, and final sale total.
+Backend-final areas include final inventory quantity, synchronized Discount and
+final sale total, card/QR payment, refund,
+exchange, future/deferred loyalty or store credit, and till final close.
 
 ## Platform Source Rule
 

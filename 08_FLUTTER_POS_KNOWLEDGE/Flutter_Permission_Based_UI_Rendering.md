@@ -1,7 +1,7 @@
 <!-- title: Flutter Permission Based UI Rendering -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-09 -->
 
 
 # Flutter Permission Based UI Rendering
@@ -42,6 +42,10 @@ Flutter must load:
 ## POS Examples
 
 - Hide discount button without discount permission.
+- `sales.discount.apply` controls the current MANUAL Discount surface. Offline
+  visibility may use a cached snapshot, but sync backend revalidation is final.
+- Do not show manager approval/POLICY/Item Fixed controls in current cashier UI;
+  `sales.discount.approve` is deferred capability, not a normal Cashier grant.
 - Hide refund/exchange without permission.
 - Disable card/QR payment while offline.
 - Disable till close while offline.

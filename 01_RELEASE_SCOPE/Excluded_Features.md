@@ -1,7 +1,7 @@
 <!-- title: Excluded Features -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-08 -->
 
 
 # Excluded Features
@@ -37,6 +37,11 @@ must be treated as outdated until updated.
 | Driver assignment and delivery tracking | Deferred |
 | Franchise and chain management | Deferred |
 | Full CRM inside OneVerz POS | Deferred / external boundary |
+| Customer Loyalty | Deferred; not Release 1 Cashier functionality |
+| Loyalty Points and Rewards | Deferred; no balance, ledger, or rewards UI in Release 1 |
+| Membership Tiers | Deferred; no Gold/Silver/VIP/Bronze customer concepts in Release 1 |
+| Loyalty Earn / Redeem | Deferred; no Cashier earn/redeem action in Release 1 |
+| Store-credit loyalty capability | Deferred; not part of Release 1 Customer Management |
 | Supplier management | Excluded unless separately approved |
 | Purchase order and supplier invoice module | Excluded unless approved |
 | Stock transfer between outlets | Excluded unless approved |
@@ -66,7 +71,7 @@ Do not implement offline final authority for:
 - QR payment.
 - Refund.
 - Exchange.
-- Loyalty/store credit.
+- Future/deferred loyalty or store credit.
 - Till final close.
 - Final sale total.
 

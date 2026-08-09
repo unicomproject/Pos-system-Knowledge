@@ -1,7 +1,7 @@
 <!-- title: Flutter Security Guardrails -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-08 -->
 
 
 # Flutter Security Guardrails
@@ -58,7 +58,7 @@ production security.
 Offline mode must restrict protected actions that require backend validation.
 
 Do not allow offline finalization of card/QR payment, refund, exchange,
-loyalty/store credit, till final close, or final stock.
+future/deferred loyalty or store credit, till final close, or final stock.
 
 ## Debug Rule
 

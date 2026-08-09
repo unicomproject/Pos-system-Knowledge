@@ -1,10 +1,18 @@
 <!-- title: Included Features -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-08 -->
 
 
 # Included Features
+
+## Cashier Customer Management
+
+Release 1 includes the `/pos/customers` Cashier Customer Management screen:
+search, status/source filters, pagination, conditional master-detail profile,
+completed-order aggregates, recent purchases, add, edit, deactivate, and
+ACTIVE-customer attachment to a sale. This is POS customer management, not a
+full CRM. Loyalty, membership, points, rewards, and earn/redeem are excluded.
 
 ## Purpose
 

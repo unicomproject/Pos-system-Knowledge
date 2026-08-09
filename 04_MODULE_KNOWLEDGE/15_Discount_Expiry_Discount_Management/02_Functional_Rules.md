@@ -1,7 +1,7 @@
 <!-- title: Discount & Expiry Discount Management Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-07-13 -->
+<!-- last_updated: 2026-08-09 -->
 
 # Discount & Expiry Discount Management Functional Rules
 
@@ -13,24 +13,39 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 ## Business Rules
 
+### Current Release Cashier Override
+
+The approved authority is
+[[../../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
+
+- Cashier UI sends `MANUAL` only and allows exactly one active discount.
+- Order: Percentage or Fixed. Item/Line: Percentage only with exact cart variant.
+- At/below `max_percentage` or `max_fixed_amount` in `currency_code` is allowed.
+- Above authority is directly rejected; no current `PENDING_APPROVAL` path.
+- Reason is optional. Quick labels only populate reason text.
+- POLICY, manager approval, LINE Fixed, and stacking below describe existing or
+  deferred capability and must not be exposed by current Flutter cashier UI.
+
 - Discount policy determines scope, limits, targets, and approval requirement.
 - Expiry discount uses product batches/expiry dates and configured tiers.
 - POS discount application must snapshot policy and approval result.
-- Manager approval is required when the cashier exceeds allowed limit.
+- Existing backend/schema can model manager approval; current cashier flow does not use it.
 - Coupon campaign engine is not part of this module unless explicitly added later.
 - A POS cashier's percentage and fixed-amount authority limits are user-specific.
 - A request at or below cashier authority may be applied directly.
-- A request above cashier authority but at or below the policy absolute limit creates a `PENDING_APPROVAL` application.
+- Existing backend may create `PENDING_APPROVAL`; current cashier requests above authority must be rejected instead.
 - A request above the policy absolute limit is rejected and must not create an application.
 - The user who requested a discount must not approve their own request.
 - Approval does not bypass checkout revalidation: cart fingerprint, requester, device, till session, expiry, and active policy are checked again.
 - Successful payment snapshots the approved application into `sales_order_discounts` and marks the application `APPLIED`.
-- POS runtime supports two sources: `MANUAL` and `POLICY`.
+- Existing backend supports `MANUAL` and `POLICY`; current cashier UI supports `MANUAL` only.
 - `POLICY` source is server-authoritative: policy scope, value, calculation method, active dates, outlet/channel targeting, target rules, conditions, approval requirement, and stacking settings are reloaded from the database.
 - `MANUAL` source does not require the cashier to select a fake policy in the POS UI; the backend resolves the internal manual authority envelope by calculation method.
-- Manual POS discounts are resolved by both calculation method and requested scope. The internal envelopes are order percentage, order fixed amount, line percentage, and line fixed amount; an order envelope must never be reused for a line discount.
+- Existing backend has four internal manual envelopes, including line fixed;
+  current cashier UI/runtime target must reject or not offer line fixed.
 - `ORDER` discounts apply to the cart. `LINE` discounts require a selected variant in the cart. The client cannot apply an `ORDER` policy as `LINE` or a `LINE` policy as `ORDER`.
-- POS runtime must support manual order, manual line, predefined order, and predefined line application. Line application must include a target variant that exists in the current cart.
+- Current cashier runtime supports manual order and manual line Percentage only;
+  predefined policies remain deferred. Line requires a variant in the cart.
 - Discount target matching uses `discount_policy_targets`: `EXCLUDE` matches always reject; if any `INCLUDE` target exists, at least one include must match; if no include target exists, the policy remains eligible unless excluded.
 - Product, product variant, category, brand, and collection targets are derived from tenant-owned backend catalog data. Frontend-supplied product/category/brand identifiers are not trusted for policy matching.
 - Active conditions currently supported by POS runtime are minimum cart/order/eligible amount, minimum quantity, and customer-required checks. Unknown active condition types fail closed.
@@ -66,7 +81,13 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 - Cache can speed up safe reference data only.
 - Backend database remains final truth for sale totals, stock, payments, refunds, exchanges, permissions, and sync acceptance.
-- Offline operations must be marked pending until accepted by backend sync.
+- Eligible MANUAL Discount capture is allowed offline using the latest safe
+  cached authority/context/cart/pricing snapshot.
+- Offline preview and cart totals are provisional; persist one `PENDING_SYNC`
+  local outbox intent with stable idempotency identity.
+- Sync revalidates permission, authority, context, currency, cart/hash, target,
+  scope matrix, single-discount rule, and related offline sale.
+- Backend rejection/conflict is visible and never silently overwritten.
 - Conflicts must be visible; do not silently overwrite backend truth.
 
 ## Error Rules
@@ -78,7 +99,9 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 | Feature disabled | Return 403 and show feature not enabled state |
 | Invalid business data | Return 400 with safe field/form errors |
 | Duplicate or conflict | Return 409 with safe conflict message |
-| Offline blocked action | Explain that online backend validation is required |
+| Offline unavailable/stale context | Block unsafe capture and explain refresh requirement |
+| Offline pending | Show provisional/pending-sync state |
+| Sync rejection/conflict | Preserve local audit facts and show reconciliation state |
 | Scope tampering | Reject with `pos_discounts.scope_mismatch` |
 | Target not applicable | Reject with `pos_discounts.policy_not_applicable` |
 | Missing manual scope envelope | Reject with `pos_discounts.manual_configuration_not_found` |

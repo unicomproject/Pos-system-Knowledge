@@ -1,7 +1,7 @@
 <!-- title: Virtual Caching Architecture -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-08 -->
 
 
 # Virtual Caching Architecture
@@ -48,7 +48,7 @@ Do not use cache as final authority for:
 - Card/QR payment result.
 - Refund approval.
 - Exchange approval.
-- Loyalty/store credit balance.
+- Future/deferred loyalty or store-credit balance; not Release 1.
 - Till final close.
 - Sync conflict resolution.
 - Tenant access or permission final decision.

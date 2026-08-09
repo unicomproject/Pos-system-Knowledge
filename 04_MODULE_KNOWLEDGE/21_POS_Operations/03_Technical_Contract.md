@@ -73,6 +73,15 @@ history/ledger behavior where applicable.
 - Cash Drawer/Cash In/Cash Drop routes and forms exist, but no backend
   cash-movement datasource is wired.
 - Use DTOs in data layer, domain/view models in UI layer.
+- Checkout customer selection is a separate full-screen route owned by the sale
+  flow. The Payment Method Customer card is its entry point; `/pos/customers`
+  remains Customer Management. Selection/create success must update the active
+  cart/checkout customer state and pop/return automatically.
+- Its complete field, permission, duplicate, search/pagination, revalidation,
+  state, privacy, and acceptance contract is
+  [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Checkout_Customer_Selection_Implementation_Specification]].
+- Checkout summary/payment request models keep `customerId` nullable. A selected
+  ID is propagated to completed-sale persistence; null is valid walk-in/guest.
 - Permission and entitlement checks are UX helpers only; backend remains final authority.
 - Browser online store and Flutter business app must share backend rules but keep separate user/auth surfaces.
 

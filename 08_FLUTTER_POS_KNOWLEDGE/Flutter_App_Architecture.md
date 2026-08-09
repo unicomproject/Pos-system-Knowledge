@@ -1,7 +1,7 @@
 <!-- title: Flutter App Architecture -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-08 -->
 
 
 # Flutter App Architecture
@@ -45,7 +45,7 @@ Presentation -> Application/State -> Domain -> Data -> API / Local Cache
 ## Backend Final Authority
 
 Flutter may cache and calculate for fast UI, but backend validates final sale
-total, payment, refund, exchange, inventory, loyalty/store credit, till close,
+total, payment, refund, exchange, inventory, future/deferred loyalty or store credit, till close,
 and sync acceptance.
 
 ## Main App Flow

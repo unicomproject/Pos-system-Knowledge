@@ -1,7 +1,7 @@
 <!-- title: Flutter Virtual Caching Strategy -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-08 -->
 
 
 # Flutter Virtual Caching Strategy
@@ -69,7 +69,7 @@ Widget -> Provider -> Repository -> Memory cache / Local cache / API
 ## Non-Final Cache Data
 
 Cache must never be final authority for final sale total, final inventory,
-card/QR payment, refund, exchange, loyalty/store credit, or till final close.
+card/QR payment, refund, exchange, future/deferred loyalty or store credit, or till final close.
 
 ## Invalidation Rule
 

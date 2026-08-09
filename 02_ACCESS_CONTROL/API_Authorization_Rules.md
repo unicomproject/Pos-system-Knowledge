@@ -1,7 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-07 -->
+<!-- last_updated: 2026-08-09 -->
 
 # API Authorization Rules
 
@@ -88,10 +88,32 @@ Do not use umbrella-only checks such as `platform.subscriptions.manage` where gr
 | Product management | Catalog entitlement and permission `catalog.products.view`, `catalog.products.create`, `catalog.products.update`, `catalog.products.delete`, `catalog.products.publish`, `catalog.products.restore`, or `catalog.products.duplicate` (Note: `catalog.products.import` remains in schema but is deferred and excluded from the active Tenant Admin UI scope). Legacy permission codes starting with `tenant.products.*` must be mapped to their canonical `catalog.products.*` equivalents in the Flutter client per ADR 007. |
 | Catalog master data | Catalog entitlement and respective department, category, brand, collection, or return-policy permission |
 | Inventory management | Inventory entitlement and inventory permission |
-| Loyalty setup | Loyalty entitlement and loyalty permission |
+| Loyalty setup | Future/deferred; not active Release 1 Cashier Customer Management |
 | Reports | Reports entitlement and report permission |
 
 ## POS API Rules
+
+### POS Customer API authorization
+
+Current implementation applies `[Authorize(Policy = "TenantOnly")]`, resolves
+tenant/user from claims, checks the action permission in `PosCustomerService`,
+and requires a valid trusted device assigned to a till with an open session for
+every endpoint below. No separate customer entitlement check exists in the
+current controller/service; this is an implementation gap if product policy
+requires one.
+
+| Endpoint | Permission | Device/till context |
+|---|---|---|
+| `GET /api/v1/customers/summary` | `customers.view` | Trusted device, assigned till, open session |
+| `GET /api/v1/customers` | `customers.view` | Trusted device, assigned till, open session |
+| `GET /api/v1/customers/{customerId}` | `customers.view` | Trusted device, assigned till, open session |
+| `GET /api/v1/customers/{customerId}/orders` | `customers.view` | Trusted device, assigned till, open session |
+| `POST /api/v1/customers` | `customers.create` | Trusted device, assigned till, open session |
+| `PUT /api/v1/customers/{customerId}` | `customers.update` | Trusted device, assigned till, open session |
+| `POST /api/v1/customers/{customerId}/attach-to-sale` | `customers.view` + `sales.cart.manage` | Trusted device, assigned till, open session |
+
+Frontend route/button gating is UX only. Repository tenant predicates and
+service status checks remain security authority.
 
 | API Action | Required Checks |
 |---|---|
@@ -109,8 +131,13 @@ Frontend hiding is UX only; backend authorization is final. Cancel uses
 Parked-sale detail uses `sales.park.view`; Start New Sale uses verified
 `sales.create`. The exact list-screen mapping is documented in
 [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Parked_Sales_Recall_Screen_Implementation_Specification]].
-| Apply discount | Discount entitlement, discount permission, policy check |
-| Approve discount | Discount permission and manager PIN where required |
+| Apply/cancel current cashier Discount | Discount entitlement, `sales.discount.apply`, tenant/outlet/device/till/session, user authority, cart/target, currency, one-discount and idempotency checks |
+| Approve discount | Existing/deferred `sales.discount.approve`; not invoked by current cashier flow |
+
+Offline permission/authority context is a cached snapshot only. Generic sync must
+revalidate all gates and expose rejection/conflict. Current above-authority
+cashier input is directly rejected, not routed to manager approval. See
+[[../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
 | Take payment | Payment entitlement, permission, open till session |
 | Print receipt | Receipt entitlement, permission, device context |
 | Return/refund | POS entitlement, exact `returns.view` for shared Step 1 search/eligibility load, open till/outlet isolation, original sale validation |

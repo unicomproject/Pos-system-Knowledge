@@ -1,7 +1,7 @@
 <!-- title: Cashier POS Second Brain vs Code Comparison Status -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-06 -->
+<!-- last_updated: 2026-08-09 -->
 
 
 # Cashier POS Second Brain vs Code Comparison
@@ -51,6 +51,113 @@ The comparison below contains the original 2026-07-02 snapshot and its
 current implementation truth. Use **Current Re-audit — 2026-07-23** for current
 Cashier POS status.
 
+## Checkout Customer Flow Reconciliation — 2026-08-07
+
+Status: **Step 3 Checkout Customer Persistence Fully Complete**.
+
+The approved Payment Method journey uses a clickable Customer card and a
+separate full-screen checkout customer selection/add screen. Existing selection
+by name/mobile/email and successful Add Customer creation must auto-associate to
+the active cart/checkout, auto-return to Payment Method, and display the selected
+name. Customer remains optional; nullable `customerId` must not block walk-in/
+guest checkout. `/pos/customers` remains Customer Management, and its explicit
+`attach-to-sale` capability is not the approved checkout UX.
+
+The complete handoff contract is
+[[../../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Checkout_Customer_Selection_Implementation_Specification]].
+Backend core customer/search/create and nullable checkout APIs are supported.
+The approved normal Cashier
+requirement for `customers.create` is restored in the canonical seed and a
+forward corrective migration. The migration is applied to Local Development;
+direct DB checks prove one active permission and one canonical Cashier mapping.
+Authenticated Cashier search/create passed (HTTP 200/201), while a legitimate
+principal without `customers.create` was denied specifically with HTTP 403 and
+`pos_customers.create_permission_denied`. This completes permission Step 1.
+
+Flutter Step 2 now provides a dedicated nested Payment Method route, clickable
+Customer card, debounced active-customer search, stale-response protection,
+20-row paging with Load More, selected-customer indication, Walk-in reset,
+permission-separated search/create actions, backend-authoritative customer
+creation, duplicate/authorization/network error mapping, duplicate-submit
+protection, and checkout-summary revalidation with safe customer rollback on
+failure. It uses the existing New Sale cart `selectedCustomer`; no attach-to-sale
+call or parallel customer state was added.
+
+Authenticated Local Development runtime evidence (2026-08-07): the Cashier
+session, trusted Web POS device and open till reached the real
+`/pos/new-sale/payment/customer` route from Payment Method with Match Shorts
+(Small), quantity 1 and LKR 2,800.00 intact. Real backend search passed by name,
+phone and email, including selected and empty states. Existing customer
+selection revalidated checkout and returned to Payment Method. One controlled
+customer was created through `POST /api/v1/customers`; the backend-authoritative
+result auto-selected and returned to Payment Method without changing the cart.
+PostgreSQL contains exactly one matching ACTIVE/POS row: CustomerId
+`a6cac5ca-7c23-44f4-a840-a91d582a5bc9`, CustomerCode `CUS000004`, tenant
+`55555555-0000-4000-8000-000000000001`. A duplicate-phone create was rejected
+with the canonical message while the form, selected customer and cart remained
+intact; the database still contained one row.
+
+The current architecture does not create `sales_orders` before payment starts;
+Step 3 verified its existing atomic cash `start-payment` behaviour without a
+new attach endpoint or customer state. Flutter passes the canonical
+`posNewSaleCartProvider.selectedCustomer.customerId` through
+`PosCheckoutRemoteDatasource.startPayment`; walk-in omits `customerId`. The
+backend tenant-scopes and status-validates the customer before its serializable
+payment transaction and passes the validated request CustomerId to
+`SalesOrder.CreateCompletedPosSale`. Unknown and cross-tenant IDs return
+`pos_checkout.customer_not_found`; inactive customers return
+`pos_checkout.customer_inactive`; none create an order.
+
+Authenticated Local Development Step 3 runtime (2026-08-07) completed exactly
+one mandatory atomic cash payment-start with correlation `f4398d573a74`:
+Match Shorts (Small), quantity 1, LKR 2,800.00; selected CustomerId
+`a6cac5ca-7c23-44f4-a840-a91d582a5bc9`; LKR 3,000.00 tendered and LKR 200.00
+change. PostgreSQL changed from zero to exactly one relevant order:
+`SO-000106` / `aa9790d0-9b93-48fc-b292-96ba682cc34b`, tenant
+`55555555-0000-4000-8000-000000000001`, with the exact selected CustomerId,
+one line, one payment and one receipt (`RCP-000095`). Total/paid amounts were
+LKR 2,800.00 and no duplicate order was created. Because `start-payment` is
+atomic in the existing architecture, the sale completed; no second submission,
+receipt printing or hardware action was performed.
+
+Post-runtime automated evidence: **8/8 Step 2 tests passed**, **41/41 targeted
+checkout/Payment Method/customer regression tests passed** (current count), and
+focused Flutter analysis completed with no issues. No runtime defect required a
+production-code change. Step 3 added focused tests only: **4/4 Flutter customer
+handoff tests**, combined focused Flutter regressions **37/37**, backend checkout
+repository integration **15/15**, checkout controller **8/8**, focused Flutter
+analysis clean, and backend Release build succeeded with zero warnings/errors.
+
+### Checkout Customer target UI closure — 2026-08-07
+
+Status: **Target UI implemented and authenticated visual verification passed**.
+
+The dedicated checkout Customer route now matches the approved cashier target:
+one shared black POS header using live business, till-session, outlet and till
+context; one unified white rounded workspace; compact two-column Find Existing
+Customer / Add New Customer panels; target outlined search and form fields;
+orange primary action and information treatment; and the existing black cashier
+navigation with New Sale active. The old customer-route Payment banner and
+duplicate shell header are absent. The final authenticated Pixel Tablet capture
+is `C:\tmp\checkout-customer-target-final.png`; Back to Payment returned safely,
+and the runtime log contained no RenderFlex overflow or Flutter exception.
+
+Step 2 integration remains authoritative and unchanged: real active-customer
+search, pagination, create, selectedCustomer, checkout revalidation/rollback,
+duplicate-submit prevention and error mapping still use the existing provider,
+remote datasource and cart state. Customer rows show only supported real data:
+initials, name, phone, status and backend `totalOrderCount`; no fake images,
+membership or visit counts were added. Filter is visibly disabled because the
+checkout provider has no approved interactive filter contract. Recent Customers
+is hidden because there is no canonical recent-customer source. Customer Type
+and Notes are absent because `POST /api/v1/customers` supports only `fullName`,
+`phone` and optional `email`.
+
+Automated evidence: checkout Customer + Payment handoff focused suites **17/17
+passed**; target layouts passed at 1280x800, 1680x1050 and 2560x1600 plus
+1280x800 at 1.3 text scale with no overflow; focused analysis reported no
+issues. No backend, database, migration or customer API contract changed.
+
 ## Current Re-audit — 2026-07-23
 
 ### Repository Evidence
@@ -69,8 +176,8 @@ Cashier POS status.
 | Device activation | End-to-end implemented | Current/activate endpoints and device context require correction |
 | Till opening | End-to-end implemented | Exact current-session/open contract requires correction |
 | Start New Sale | Partially implemented | Product/SKU/barcode, HID/camera scanning, cart and cash-checkout entry are implemented; offline sale is not |
-| Discount | Partially implemented | Real list/validate/apply/approve/cancel APIs exist; manager approval remains permission-dependent |
-| Customer and loyalty | Partially implemented | Customer CRUD/select/attach exists; loyalty earn/redeem is not implemented |
+| Discount | Partially implemented | Real APIs include approve/POLICY/LINE-Fixed capability outside current cashier target; MANUAL-only direct-reject/offline/responsive alignment remains pending |
+| Customer Management | Partially implemented | Release 1 customer management/state/nullable checkout propagation exist; loyalty earn/redeem is deferred and not Release 1 scope |
 | Payment and checkout | Partially implemented | Cash is transactional; Card, QR and Split routes are placeholders |
 | Return and refund | End-to-end implemented | Current ten-step journey is substantially aligned |
 | Exchange | End-to-end implemented | Implemented as a Return resolution branch, not a standalone Exchange API |
@@ -105,7 +212,7 @@ Cashier POS status.
 - Card, QR and Split payment completion.
 - Backend persistence for cashier Cash In / Cash Out.
 - Flutter integration with backend POS Holds.
-- Loyalty earn/redeem.
+- Loyalty earn/redeem is future/deferred and not Release 1 scope.
 - Email receipt delivery.
 - Offline cash-sale outbox and sync.
 - Physical scanner, printer, drawer and card-terminal acceptance evidence.
@@ -145,7 +252,7 @@ the current active map.
 |---|---|---|---|---|---|
 | Dashboard Start Sale hero | Clickable Start Sale entry | Implemented; routes to `/pos/new-sale` | Matches docs | Low | None |
 | Dashboard Returns card | Functional returns/refunds entry | Card exists; destination is placeholder | Partial implementation | Medium | Implement returns UI/API flow |
-| Dashboard Add Customer | Customer flow entry | Implemented via New Sale customer dialog/state | Partial implementation | Medium | Document exact behavior under cashier notes |
+| Dashboard Add Customer | Checkout entry is the Payment Method Customer card | Existing customer management/dialog/state does not prove the approved entry or full-screen route | Missing approved checkout UX | High | Implement dedicated checkout route and clickable card |
 | Dashboard Parked Sales | Park/recall journey supported | Route exists, core flow handled in New Sale dialogs | Different behavior | Medium | Clarify route vs dialog primary flow |
 | Dashboard Cash Drawer | Cash drawer operational flow | Placeholder screen | Missing from code | High | Implement cashier cash drawer flow |
 | Dashboard Orders | Orders management entry | Card/nav unavailable or placeholder | Missing from code | High | Implement orders route + APIs |
@@ -153,11 +260,11 @@ the current active map.
 | Product grid | Search/filter + product tiles | Implemented; product image rendering in place | Matches docs | Low | None |
 | Product tile price | Latest UI direction hides tile price | Implemented (price hidden on tile, visible in cart) | Matches docs | Low | None |
 | Cart panel | Qty, remove, totals, proceed action | Implemented with permission gating | Matches docs | Low | None |
-| Add/Change customer action | Permission-gated customer selection | Implemented; label switches by selected customer | Matches docs | Low | None |
-| Existing customer search | Search/select by name/phone/email | Implemented and API wired | Matches docs | Low | None |
-| Quick add customer | Name+phone required, email optional | Implemented with validation and API create | Matches docs | Low | None |
+| Add/Change customer action | Clickable Payment Method Customer card opens dedicated full-screen checkout selector | Payment Method card is display-only; management route/dialog is not the approved checkout route | Missing implementation | High | Implement exact full-screen journey |
+| Existing customer search | Search name/mobile/email; select auto-associates and auto-returns | Search exists in Customer Management, but approved checkout auto-association/return is not proved | Partial/different implementation | High | Reuse data layer in dedicated checkout route |
+| Quick add customer | Create, auto-select, auto-associate and auto-return without re-search | Create exists, but approved automatic checkout continuation is not proved | Partial/different implementation | High | Complete create-success orchestration |
 | Customer in cart | Selected customer visible in cart | Implemented | Matches docs | Low | None |
-| Customer in checkout | `customerId` included if supported | Implemented in checkout summary/start payment | Matches docs | Low | None |
+| Customer in checkout | Nullable `customerId`; selected value persists, null never blocks walk-in/guest | Request propagation exists; exact UI journey remains pending | Backend/data capability only | Medium | Retain nullable propagation while implementing UX |
 | Discount flow | Discount policy-driven behavior | Manual + item discount dialog with %/fixed + validation implemented | Extra in code but not in docs | Medium | Update implementation docs/status |
 | Parked save/recall | Save and recall parked sales | Implemented with local secure-storage persistence | Different behavior | Medium | Decide/document local vs backend authority |
 | Parked sale persistence | Expected backend-aware lifecycle | Local secure storage + restore/delete | Different behavior | Medium | Add explicit offline parked-sale contract note |
@@ -175,7 +282,8 @@ the current active map.
 ## 3. Extra Features Implemented but Not in Second Brain
 
 1. Discount system completion (manual + item, percentage + fixed, validation).
-2. Customer-in-cart propagation through checkout (`customerId` wired).
+2. Customer-in-cart nullable propagation through checkout (`customerId` wired);
+   this is data capability, not completion of the approved selection UX.
 3. Payment-success print popup behavior (same-screen dialog UX).
 4. Parked sale local persistence and restore in secure storage.
 5. Resilient checkout network fallback on payment screens (catalog mock removed).
@@ -188,6 +296,8 @@ the current active map.
 4. Actual printer execution.
 5. Actual email receipt sending.
 6. Complete non-cash payment methods (card/QR/split) end-to-end.
+7. Dedicated full-screen checkout customer selection/add with automatic
+   association and return to Payment Method.
 
 ## 5. Different from Second Brain
 

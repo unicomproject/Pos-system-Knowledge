@@ -1,7 +1,7 @@
 <!-- title: Discount & Expiry Discount Management Technical Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-07-13 -->
+<!-- last_updated: 2026-08-09 -->
 
 # Discount & Expiry Discount Management Technical Contract
 
@@ -32,16 +32,22 @@ new OneVerz POS MVP scope images and the uploaded Unified Commerce database desi
 
 ### POS Runtime Discount Contract
 
+Current Release restriction: Flutter cashier invokes MANUAL only, one active
+discount, Order Percentage/Fixed or Item Percentage. Above authority, Item Fixed,
+POLICY selection, stacking, and manager approval are not current cashier paths.
+The wider endpoint/schema capability below is retained as technical truth. See
+[[../../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
+
 | Method | Route | Permission | Purpose |
 |---|---|---|---|
-| GET | `/api/v1/pos/discounts?deviceId=` | `sales.discount.apply` | Available policy envelopes plus current user's percentage/fixed authority limits |
-| POST | `/api/v1/pos/discounts/validate` | `sales.discount.apply` | Authoritative price calculation and direct/approval/reject outcome without persistence |
-| POST | `/api/v1/pos/discounts/apply` | `sales.discount.apply` | Idempotently create an approved-direct or pending-approval application |
-| POST | `/api/v1/pos/discounts/{applicationId}/approve` | `sales.discount.approve` | Approve or reject a pending application using a typed decision body |
+| GET | `/api/v1/pos/discounts?deviceId=` | `sales.discount.apply` | Current authority/context; wider policy data is existing backend capability, not current selector |
+| POST | `/api/v1/pos/discounts/validate` | `sales.discount.apply` | Online authoritative preview/validation; current above-limit result is reject |
+| POST | `/api/v1/pos/discounts/apply` | `sales.discount.apply` | Idempotently create current eligible MANUAL application |
+| POST | `/api/v1/pos/discounts/{applicationId}/approve` | `sales.discount.approve` | Existing/deferred capability; not invoked by current cashier flow |
 | POST | `/api/v1/pos/discounts/{applicationId}/cancel` | `sales.discount.apply` | Idempotently cancel an unfinalized direct/pending/approved application and write an audit event |
 
-Apply commands require an idempotency key. Approval IDs identify a POS discount
-application, never a discount policy. The requester cannot self-approve.
+Apply commands require an idempotency key. Existing approval IDs identify an
+application, never a policy; approval behavior is deferred from current cashier UI.
 
 `GET /api/v1/pos/discounts` accepts optional context query parameters:
 `scope`, `variantId`, repeated `variantIds`, `customerId`, `quantity`,
@@ -54,11 +60,24 @@ use the same authoritative resolution rules:
 
 - `discountSource = MANUAL` omits `discountId`; backend resolves the internal
   manual policy by `calculationMethod` and requested `scope`.
-- `discountSource = POLICY` requires `discountId`; backend reloads scope, method,
+- Existing/deferred `discountSource = POLICY` requires `discountId`; backend reloads scope, method,
   predefined value, targets, conditions, limits, approval, and stacking rules.
 - `scope = LINE` requires `targetVariantId`, and that variant must be present in
   the cart lines.
 - Scope/source mismatches are controlled business failures, not 500 responses.
+
+Current Item requests use Percentage only and must include an exact cart variant.
+Current Apply must fail if another active cashier discount exists. Remove uses
+cancel/audit lifecycle; replace must still end with one active discount.
+
+### Offline Logical Contract
+
+Flutter stores provisional Discount intent in the generic local outbox. It must
+include local operation/idempotency identity, tenant/outlet/till/session/device/
+requester context, scope/method/value/line target/reason, authority snapshot,
+cart/line snapshot and hash, currency, created time, sync status/retries/error.
+Generic sync batches/items/conflicts receive it; no new public endpoint or
+Discount offline table is asserted. Backend revalidation controls acceptance.
 
 Controlled POS runtime failures include `pos_discounts.scope_mismatch`,
 `pos_discounts.manual_configuration_not_found`,
@@ -95,7 +114,7 @@ brands, and collections.
 | `expiry_discount_rule_tiers` | Used by this module |
 | `expiry_discount_applications` | Used by this module |
 | `pos_discount_authority_limits` | User-specific cashier percentage/fixed authority |
-| `pos_discount_applications` | Persistent direct/pending/approved/applied POS discount lifecycle and snapshots |
+| `pos_discount_applications` | Existing canonical accepted/direct/approval lifecycle and snapshots; local pending sync is not added to its status |
 | `pos_discount_application_events` | Append-only request/approval/rejection/application audit |
 
 POS checkout summary and start-payment accept `discountApplicationId`. Checkout
@@ -118,6 +137,8 @@ history/ledger behavior where applicable.
 - Use DTOs in data layer, domain/view models in UI layer.
 - Permission and entitlement checks are UX helpers only; backend remains final authority.
 - Browser online store and Flutter business app must share backend rules but keep separate user/auth surfaces.
+- Discount popup is tablet-first adaptive: two columns when readable, stacked on
+  narrow widths, keyboard/safe-area aware, with reachable actions and no overflow.
 
 ## Backend Contract
 

@@ -1,7 +1,7 @@
 <!-- title: Discount & Expiry Discount Management -->
 <!-- status: ERD aligned -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-13 -->
+<!-- last_updated: 2026-08-09 -->
 <!-- source: 15_Discount & Expiry Discount Management(1).png -->
 
 # 15. Discount & Expiry Discount Management
@@ -29,6 +29,12 @@ This module defines discount types, tenant discount policies, policy outlet/chan
 
 ## POS Runtime Discount Extension
 
+Current Release uses one MANUAL cashier Discount: Order Percentage/Fixed or Item
+Percentage with exact cart variant. Above authority is rejected. POLICY,
+`PENDING_APPROVAL`, Item Fixed, approval fields, and stacking fields below remain
+existing/reserved schema capability and are not current Flutter cashier behavior.
+See [[../../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
+
 `pos_discount_authority_limits` is unique by `(tenant_id, tenant_user_id)` and
 stores `max_percentage`, `max_fixed_amount`, `currency_code`, and lifecycle status.
 
@@ -40,6 +46,18 @@ one of `PENDING_APPROVAL`, `APPROVED`, `REJECTED`, `EXPIRED`, `APPLIED`, `CANCEL
 
 `pos_discount_application_events` is append-only and records requester/manager actor,
 from/to status, event type, note, and occurrence time.
+
+Current Release mapping uses `pos_discount_authority_limits.tenant_user_id`,
+`max_percentage`, `max_fixed_amount`, `currency_code`, and `status`.
+`pos_discount_applications` retains `target_product_variant_id`,
+`discount_source`, `discount_scope`, `calculation_method_snapshot`,
+`requested_value`, `cashier_limit_snapshot`, `cart_subtotal_snapshot`,
+`eligible_subtotal_snapshot`, `discount_amount_snapshot`,
+`total_after_discount_snapshot`, `currency_code`, `cart_snapshot_json`,
+`cart_hash`, `request_reason`, `application_status`, `sales_order_id`,
+`applied_at`, `idempotency_key`, and device/till/session/requester context. Local
+`PENDING_SYNC` belongs to Flutter/generic offline sync records; do not add it to
+`application_status` solely for this scope.
 
 2026-07-13 implementation note:
 

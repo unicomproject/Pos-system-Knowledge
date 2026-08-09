@@ -1,20 +1,20 @@
 <!-- title: Design System -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-09 -->
 
 # Design System
 
 ## Purpose
 
-This file defines the visual system for SCS-TIX EPOS Release 1 UI work.
+This file defines the visual system for OneVerz POS MVP UI work.
 
 It applies to Platform Admin Web, Tenant Admin inside Flutter POS, Fixed POS,
 and Portable POS.
 
 ## Source Basis
 
-The design direction comes from uploaded SCS-TIX UI screens, POS flow screens,
+The design direction comes from approved OneVerz POS UI screens, POS flow screens,
 tenant admin screens, platform admin screens, and confirmed project decisions.
 
 This is not a generic POS theme.
@@ -23,11 +23,11 @@ This is not a generic POS theme.
 
 | Item | Rule |
 |---|---|
-| Product | SCS-TIX EPOS |
+| Product | OneVerz POS |
 | Business context | Event, stadium, venue, merchandise, retail POS |
 | UI personality | Enterprise, premium, practical, touch-friendly |
 | Main app feel | Dark blue and white POS/admin layout |
-| Presentation feel | Clean investor-ready SCS-TIX screens |
+| Presentation feel | Clean production-ready OneVerz POS screens |
 
 ## Color System
 
@@ -76,6 +76,11 @@ Do not create a colorful consumer app style.
 | Modals | Confirmation, discount, refund, manager approval |
 | Toasts | Non-critical feedback |
 | Blocking panels | Permission denied, tenant suspended, device not trusted |
+
+Current cashier Discount does not use manager approval. Its modal is
+tablet-first adaptive, stacks on narrow widths, respects keyboard/viewInsets and
+safe areas, and keeps amounts/errors/actions untruncated and reachable. See
+[[../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
 
 ## Flutter POS Primary Action Buttons
 
@@ -147,7 +152,7 @@ flowchart TD
 
 ## Out of Scope
 
-- E-commerce storefront UI is not active Release 1.
+- Online Store UI belongs to its browser surface and separate design contract.
 - Self-service kiosk UI is not active Release 1.
 - Delivery UI is not active Release 1.
 - AI analytics UI is not active Release 1.
