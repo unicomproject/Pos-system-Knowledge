@@ -6,6 +6,11 @@
 
 # Flutter Cashier POS Implementation Map
 
+> Checkout Customer Selection / Add: Second Brain is ready for implementation;
+> dedicated Flutter implementation, `customers.create` permission seed
+> restoration, and authenticated E2E verification remain pending. Normative
+> contract: [[Flutter_Checkout_Customer_Selection_Implementation_Specification]].
+
 ## Purpose
 
 Active implementation map for cashier POS in `Nytroz-POS-App` against
@@ -50,7 +55,7 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 |---|---|---|---|
 | Start New Sale | Enabled rules | products + checkout | Partial |
 | Returns & Exchanges | Count | `GET /api/v1/pos/returns/sales/search` | Step 1 integrated; exact `returns.view` |
-| Add Customer | Count | customers APIs | Wired (`/pos/customers`) |
+| Customer Management | Count | customers APIs | Wired (`/pos/customers`); separate approved checkout selector remains pending |
 | Parked Sales | Device-local count/dialog | Backend `/api/v1/pos/holds` exists but is not called by Flutter | Partial/disconnected |
 | Cash Drawer | Balance | drawer detail API | Partial (balance only) |
 | Online Orders | Placeholder | none | UI only |
@@ -205,7 +210,7 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 |---|---|---|---|
 | Start New Sale | Enabled rules | products + checkout | Partial |
 | Returns & Exchanges | Count | `GET /api/v1/pos/returns/sales/search` | Step 1 integrated; exact `returns.view` |
-| Add Customer | Count | customers APIs | Wired (`/pos/customers`) |
+| Customer Management | Count | customers APIs | Wired (`/pos/customers`); not the approved full-screen checkout selector |
 | Parked Sales | Device-local count/dialog | Backend `/api/v1/pos/holds` exists but is not called by Flutter | Partial/disconnected |
 | Cash Drawer | Balance | drawer detail API | Partial (balance only) |
 | Online Orders | Placeholder | none | UI only |

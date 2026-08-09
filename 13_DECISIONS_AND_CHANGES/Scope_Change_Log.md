@@ -1,9 +1,25 @@
 <!-- title: Scope Change Log -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-06 -->
+<!-- last_updated: 2026-08-09 -->
 
 # Scope Change Log
+
+## 2026-08-09 — Current Release cashier Discount scope lock
+
+- Locked MANUAL-only cashier popup and exactly one active Discount.
+- Order allows Percentage/Fixed; Item allows Percentage only with exact cart target.
+- At/below user authority is allowed; above authority is directly rejected with
+  no manager approval or `PENDING_APPROVAL`.
+- POLICY selection, manager PIN/approval, Item Fixed, and stacking are deferred
+  while existing backend/schema capability remains preserved.
+- Added provisional offline Discount using safe cached authority/reference,
+  local pending sync, backend revalidation, and visible conflict handling.
+- Clarified tablet-first two-column and adaptive stacked/narrow popup contract,
+  keyboard/safe-area behavior, and no overflow/clipping.
+- Documentation-only decision; implementation/runtime evidence remains pending.
+
+Decision: [[POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
 
 ## 2026-08-06 — Park / Recall gap closure implementation
 

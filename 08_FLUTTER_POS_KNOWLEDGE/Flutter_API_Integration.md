@@ -1,7 +1,7 @@
 <!-- title: Flutter API Integration -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-08 -->
 
 
 # Flutter API Integration
@@ -61,8 +61,8 @@ Map DTOs to domain/view models before UI.
 
 Before completing protected actions, Flutter must call backend validation.
 
-Protected actions include final sale total, payment, refund, exchange, loyalty,
-store credit, final stock, and till close.
+Protected actions include final sale total, payment, refund, exchange,
+future/deferred loyalty or store credit, final stock, and till close.
 
 ## Related Files
 

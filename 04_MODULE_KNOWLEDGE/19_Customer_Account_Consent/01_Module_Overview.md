@@ -1,13 +1,16 @@
 <!-- title: Customer Basic, Authentication & Consent Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-08 -->
 
 # Customer Basic, Authentication & Consent Module Overview
 
 ## Purpose
 
-Support customer records, customer website authentication, OTP verification, password reset, sessions, refresh tokens, and consent records for online store and loyalty use.
+Support customer records, customer website authentication, OTP verification,
+password reset, sessions, refresh tokens, and consent records. Loyalty and
+membership are future/deferred and are not Release 1 Cashier Customer
+Management functionality.
 
 This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device

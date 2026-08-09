@@ -1,7 +1,7 @@
 <!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-07 -->
+<!-- last_updated: 2026-08-09 -->
 
 > Park / Recall Sale update (2026-08-06): Flutter Chunk 2 data integration is code complete with typed backend create/list/recall/cancel, stable idempotency, canonical permissions, safe cart rules, and 791 passing Flutter tests. Authenticated Flutter-backend verification and final UI/E2E acceptance remain pending; the full feature is not Completed.
 
@@ -16,6 +16,41 @@
 > Parked Sales backend/API Chunk 1 update (2026-08-07): existing GET now implements Today/current-shift/all-active, controlled pagination and authoritative pre-pagination count/value/currency metadata. Build passed; affected Unit/API/Integration suites passed 46/19/8. No migration or new endpoint. Flutter Chunk 2/3 and authenticated E2E remain pending.
 
 > Parked Sales Flutter Chunk 2 update (2026-08-07): the existing screen/provider stack now consumes backend scope, pagination and aggregate metadata and renders filters, responsive headings/list, typed View, Recall/Cancel actions, summary and Start New Sale. Focused analysis and automated tests pass. Authenticated Chunk 3 visual/E2E acceptance remains pending; the full feature is not Completed.
+
+> Checkout Customer Selection update (2026-08-07): final Payment Method journey
+> is fully specified and Second Brain ready for implementation — optional customer, clickable Customer card,
+> dedicated full-screen select/add, automatic association and return, nullable
+> `customerId`. Flutter implementation, `customers.create` permission seed
+> restoration, and authenticated runtime verification are pending;
+> `/pos/customers` remains Customer Management.
+
+> Checkout Customer Selection Step 2 runtime closure (2026-08-07): authenticated
+> Cashier navigation, real name/phone/email search, existing selection, one real
+> backend-authoritative create, PostgreSQL persistence, auto-selection/return,
+> cart preservation and duplicate-phone failure preservation passed. Step 2
+> tests are 8/8, targeted regressions are 41/41 and focused analysis is clean.
+> `sales_orders` is not created until payment starts, so
+> `sales_orders.customer_id` remains a later Step 3 persistence dependency; no
+> payment was submitted.
+
+> Checkout Customer Persistence Step 3 closure (2026-08-07): the existing
+> Flutter cash start-payment request carries the canonical selected CustomerId;
+> backend tenant/status validation and transactional SalesOrder creation were
+> verified. One authenticated atomic runtime sale (`SO-000106`, receipt
+> `RCP-000095`) persisted the exact selected CustomerId with one order/line/
+> payment/receipt and no duplicate. Walk-in NULL, unknown, cross-tenant,
+> inactive, failure preservation and idempotency are covered by focused tests.
+> No production-code change, new customer state or attach endpoint was needed.
+
+> Checkout Customer target UI closure (2026-08-07): the approved unified white
+> two-column workspace, live shared black POS operational header, outlined
+> search/form controls, real customer metadata, orange action treatment and
+> existing New Sale footer are implemented. Unsupported Customer Type, Notes,
+> recent history and interactive filtering were not fabricated. Focused Flutter
+> Customer/Payment tests pass 17/17, required viewport and 1.3 text-scale checks
+> have no overflow, analysis is clean, and authenticated Pixel Tablet visual
+> verification plus Back-to-Payment navigation passed. Evidence:
+> `C:\tmp\checkout-customer-target-final.png`.
 
 # Full Feature Status Index
 
@@ -121,9 +156,9 @@ PR/commit reference is recorded.
 | Backend | Tenant / Outlet | Outlet Create | Completed | 2026-06-18 | dashboard_tenant | `POST /api/v1/tenant-admin/outlets` |
 | Flutter | Tenant Admin / Outlet | Outlet Create UI | Completed | 2026-06-18 | tenant-dashboard | Add/Edit outlet screens |
 | Flutter | Tenant Admin / Till | Till Monitoring UI | Partially Implemented | - | - | Implementation tracking added. See [[Flutter/Tenant_Admin/Till_Monitoring_UI_Implementation_Status]] |
-| Flutter | Sales | Discount | Testing | - | `scanner_inte` | API-backed list/validate/apply flow; manager approval is permission-dependent |
-| Flutter | Sales | Customer Management | Testing | - | `scanner_inte` | List/create/update/select/attach implemented; loyalty is separate and incomplete |
-| Flutter | Sales | Loyalty Earn / Redeem | Not Started | - | - | No verified cashier Flutter-to-backend loyalty flow |
+| Flutter | Sales | Discount | Testing | - | `scanner_inte` | Existing APIs include approval/POLICY/LINE-Fixed; current target is MANUAL-only, one Discount, above-limit reject, Item Percentage only; offline/responsive gaps pending |
+| Flutter | Sales | Customer Management | Partially Implemented | - | Current working tree | Core API-backed UI and authenticated 2560×1600 master/detail runtime verified; controlled mutation and remaining tablet E2E are pending. See [[Flutter/Sales/Customer_Management_Implementation_Status]] |
+| Cross-platform | Customer | Loyalty / Membership / Points | Deferred | - | - | Explicitly not Release 1 Cashier Customer Management scope |
 | Flutter | Sales | Cash Checkout | Completed | 2026-08-04 | scanner_inte | Full flow completed. Hardware integration deferred. See [[Flutter/Sales/Cashier_UJ7_Payment_Flow_Final_Signoff]] |
 | Flutter | Sales | Cash Payment Screen Redesign | Complete | 2026-08-05 | - | Chunks 1–3 complete; target UI, dynamic Quick Amount, Cash payment submission, authoritative success handling and database persistence validated. Physical printer/drawer status recorded separately. |
 | Flutter | Sales | Card Payment | Blocked | - | Current working tree | Provider-neutral backend safety exists; real provider/terminal absent |
@@ -141,6 +176,7 @@ PR/commit reference is recorded.
 | Flutter | Hardware | HID / Camera Barcode Scanner | Testing | - | Current working tree | Chunk 3 code and automation implemented; TB-00D/camera/POS80 physical matrix pending |
 | Flutter | Hardware | Hardware Testing Workflow | Testing | - | Current working tree | Authoritative versioned printer config and backend test-log lifecycle wired; scanner screen and physical matrix pending |
 | Flutter | Sales | Offline Cash Sale / Outbox | Not Started | - | - | Included MVP scope; no verified end-to-end cashier implementation |
+| Flutter | Sales | Checkout Customer Selection / Add | Step 3 Checkout Persistence Complete | 2026-08-07 | Current working tree | Steps 1–3 complete. Authenticated atomic payment-start persisted the exact selected backend CustomerId to one SalesOrder (`SO-000106`) with no duplicate; tenant/status validation and walk-in NULL behaviour verified. Step 3 Flutter 4/4, combined focused Flutter 37/37, backend integration 15/15, API 8/8, analyze and Release build pass. See [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Checkout_Customer_Selection_Implementation_Specification]] |
 | Backend | CatalogProduct | POS Popular Products | Completed | 2026-07-31 | - | Manual Popular product list curation and default segment |
 | Backend | CatalogProduct | POS Frequently Sold | Completed | 2026-07-31 | Current working tree | Dynamic sales aggregation lookback calculation |
 | Backend | CatalogProduct | POS Offers Product List | Completed | 2026-07-31 | Current working tree | Dynamic targeted discount and special price retrieval |
@@ -156,7 +192,7 @@ PR/commit reference is recorded.
 | Backend | ECommerce / CartCheckout | Storefront Cart Management | Testing | - | - | Cart test matrix and backend status added; latest regression pending. See [[Backend/ECommerce/Storefront_Cart_Implementation_Status]] |
 | Backend | ECommerce / CustomerWishlist | Customer Wishlist APIs | Testing | - | - | Implementation tracking added; current regression/exception evidence pending. See [[Backend/ECommerce/Customer_Wishlist_Implementation_Status]] |
 | Backend | ECommerce / ProductReviews | Product Reviews APIs | Testing | - | - | Implementation tracking added; current regression/commit evidence pending. See [[Backend/ECommerce/Product_Review_Implementation_Status]] |
-| Backend | ECommerce / Customer | POS Customer Profile And Attach To Sale | Testing | - | - | Implementation tracking added; latest regression and entitlement review pending. See [[Backend/ECommerce/Customer_Profile_Pos_Customer_Implementation_Status]] |
+| Backend | ECommerce / Customer | POS Customer Profile And Attach To Sale | Complete | 2026-08-08 | - | Permission, migration, DB, Till Name, full regression, seven authenticated APIs, and real editable-sale attach persistence verified. See [[Backend/ECommerce/Customer_Profile_Pos_Customer_Implementation_Status]] |
 | Full Stack | E-Commerce | Web Storefront & Tracking | Testing | - | e-commerce | Core flows are tracked across auth, browse, media, cart, checkout, wishlist, reviews, orders, fulfillment, and POS customer docs. See [[Online_Store/01_ECommerce_Implementation_Status]] |
 | Backend | POS Operations | Receipt Template Resolution | Testing | - | Current working tree | Resolution service and dynamic snapshot merge fully implemented and verified via tests/API. Template management API remains pending. See [[Backend/POSOperations/Receipt_Template_Resolution_Implementation_Status]] |
 | Flutter | Sales | Payment Success Receipt Screen | In Progress | - | - | Backend dependency (snapshot generation) fully implemented. Flutter data layer updated to accept snapshot. UI implementation pending. See [[Flutter/Sales/Payment_Success_Receipt_Screen_Implementation_Status]] |

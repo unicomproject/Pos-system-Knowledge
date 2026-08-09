@@ -1,105 +1,109 @@
-<!-- title: Customer Loyalty Flow -->
+<!-- title: Cashier Customer Management Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-08-08 -->
 
-# Customer Loyalty Flow
+# Cashier Customer Management Flow
 
 ## Purpose
 
-Defines adding customer to sale and using basic loyalty earn/redeem.
+Defines Release 1 Cashier Customer Management at `/pos/customers`. This is a
+POS management surface, not a full CRM and not the checkout-specific customer
+selector. The legacy filename is retained to preserve inbound links.
 
-## Source Basis
-
-This journey is based on the uploaded SCS-TIX Release 1 user journey files, UI
-screens, backend architecture, database design, and confirmed project decisions.
-
-It must not be expanded into e-commerce, offline sync, supplier, delivery, kiosk,
-coupon, AI, or accounting scope.
-
-## Actors
-
-| Actor | Responsibility |
-|---|---|
-| Cashier | Searches/selects or creates customer |
-| Customer | Receives loyalty benefit if member |
-| Backend | Validates membership and loyalty rules |
+Loyalty and customer membership functionality are deferred and are not part of
+OneVerz POS Release 1. No earn, redeem, points, tier, rewards, ledger, or
+store-credit loyalty action belongs to this journey.
 
 ## Preconditions
 
-- Cart/sale exists.
-- Customer/loyalty feature is enabled where used.
-- Cashier has customer/loyalty permission.
+- Authenticated tenant user with `customers.view`.
+- Valid trusted POS device assigned to a till with an open till session.
+- Active tenant context supplied by authentication, never by the client body.
 
-## Main Flow
+## Main Journey
 
-| Step | User/System Action | Expected Result |
+| Step | Cashier action | Expected result |
 |---:|---|---|
-| 1 | Tap Add Customer | Customer search screen opens |
-| 2 | Search by phone/email/name | Matching customer appears |
-| 3 | Select or create customer | Customer attaches to cart/sale |
-| 4 | View customer detail or purchase history | Backend customer and order data are shown |
-| 5 | Continue the sale | Selected customer remains attached to the cart/checkout request |
+| 1 | Open **Customers** from bottom navigation | `/pos/customers` opens |
+| 2 | Wait for the customer list | API-backed customers load; no mock rows |
+| 3 | Search or filter | Results reset to page 1 and refresh |
+| 4 | Select a customer row | Row highlights; list shrinks; detail opens on the same screen |
+| 5 | Review profile and aggregates | Contact, status, joined date, spend/order stats appear |
+| 6 | Review recent purchases | Existing paginated order-history API supplies preview data |
+| 7 | Add a customer, if permitted | Backend generates code; source is `POS`; status is `ACTIVE` |
+| 8 | Edit a customer, if permitted | Full name, phone, email, and allowed status are updated |
+| 9 | Deactivate a customer, if permitted | Confirmation changes status to `INACTIVE`; no hard delete |
+| 10 | Attach an ACTIVE customer to sale | Backend revalidates eligibility and cart permission |
+| 11 | Return to or continue the sale | Selected customer remains in the active sale context |
 
-## Journey Diagram
+## Dynamic Layout
 
-```mermaid
-flowchart TD
-    S1[Tap Add Customer]
-    S1 --> S2[Search by phone/email/name]
-    S2 --> S3[Select or create customer]
-    S3 --> S4[View customer detail or purchase history]
-    S4 --> S5[Continue sale with customer attached]
-    S5 --> Done[Journey completed]
-```
+- Initial `selectedCustomerId = null`: list uses 100%; detail is not rendered.
+- Row selection: list is approximately 64%; detail is approximately 36%.
+- Detail never overlays the table and does not trigger full-page navigation.
+- Clearing or invalidating selection hides detail and restores list to 100%.
+- Search/filter/page refresh clears selection when the selected row is absent;
+  otherwise selection may be preserved.
 
-## Business Rules
+## Search And Filters
 
-- Customer records are tenant-scoped.
-- Loyalty is basic earn/redeem in Release 1.
-- Redeem requires valid membership and permission.
-- Loyalty transactions are ledger records.
+Search covers display/full name, phone, normalized phone, email, normalized
+email, and customer code. Flutter uses a 300 ms debounce, resets page to 1, and
+prevents stale responses from replacing newer results.
 
-## Access-Control Rules
+The customer table shows four server-authoritative rows per page and uses the
+pagination footer only. It does not combine pagination with an internal vertical
+table scrollbar.
 
-| Control | Required Rule |
-|---|---|
-| Authentication | Required |
-| Feature entitlement | Customer/loyalty enabled |
-| Permission | Customer select/create and loyalty redeem where used |
-| Open till session | Required for sale use |
+Status values are `ALL`, `ACTIVE`, `INACTIVE`, and `BLOCKED`. `DELETED` is never
+shown in normal POS browsing.
 
-## Data and API References
+Verified customer source values produced by current code are `POS` and
+`ECOMMERCE`; `ALL` removes the source filter. `CLICK_AND_COLLECT`, `MANUAL`, and
+`IMPORT` are not verified current customer-source producers and must not be
+presented as working filters.
 
-| Area | References |
-|---|---|
-| Implemented API group | `/api/v1/customers` for list, summary, detail, create and update |
-| Implemented sale behavior | Select and attach customer to the current cart/checkout request |
-| Tables used by current customer flow | `customers`, `sales_orders` and related customer/order records |
+## Add, Edit, And Deactivate Rules
 
-Loyalty earn, redeem, loyalty-ledger and store-credit behavior remain documented
-MVP targets, but no complete Cashier Flutter → API → persistence → test chain was
-verified. They must not be presented as working cashier actions.
+- Create: `customers.create`; full name and phone required; email optional.
+- Add Customer opens a create-only orange modal with exactly Full Name, Phone
+  Number, and Email inputs; it does not search or render existing customers.
+- Customer Management shows one toolbar Add Customer action when
+  `customers.create` is granted; successful creation refreshes the paginated
+  list and selects the backend-created customer.
+- Update/deactivate: `customers.update`.
+- Name maximum: 150 characters.
+- Phone maximum: 50 characters and at least 7 normalized digits.
+- Email maximum: 150 characters and valid address syntax when supplied.
+- Phone/email duplicates are tenant-scoped and exclude `DELETED` records.
+- Update duplicate checks exclude the current customer.
+- Customer code is backend-owned and immutable.
+- POS create defaults to source `POS` and status `ACTIVE`.
+- Update statuses: `ACTIVE`, `INACTIVE`, or `BLOCKED` only.
 
-## Edge Cases
+## Attach Rules
 
-- Customer not found allows create if permitted.
-- Loyalty actions remain unavailable until their backend-authoritative flow is implemented.
+Attach requires `customers.view` plus `sales.cart.manage`. Only an `ACTIVE`
+customer is eligible. Current rejection codes are:
 
-## Out of Scope
+- `pos_customers.customer_inactive`
+- `pos_customers.customer_blocked`
+- `pos_customers.customer_deleted`
+- `pos_customers.customer_not_eligible`
 
-- E-commerce customer profile is excluded.
-- Advanced loyalty campaigns are excluded.
+Flutter permission state is UX only. Attach and checkout independently recheck
+tenant ownership and customer status on the backend.
 
-## Completion Criteria
+## Deferred Functionality
 
-- The user reaches the expected final state without bypassing access control.
-- Tenant-owned data remains inside the resolved tenant context.
-- Sensitive actions write audit records where required.
-- UI state and backend state stay consistent after completion.
+Release 1 excludes loyalty points, earn/redeem, membership tiers, Gold/Silver/
+VIP/Bronze concepts, rewards, loyalty history/ledger, and store-credit loyalty
+UI. Future architecture references do not authorize Cashier Release 1 UI.
 
 ## Related Files
 
-- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_POS_Customer_Management]]
+- [[../../02_ACCESS_CONTROL/API_Authorization_Rules]]
+- [[../../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]]
+- [[../../10_TESTING_QA/Test_Case/21_POS_Operations/POS_Customer_Management_Test_Cases]]

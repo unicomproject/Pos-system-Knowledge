@@ -1,7 +1,7 @@
 <!-- title: 22. Cart & Checkout -->
 <!-- status: ERD aligned -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-09 -->
 <!-- source: 22_Cart & Checkout ERD(3).png -->
 
 # 22. Cart & Checkout
@@ -9,6 +9,12 @@
 ## Purpose
 
 This file documents the database tables, attributes, keys, nullability, indexes, constraints, and external reference entities for this module.
+
+Current Release cashier carts carry at most one MANUAL Discount intent. Online
+checkout uses the canonical `discountApplicationId`; offline cart totals and
+Discount are provisional until generic sync/backend revalidation. Existing cart
+amount fields do not create stacking or Item Fixed support. See
+[[../../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
 
 ## ERD Update Rule
 

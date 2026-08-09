@@ -1,7 +1,7 @@
 <!-- title: API Standards -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-13 -->
+<!-- last_updated: 2026-08-08 -->
 
 # API Standards
 
@@ -72,7 +72,7 @@ Release 1 API groups include:
 - `/api/v1/pos/refunds`
 - `/api/v1/pos/exchanges`
 - `/api/v1/customers`
-- `/api/v1/loyalty`
+- `/api/v1/loyalty` (future/deferred; not an active Release 1 API contract)
 - `/api/v1/reports`
 - `/api/v1/files`
 - `/api/v1/notifications`

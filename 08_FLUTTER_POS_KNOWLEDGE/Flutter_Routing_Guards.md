@@ -1,7 +1,7 @@
 <!-- title: Flutter Routing Guards -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-08 -->
 
 
 # Flutter Routing Guards
@@ -58,7 +58,7 @@ Examples blocked offline:
 - Refund final approval.
 - Exchange final approval.
 - Till final close.
-- Loyalty/store credit final balance.
+- Future/deferred loyalty or store-credit final balance; not Release 1.
 
 ## UX Rule
 

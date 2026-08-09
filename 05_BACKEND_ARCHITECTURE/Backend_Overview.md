@@ -1,7 +1,7 @@
 <!-- title: Backend Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-08 -->
 
 
 # Backend Overview
@@ -67,7 +67,7 @@ flowchart TD
 ## Backend Final Authority
 
 Backend validates final sale total, final inventory quantity, card/QR payment,
-refund, exchange, loyalty/store credit, till final close, tenant access,
+refund, exchange, future/deferred loyalty or store credit, till final close, tenant access,
 permission, idempotency, and audit.
 
 ## Backend Repository (active)

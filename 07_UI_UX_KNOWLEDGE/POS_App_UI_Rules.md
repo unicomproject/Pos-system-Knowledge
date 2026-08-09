@@ -1,7 +1,7 @@
 <!-- title: POS App UI Rules -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-09 -->
 
 # POS App UI Rules
 
@@ -12,9 +12,9 @@
 
 ## Purpose
 
-This file defines the Release 1 POS app UI rules for SCS-TIX.
+This file defines the current OneVerz POS MVP app UI rules.
 
-It covers Fixed POS and Portable POS queue-busting flow.
+It covers fixed and portable OneVerz POS operation.
 
 ## Layout Decision
 
@@ -72,13 +72,62 @@ Do not show inventory/product admin shortcuts to cashier unless permission grant
 | Totals | Always visible |
 | Payment CTA | Strong and reachable |
 | Discount | Visible only if entitled and permitted |
-| Customer | Add/select customer action |
-| Loyalty | Show earn/redeem only when enabled |
+| Customer | Clickable Payment Method Customer card; optional full-screen select/add journey |
+| Loyalty | Deferred; do not show in Release 1 Cashier UI |
+
+### Discount Popup
+
+- MANUAL only; exactly one active cashier discount.
+- Order supports Percentage/Fixed; Item supports Percentage only with exact cart line.
+- Above authority is rejected; no manager approval/POLICY selector in current flow.
+- Tablet landscape prefers two columns; smaller tablets adapt without fixed
+  overflow; narrow widths stack. Keyboard, safe areas, text scale, long products
+  and errors must keep Apply/Cancel reachable.
+- Offline preview is provisional and shows pending/failed/conflict sync state.
+- Normative decision:
+  [[../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
+
+### Customer Management Master-Detail
+
+- `/pos/customers` starts with no selection and a 100%-width customer table.
+- Do not render an empty right-side placeholder before selection.
+- Selecting the whole row highlights it, shrinks the list responsively to about
+  64%, and opens a non-overlay detail panel at about 36%.
+- Clearing or invalidating selection removes detail and restores full width.
+- Detail loading must not unnecessarily block the list.
+- Use touch-first action targets and prevent horizontal overflow at supported
+  POS tablet widths.
+- Do not show loyalty points, earn/redeem, membership badges, or tiers in
+  Release 1 Customer Management.
+
+### Checkout Customer Selection
+
+Normative screen specification:
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Checkout_Customer_Selection_Implementation_Specification]].
+
+- Customer selection is optional; walk-in/guest checkout must remain available.
+- Tapping the Payment Method Customer card opens a separate full-screen checkout
+  customer selection/add screen.
+- Do not use a popup, modal, dialog, or the bottom-navigation `/pos/customers`
+  Customer Management screen for this checkout journey.
+- Search supports customer name, mobile, and email.
+- Use approximately 300 ms debounce, stale-response protection, `pageSize = 20`
+  and append-only Load More; do not use numbered pages or load all customers.
+- Wide tablets use side-by-side select/add sections; narrow widths stack without
+  overflow. The whole row is tappable and touch targets are at least
+  approximately 44 logical pixels where no stricter rule applies.
+- Do not show checkout Filter, Recent Customers, customer type, notes, tiers,
+  visits, photos, loyalty balance, or fabricated profile data.
+- Selecting an existing customer or successfully creating a new customer
+  automatically associates it with the active checkout and automatically
+  returns to Payment Method, where the Customer card shows the selected name.
+- Do not show an Attach or Save/Attach button and do not require a newly created
+  customer to be searched again.
 
 ## Payment UI Rules
 
-Payment screen must support cash, card, QR, split payment, and store credit where
-used by refund/exchange/customer credit flow.
+Payment screen supports the approved Release 1 payment methods. Store credit is
+future/deferred and is not Release 1 Customer Management functionality.
 
 Card payment must reflect real reader/provider integration where configured.
 
@@ -86,7 +135,8 @@ Card payment must reflect real reader/provider integration where configured.
 
 Return/refund screens must show original sale lookup, sale line selection,
 returnable quantity, non-returnable disabled state, reason, refund method,
-manager approval where required, and store credit where supported.
+manager approval where required. Store credit remains future/deferred unless a
+separate approved release decision activates it.
 
 ## Till UI Rules
 
@@ -136,7 +186,8 @@ flowchart TD
 
 ## Out of Scope
 
-- Offline sale queue UI is excluded.
+- Offline sale/Discount pending, failed, and conflict states are included in the
+  OneVerz POS continuity model; full reconciliation UX remains implementation work.
 - E-commerce order management is excluded.
 - Kiosk UI is excluded.
 - Delivery UI is excluded.

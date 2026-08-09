@@ -1,7 +1,7 @@
 <!-- title: Access Control Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-08 -->
 
 
 # Access Control Overview
@@ -104,7 +104,7 @@ Offline data is not final truth until backend sync and validation succeed.
 ## Critical Backend-Final Actions
 
 Backend remains final authority for final sale total, card/QR payment, refund,
-exchange, loyalty/store credit, till final close, final inventory quantity,
+exchange, future/deferred loyalty or store credit, till final close, final inventory quantity,
 permission, tenant isolation, and audit.
 
 ## Related Files

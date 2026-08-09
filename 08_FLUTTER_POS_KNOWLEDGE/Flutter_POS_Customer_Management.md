@@ -1,101 +1,204 @@
-<!-- title: POS Customer Management Implementation -->
+<!-- title: Flutter POS Customer Management -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-18 -->
+<!-- last_updated: 2026-08-08 -->
 
-# POS Customer Management (`/pos/customers`)
+# Flutter POS Customer Management
 
-## Scope
+## Release 1 Boundary
 
-Cashier POS Customer Selection / Management screen. Not Tenant Admin CRM.
-Not loyalty or store-credit.
+Route: `/pos/customers`
+Bottom navigation: **Customers**
 
-## Backend
+This is the Cashier POS Customer Management screen, not a full CRM and not the
+checkout-specific customer selector. Customer Management is included in Release
+1. Loyalty, membership tiers, loyalty points, rewards, earn/redeem, loyalty
+ledger, and store-credit loyalty UI are deferred.
 
-| Method | Route | Permission |
-|---|---|---|
-| GET | `/api/v1/customers/summary` | `customers.view` |
-| GET | `/api/v1/customers` | `customers.view` |
-| GET | `/api/v1/customers/{customerId}` | `customers.view` |
-| GET | `/api/v1/customers/{customerId}/orders` | `customers.view` |
-| POST | `/api/v1/customers` | `customers.create` |
-| PUT | `/api/v1/customers/{customerId}` | `customers.update` |
-| POST | `/api/v1/customers/{customerId}/attach-to-sale` | `customers.view` + `sales.cart.manage` |
+## Component Contract
 
-Open till + trusted device required for all POS customer operations.
+```text
+POSCustomerManagementScreen
+|-- CustomerListSection
+|   |-- CustomerToolbar
+|   |   |-- CustomerSearchField
+|   |   |-- CustomerFilterButton
+|   |   `-- AddCustomerButton
+|   |-- CustomerFilterBar
+|   |   |-- StatusFilter
+|   |   |-- SourceFilter
+|   |   `-- ResetFilterButton
+|   |-- CustomerTable
+|   |   |-- CustomerTableHeader
+|   |   `-- CustomerTableRow
+|   `-- CustomerPagination
+|-- CustomerDetailPanel (conditional)
+|   |-- CustomerProfileHeader
+|   |-- CustomerContactInfo
+|   |-- CustomerStats
+|   |   |-- TotalSpendCard
+|   |   |-- OrderCountCard
+|   |   `-- AverageOrderValueCard
+|   |-- RecentPurchases
+|   `-- CustomerActions
+|-- AddCustomerDialog
+|-- EditCustomerDialog
+|-- PurchaseHistoryDialog
+`-- DeactivateConfirmationDialog
+```
 
-### List / detail fields (backend authority)
+## Master-Detail Behaviour
 
-- `sourceType` — POS / MANUAL / ECOMMERCE / IMPORT
-- `totalOrderCount` — COMPLETED, non-cancelled sales only
-- `totalSpentAmount` + `currencyCode` — same policy
-- `isMixedCurrencySpend` — when COMPLETED orders use more than one currency; spend display must not invent a combined total
-- `lastPurchaseAt`
+Initial state is `selectedCustomerId = null`.
 
-### Update
+| State | List | Detail |
+|---|---:|---:|
+| No selection | 100% available customer-content width | Not rendered |
+| Customer selected | approximately 64% | approximately 36% |
 
-Editable: `fullName`, `phone`, `email`, `status` (`ACTIVE` / `INACTIVE` / `BLOCKED`).
+The ratios are responsive guidance, not fixed pixels. Before selection there is
+no right-side placeholder. After selection, the row highlights, the table
+shrinks, and detail appears without overlay or page navigation. Clearing
+selection restores full width.
 
-Immutable: `tenantId`, `customerId`, `customerCode`, `sourceType`, aggregates, create audit.
+Row selection sets `selectedCustomerId`, preserves the selected detail and order
+history state, and loads missing detail/recent purchases. Search, filter, page,
+or refresh clears selection when the customer is no longer present; otherwise
+selection should be retained where practical.
 
-Phone/email normalized; tenant-scoped duplicate checks exclude self.
+## Customer Table
 
-### Summary — New customers this month
+Columns:
 
-Uses `Tenants.DefaultTimezone` (fallback `UTC` if missing/invalid).
+- Customer: avatar/initial, full name, customer code
+- Phone
+- Email
+- Last Purchase
+- Total Spend
+- Actions
 
-Local month start → next month start converted to UTC for `customers.created_at` query.
-Response includes `timeZoneId`.
+No tag/loyalty, tier, Gold, Silver, VIP, Bronze, membership, or points column is
+allowed in Release 1.
 
-### Attach / checkout
+## Search, Filter, And Pagination
 
-Attach rejects non-ACTIVE with:
+Search authority covers full/display name, phone, normalized phone, email,
+normalized email, and customer code. Flutter must debounce by 300 ms, reset to
+page 1, and cancel or ignore stale responses.
 
-- `pos_customers.customer_inactive`
-- `pos_customers.customer_blocked`
-- `pos_customers.customer_deleted`
-- `pos_customers.customer_not_eligible`
+Status filters: `ALL`, `ACTIVE`, `INACTIVE`, `BLOCKED`. `DELETED` is excluded.
 
-Attachment mode remains `CART_CONTEXT` when no saleId; optional DRAFT sale assignment when saleId provided.
+The Customer Management list uses server-side pagination as its only row
+navigation mechanism. The table body must not introduce an additional internal
+vertical scrollbar. Flutter requests four customer rows per page so the rows,
+table header, and pagination footer remain fixed within the supported tablet
+content area. Detail and purchase-history surfaces may retain their own scoped
+scrolling where their content is not page-based.
 
-Checkout independently revalidates ACTIVE-only customer (`pos_checkout.customer_*` codes). Does not trust Flutter attach alone.
+Verified backend customer sources produced today are `POS` and `ECOMMERCE`.
+The backend accepts a source string and compares it to `customers.source_type`;
+`CLICK_AND_COLLECT`, `MANUAL`, and `IMPORT` are not verified customer-source
+producers. Do not expose them as functional filters until implementation proves
+them. Record any target desire as a gap.
 
-## Flutter
+## Detail Panel
 
-- Route: `/pos/customers`
-- Table binds `sourceType`, `totalOrderCount`, `totalSpentAmount` / `currencyCode` / mixed flag
-- Source filter: ALL / POS / MANUAL / ECOMMERCE / IMPORT → list API `source`
-- Search: `TenantAdminSearchField` debounce **300 ms**; provider CancelToken + request sequence; dispose cancels
-- Edit dialog: PUT update; requires `customers.update`
-- Purchase History dialog: paginated GET orders (no new API)
-- Attach: UI requires `customers.view` + `sales.cart.manage` (aligned with backend)
+Profile: initials/avatar, full name, customer code, status, phone, email, joined
+date. Stats: total spend, completed order count, and derived average order value.
 
-## Database
+Average Order Value:
 
-**No migration required** for customer schema attributes.
+```text
+totalSpentAmount / totalOrderCount
+```
 
-Permission seed migration: `20260718160000_SeedPosCustomerUpdatePermission`
+Show `—` when order count is zero or `isMixedCurrencySpend` is true. Otherwise
+format with the aggregate `currencyCode`. It is presentation-derived: no DB
+column and no new API field.
 
-| Field | Value |
+Recent purchases use the existing customer orders endpoint and show order
+number, purchase date/time, amount, currency, status, and
+`outletDisplayName`. **Implementation gap:** the DTO does not expose till name;
+the target's “Till 01” cannot be claimed. A future DTO extension could resolve
+the existing `sales_orders.till_id` relation without a migration. **View All**
+opens the existing paginated purchase-history UI/API.
+
+Actions: View Profile, Attach to Sale, Edit Customer, Deactivate Customer.
+
+## Backend DTO Authority
+
+Customer DTO fields are `customerId`, `fullName`, `phone`, `email`, `status`,
+`customerCode`, `sourceType`, `joinedAt`, `totalOrderCount`,
+`totalSpentAmount`, `currencyCode`, `lastPurchaseAt`, and
+`isMixedCurrencySpend`.
+
+Order/spend aggregates include only same-tenant, same-customer `COMPLETED`
+orders where `cancelled_at` is null. Mixed currencies are never summed into a
+fake monetary total.
+
+## Add, Edit, And Deactivate
+
+Create requires `customers.create`; full name and phone are required, email is
+optional. Backend validation is name <=150, phone <=50 with at least 7 normalized
+digits, and optional valid email <=150. Duplicate normalized phone/email checks
+are tenant-scoped; update excludes self.
+
+The dedicated Add Customer modal is create-only. It contains exactly three
+customer inputs: full name, phone number, and optional email. It must not load or
+display the existing customer list and must not contain customer search. Existing
+customer discovery remains the responsibility of the Customer Management list or
+the checkout customer-selection screen. The modal follows the OneVerz orange
+primary-action theme and submits only to `POST /api/v1/customers`.
+
+Customer Management exposes one orange `Add Customer` toolbar action only when
+the authenticated user has `customers.create`. The duplicate page-header action
+and customer summary cards remain removed. After a successful create, Flutter
+reloads the first server page and selects the backend-created customer.
+
+POS create defaults to `sourceType = POS`, `status = ACTIVE`; customer code is
+generated by the backend. Flutter neither generates nor edits customer code.
+
+Editable fields are `fullName`, `phone`, `email`, and `status`; allowed statuses
+are `ACTIVE`, `INACTIVE`, `BLOCKED`. Tenant/customer IDs, code, source,
+aggregates, and creation audit values are immutable.
+
+Deactivate requires confirmation and uses the existing update endpoint to set
+`INACTIVE`; no DELETE endpoint exists. Refresh detail and list afterward. If an
+ACTIVE-only list drops the row, clear selection and restore full width.
+
+## Attach And Permissions
+
+| Capability | Permission |
 |---|---|
-| Permission code | `customers.update` |
-| Deterministic UUID | `77777777-0338-4000-8000-000000000001` |
-| Module ID | `71000000-0000-0000-0000-000000000010` (Core POS) |
-| Feature ID | `72000000-0000-0000-0000-000000000013` (POS Customers) |
-| Action | `update` |
-| Assignment | Development Cashier role (`88888888-0003-...`) via `tenant_role_permissions` |
-| Seed SQL | `DevelopmentPosCustomerUpdatePermissionSeedData` — update-by-code then insert-if-missing |
+| Navigation/list/search/detail/history/profile | `customers.view` |
+| Add | `customers.create` |
+| Edit/deactivate | `customers.update` |
+| Attach to sale | `customers.view` + `sales.cart.manage` |
 
-### Migration hardening (2026-07-18)
+Only ACTIVE customers attach. Backend attach and final checkout revalidate
+tenant/status eligibility. UI permission handling never replaces backend checks.
 
-**Root cause:** the first draft called `DevelopmentPosNewSalePermissionsSeedData.UpSql`, which reseeded the entire New Sale catalogue and reused UUID `77777777-0316-...` already owned by `sales.checkout`. `ON CONFLICT (permission_code)` does not catch primary-key collisions on `id`.
+## Runtime States And Responsive Rules
 
-**Fix:** seed only `customers.update` with unused UUID `0338`; preserve existing permission IDs; Down deletes only the migration-owned UUID + Cashier assignment for that code.
+Support initial loading, loaded list, empty database, no result, list error,
+detail loading, order-history loading, permission denied, invalid/untrusted
+device, till not open, duplicate conflict, and network/backend unavailable.
+Never inject mock customer rows in production runtime.
 
-**Verification:** first `dotnet ef database update` applied; second run reported already up to date; exactly one `customers.update` row.
+The entire row is selectable. Use touch-sized targets, avoid horizontal
+overflow, keep detail from overlaying the table, and do not block the list while
+detail loads. Supported POS tablet sizes must retain usable controls.
 
-## Remaining limitations
+## Persistence Contract
 
-- Loyalty / store credit not implemented
-- Multi-currency spend shown as unavailable (`—`) rather than converted totals
-- Physical printer / unrelated POS modules unchanged
+No new table, customer column, or endpoint is required. Existing `customers`,
+`sales_orders`, `sales_order_lines`, `tills`, `pos_devices`, `till_sessions`,
+and access-control tables are sufficient. Do not add loyalty tier, membership,
+points balance, average-order-value, or customer-notes columns for this screen.
+
+## Related Files
+
+- [[../03_USER_JOURNEYS/Cashier/06_Customer_Loyalty_Flow]]
+- [[../02_ACCESS_CONTROL/API_Authorization_Rules]]
+- [[../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]]
+- [[../10_TESTING_QA/Test_Case/21_POS_Operations/POS_Customer_Management_Test_Cases]]

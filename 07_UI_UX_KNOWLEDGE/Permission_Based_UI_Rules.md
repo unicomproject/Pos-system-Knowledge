@@ -1,14 +1,14 @@
 <!-- title: Permission Based UI Rules -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-09 -->
 
 
 # Permission Based UI Rules
 
 ## Purpose
 
-This file defines how SCS-TIX Release 1 UI must respond to feature entitlement,
+This file defines how OneVerz POS MVP UI must respond to feature entitlement,
 role permissions, user rights, outlet access, device trust, and till session
 state.
 
@@ -68,7 +68,7 @@ Buttons must be hidden or disabled based on permission and context.
 | Button | Required Context |
 |---|---|
 | Start Sale | POS feature, sale permission, trusted device, open till |
-| Apply Discount | Discount feature and permission |
+| Apply Discount | Discount feature and `sales.discount.apply`; cached offline context is provisional |
 | Refund | Return/refund permission and original sale |
 | Close Till | Till close permission and open session |
 | Generate Activation Code | Till/device management permission |

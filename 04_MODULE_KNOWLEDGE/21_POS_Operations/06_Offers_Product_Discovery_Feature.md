@@ -1,7 +1,7 @@
 <!-- title: Offers Product Discovery Feature Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-31 -->
+<!-- last_updated: 2026-08-09 -->
 
 # Offers Product Discovery Feature
 
@@ -35,7 +35,9 @@ This feature reuses existing configuration tables:
 6. **Conditional Offers**:
    - Offers with conditions (e.g., minimum cart quantity/amount, specific customer) still display in the Offers tab.
    - The DTO does not return a false final discount price; instead it returns the standard selling price, sets `requiresCartValidation = true`, and returns the label `Offer available`.
-7. **Manager Approval**: If applying the discount requires manager approval, the DTO sets `requiresManagerApproval = true`.
+7. **Existing policy metadata**: the DTO may expose
+   `requiresManagerApproval` from existing backend policy capability. The current
+   MANUAL cashier Discount popup does not start approval or offer POLICY selection.
 
 ---
 
@@ -62,7 +64,7 @@ This feature reuses existing configuration tables:
 | Context | Required Permission | Description |
 |---|---|---|
 | Cashier View | `products.view` | View the product grid and access the Offers segment tab |
-| Cashier Apply | `sales.discount.apply` / `sales.discount.approve` | Apply or approve discounts at the cart/checkout boundary |
+| Cashier Apply | `sales.discount.apply` | Current MANUAL cashier Discount; `sales.discount.approve` remains deferred capability |
 | Admin Config | `discount.policy.*` | Create, update, or activate discount policies in admin console |
 
 ---

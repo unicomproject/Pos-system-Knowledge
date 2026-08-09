@@ -1,9 +1,67 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-07 -->
+<!-- last_updated: 2026-08-09 -->
 
 # Platform Subscription Plan API Endpoints
+
+## POS Cashier Discount
+
+| Method | Route | Current Release use |
+|---|---|---|
+| GET | `/api/v1/pos/discounts` | Load current Discount context/authority; cashier UI is MANUAL only |
+| POST | `/api/v1/pos/discounts/validate` | Online authoritative preview; above authority is rejected |
+| POST | `/api/v1/pos/discounts/apply` | Idempotently apply one eligible MANUAL Discount |
+| POST | `/api/v1/pos/discounts/{applicationId}/cancel` | Cancel unfinalized application and preserve audit |
+| POST | `/api/v1/pos/discounts/{applicationId}/approve` | Existing/deferred capability; not called by current cashier flow |
+
+Current matrix: Order Percentage/Fixed; Item Percentage only with exact cart
+variant; one active Discount; optional reason. Checkout summary and
+start-payment accept `discountApplicationId`. POLICY, Item Fixed, approval, and
+stacking may exist in backend/schema but are not current Flutter cashier scope.
+Offline capture uses generic outbox/sync infrastructure; no new public endpoint
+is asserted. Authority:
+[[../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
+
+## POS Customer Management
+
+Base route: `/api/v1/customers`; controller: `CustomersController`. Every route
+uses tenant authentication/context, the listed permission, and the current
+implementation's trusted-device, assigned-till, open-session resolution.
+
+| Method and route | Purpose | Query/body | Permission |
+|---|---|---|---|
+| `GET /summary` | Customer summary | `deviceId` | `customers.view` |
+| `GET /` | Search/filter/page | `deviceId`, `search`, `status`, `source`, `page`, `pageSize` | `customers.view` |
+| `GET /{customerId}` | Profile and completed-order aggregates | `deviceId` | `customers.view` |
+| `GET /{customerId}/orders` | Existing paginated purchase history | `deviceId`, `page`, `pageSize`, `fromDate`, `toDate`, `status` | `customers.view` |
+| `POST /` | Create POS customer | `deviceId`; full name, phone, optional email | `customers.create` |
+| `PUT /{customerId}` | Edit profile/status; also supports deactivate-to-INACTIVE | `deviceId`; full name, phone, optional email, status | `customers.update` |
+| `POST /{customerId}/attach-to-sale` | Validate ACTIVE customer and attach to cart/editable sale | `deviceId`; optional `saleId` | `customers.view` + `sales.cart.manage` |
+
+List search covers name, phone/normalized phone, email/normalized email, and
+customer code. Status excludes `DELETED`; source is an exact current
+`source_type` filter. Order history already returns `outletDisplayName`, not
+till name. No new Recent Purchases endpoint is required.
+
+The customer DTO exposes identity/contact/status/source/joined fields plus
+`totalOrderCount`, `totalSpentAmount`, `currencyCode`, `lastPurchaseAt`, and
+`isMixedCurrencySpend`. Average order value is derived by Flutter and is not an
+API or database field.
+
+## Checkout Customer Association Boundary
+
+Consuming-screen contract:
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Checkout_Customer_Selection_Implementation_Specification]].
+
+- Checkout accepts an optional `customerId`; null is the valid walk-in/guest
+  path and customer selection must not become a payment prerequisite.
+- When supplied, the selected customer ID is carried through checkout/payment
+  and stored on the completed `sales_orders` record.
+- `POST /api/v1/customers/{customerId}/attach-to-sale` remains a supported
+  backend/Customer Management capability where implemented. It is not a
+  required cashier checkout UX step: the approved full-screen checkout selector
+  auto-associates on select/create and auto-returns to Payment Method.
 
 ## POS Park / Recall Sale
 
@@ -1047,7 +1105,7 @@ Commercial modules returned to UI:
 - Core POS: locked included.
 - Tenant Operations: locked included.
 - Inventory: optional.
-- Customers & Loyalty: optional.
+- Customers: optional; Loyalty is future/deferred and not Release 1.
 - Returns & Exchanges: optional.
 - Reports: optional.
 
@@ -1139,6 +1197,10 @@ Computed offer projection properties in `PosProductSummaryResponseDto` (Planned)
 - `discountLabel` (string): Badge label text (e.g., "15% OFF" or "Offer available").
 - `requiresCartValidation` (bool): True if qualification depends on cart totals or items.
 - `requiresManagerApproval` (bool): True if manager approval is required to apply the discount.
+
+This planned Offers projection describes existing policy metadata only. The
+current Release MANUAL cashier Discount popup does not select this policy or
+invoke manager approval.
 
 `GET /api/v1/pos/products` product summaries expose variant search metadata for
 New Sale filtering. Product name remains the primary search key; variant terms

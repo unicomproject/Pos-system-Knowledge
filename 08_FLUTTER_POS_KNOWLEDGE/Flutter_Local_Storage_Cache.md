@@ -1,7 +1,7 @@
 <!-- title: Flutter Local Storage Cache -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-09 -->
 
 
 # Flutter Local Storage Cache
@@ -42,11 +42,13 @@ Backend remains final truth.
 | Offline cash sale queue | Yes |
 | Pending inventory movement | Yes |
 | Sync outbox | Yes |
+| Discount authority/reference snapshot | Yes, limited and freshness-controlled |
+| Provisional manual Discount intent | Yes, pending sync |
 
 ## Do Not Store As Final Truth
 
 Do not treat local cache as final source for payment result, refund approval,
-exchange approval, loyalty/store credit balance, final stock, final sale total,
+exchange approval, future/deferred loyalty or store-credit balance, final stock, final sale total,
 or till final close.
 
 ## Secure Storage Rule
@@ -66,6 +68,20 @@ Local cache records should store:
 - Last refreshed time.
 - Data version or server version where available.
 - Expiry/freshness policy.
+
+## Discount Authority Snapshot
+
+Offline Discount requires the latest safe snapshot of `sales.discount.apply`,
+feature entitlement, tenant/outlet/till/current-session/device/requester context,
+`maxPercentage`, `maxFixedAmount`, `currencyCode`, product/variant identity, and
+pricing/tax/cart references needed for provisional calculation. Store
+`lastSyncedAt`, data/server version where available, freshness/expiry policy, and
+ownership context. The snapshot is not final authority and is revalidated on sync.
+
+The local outbox retains scope/method/value/target/optional reason, authority and
+cart/line snapshots, cart fingerprint/hash, currency, stable idempotency key,
+created time, sync status, retry count, and last safe error. Do not add raw PINs,
+secrets, or card data.
 
 ## Recovery Rule
 

@@ -1,7 +1,7 @@
 <!-- title: Discount & Expiry Discount Management Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-09 -->
 
 # Discount & Expiry Discount Management Module Overview
 
@@ -21,7 +21,7 @@ merchandising, attractions, and temporary retail locations.
 | Module | `Discount_Expiry_Discount_Management` |
 | Module number | 15 |
 | Primary users | Tenant Admin, Cashier, Store Manager |
-| Frontend surfaces | Discount setup, Expiry discount setup, POS discount dialog, Manager approval flow |
+| Frontend surfaces | Discount setup, Expiry discount setup, current MANUAL POS dialog; manager approval is deferred cashier capability |
 | API groups | `/api/v1/discounts`, `/api/v1/discount-policies`, `/api/v1/expiry-discounts`, `/api/v1/pos/discounts` |
 
 ## Main Tables
@@ -40,10 +40,12 @@ merchandising, attractions, and temporary retail locations.
 
 ## Core Business Rules
 
-- Discount policy determines scope, limits, targets, and approval requirement.
+- Current cashier UI uses MANUAL only, one active discount, and direct rejection
+  above user authority. Order supports Percentage/Fixed; Item Percentage only.
 - Expiry discount uses product batches/expiry dates and configured tiers.
-- POS discount application must snapshot policy and approval result.
-- Manager approval is required when the cashier exceeds allowed limit.
+- POS discount application snapshots request, authority, cart, outcome, and context.
+- POLICY, manager approval, Item Fixed, and stacking remain existing/reserved
+  backend/schema capability, not current cashier UI behavior.
 - Coupon campaign engine is not part of this module unless explicitly added later.
 
 ## Access Summary
@@ -74,3 +76,4 @@ merchandising, attractions, and temporary retail locations.
 
 - [[04_MODULE_KNOWLEDGE/15_Discount_Expiry_Discount_Management/02_Functional_Rules]]
 - [[04_MODULE_KNOWLEDGE/15_Discount_Expiry_Discount_Management/03_Technical_Contract]]
+- [[../../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]]

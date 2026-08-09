@@ -1,7 +1,7 @@
 <!-- title: OneVerz POS Second Brain Start Here -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-06 -->
+<!-- last_updated: 2026-08-08 -->
 
 
 # OneVerz POS Second Brain Start Here
@@ -86,7 +86,7 @@ print, held sale, current till session, pending inventory movement, and sync
 outbox.
 
 Backend final validation is still required for final inventory quantity,
-card/QR payment, refund, exchange, loyalty/store credit, till final close, and
+card/QR payment, refund, exchange, future/deferred loyalty or store credit, till final close, and
 final sale total.
 
 ## What This Folder Contains

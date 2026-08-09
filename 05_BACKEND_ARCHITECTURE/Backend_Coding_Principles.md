@@ -1,7 +1,7 @@
 <!-- title: Backend Coding Principles -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-01 -->
+<!-- last_updated: 2026-08-08 -->
 
 
 # Backend Coding Principles
@@ -138,7 +138,7 @@ exchange, and any retryable command that may create duplicate records.
 Cache is allowed only for safe reference/config/read data.
 
 Do not use cache as final authority for payment, inventory, refund, exchange,
-till close, loyalty/store credit, or final sale total.
+till close, future/deferred loyalty or store credit, or final sale total.
 
 ## Security Rule
 

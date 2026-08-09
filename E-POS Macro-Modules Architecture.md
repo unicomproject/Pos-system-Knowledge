@@ -26,7 +26,7 @@ This document categorizes all 23 existing modules of the E-POS project into four
 | `TenantFoundation` | **Tenant** | Tenant profile, Sales Channels |
 | `Orders` | **Tenant** | In-store & Online Sales Orders processing |
 | `CustomerAuth` | **ECommerce** | Customer login, OTP, Registration |
-| `Customer` | **ECommerce** | CRM, Loyalty, Customer profiles |
+| `Customer` | **ECommerce** | Customer profiles; CRM/Loyalty are future/deferred, not Release 1 |
 | `Storefront` | **ECommerce** | Customer-facing product browsing (READ-only) |
 | `CartCheckout` | **ECommerce** | Shopping cart & checkout |
 | `FulfilmentPickup` | **ECommerce** | Click & Collect, Delivery |
