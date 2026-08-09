@@ -70,3 +70,9 @@ A new Till is successfully created and persisted. Initial hardware devices are a
 
 ## Documentation Update 2026-08-04 — Single Page UI Replacement
 This document supersedes any previous references to the Add Till four-step wizard. Orchestration relies on Strategy B: Create Till, followed by sequential hardware assignments, and a refresh. "Connected" status in the Quick Pair panel is NEVER hardcoded; it is derived from real heartbeat/test states, leaving physical verification PENDING until real devices are tested via native POS.
+
+## Source Audit 2026-08-08 — API & Flow Mismatches
+An audit of the implementation has revealed the following gaps that must be corrected to achieve this flow:
+- **API Contract:** The backend `GetCreateOptions` endpoint (`TenantAdminTillCreateOptionsResponse`) does not currently provide `outletId`, `status`, or assignment states for POS and Hardware devices. This breaks the UI's ability to filter hardware by outlet (Step 4 & 6) and display real-time statuses (Step 7).
+- **Backend Atomicity:** The backend `TenantAdminTillService.CreateAsync` currently silently ignores missing/invalid hardware IDs instead of throwing a validation error (Step 9). It also bypasses `tenant.hardware.manage` permission checks for the hardware assignment portion.
+- **Frontend Filtering:** The UI erroneously filters POS devices from the `hardwareDevices` list instead of using the dedicated `posDevices` list.

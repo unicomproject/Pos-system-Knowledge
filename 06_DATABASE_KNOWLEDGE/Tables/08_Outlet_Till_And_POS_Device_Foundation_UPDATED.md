@@ -139,30 +139,42 @@ Purpose: Stores tills/registers under outlets.
 | `id` | uuid | PK | NOT NULL | Primary key. |
 | `tenant_id` | uuid | FK | NOT NULL | References tenants(id). Tenant that owns the till. |
 | `outlet_id` | uuid | FK | NOT NULL | References outlets(id). Outlet where till is located. |
-| `till_code` | varchar(60) | UNIQUE | NOT NULL | Unique till code within tenant and outlet. |
+| `till_code` | varchar(60) | UNIQUE | NOT NULL | Unique till code within tenant (excluding deleted records). |
 | `till_name` | varchar(150) |  | NOT NULL | Till display name. |
+| `till_area_name` | varchar(80) |  | NOT NULL | Area name where the till is located. |
+| `till_number` | integer |  | NOT NULL | Auto-incremented or assigned till number. |
 | `till_type` | varchar(40) |  | NOT NULL | Original ERD domain: till_type. |
 | `default_opening_float_amount` | numeric(18,4) |  | NOT NULL DEFAULT 0 | Default opening cash float amount. |
 | `currency_code` | char(3) | FK | NOT NULL | References currencies(currency_code). Till cash currency. |
+| `default_cashier_tenant_user_id`| uuid | FK | NULL | References tenant_users(id). Default cashier. |
 | `is_cash_managed` | boolean |  | NOT NULL DEFAULT true | Whether this till manages cash. |
-| `status` | varchar(40) |  | NOT NULL | Original ERD domain: till_status. |
+| `status` | varchar(40) |  | NOT NULL | Status IN ('ACTIVE', 'INACTIVE', 'MAINTENANCE', 'DELETED'). |
 | `created_at` | timestamptz |  | NOT NULL | Creation timestamp. |
 | `created_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id). Tenant user who created the till. |
 | `updated_at` | timestamptz |  | NOT NULL | Last update timestamp. |
 | `updated_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id). Tenant user who last updated the till. |
+| `device_name` | varchar(120) |  | NULL | Legacy mapped hardware name. |
+| `printer_name` | varchar(120) |  | NULL | Legacy mapped hardware name. |
+| `scanner_name` | varchar(120) |  | NULL | Legacy mapped hardware name. |
+| `cash_drawer_name` | varchar(120) |  | NULL | Legacy mapped hardware name. |
+| `card_reader_name` | varchar(120) |  | NULL | Legacy mapped hardware name. |
+| `internal_note` | varchar(500) |  | NULL | Internal till note. |
 
 
 Constraints / Notes:
 
 ```text
-UNIQUE(tenant_id, outlet_id, till_code)
+UNIQUE(tenant_id, till_code) WHERE status != 'DELETED'
+UNIQUE(tenant_id, outlet_id, till_area_name, till_number)
+CHECK(status IN ('ACTIVE', 'INACTIVE', 'MAINTENANCE', 'DELETED'))
+CHECK(till_number > 0)
 ```
 
 Relationships:
 
 - tills.tenant_id -> tenants(id)
 - tills.outlet_id -> outlets(id)
-- tills.currency_code -> currencies(currency_code)
+- tills.default_cashier_tenant_user_id -> tenant_users(id)
 - tills.created_by_tenant_user_id -> tenant_users(id)
 - tills.updated_by_tenant_user_id -> tenant_users(id)
 

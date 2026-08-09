@@ -1,63 +1,38 @@
-<!-- title: Tenant Admin Add Till Single-Page UI -->
-<!-- status: Active -->
-<!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-04 -->
+# Tenant Admin Add Till UI Specification
 
-# Tenant Admin Add Till Single-Page UI
+## Overview
+This defines the canonical source of truth for the Tenant Admin Add Till UI, reflecting the Single Page Form approach implemented in `Nytroz-POS-App`.
 
-## Purpose
-Defines the approved single-page UI contract for creating a Till and assigning its initial hardware, replacing the deprecated four-step wizard.
+## Target Layout
+*   **Wrapper**: Uses `TenantAdminPageScaffold` for responsive rendering across 16:9 desktops, laptops, and tablets.
+*   **Form Structure**: A single vertical scrollable page (not a step-by-step wizard).
+*   **Theme Integration**: Designed with the "Black/Orange Shell" aesthetic (TenantAdminTheme).
 
-## Route
-`/tenant-admin/tills/add`
+## Architectural Constraints (CRITICAL)
+*   **Strict API Source**: The Add Till screen MUST ONLY rely on the `GET /api/v1/tenant-admin/tills/create-options` endpoint (via `tillCreateOptionsProvider`). 
+*   **No Legacy Endpoints**: The Add Till screen MUST NOT watch or fetch from global paginated endpoints such as `GET /api/v1/tenant-admin/users` (e.g. `userListProvider`) or `GET /api/v1/tenant-admin/hardware` (e.g. `hardwareListProvider`). Doing so causes 409 Conflict or 404 Not Found errors as well as unintended Dropdown assertions when outlet selections change.
 
-## Layout and Shared Shell
-- **Shell:** Reuses the existing OneVerz POS Tenant Admin header, sidebar (Tills active), and fixed black footer navigation. Do NOT create a generic dashboard shell.
-- **Route Guards:** Preserves existing Tenant Admin route and permission guards (`tenant.tills.create`).
-- **Page Header:**
-  - **Title:** Add Till
-  - **Subtitle:** Create a till and connect its hardware.
-- **Wizard Removal:** The four-step wizard and horizontal stepper are permanently removed.
+## Key UI Sections (`AddTillSinglePageForm`)
 
-## Section 1: Till Details (Left Card)
-- **Till Name:** Required. Trimmed. Field-level validation according to Backend rules.
-- **Till Code:** Required. Manually entered. Must be unique within the tenant/outlet scope. Displays 409 conflict on duplicate.
-- **Assign Outlet:** Required. Filtered to active tenant-owned outlets. Changing this clears incompatible POS and hardware selections.
-- **Status:** Required. (Active, Inactive, Maintenance). Active is the default. Operational statuses (Online, Offline) are derived and NOT submitted here.
-- **Default Cashier:** Required in UI. Filtered to active tenant users allowed to operate POS at the selected outlet. Distinct from "Current Cashier" which is resolved from open sessions. *(Implementation Gap: Requires future database migration, no canonical property exists currently)*.
-- **Opening Float:** Required. Numeric >= 0. Default currency displayed. Maps to `tills.default_opening_float_amount`. Suggested amount on till open.
+### 1. Till Details Section
+*   **Till Name**: Maximum length validation of 120 chars (Backend limitation).
+*   **Till Code**: Maximum length validation of 40 chars (Backend limitation). Must be unique per tenant (excluding `DELETED`).
+*   **Outlet Selection**: Dropdown sourced from `TillCreateOptionsDto.outlets`.
+*   **Default Cashier**: Dropdown sourced from `TillCreateOptionsDto.cashiers`. Must dynamically update when the Outlet selection changes.
+*   **Status**: Dropdown for `Active`, `Inactive`, `Maintenance`.
 
-## Section 2: Hardware Setup (Center/Right Card)
-Uses normalized real registered records (`hardware_devices`, `hardware_device_assignments`), NOT free-text strings.
-- **POS Device (Device Name):** Dropdown/searchable selector using `posDeviceId`. Filtered by outlet. Must not be assigned to another Till.
-- **Scanner:** Optional selector using `hardwareDeviceId`. Filtered by scanner type and outlet.
-- **Receipt Printer:** Optional selector using `hardwareDeviceId`. Filtered by printer type and outlet.
-- **Cash Drawer:** Optional selector using `hardwareDeviceId`. Filtered by drawer type and outlet. Supports printer-linked behavior.
-- **Card Reader:** Optional selector using `hardwareDeviceId`. Filtered by card-reader type and outlet. (No sensitive payment data stored).
+### 2. Hardware Setup Section
+*   **Pos Device Selection**: Sourced purely from `options.posDevices`.
+*   **Peripheral Selections** (Receipt Printer, Barcode Scanner, Cash Drawer, Card Reader): Sourced from `options.hardwareDevices` where `type` matches the expected peripheral category.
+*   **Dual-Mode Inputs**: Peripheral dropdowns allow the user to either SELECT an existing device (by ID) or TYPE a custom name to dynamically register a new hardware device inline during Till creation. The text entered is bound to the `AddTillFormData` fields (e.g., `scannerName`, `printerName`) and forwarded to the backend.
+*   **Filter Logic Requirement**: Peripheral dropdowns must only show devices that belong to the *currently selected Outlet*.
 
-## Section 3: Quick Pair & Status (Right Panel)
-Dynamic panel showing cards only for selected hardware.
-- **Content:** Hardware type, display name, connection/health status, last-seen context, and supported test actions (e.g., Test Scan, Print Test).
-- **Truth Rule:** "CONNECTED" status requires active assignment, trusted POS identity, fresh heartbeat, and health/test state. Never hardcoded.
-- **Test Actions:** Disabled/hidden before save. Actions executed by the native POS application only after creation. Tenant Admin is monitoring-only. Physical Verification Pending.
+### 3. Quick Pair & Status Panel
+*   **Purpose**: To provide real-time connection telemetry for selected hardware prior to submission.
+*   **Current State**: Static UI stub. Requires real telemetry integration via SignalR or periodic polling. Only selected hardware IDs are rendered; typed inline hardware names (which do not yet have an ID) will not appear in Quick Pair until the Till is successfully created.
 
-## Submission Actions (Bottom Row)
-- **Cancel:** Returns to `/tenant-admin/tills`. Unsaved changes warning applies.
-- **Create Till:** Validates all required fields. Disables duplicate submission. Displays Backend errors.
-  - On Success: Refreshes Till list/summary and navigates back or shows success dialog.
-- Orchestration (Strategy B): Submits Create Till API (`POST /api/v1/tenant-admin/tills`) -> Submits Hardware Assignments -> Refreshes.
-
-## Responsive Design
-- **Desktop:** Single-page layout (Till Details left, Hardware middle/right, Quick Pair far right). Bottom actions visible. No horizontal scrolling.
-- **Tablet:** Two columns for Till Details/Hardware where space permits. Quick Pair moves below selectors if needed.
-- **Mobile:** Vertically stacked (Till Details -> Hardware Setup -> Quick Pair). Cancel/Create remain accessible. No horizontal overflow.
-- **Accessibility:** Keyboard navigation, visible focus state, required indicators, minimum touch targets, proper screen-reader labels. Status not reliant on color alone.
-
-## Permissions & Entitlements
-- **Till Creation:** `tenant.tills.create`. If missing, access denied.
-- **Hardware Visibility:** `tenant.hardware.view`. If missing, hardware section shows truthful permission state/read-only.
-- **Hardware Assignment:** `tenant.hardware.manage`. If missing, read-only status viewing.
-- **Entitlement:** `till_management` (for Till CRUD), `device_hardware` (for Hardware).
-
-## Documentation Updates
-This document supersedes all references to the Add Till four-step wizard.
+## Data Contracts (Target state)
+To properly render the Add Till UI, the API (`GET /api/v1/tenant-admin/tills/create-options`) must supply:
+*   `outlets`, `cashiers`, `posDevices`, and `hardwareDevices`.
+*   `outletId` for all hardware and pos devices (for filtering).
+*   `isAssigned`, `status`, and `isTrusted` (for Quick Pair statuses).
