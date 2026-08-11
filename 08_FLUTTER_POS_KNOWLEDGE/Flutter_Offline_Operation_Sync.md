@@ -58,6 +58,10 @@ Percentage with an exact cached cart target. Validate locally against the latest
 safe authority/reference snapshot, persist a stable idempotent outbox intent,
 update the local cart as pending sync, and restore it after restart.
 
+The implementation is located under `features/discount/`:
+- Local Datasources: `data/datasources/local/pos_discount_offline_coordinator.dart` (authority cache & outbox) and `data/datasources/local/pos_pending_sale_recovery_store.dart` (encrypted restart recovery).
+- Domain Use Cases: `domain/usecases/validate_pos_discount.dart`, `domain/usecases/apply_pos_discount.dart`, `domain/usecases/sync_pending_pos_discounts.dart`, and `domain/usecases/restore_pending_discount_sale.dart`.
+
 Reconnect submits through generic sync. Backend revalidates ownership, permission,
 authority, currency, cart/hash, target, one-discount rule, and calculation. Show
 pending, failed, conflict, and last-successful-sync states. A rejection must not

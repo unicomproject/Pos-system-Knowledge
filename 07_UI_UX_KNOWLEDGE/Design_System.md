@@ -1,7 +1,7 @@
 <!-- title: Design System -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-10 -->
 
 # Design System
 
@@ -34,7 +34,7 @@ This is not a generic POS theme.
 | Usage | Color Direction |
 |---|---|
 | Main dark surface | Deep navy / dark blue |
-| Primary action | Blue for app actions, golden yellow where previous premium kiosk style applies |
+| Primary action | OneVerz orange; feature-specific semantic/status colours may be used only where their approved screen contract requires them |
 | Content surface | White or soft ivory card surface |
 | Primary text | Charcoal or deep navy |
 | Secondary text | Muted gray-blue |
@@ -43,6 +43,17 @@ This is not a generic POS theme.
 | Error | Strong red/error state with text explanation |
 
 Do not create a colorful consumer app style.
+
+Tenant-configurable POS Login Branding does not change the product primary
+action colour or enable arbitrary application theming. The Sign In action stays
+OneVerz orange even when the tenant configures login background media or colour.
+
+Login and Device Activation use one shared POS branding panel. Activation uses
+the same heading, subtitle, field, radius and orange primary-action visual
+language as Login. Feature widgets must not define direct colour literals or
+duplicate orange/theme constants; use canonical theme/design tokens and shared
+input/button components. A missing semantic colour is added once to the
+canonical theme token file.
 
 ## Layout Principles
 

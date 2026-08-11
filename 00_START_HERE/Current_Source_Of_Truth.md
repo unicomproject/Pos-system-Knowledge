@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-10 -->
 
 
 # Current Source Of Truth
@@ -27,6 +27,21 @@ The 2026-08-05 documentation audit is the current traceability layer: [[../15_IM
 Chunk 2 security authority is the approved [[../13_DECISIONS_AND_CHANGES/FLOW_4_SECURE_TEST_HOST_TOKEN_AND_FIXTURE_CONTRACT_2026-08-05]], with threat model [[../09_SECURITY_AND_COMPLIANCE/FLOW_4_TEST_FIXTURE_TOKEN_THREAT_MODEL_2026-08-05]] and implementation contract [[../10_TESTING_QA/FLOW_4_SECURE_LIFECYCLE_FIXTURE_IMPLEMENTATION_CONTRACT_2026-08-05]]. Chunk 3 must use a separate non-HTTP test CLI/hybrid, production token/hash primitives, cumulative environment/database/credential guards, one-time process-local secret handoff and ownership-bound cleanup. No production fixture endpoint, DI registration or Swagger route is authorized. This approval does not increase the 59/64 verified P0 count; fixture runtime and security proof remain pending.
 
 ## Highest Priority Decision
+
+Tenant-configurable pre-authentication POS Login Branding is governed by
+[[../04_MODULE_KNOWLEDGE/02_Tenant_Foundation/04_POS_Login_Branding_Functional_Rules]]
+and [[../04_MODULE_KNOWLEDGE/02_Tenant_Foundation/05_POS_Login_Branding_Technical_Contract]].
+It reuses tenant profile, typed settings and media assets; requires no dedicated
+table or physical branding columns; keeps the OneVerz primary action orange; and
+does not change tenant authentication. Login branding infrastructure and the
+reusable Flutter renderer are implemented. The existing Device Activation screen
+must reuse that renderer with packaged OneVerz fallback before provisioning; it
+must not create separate branding storage/API/UI. Activation authority is
+[[../03_USER_JOURNEYS/Cashier/02_Device_Activation_Flow]]. Backend
+Backend `tenant.till.manage` enforcement and USED-code rejection, including the
+changed-fingerprint case, were completed and runtime-verified on 2026-08-11.
+Flutter Device Activation remains pending Chunk 2 and the overall feature must
+not be reported complete until that UI/runtime scope passes.
 
 Current Release cashier Discount authority is
 [[../13_DECISIONS_AND_CHANGES/POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].

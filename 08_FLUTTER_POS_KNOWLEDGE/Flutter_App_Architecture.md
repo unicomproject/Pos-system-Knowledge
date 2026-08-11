@@ -19,17 +19,40 @@ workflows for staff.
 
 ## Architecture Decision
 
-Use feature-based clean architecture with Riverpod state management, GoRouter
-routing, Dio networking, local persistent cache, memory cache, and repository
+Use feature-first clean architecture with Riverpod state management, GoRouter
+routing, Dio networking, local persistent cache, secure storage outbox, and repository
 abstractions.
 
 Widgets must not call APIs directly.
 
-## Layer Rule
+## Layer and Dependency Flow
 
 ```text
-Presentation -> Application/State -> Domain -> Data -> API / Local Cache
+Widget / Screen
+       ↓
+Presentation Provider
+       ↓
+Domain Use Case
+       ↓
+Domain Repository Contract
+       ↓
+Data Repository Implementation
+       ↓
+ ┌─────────────────────┐
+ │                     │
+Remote Datasource   Local Datasource
+ │                     │
+Backend API         Cache / Outbox /
+                    Recovery Storage
 ```
+
+### Architectural Rules
+
+1. **Feature-First Organization**: Features (e.g. `features/discount/`, `features/pos/`) contain their own `data`, `domain`, and `presentation` layers.
+2. **Single Feature Rule**: Features that support both online and offline modes (such as Discount) remain ONE single frontend feature. Online and offline are data-access strategies under `data/datasources/remote/` and `data/datasources/local/`, never separate features (`features/online_discount`, `features/offline_discount` or `discount/online/`, `discount/offline/` are prohibited).
+3. **Presentation Layer**: Exposes UI state and orchestrates use case invocations. Providers must not contain raw API communication or outbox serialization logic.
+4. **Domain Layer**: Contains business models (entities), abstract repository contracts, and isolated use cases. The domain layer must never depend on Flutter presentation widgets.
+5. **Data Layer**: Implements repository contracts by coordinating between remote HTTP data sources and local caching/outbox/recovery stores.
 
 ## Flutter Responsibilities
 

@@ -1,7 +1,7 @@
 <!-- title: Cashier Login Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-08-10 -->
 
 # Cashier Login Flow
 
@@ -35,20 +35,23 @@ coupon, AI, or accounting scope.
 
 | Step | User/System Action | Expected Result |
 |---:|---|---|
-| 1 | Open POS app | Login screen appears |
-| 2 | Enter username/email and password | Credentials are submitted |
-| 3 | Backend validates user and tenant | Access and refresh token are issued |
-| 4 | App stores the session securely and resolves device/till context | Cashier is routed to activation, till open, or POS home |
+| 1 | Open provisioned POS app | Resolve the provisioned public `tenantSlug`; show cached branding or platform defaults immediately |
+| 2 | App refreshes public branding in background | Branded login updates without hiding or blocking credentials |
+| 3 | Enter email and password and press Sign In once | Existing local validation and duplicate-submit guard run |
+| 4 | Existing backend validates user and tenant | Access and refresh token are issued |
+| 5 | App stores the session securely and resolves device/till context | Cashier is routed to activation, till open, or POS home |
 
 ## Journey Diagram
 
 ```mermaid
 flowchart TD
-    S1[Open POS app]
-    S1 --> S2[Enter username/email and password]
-    S2 --> S3[Backend validates user and tenant]
-    S3 --> S4[App loads allowed outlets/features]
-    S4 --> Done[Journey completed]
+    S1[Open provisioned POS app]
+    S1 --> S2[Render cached or default branding]
+    S2 --> S3[Refresh public tenant branding]
+    S3 --> S4[Enter email and password]
+    S4 --> S5[Existing tenant authentication]
+    S5 --> S6[Load allowed outlets and features]
+    S6 --> Done[Journey completed]
 ```
 
 ## Business Rules
@@ -57,6 +60,11 @@ flowchart TD
 - Login alone does not allow POS checkout.
 - Tenant status must be checked.
 - Tokens must be stored securely by app.
+- Branding lookup uses provisioned `tenantSlug`, never entered email.
+- Branding failure does not prevent authentication.
+- When post-login routing requires Device Activation, the Activation screen
+  reuses the same shared left branding panel and fallback behavior as Login;
+  only the right-side form content changes.
 
 ## Access-Control Rules
 
@@ -92,6 +100,7 @@ once. A retried 401 is not refreshed repeatedly.
   the wider MVP scope, but it does not currently make authentication locally
   authoritative.
 - Tenant Code is no longer entered on the POS login screen. Backend resolves the tenant from the tenant user email and returns a clear tenant-selection error if the email belongs to multiple tenants.
+- Tenant POS staff Forgot Password is hidden and deferred for Release 1; customer e-commerce password reset is a separate flow.
 
 ## Completion Criteria
 
@@ -105,3 +114,4 @@ once. A retried 401 is not refreshed repeatedly.
 - [[../../01_RELEASE_SCOPE/Release_1_Scope]]
 - [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
 - [[../../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../04_MODULE_KNOWLEDGE/02_Tenant_Foundation/04_POS_Login_Branding_Functional_Rules]]

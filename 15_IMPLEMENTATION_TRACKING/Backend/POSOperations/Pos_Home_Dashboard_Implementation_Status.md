@@ -51,8 +51,10 @@ When device/till/session cannot be resolved, returns structured
 
 ## Dashboard Contract Extension (2026-07-23)
 
-- Added additive `branding` projection using `tenant_profiles.trading_name`,
-  `tenant_profiles.logo_url`, and `tenants.display_name` fallback.
+- Added additive `branding` projection using `tenant_profiles.trading_name` and
+  `tenants.display_name` fallback. The historical `tenant_profiles.logo_url`
+  projection has been superseded: current schema resolves logo through
+  `tenant_profiles.logo_media_asset_id` -> `media_assets.id`.
 - Added cashier effective tenant-role label from the latest active tenant role.
 - Added explicit `CURRENT_TILL_SESSION` summary scope, business date, session ID,
   currency, gross sales, completed transaction count, completed refunds,

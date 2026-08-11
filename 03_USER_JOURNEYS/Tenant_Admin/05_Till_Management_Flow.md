@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin Till Management Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-08-10 -->
 
 # Tenant Admin Till Management Flow
 
@@ -67,6 +67,15 @@ Tenant Admin navigates to the Tills monitoring page from the sidebar.
 - All create/update/status actions should be audit logged.
 - Device binding and hardware management are linked but separate flows.
 - Cashier open/close shift is a separate flow.
+
+### Device activation hand-off
+
+Till management owns the existing till/device assignment and activation-code
+setup under `tenant.till.manage`. Activation consumes that existing context via
+`POST /api/v1/devices/activate`; it does not create a till, device, assignment,
+permission, API or table. Raw activation codes are never persisted—only their
+canonical hash. See
+[[../Cashier/02_Device_Activation_Flow]] for the cashier/device-side contract.
 
 ## Validation And Error Cases
 
