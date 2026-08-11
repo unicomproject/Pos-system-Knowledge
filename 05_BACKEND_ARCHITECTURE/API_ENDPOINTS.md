@@ -1,7 +1,7 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-10 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -196,6 +196,23 @@ Request body (Flutter contract):
 Tenant Code is not accepted from the POS login screen. Backend resolves tenant
 from the tenant user email.
 
+### POS Login Branding (Backend Chunk 1 complete; verified 2026-08-10)
+
+| Method | Route | Authentication / permission | Status |
+|---|---|---|---|
+| GET | `/api/v1/pos/public/login-branding/{tenantSlug}` | Anonymous public-safe read | **IMPLEMENTED; runtime verified** |
+| GET | `/api/v1/tenant-admin/settings/pos-login-branding` | Tenant auth + `tenant.settings.manage` | **IMPLEMENTED; authenticated runtime verified** |
+| PUT | `/api/v1/tenant-admin/settings/pos-login-branding` | Tenant auth + `tenant.settings.manage` | **IMPLEMENTED; authenticated runtime verified** |
+
+The public route uses the provisioned public tenant slug, not entered email or
+internal tenant ID. Exact DTO, status, validation, cache and isolation contracts:
+[[../04_MODULE_KNOWLEDGE/02_Tenant_Foundation/05_POS_Login_Branding_Technical_Contract]].
+
+Runtime evidence includes public `200`/ETag `304`, Admin COLOR and IMAGE/HERO
+updates, subtitle validation, unauthenticated `401`, missing-permission `403`,
+cross-tenant media `422`, atomic no-partial-update behavior and provisioned
+device `tenantSlug`. Flutter consumption remains Chunk 2.
+
 > **Active backend:** `POS Backend/Unified-Commerce` · `E_POS.Api`
 >
 > **Obsolete:** `Nytroz-POS-Backend` / `SCS.Api` — see
@@ -213,6 +230,24 @@ from the tenant user email.
 | POST | `/api/v1/tills/close` | Implemented | Yes |
 | GET | `/api/v1/pos/home` | Implemented | Yes |
 | GET | `/api/v1/pos/products` | Implemented on `Sale_Screen` branch | Yes |
+
+### Device activation contract clarification — 2026-08-10
+
+No new activation endpoint is required. `POST /api/v1/devices/activate` reuses
+the existing request fields `activationCode`, `deviceFingerprint`, `deviceName`,
+`deviceType`, `platform` and `appVersion`. A successful response reuses the
+existing device/outlet/till context and includes `tenantSlug`. `GET
+/api/v1/devices/current` is the existing already-trusted-device lookup.
+
+Canonical authorization for activation is `TenantOnly` plus
+`tenant.till.manage`; Flutter `canActivatePosDevice` is not security authority.
+Backend enforcement and 403 mapping were implemented and runtime-verified on
+2026-08-11. The changed-fingerprint USED-code re-pair path was removed; both
+same-fingerprint and changed-fingerprint POST reuse return the canonical 409,
+while trusted idempotent resolution remains on `GET /devices/current`.
+
+Activation branding reuses the existing Login Branding state/API. There is no
+activation-specific branding endpoint.
 
 Query notes:
 
@@ -375,7 +410,7 @@ Documented final decisions in [[02_Platform_Dashboard_Flow]] (2026-07-29):
 | Per-currency MRR | `ACTIVE` only; no FX; monthly÷1, yearly÷12; quarterly÷3 when supported; currency precision; MRR currency groups include `currencyCode`, `decimalPlaces`, and `amount`; rounding mode `MidpointRounding.ToEven`; requires `platform.tenant_subscriptions.view` + `platform.billing.view`. If any eligible currency has missing/invalid central metadata → entire Revenue section UNAVAILABLE (`platform_dashboard.currency_metadata_unavailable` concept); empty eligible set → success empty/zero (not metadata failure). |
 | Historical trends / % change | Real series — not hard-coded zeros |
 | Real System Health | API, DB, jobs, email, payment, blob; HEALTHY/DEGRADED/CRITICAL/UNKNOWN |
-| Lifecycle / subscription separation | draft/setup_pending/pending_activation/pending_payment → Setup Pending; Trial subscription-only |
+| Lifecycle / subscription separation | `DRAFT`, `PENDING_PAYMENT`, and `PENDING_ACTIVATION` are distinct lifecycle states; `setup_pending` is obsolete and must not be emitted; Trial is subscription-only |
 | Setup Pending | Dashboard count only; detail progress; count≡filter |
 | Permission-filtered widgets | `platform.tenants.view` (tenant data/nav) / `platform.tenant_subscriptions.view` (tenant subscription widgets + navigation) / `platform.billing.view` (MRR + revenue/financial values) / `platform.users.view`. **Partial BE filtering present**; permission-hidden metrics must be omitted/hidden — not authentic-looking zeros. |
 | Trend period timezone | Platform Default Timezone defines daily/weekly/monthly period boundaries (DST-safe); backend converts local boundaries to UTC for persisted-record queries; no client timezone override (no new query parameter); invalid/missing timezone → trends unavailable |

@@ -1,7 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-10 -->
 
 # API Authorization Rules
 
@@ -92,6 +92,24 @@ Do not use umbrella-only checks such as `platform.subscriptions.manage` where gr
 | Reports | Reports entitlement and report permission |
 
 ## POS API Rules
+
+### POS Device Activation authorization
+
+| Endpoint | Canonical authorization |
+|---|---|
+| `GET /api/v1/devices/current` | Authenticated `TenantOnly`; tenant from claims; fingerprint resolves only a same-tenant active trusted device and active assignment |
+| `POST /api/v1/devices/activate` | Authenticated `TenantOnly` **and** `tenant.till.manage`; tenant from claims; code/till/device/assignment/fingerprint validation |
+
+No new permission is required. Flutter `canActivatePosDevice` is a UX gate only;
+backend enforcement of `tenant.till.manage` is authoritative. Backend service
+enforcement and canonical 403 mapping were implemented and runtime-verified on
+2026-08-11. `GET /devices/current` remains `TenantOnly` and does not require the
+activation permission.
+
+Activation must never accept client tenant identity as authority, log/store the
+raw activation code, or persist partial trusted state after failure. Existing
+same-device trusted resolution may be idempotent; a `USED` code must not re-pair
+a changed fingerprint.
 
 ### POS Customer API authorization
 

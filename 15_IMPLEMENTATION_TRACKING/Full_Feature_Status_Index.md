@@ -1,7 +1,7 @@
 <!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-10 -->
 
 > Park / Recall Sale update (2026-08-06): Flutter Chunk 2 data integration is code complete with typed backend create/list/recall/cancel, stable idempotency, canonical permissions, safe cart rules, and 791 passing Flutter tests. Authenticated Flutter-backend verification and final UI/E2E acceptance remain pending; the full feature is not Completed.
 
@@ -138,7 +138,9 @@ PR/commit reference is recorded.
 | Backend | Platform Billing | Flow 4 Manual Payment + Future IPG | Backend implemented and verified | 2026-08-05 | [[FLOW_4_MANUAL_PAYMENT_BACKEND_IMPLEMENTATION_EVIDENCE_2026-08-04]] | Real execution defects fixed; 1,461 backend tests pass; EF model current; current release manual and `checkoutUrl` null; Stripe/PayHere deferred |
 | Angular | Platform Billing | Flow 4 Manual Payment | Testing; partial browser acceptance; production NO-GO | 2026-08-05 | [[FLOW_4_MANUAL_PAYMENT_ANGULAR_IMPLEMENTATION_EVIDENCE_2026-08-04]] | 453 tests and production audit pass; responsive 5-viewport queue passes; 6 distinct Playwright scenarios pass and 14 remain blocked |
 | Backend | Auth | Tenant Login | Completed | 2026-07-01 | Tenant auth module | `POST /api/v1/tenant-auth/login` |
-| Backend | OutletTillDevice | Device Context | Completed | 2026-07-09 | `5c99b66` | `devices/current`, `devices/activate` |
+| Full Stack | Tenant Foundation / Auth | Tenant-configurable POS Login Branding | Backend Chunk 1 Complete; Flutter Chunk 2 Pending | 2026-08-10 | Current working tree + authenticated Local Development runtime | Seven settings, media purposes, public/admin APIs, COLOR/IMAGE/hero/subtitle, permission, cross-tenant atomicity and device `tenantSlug` runtime pass. Focused 13/13 and full unit 940/940 pass; Release build has zero warnings/errors. Flutter dynamic branding and Tenant Admin UI remain Chunk 2. [[Flutter/Auth/POS_Login_Branding_Implementation_Status]] |
+| Backend | OutletTillDevice | Device Context / Activation APIs | Completed — Backend ready for Flutter | 2026-08-11 | `5c99b66` + current working tree/runtime | `tenant.till.manage` enforced; USED same/changed fingerprint reuse rejected; trusted current-device lookup and `tenantSlug` preserved. Focused 23/23, full unit 945/945, Release build clean, real Local Development 401/403/200 lifecycle accepted. [[Backend/OutletTillDevice/Device_Context_Implementation_Status]] |
+| Flutter | OutletTillDevice | Device Activation Screen | Specification complete; implementation pending | 2026-08-10 | [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Device_Activation_Screen_Implementation_Specification]] | Modify existing screen; reuse `PosLoginBrandingPanel`; align Activation form to Login visual/tokens; no new API, DB or permission |
 | Backend | OutletTillDevice | Till Session Open/Close | Completed | 2026-07-09 | `06048db` | current-session, open, close |
 | Backend | POSOperations | POS Home Dashboard API | Testing | 2026-07-08 | Current working tree | Branding + explicit current-session sales/refund/discount/net metrics added; focused API/repository tests pass |
 | Backend | CatalogProduct | Tenant Admin Product Setup Wizard | In Progress | - | - | Legacy Product CRUD completed (but deprecated); final 8-step wizard setup flow, APIs and validations in progress. |
@@ -158,7 +160,7 @@ PR/commit reference is recorded.
 | Backend | Tenant / Outlet | Outlet Create | Partial (P0) | 2026-08-06 | - | See [[../04_MODULE_KNOWLEDGE/07_Outlet_Till_POS_Device_Foundation/01_Outlet_Management_Overview]] |
 | Flutter | Tenant Admin / Outlet | Outlet Create UI | Partial (P0) | 2026-08-06 | - | See [[../04_MODULE_KNOWLEDGE/07_Outlet_Till_POS_Device_Foundation/01_Outlet_Management_Overview]] |
 | Flutter | Tenant Admin / Till | Till Monitoring UI | Partially Implemented | - | - | Implementation tracking added. See [[Flutter/Tenant_Admin/Till_Monitoring_UI_Implementation_Status]] |
-| Flutter | Sales | Discount | Testing | - | `scanner_inte` | Existing APIs include approval/POLICY/LINE-Fixed; current target is MANUAL-only, one Discount, above-limit reject, Item Percentage only; offline/responsive gaps pending |
+| Flutter | Sales | Discount | Testing (Architecture Refactor Complete) | 2026-08-10 | Current working tree | Refactored into canonical feature-first clean architecture under `lib/features/discount/` (remote/local datasources, domain usecases, repository contract/impl, presentation providers/widgets). Verified with 31 discount tests, 278 affected regression tests, and 473 full Flutter tests passing; zero errors/warnings in discount code (3 unrelated Tenant Admin info lints remain). Online authenticated Order %, Order Fixed, Item % and discounted Cash sale verified; offline device disconnect/restart/reconnect/conflict evidence remains required before Complete. See [[POS_Cashier_Discount_Second_Brain_Alignment_2026-08-09]] |
 | Flutter | Sales | Customer Management | Partially Implemented | - | Current working tree | Core API-backed UI and authenticated 2560×1600 master/detail runtime verified; controlled mutation and remaining tablet E2E are pending. See [[Flutter/Sales/Customer_Management_Implementation_Status]] |
 | Cross-platform | Customer | Loyalty / Membership / Points | Deferred | - | - | Explicitly not Release 1 Cashier Customer Management scope |
 | Flutter | Sales | Cash Checkout | Completed | 2026-08-04 | scanner_inte | Full flow completed. Hardware integration deferred. See [[Flutter/Sales/Cashier_UJ7_Payment_Flow_Final_Signoff]] |

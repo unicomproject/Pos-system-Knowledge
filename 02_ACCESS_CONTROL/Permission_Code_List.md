@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-10 -->
 
 # Permission Code List
 
@@ -425,6 +425,11 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `pos.hardware.settings` | Configure/test Local Print Agent for the activated POS device |
 | `tenant.till.manage` | Device activation gate (`canActivatePosDevice`) |
 | `till.session.view` | Home header till status chip |
+
+`canActivatePosDevice` is a Flutter visibility/action capability only. The
+backend `POST /api/v1/devices/activate` independently enforces
+`tenant.till.manage`. The service gate and canonical 403 response were
+runtime-verified on 2026-08-11. No new permission was introduced.
 
 Park/Recall: canonical trio `sales.park.create|view|recall` is required for
 Flutter home and New Sale Park actions. Legacy `pos.sale.park*` aliases are

@@ -1,7 +1,7 @@
 <!-- title: 08. Outlet, Till & POS Device Foundation -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-06 -->
+<!-- last_updated: 2026-08-10 -->
 <!-- source: Updated from uploaded ERD image -->
 
 # 08. Outlet, Till & POS Device Foundation
@@ -340,4 +340,22 @@ To fully support the Create Outlet wizard requirements:
 - [[../Status_And_Type_Check_Rules]]
 - [[../Migration_Rules]]
 - [[../../04_MODULE_KNOWLEDGE/07_Outlet_Till_POS_Device_Foundation/07_Create_Outlet_Database_Design_and_Mapping]]
+
+## Device Activation Screen Reuse Contract — 2026-08-10
+
+The Device Activation screen requires **no new table and no new physical
+column**. It reuses existing `till_activation_codes`, `pos_devices`,
+`till_device_assignments`, `tills` and `outlets`. The existing activation-code
+record contains `id`, `tenant_id`, `outlet_id`, `till_id`,
+`activation_code_hash`, `issued_by_tenant_user_id`, `status`, `expires_at`,
+`used_by_pos_device_id`, `used_at` and `created_at`; canonical statuses are
+`ACTIVE`, `USED`, `EXPIRED` and `REVOKED`.
+
+Only the hash is persisted. No raw activation code is stored or logged. The
+screen also reuses Login Branding data from `tenants`, `tenant_profiles`,
+`setting_definitions`, `tenant_settings` and `media_assets`; no
+Activation-specific branding storage is allowed.
+
+See [[../../03_USER_JOURNEYS/Cashier/02_Device_Activation_Flow]] for validation,
+permission, idempotency and current implementation-drift authority.
 

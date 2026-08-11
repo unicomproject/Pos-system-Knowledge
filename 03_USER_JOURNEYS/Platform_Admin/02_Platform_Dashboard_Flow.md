@@ -770,7 +770,7 @@ Do **not** treat optional outlet/till as mandatory for the Setup Pending dashboa
 | Topic | Approved direction |
 |---|---|
 | Calculation source | Target: evaluated checklist (and/or a stored lifecycle status that is kept consistent with the checklist) |
-| Current source | Stored status `setup_pending` **OR** `pending_payment` (legacy attention definition) � incomplete vs approved mapping that also includes `draft` and `pending_activation` |
+| Current source | Historical pre-alignment code used `setup_pending`/`pending_payment`; `setup_pending` is obsolete. Current lifecycle values are `DRAFT`, `PENDING_PAYMENT`, `PENDING_ACTIVATION`, `ACTIVE`, `SUSPENDED`, and `CANCELLED`; dashboard grouping must not persist or emit a separate setup status. |
 | Main dashboard card | **Count only** � do **not** show average setup percentage on the main Dashboard |
 | Detail destination | Tenant detail / activation readiness for that tenant (existing Platform Admin tenant detail / activation surfaces). Show completed steps, missing steps, individual progress %, and **Continue Setup** action |
 | Progress % (detail only) | `(completed mandatory steps � total mandatory steps) � 100` for that tenant |

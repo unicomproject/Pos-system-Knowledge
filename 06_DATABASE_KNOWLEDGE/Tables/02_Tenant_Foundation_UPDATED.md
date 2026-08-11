@@ -173,7 +173,7 @@ Purpose: Stores tenant legal/profile data.
 | `primary_email`               | varchar(255) |     | NULL     |                               |
 | `primary_phone`               | varchar(40)  |     | NULL     |                               |
 | `website_url`                 | varchar(500) |     | NULL     |                               |
-| `logo_url`                    | varchar(500) |     | NULL     |                               |
+| `logo_media_asset_id`         | uuid         | FK  | NULL     | References `media_assets(id)`; canonical tenant logo reference |
 | `description`                 | text         |     | NULL     |                               |
 | `created_at`                  | timestamptz  |     | NOT NULL |                               |
 | `updated_at`                  | timestamptz  |     | NOT NULL |                               |
@@ -190,6 +190,11 @@ Relationships:
 
 - tenant_profiles.tenant_id -> tenants.id
 - tenant_profiles.business_type_id -> business_types.id
+- tenant_profiles.logo_media_asset_id -> media_assets.id
+
+`logo_url` is a removed legacy field. Public/renderable logo URLs are resolved
+through the referenced `media_assets` row; new features must not restore or read
+`tenant_profiles.logo_url`.
 
 ## `tenant_addresses`
 
@@ -322,3 +327,32 @@ Relationships:
 - POS and E-commerce are rows in `sales_channels`; separate `pos_channels` or `ecommerce_channels` tables are not required.
 - Requested minimal `sales_channels` version is used: no `default_price_list_id`, no payment/order/return enable flags, no audit user columns.
 - `sales_channels.tenant_id` is NOT NULL because channels are tenant-specific configuration.
+## POS Login Branding Current State (2026-08-10)
+
+POS login branding reuses `setting_definitions`, `tenant_settings`,
+`tenant_profiles` and `media_assets`. It does not introduce a branding table or
+physical branding columns.
+
+The following tenant-editable definitions are active and were applied to the
+Local Development database through data-only migrations:
+
+- `pos.login.system_name`
+- `pos.login.description`
+- `pos.login.subtitle_template`
+- `pos.login.background_mode`
+- `pos.login.background_color`
+- `pos.login.background_media_asset_id`
+- `pos.login.hero_media_asset_id`
+
+Optional media UUID defaults use an empty JSON string to represent unset state,
+which is compatible with the existing typed-settings provisioner. Runtime
+resolution treats empty or invalid UUIDs as absent and falls back safely.
+
+Existing `media_assets.asset_purpose` supports `POS_LOGIN_BACKGROUND` and
+`POS_LOGIN_HERO`. Branding media must be ACTIVE, tenant-owned image media with
+an allowed MIME/extension and a maximum size of 5 MiB.
+
+Final Local Development verification applied a deterministic data-only fixture
+migration for same-tenant and cross-tenant branding acceptance. The database
+contains exactly one ACTIVE definition for each of the seven keys. No branding
+table and no physical branding column were introduced.

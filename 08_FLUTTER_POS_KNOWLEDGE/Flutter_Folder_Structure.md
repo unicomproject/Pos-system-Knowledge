@@ -47,14 +47,17 @@ lib/
     reports/
     hardware/
     offline_sync/
+    discount/
 ```
 
 ## Feature Structure
 
 ```text
-features/pos/
+features/[feature_name]/
   data/
     datasources/
+      remote/
+      local/
     repositories/
     dtos/
   domain/
@@ -65,6 +68,50 @@ features/pos/
     providers/
     screens/
     widgets/
+    utils/
+```
+
+### Canonical Discount Feature Structure Example
+
+```text
+features/discount/
+  data/
+    datasources/
+      local/
+        pos_discount_offline_coordinator.dart
+        pos_pending_sale_recovery_store.dart
+      remote/
+        pos_discount_remote_datasource.dart
+    dtos/
+      pos_discount_dtos.dart
+    repositories/
+      pos_discount_repository_impl.dart
+  domain/
+    entities/
+      pos_cart_discount.dart
+      pos_discount_api_models.dart
+    repositories/
+      pos_discount_repository.dart
+    usecases/
+      apply_pos_discount.dart
+      cancel_pos_discount.dart
+      rebind_discount_after_customer_change.dart
+      restore_pending_discount_sale.dart
+      sync_pending_pos_discounts.dart
+      validate_pos_discount.dart
+  presentation/
+    providers/
+      pos_discount_catalog_provider.dart
+      pos_discount_provider.dart
+    utils/
+      pos_discount_error_mapper.dart
+    widgets/
+      discount_controller.dart
+      discount_item_picker.dart
+      discount_sections.dart
+      discount_state.dart
+      discount_sync_conflict_panel.dart
+      pos_discount_dialog.dart
 ```
 
 ## Core Folder Meaning

@@ -1,7 +1,7 @@
 <!-- title: Developer Reading Guide -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-07 -->
+<!-- last_updated: 2026-08-10 -->
 
 
 # Developer Reading Guide
@@ -62,6 +62,10 @@ Always read source-of-truth and scope rules first.
 8. Read hardware integration files before printer/scanner/drawer/card work.
 9. For the Dashboard Recall Sale list, read
    [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Parked_Sales_Recall_Screen_Implementation_Specification]].
+10. For POS Device Activation, read
+    [[../03_USER_JOURNEYS/Cashier/02_Device_Activation_Flow]] and
+    [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Device_Activation_Screen_Implementation_Specification]];
+    modify the existing screen and reuse the Login branding panel.
 
 ## Online Store Developer Reading Path
 
