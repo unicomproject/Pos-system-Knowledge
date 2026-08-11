@@ -106,7 +106,9 @@ PR/commit reference is recorded.
 | Backend | OutletTillDevice | Device Context | Completed | 2026-07-09 | `5c99b66` | `devices/current`, `devices/activate` |
 | Backend | OutletTillDevice | Till Session Open/Close | Completed | 2026-07-09 | `06048db` | current-session, open, close |
 | Backend | POSOperations | POS Home Dashboard API | Testing | 2026-07-08 | Current working tree | Branding + explicit current-session sales/refund/discount/net metrics added; focused API/repository tests pass |
-| Backend | CatalogProduct | Tenant Admin Product Setup Wizard | In Progress | - | - | Legacy Product CRUD completed (but deprecated); final 8-step wizard setup flow, APIs and validations in progress. |
+| Backend | CatalogProduct | Tenant Admin Product Setup Wizard (Steps 1 & 2) | In Progress | - | - | Steps 1 & 2 backend implementation complete; Step 3 & Step 4 Second Brain Contracts READY (Implementation Gaps recorded for DB/Backend/Frontend). |
+| Cross-platform | CatalogProduct | Tenant Admin Add Product Step 3 — Units & Pack Conversion | Second Brain READY | 2026-08-10 | [[04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Units_Pack_Conversion_Specification]] | Detailed implementation-ready spec complete. DB/Backend/Frontend implementation pending. |
+| Cross-platform | CatalogProduct | Tenant Admin Add Product Step 4 — Variant Configuration | Second Brain READY | 2026-08-11 | [[04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification]] | Detailed implementation-ready spec complete. Zero DB migrations needed. Backend/Frontend implementation pending. |
 | Backend | CatalogProduct | Tenant Admin Product List & Filters | In Progress | - | - | Added API, filter options, lifecycle/stock calculations, and pagination details. |
 | Backend | CatalogProduct | Tenant Admin Product CSV Import | In Progress | - | - | CSV batch upload, row parsing validations, template, and commit logic details. |
 | Backend | CatalogProduct | POS Products List | Completed | 2026-07-23 | Current `main` audit | `GET /api/v1/pos/products`, categories, detail and exact barcode lookup exist |

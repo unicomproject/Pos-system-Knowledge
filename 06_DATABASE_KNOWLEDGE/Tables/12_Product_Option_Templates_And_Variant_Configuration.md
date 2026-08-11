@@ -159,7 +159,7 @@ CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 | `value_name` | varchar(150) | NOT NULL | Value name. |
 | `display_name` | varchar(150) | NULL | Optional UI display name. |
 | `color_hex` | varchar(30) | NULL | Optional color value. |
-| `image_url` | varchar(500) | NULL | Optional value image URL. |
+| `image_media_asset_id` | uuid | FK NULL | Optional value image media asset ID referencing media_assets(id). |
 | `sort_order` | int | NOT NULL DEFAULT 0 CHECK | Display order. |
 | `status` | varchar(30) | NOT NULL CHECK | Logical ERD type: record_status. |
 | `created_at` | timestamptz | NOT NULL | Creation timestamp. |
