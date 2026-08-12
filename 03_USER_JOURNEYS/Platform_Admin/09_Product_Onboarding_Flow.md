@@ -1,9 +1,13 @@
 <!-- title: Product Onboarding Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-08-12 -->
+<!-- parent_mode: Selected-Tenant Mode -->
+<!-- atomic_journeys: SA-ST-UJ-009, SA-ST-UJ-010 -->
 
 # Product Onboarding Flow
+
+> **Reconciled 2026-08-12.** Macro parent for bootstrap product seeding. Atomic journeys: **SA-ST-UJ-009** (manual), **SA-ST-UJ-010** (CSV). Full Tenant Admin product lifecycle remains separate.
 
 ## Purpose
 

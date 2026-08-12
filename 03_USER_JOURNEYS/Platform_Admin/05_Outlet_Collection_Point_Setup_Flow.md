@@ -1,9 +1,13 @@
 <!-- title: Outlet And Collection Point Setup Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-08-12 -->
+<!-- parent_mode: Selected-Tenant Mode -->
+<!-- atomic_journey: SA-ST-UJ-005 -->
 
 # Outlet And Collection Point Setup Flow
+
+> **Reconciled 2026-08-12.** This flow is a **macro parent** for Selected-Tenant bootstrap outlet creation. Canonical contract: [[Selected_Tenant_Mode_Contract]]. Atomic journey: [[Selected_Tenant_Atomic_Journey_Register#sa-st-uj-005--create-outlet-for-selected-tenant]]. Ongoing outlet management remains **Tenant Admin** responsibility.
 
 ## Purpose
 
@@ -35,7 +39,7 @@ Platform Admin opens outlet setup for a selected tenant.
 | 3 | Click add outlet | System opens add outlet form. |
 | 4 | Enter outlet details | Platform Admin provides outlet name, code, address, and contact number. |
 | 5 | Set operating details | Platform Admin configures operating days and hours. |
-| 6 | Enable collection point if needed | Platform Admin marks outlet as customer pickup point for click and collect. |
+> **Collection point at create:** Deferred from SA bootstrap per [[Selected_Tenant_Collection_Point_Contract]]. Tenant Admin enables via `fulfillment_method_outlets`.
 | 7 | Save outlet | System validates and saves outlet. |
 | 8 | Outlet created or active | System makes outlet available for till assignment and pickup setup. |
 

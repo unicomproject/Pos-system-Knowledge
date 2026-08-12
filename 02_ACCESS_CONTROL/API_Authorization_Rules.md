@@ -1,7 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-10 -->
+<!-- last_updated: 2026-08-12 -->
 
 # API Authorization Rules
 
@@ -71,8 +71,23 @@ Frontend route guards and menu filtering are UX only. Backend service checks are
 | Platform audit logs (R1 login/security) | `platform.audit.view` → `GET /api/v1/platform-admin/audit-logs` |
 | Platform integrations | `platform.integrations.manage` |
 | Return policy templates | Respective `platform.return_policy_templates.*` action code |
+| Selected-Tenant bootstrap summary | `platform.tenants.bootstrap.access` + `platform.tenants.view` |
+| Selected-Tenant bootstrap outlet create | `platform.tenants.bootstrap.outlets.manage` |
+| Selected-Tenant bootstrap till create | `platform.tenants.bootstrap.tills.manage` |
+| Selected-Tenant bootstrap role create | `platform.tenants.bootstrap.roles.manage` |
+| Selected-Tenant bootstrap user create | `platform.tenants.bootstrap.users.manage` |
+| Selected-Tenant bootstrap product create | `platform.tenants.bootstrap.products.manage` |
+| Selected-Tenant bootstrap product import | `platform.tenants.bootstrap.products.import` |
 
-Do not use umbrella-only checks such as `platform.subscriptions.manage` where granular codes already exist.
+Selected-Tenant bootstrap APIs additionally require:
+
+- Valid platform JWT (not tenant-user token)
+- Route `tenantId` authorized for caller
+- Tenant lifecycle allows mutation (block `SUSPENDED` / `CANCELLED` mutations)
+- Effective feature entitlement for module
+- Audit attribution with `platform_user_id` + `tenant_id`
+
+Contract: [[../05_BACKEND_ARCHITECTURE/Platform_Selected_Tenant_API_Contract]]
 
 ## Tenant Admin API Rules
 

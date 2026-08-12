@@ -1,9 +1,13 @@
 <!-- title: Tenant User Management Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-08-12 -->
+<!-- parent_mode: Selected-Tenant Mode -->
+<!-- atomic_journey: SA-ST-UJ-008 -->
 
 # Tenant User Management Flow
+
+> **Reconciled 2026-08-12.** Macro parent for **additional** tenant user bootstrap. First Tenant Admin from create wizard is **not** this journey. Atomic journey: **SA-ST-UJ-008**.
 
 ## Purpose
 

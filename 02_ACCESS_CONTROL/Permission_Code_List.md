@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-10 -->
+<!-- last_updated: 2026-08-12 -->
 
 # Permission Code List
 
@@ -48,6 +48,32 @@ code references.
 | platform.tenants.suspend | Suspend tenant |
 | platform.tenants.entitlements.update | Assign or update tenant feature entitlements |
 | platform.tenant_subscriptions.view | View tenant subscriptions (subscription lifecycle + dashboard subscription widgets) |
+
+### Platform selected-tenant bootstrap (added 2026-08-12)
+
+Selected-Tenant Mode uses **platform bootstrap permissions** — distinct from tenant permission codes used by Tenant Admin.
+
+| Code | Meaning | Journey / Screen |
+|---|---|---|
+| platform.tenants.bootstrap.access | Enter Selected-Tenant Mode and view Setup Hub | SA-ST-UJ-001 / ST-01 |
+| platform.tenants.bootstrap.outlets.manage | Create bootstrap outlet for selected tenant | SA-ST-UJ-005 / ST-02 |
+| platform.tenants.bootstrap.tills.manage | Create bootstrap till for selected tenant | SA-ST-UJ-006 / ST-03 |
+| platform.tenants.bootstrap.roles.manage | Create bootstrap tenant role | SA-ST-UJ-007 / ST-04 |
+| platform.tenants.bootstrap.users.manage | Add additional bootstrap tenant user | SA-ST-UJ-008 / ST-05 |
+| platform.tenants.bootstrap.products.manage | Manual bootstrap product onboarding | SA-ST-UJ-009 / ST-06A |
+| platform.tenants.bootstrap.products.import | CSV bootstrap product import | SA-ST-UJ-010 / ST-06B |
+
+**Entry also requires** `platform.tenants.view`.
+
+Default assignment (target seed — **NOT IMPLEMENTED**):
+
+| Platform Role | bootstrap.access | outlets | tills | roles | users | products | import |
+|---|---|---|---|---|---|---|---|
+| Super Administrator | Grant | Grant | Grant | Grant | Grant | Grant | Grant |
+| Support Admin | Explicit only | Explicit | Explicit | Explicit | Explicit | Explicit | Explicit |
+| Billing Admin | Deny | Deny | Deny | Deny | Deny | Deny | Deny |
+
+Contract: [[../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Mode_Contract]]
 
 #### Platform Dashboard page vs widget permissions
 
