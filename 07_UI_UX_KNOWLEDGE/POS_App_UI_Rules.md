@@ -1,7 +1,7 @@
 <!-- title: POS App UI Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-11 -->
 
 # POS App UI Rules
 
@@ -141,6 +141,22 @@ separate approved release decision activates it.
 ## Till UI Rules
 
 Till open must show opening cash/float entry when required.
+
+Approved Open Till UI contract (2026-08-11):
+
+- Reuse the existing Dashboard Top Bar / POS shell header — do not create an
+  Open Till-only top bar.
+- OneVerz **orange** primary theme (not blue/purple).
+- Main content on a full **white** parent surface; preserve component-wise form
+  cards (float, keypad, quick amounts, note, till summary, CTA).
+- Important text dark and strong/bold.
+- Responsive Phone + Tablet + Desktop without overflow/clipping/unusable
+  targets.
+- Online backend confirmation only; never claim OPEN locally first.
+
+Canonical:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]],
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Till_Screen_Implementation_Specification]].
 
 Till close must show counted cash, expected cash, variance, and close note.
 

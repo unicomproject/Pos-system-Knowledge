@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-12 -->
 
 # Hardware Operations, Till Session & Cash Control Module Overview
 
@@ -33,7 +33,7 @@ merchandising, attractions, and temporary retail locations.
 | `hardware_test_logs` | Used by this module |
 | `till_sessions` | Used by this module |
 | `till_cash_movements` | Schema foundation exists; cashier mutation API is not wired |
-| `cash_reconciliations` | Used by this module |
+| `cash_reconciliations` | Schema exists; current Close Till does not persist it |
 | `cash_count_denominations` | Used by this module |
 
 ## Core Business Rules
@@ -49,6 +49,8 @@ merchandising, attractions, and temporary retail locations.
   states; spooler acceptance does not prove that paper printed successfully.
 - Current hardware-test logging and cashier Cash In/Out are not end-to-end
   implemented; schema presence is not operational API behavior.
+- Close Till route and CLOSED event exist, but production close is blocked until
+  Expected Cash is backend-calculated and `cash_reconciliations` is committed.
 
 ## Access Summary
 
@@ -78,6 +80,8 @@ merchandising, attractions, and temporary retail locations.
 
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/02_Functional_Rules]]
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/03_Technical_Contract]]
+- [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]]
+- [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]]
 
 
 ## Tenant Admin Monitoring Surface (2026-08-01)

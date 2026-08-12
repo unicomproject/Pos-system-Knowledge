@@ -1,7 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-10 -->
+<!-- last_updated: 2026-08-12 -->
 
 # API Authorization Rules
 
@@ -111,6 +111,24 @@ raw activation code, or persist partial trusted state after failure. Existing
 same-device trusted resolution may be idempotent; a `USED` code must not re-pair
 a changed fingerprint.
 
+### POS Open Till authorization
+
+| Endpoint | Canonical authorization |
+|---|---|
+| `GET /api/v1/devices/current` | Authenticated `TenantOnly`; trusted ACTIVE device + active assignment within tenant |
+| `GET /api/v1/tills/current-session` | `TenantOnly` + any of `pos.till.open`, `pos.till.close`, `till.session.view`; trusted device context |
+| `POST /api/v1/tills/open` | `TenantOnly` + **`pos.till.open`**; trusted ACTIVE device; active till assignment; requested till match; ACTIVE till; opening float >= 0; reject duplicate OPEN (`till_session.already_open`) |
+| `POST /api/v1/tills/close` | `TenantOnly` + **`pos.till.close`**; trusted ACTIVE device; active assignment and requested-till match; ACTIVE till; one open session; non-negative Counted Cash; approved reason for non-zero variance; backend-authoritative Expected Cash |
+
+No new permission is required. Flutter open-till visibility is UX only; backend
+authorization remains final. Open Till is not offline-authoritative. Canonical:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]].
+
+No new Close Till permission is required. Flutter visibility is UX only. Current
+backend route enforces `pos.till.close`, but expected-cash authority, approved
+reason validation and reconciliation persistence remain production blockers.
+Canonical: [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]].
+
 ### POS Customer API authorization
 
 Current implementation applies `[Authorize(Policy = "TenantOnly")]`, resolves
@@ -162,6 +180,7 @@ cashier input is directly rejected, not routed to manager approval. See
 | Exchange | POS entitlement, permission, exchange validation |
 | Cash in/out | Cash drawer entitlement, permission, open till |
 | Close till | Till permission, open till, cash count validation |
+| Open till | `pos.till.open`, trusted ACTIVE device, active assignment, ACTIVE till, opening float >= 0, no duplicate OPEN session |
 
 ## Storefront Customer Authentication Rules
 

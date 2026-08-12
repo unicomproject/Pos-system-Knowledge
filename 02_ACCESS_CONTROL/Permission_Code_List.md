@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-10 -->
+<!-- last_updated: 2026-08-12 -->
 
 # Permission Code List
 
@@ -420,11 +420,19 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `cash_drawer.view` / `cash_drawer.manage` | Cash drawer nav |
 | `cash_drawer.movement.create` | Create authorized Cash In/Out movement when backend flow exists |
 | `notifications.view` | Notification bell |
-| `pos.till.open` | Till open flow (`canOpenPosTill`) |
+| `pos.till.open` | Till open flow (`canOpenPosTill`); backend Open Till authority |
 | `pos.till.close` | End Shift / close currently assigned open till session |
 | `pos.hardware.settings` | Configure/test Local Print Agent for the activated POS device |
 | `tenant.till.manage` | Device activation gate (`canActivatePosDevice`) |
 | `till.session.view` | Home header till status chip |
+
+Canonical Open Till permission remains `pos.till.open`. No new Open Till
+permission is required. Feature contract:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]].
+
+Canonical Close Till permission remains `pos.till.close`; no new permission is
+required for reconciliation or End Shift. Feature contract:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]].
 
 `canActivatePosDevice` is a Flutter visibility/action capability only. The
 backend `POST /api/v1/devices/activate` independently enforces

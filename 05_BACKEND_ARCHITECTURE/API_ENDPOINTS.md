@@ -1,7 +1,7 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-10 -->
+<!-- last_updated: 2026-08-12 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -230,6 +230,41 @@ device `tenantSlug`. Flutter consumption remains Chunk 2.
 | POST | `/api/v1/tills/close` | Implemented | Yes |
 | GET | `/api/v1/pos/home` | Implemented | Yes |
 | GET | `/api/v1/pos/products` | Implemented on `Sale_Screen` branch | Yes |
+
+### Open Till contract clarification — 2026-08-11
+
+No new Open Till endpoint is required. Reuse:
+
+| Method | Route | Role |
+|---|---|---|
+| GET | `/api/v1/devices/current` | Device/outlet/till bootstrap for Open Till context |
+| GET | `/api/v1/tills/current-session?deviceId=` | Detect/restore open session |
+| POST | `/api/v1/tills/open` | Open Till (`deviceId`, `tillId`, `openingFloat`, `openingNote`) |
+
+Success payload reuses `CurrentTillSessionDto` fields: `id`, `outletId`,
+`tillId`, `openedDeviceId`, `openingFloat`, `status`, `openedAt`,
+`openingNote`. Permission: `pos.till.open`. Opening float must be >= 0 (zero
+allowed). Blank opening note becomes null after trim. Open Till is online
+backend-authoritative. Canonical:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]].
+
+### Close Till contract clarification — 2026-08-11
+
+No parallel Close Till endpoint is approved. Reuse/modify:
+
+| Method | Route | Role |
+|---|---|---|
+| GET | `/api/v1/tills/current-session?deviceId=` | Extend/reuse for authoritative close summary |
+| POST | `/api/v1/tills/close` | Close and atomically persist reconciliation + CLOSED event |
+
+Current close request includes `deviceId`, `tillId`, `countedCash`, optional
+`expectedCash`, `mismatchReason`, `closingNote`. The current repository trusts
+`expectedCash`, otherwise only opening float, and does not create
+`cash_reconciliations`. Production target ignores/removes caller authority over
+Expected Cash, calculates it server-side, validates the approved variance reason
+and commits all close records atomically. Existing route is implemented but
+production-blocked. Canonical:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]].
 
 ### Device activation contract clarification — 2026-08-10
 

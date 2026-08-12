@@ -1,7 +1,7 @@
 <!-- title: Design System -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-10 -->
+<!-- last_updated: 2026-08-11 -->
 
 # Design System
 
@@ -41,6 +41,13 @@ This is not a generic POS theme.
 | Success | Use status styling, not decorative color overload |
 | Warning | Use clear warning state for stock, expiry, payment, till variance |
 | Error | Strong red/error state with text explanation |
+
+**Open Till (2026-08-11):** The approved Open Till primary action / accent colour
+is OneVerz **orange**. Do not treat blue or purple/violet as the approved Open
+Till primary. Reuse existing orange theme tokens (for example
+`posHomeAccentOrange` / `posHomeOrangeStart` / `posHomeOrangeEnd`). Screen
+contract:
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Till_Screen_Implementation_Specification]].
 
 Do not create a colorful consumer app style.
 
@@ -120,6 +127,11 @@ The Flutter POS canonical primary action is
 - Back, Cancel, and Close remain outlined/neutral. Delete, Void, Reject, and
   other destructive actions retain semantic red styling.
 - Feature code must not duplicate the navy-to-violet primary gradient.
+
+**Open Till exception to violet shared CTA:** Open Till’s approved primary is
+**orange**, not the navy→violet `PosPrimaryActionButton` gradient. Prefer
+shared/orange tokenized CTA styling for that screen; do not introduce blue or
+purple Open Till primary actions.
 
 ## Form Rules
 

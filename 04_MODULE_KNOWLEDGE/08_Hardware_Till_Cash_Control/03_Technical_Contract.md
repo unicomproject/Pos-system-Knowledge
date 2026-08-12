@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Technical Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-12 -->
 
 # Hardware Operations, Till Session & Cash Control Technical Contract
 
@@ -30,6 +30,24 @@ new OneVerz POS MVP scope images and the uploaded Unified Commerce database desi
 | `/api/v1/tills/close` | Close the open session with counted cash and variance reason |
 | Cash movement / hardware test | No verified Cashier mutation API currently exists |
 
+### Open Till reuse clarification — 2026-08-11
+
+Open Till reuses the existing groups above plus `GET /api/v1/devices/current`.
+No new endpoint, table, attribute, permission or migration is required for the
+Open Till screen. Full contract: [[04_Open_Till_Feature]].
+
+Known audit gap (not blocking API reuse): Open Till does not currently write
+`till_session_events` `OPENED`; Close Till does write `CLOSED`.
+
+### Close Till production clarification — 2026-08-11
+
+Close Till reuses current-session and close routes, `pos.till.close`, and the
+existing schema. The current repository trusts request `ExpectedCash` (fallback:
+opening float) and omits `cash_reconciliations`; therefore close is production
+blocked. Target: calculate expected cash server-side and atomically write the
+closed session, one reconciliation and one CLOSED event. Full contract:
+[[05_Close_Till_Feature]].
+
 ## Database Contract
 
 | Table | Contract |
@@ -38,8 +56,8 @@ new OneVerz POS MVP scope images and the uploaded Unified Commerce database desi
 | `hardware_device_assignments` | Used by this module |
 | `hardware_test_logs` | Used by this module |
 | `till_sessions` | Used by this module |
-| `till_cash_movements` | Defined in schema source; live application and Cashier API use not verified |
-| `cash_reconciliations` | Used by this module |
+| `till_cash_movements` | Canonical cash-movement table; existing writes are partial and cashier mutation API is absent |
+| `cash_reconciliations` | Schema exists; current Close Till write is missing |
 | `cash_count_denominations` | Used by this module |
 
 ## Hardware Readiness UI Mapping
@@ -129,6 +147,8 @@ Test coverage must include:
 
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/02_Functional_Rules]]
+- [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]]
+- [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]]
 
 ## Barcode scanner device contract (2026-07-29)
 

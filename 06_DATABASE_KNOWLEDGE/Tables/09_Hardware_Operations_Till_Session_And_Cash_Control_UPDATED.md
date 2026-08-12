@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-08-12 -->
 <!-- source: Updated from uploaded ERD image: 09_Hardware Operations, Till Session & Cash Control.png -->
 
 # 09. Hardware Operations, Till Session & Cash Control
@@ -28,7 +28,7 @@ This markdown version follows the uploaded ERD image as the source of truth. Tab
 | `hardware_test_logs` | Stores append-only hardware test logs and result payloads. |
 | `till_sessions` | Stores till opening/closing session lifecycle, operator, device, currency and float data. |
 | `cash_movement_types` | Stores tenant/system cash movement type catalog and whether the type affects expected cash. |
-| `cash_movements` | Stores cash in/out movements linked to till session and optional order/payment/refund reference. |
+| `till_cash_movements` | Canonical EF-backed till cash movement ledger. |
 | `cash_reconciliations` | Stores cash reconciliation summary per till session. |
 | `cash_count_denominations` | Stores counted cash denominations for a reconciliation. |
 
@@ -185,6 +185,10 @@ CHECK(opening_float_amount >= 0)
 CHECK(status <> '')
 ```
 
+`opening_note` is `text` with no approved 100-character database limit. Flutter
+Open Till may show a `0/100` UI counter; that is a UI constraint only. See
+[[../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]].
+
 ## `cash_movement_types`
 
 Purpose: Stores tenant/system cash movement type catalog and whether the type affects expected cash.
@@ -213,49 +217,35 @@ CHECK(direction <> '')
 CHECK(status <> '')
 ```
 
-## `cash_movements`
+## `till_cash_movements`
 
-Purpose: Stores cash in/out movements linked to till session and optional order/payment/refund reference.
+Purpose: Stores typed cash movements linked to a till session. This is the
+current entity/mapping name; `cash_movements` is not the active table.
 
 | Attribute | Type | Key / Constraint | Null | Reference / Note |
 | --- | --- | --- | --- | --- |
 | `id` | uuid | PK | NOT NULL | Primary key. |
 | `tenant_id` | uuid | FK | NOT NULL | References tenants(id). |
-| `outlet_id` | uuid | FK | NOT NULL | References outlets(id). |
-| `till_id` | uuid | FK | NOT NULL | References tills(id). |
 | `till_session_id` | uuid | FK | NOT NULL | References till_sessions(id). |
-| `pos_device_id` | uuid | FK | NULL | References pos_devices(id). |
-| `movement_type_id` | uuid | FK | NOT NULL | References cash_movement_types(id). |
-| `movement_number` | varchar(80) |  | NOT NULL | Tenant-scoped movement number. |
+| `movement_type` | varchar | CHECK | NOT NULL | `CASH_IN`, `CASH_OUT`, `OPENING_FLOAT` or `CLOSING_REMOVE`. |
 | `amount` | numeric(18,4) | CHECK | NOT NULL | Cash movement amount. |
 | `currency_code` | char(3) | FK | NOT NULL | References currencies(currency_code). |
 | `reason` | text |  | NULL | Movement reason. |
-| `order_id` | uuid | FK | NULL | References orders(id). |
-| `payment_id` | uuid | FK | NULL | References payments(id). |
-| `refund_id` | uuid | FK | NULL | References refunds(id). |
+| `reference_number` | varchar |  | NULL | Optional external/business reference. |
 | `performed_by_tenant_user_id` | uuid | FK | NOT NULL | References tenant_users(id). |
 | `performed_at` | timestamptz |  | NOT NULL | Performed timestamp. |
 | `created_at` | timestamptz |  | NOT NULL | Creation timestamp. |
-| `updated_at` | timestamptz |  | NOT NULL | Last update timestamp. |
 
 Indexes / Constraints / Notes:
 
 ```text
 PK(id)
 FK(tenant_id) REFERENCES tenants(id)
-FK(outlet_id) REFERENCES outlets(id)
-FK(till_id) REFERENCES tills(id)
 FK(till_session_id) REFERENCES till_sessions(id)
-FK(pos_device_id) REFERENCES pos_devices(id)
-FK(movement_type_id) REFERENCES cash_movement_types(id)
 FK(currency_code) REFERENCES currencies(currency_code)
-FK(order_id) REFERENCES orders(id)
-FK(payment_id) REFERENCES payments(id)
-FK(refund_id) REFERENCES refunds(id)
 FK(performed_by_tenant_user_id) REFERENCES tenant_users(id)
-UNIQUE(tenant_id, movement_number)
 CHECK(amount > 0)
-CHECK(num_nonnulls(order_id, payment_id, refund_id) <= 1)
+CHECK(movement_type IN ('CASH_IN','CASH_OUT','OPENING_FLOAT','CLOSING_REMOVE'))
 ```
 
 ## `cash_reconciliations`
@@ -352,17 +342,25 @@ CHECK(line_total >= 0)
 ```text
 hardware_devices 1 -> many hardware_device_assignments
 hardware_devices 1 -> many hardware_test_logs
-till_sessions 1 -> many cash_movements
+till_sessions 1 -> many till_cash_movements
 till_sessions 1 -> 0..1 cash_reconciliations
-cash_movement_types 1 -> many cash_movements
+cash_movement_types configures expected-cash effects; current till movement rows store a movement code
 cash_reconciliations 1 -> many cash_count_denominations
 ```
 
 ## Module Notes
 
+- Close Till currently updates `till_sessions` and inserts one CLOSED
+  `till_session_events` record, but does not insert `cash_reconciliations`.
+- Current close trusts request `ExpectedCash`, falling back to opening float;
+  production must calculate Expected Cash server-side and persist reconciliation
+  atomically. Existing schema is sufficient; no new table/attribute/migration is
+  required. See [[../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]].
+
 - Show only core operational relationships in the ERD; tenant/audit FK arrows may be omitted in diagrams for readability.
 - `hardware_test_logs` is append-only.
-- `cash_movements` allows at most one business reference among `order_id`, `payment_id`, and `refund_id`.
+- `till_cash_movements` uses one optional `reference_number`; legacy
+  `cash_movements` order/payment/refund columns are not the active EF mapping.
 - A hardware assignment must target exactly one of `till_id` or `pos_device_id`.
 - One active/open till session is allowed per till by `UNIQUE(till_id) WHERE closed_at IS NULL`.
 
