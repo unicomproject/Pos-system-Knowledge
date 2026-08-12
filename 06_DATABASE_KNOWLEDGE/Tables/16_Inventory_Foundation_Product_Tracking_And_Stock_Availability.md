@@ -72,7 +72,7 @@ CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 | `tenant_id` | uuid | FK NOT NULL | References `tenants(id)`. |
 | `product_id` | uuid | FK NOT NULL | References `products(id)`. |
 | `product_variant_id` | uuid | FK NULL | References `product_variants(id)`. NULL means product-level settings. |
-| `inventory_uom_id` | uuid | FK NOT NULL | References `unit_of_measures(id)`. |
+| `inventory_uom_id` | uuid | FK NOT NULL | References `unit_of_measures(id)`. Synchronized with `product_unit_settings.base_uom_id` upon Step 3 completion. |
 | `is_stock_tracked` | boolean | NOT NULL DEFAULT true | Whether inventory is tracked for this product/variant. |
 | `allow_negative_stock` | boolean | NOT NULL DEFAULT false | Whether sales can reduce stock below zero. |
 | `requires_batch_tracking` | boolean | NOT NULL DEFAULT false | Whether batch tracking is required. |

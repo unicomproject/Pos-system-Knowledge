@@ -1,13 +1,13 @@
 <!-- title: Tenant Admin Product Management Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-06 -->
+<!-- last_updated: 2026-08-11 -->
 
 # Tenant Admin Product Management Flow
 
 ## Purpose
 
-Defines the manual product management flows for the Tenant Admin, including the 8-step wizard, draft saving, details overview, editing, duplicating, archiving, and manual popular product curation. Product import workflows are removed from this active interface scope.
+Defines the manual product management flows for the Tenant Admin, including the canonical 8-step wizard (Reference UI 2 alignment), draft saving, details overview, editing, duplicating, archiving, and manual popular product curation. Product import workflows are removed from this active interface scope.
 
 ## Actor
 
@@ -15,56 +15,68 @@ Tenant Admin
 
 ## Trigger
 
-Tenant Admin opens product management.
+Tenant Admin opens product management navigation menu.
 
 ## Preconditions
 
-- Tenant Admin has product management permissions (`catalog.products.*`).
+- Tenant Admin has product management permissions (`catalog.products.view`, `catalog.products.create`, `catalog.products.update`, `catalog.variants.manage`).
 - Categories and brands are seeded and available.
 
 ---
 
-## Main Flow: 8-Step Product Creation Wizard
+## Main Flow: Fixed 8-Step Product Creation Wizard
 
 | Step | Wizard Step Name | System & User Behavior |
 |---:|---|---|
-| 1 | **Step 1 — Basic Details** | User inputs Name, Category (mandatory), Brand, Short Name, Internal Code, Description, and Images (Max 5MB per file). Primary Image assignment is verified. |
-| 2 | **Step 3 — Product Type & Tracking** | User selects Product Type (SIMPLE, VARIANT, BUNDLE) and Tracking. ON enables Batch, Expiry, Serial combinations. OFF disables them. |
-| 3 | **Step 4 — Units & Pack Conversion** | Configures base unit and conversion factors. |
-| 4 | **Step 5 — Product Configuration** | Auto-skips for Simple Products. Generates Cartesian options for Variants. Controls Component candidate search for Bundles. |
-| 5 | **Step 6 — Barcode & SKU** | User inputs SKU and Barcodes. System enforces uniqueness tenant-wide. |
-| 6 | **Step 7 — Pricing & Tax** | Inputs Cost Price, Standard Selling Price, promotional pricing, tax classes. Calculates margins. |
-| 7 | **Step 8 — Channel Visibility** | Sets availability for POS and Online Store. |
-| 8 | **Step 9 — Review & Create** | Displays verification summary of all sections. User clicks Create to publish. |
+| 1 | **Step 1 — Basic Details** | User inputs Product Name (mandatory), Category (mandatory), Brand (optional), Short Name / Internal Code, Short Description, Long Description, and Product Images. |
+| 2 | **Step 2 — Product Type & Tracking** | User selects Product Type (`SIMPLE`, `VARIANT`, `BUNDLE`) and Inventory Tracking rules. Standard Quantity, Batch/Lot, Expiry, and Serial tracking combinations are validated. |
+| 3 | **Step 3 — Units & Pack Conversion** | Applicable when Track Inventory = ON. Configures Single Unit Only or Multiple Units & Pack Conversion. Auto-bypassed when Track Inventory = OFF. SIMPLE + Track Inventory ON navigates to Step 5; VARIANT/BUNDLE navigates to Step 4. |
+| 4 | **Step 4 — Product Configuration** | Simple Product auto-skips (`NOT_APPLICABLE`). Variant Product renders Variant Matrix, Options, Values, Display Labels, Include Variant toggles, and Image Overrides (`Tenant_Admin_Product_Variant_Configuration_Specification`). Bundle/Kit renders Component candidate search and assembly. |
+| 5 | **Step 5 — Barcode & SKU** | Configures SKU and Barcodes (Global / UOM-specific). Enforces tenant-wide uniqueness. |
+| 6 | **Step 6 — Pricing & Tax** | Inputs Cost Price, Standard Selling Price, promotional pricing, tax classes, and outlet price overrides. Calculates margins. |
+| 7 | **Step 7 — Channel Visibility** | Sets visibility and orderability matrices for In-Store POS and Online Store sales channels. |
+| 8 | **Step 8 — Review & Create** | Displays full review summary across all 7 preceding sections. User clicks Create/Publish to complete server validation and publish product. |
 
 ---
 
-## Post-Create Journey
+## Detailed Step 4 User Journey: Variant Configuration
 
-Once created, the user is redirected to the **Product Details Overview**.
-- **Overview**: Displays Product Info, Selling/Cost Prices, Channel Visibility, Stock Summary, and Outlets.
-- **Actions**: Edit (prefilled wizard), Duplicate (resets identifiers/quantities, opens as DRAFT), and Archive.
-- **Archive Action**: Marks the product status as `ARCHIVED`, setting `archived_at` and `archived_by_tenant_user_id` in the database. The product disappears from the default list view.
+### Entry & Applicability
+- **VARIANT Product**: Enters Step 4 from Step 3 (if Track Inventory ON) or Step 2 (if Track Inventory OFF).
+- **SIMPLE Product**: Auto-bypassed.
+- **BUNDLE Product**: Renders Kit Component Assembly.
 
----
+### Main Screen Actions & Matrix Generation
+1. User defines attributes by selecting attribute name (e.g. Size, Colour) and picking active values (e.g. S, M, L / Red, Blue).
+2. User clicks `Generate Variants`. Backend/Flutter computes Cartesian product ($3 \times 2 = 6$ combinations).
+3. Summary card updates: `6 Variants Generated`, `2 Attributes Defined`, `6 Included`.
+4. Generated Variants table displays `Variant` (e.g. `Red / S`), image thumbnail, and actions (`Edit`, `Delete`).
+5. SKU, Barcode, Selling Price, Cost Price, Tax, and Channel Visibility are NOT displayed in Step 4.
 
-## Product List View States
+### Edit Variant Right-Side Drawer
+1. Clicking `Edit` opens right-side drawer.
+2. User views read-only combination label and attribute badges.
+3. User edits `Display Label` (e.g. `Home Jersey - Red / S`).
+4. User toggles **`Include Variant`** (ON/OFF). (NEVER labeled Availability).
+5. User manages variant image (uploads custom image, applies colour-group image, or removes override).
+6. Clicking `Save Changes` applies edits to wizard state.
 
-- **First-Use Empty State**: Triggered when `catalogTotalCount = 0` and no filters are active. Renders the empty state illustration with a single primary "Add Product" CTA button. **No CSV or import buttons are displayed**.
-- **Filtered Empty State**: Triggered when `catalogTotalCount > 0` but current active filters or searches return zero records. Displays "No matching products found" and a "Reset Filters" action button.
-- **Populated List State**: Renders a Filter Toolbar and a data table displaying Product Name, SKU, Category, Variants, Price/Range, Stock, Product Status, Stock Status, and Actions (View/Edit/Archive).
+### Delete Variant Confirmation Modal
+1. Clicking `Delete` opens centered confirmation modal.
+2. User confirms deletion. Combination is archived as tombstone (`status = 'ARCHIVED'`).
+3. Table and summary card update. Success toast is displayed.
 
 ---
 
 ## Access and Security Rules
 
 - Strict server-side enforcement of tenant-isolation contexts.
-- Hiding UI elements is a convenience for cashier/admin role UX; backend validation checks are always mandatory.
-- Stock and pricing calculations are evaluated server-side.
+- Permission enforcement: `catalog.products.create` / `catalog.products.update` + `catalog.variants.manage`.
+- Feature entitlement enforcement: `product_catalog` (Module: `product_management`).
 
 ---
 
-## Related Files
-- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/04_Tenant_Admin_Product_List_Contract]]
-- [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Product_List_UI_UX_Specification]]
-- [[../../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Product_List_Flutter_Implementation_Specification]]
+## Related Specifications
+
+- [[../../04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification]]
+- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_8_Step_Contract]]
