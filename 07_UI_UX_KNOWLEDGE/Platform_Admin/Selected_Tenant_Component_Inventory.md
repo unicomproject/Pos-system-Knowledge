@@ -83,6 +83,19 @@
 | **Purpose** | ST-06B validation preview |
 | **Inputs** | `rows[]`, `errors[]` |
 
+## OnlineStoreBootstrapForm
+
+| Attribute | Specification |
+|---|---|
+| **Purpose** | ST-07 initial Online Store readiness |
+| **Inputs** | `storeStatus`, `taxDisplayMode`, `entitled`, `clickCollectNotice` |
+| **States** | default, validation, not_entitled, dependency_notice, success |
+| **Actions** | save (`PUT`), cancel |
+| **Journey** | SA-ST-UJ-011 / SA-UJ-057 |
+| **Permission** | `platform.tenants.bootstrap.online_store.manage` |
+| **Entitlement** | Effective `online_store` |
+| **Fields** | `storeStatus` required (`DRAFT`\|`ACTIVE`); `taxDisplayMode` optional (`MATCH_TENANT`) |
+
 ## PermissionGroupSelector
 
 | **Purpose** | ST-04 entitlement-filtered permissions |

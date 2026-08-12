@@ -20,6 +20,7 @@ Companion documents:
 - [[Selected_Tenant_Product_Bootstrap_Contract]]
 - [[Selected_Tenant_Product_Import_Contract]]
 - [[Selected_Tenant_Setup_Hub_Status_Model]]
+- [[Selected_Tenant_Online_Store_Bootstrap_Contract]]
 - [[ST-UX-001_Selected_Tenant_Context_Requirement]]
 - [[Selected_Tenant_Journey_Readiness_Matrix]]
 - [[../../07_UI_UX_KNOWLEDGE/Platform_Admin/Selected_Tenant_Visual_Direction]]
@@ -44,6 +45,7 @@ Selected-Tenant Mode is a **required Super Admin platform capability**. It is **
   - Additional tenant role setup
   - Additional tenant user setup
   - Initial product onboarding (manual and CSV)
+  - Initial Online Store readiness (optional; entitlement-gated)
 - Permission, entitlement, audit, and security rules for the above
 - UX requirement: persistent selected-tenant context visibility
 
@@ -51,7 +53,7 @@ Selected-Tenant Mode is a **required Super Admin platform capability**. It is **
 
 - Platform commercial lifecycle (create tenant, billing, activation) — **Platform Mode**
 - Ongoing tenant CRUD, inventory, device maintenance, advanced monitoring — **Tenant Admin Mode**
-- E-commerce / online store bootstrap — **OUT OF SCOPE** for Selected-Tenant Phase 1; Tenant Admin owns storefront configuration
+- Full storefront branding / SEO / merchandising / order ops / Click & Collect FMO — **Tenant Admin** (SA Online Store is initial readiness only; see [[Selected_Tenant_Online_Store_Bootstrap_Contract]])
 - Device assignment, hardware profiles, POS session operations
 - Full Tenant Admin product lifecycle (draft/publish wizard parity)
 
@@ -313,15 +315,31 @@ Selected-tenant routes **must not** appear in the primary Platform Admin sidebar
 7. All bootstrap mutations audit platform actor + selected tenant.
 8. No Selected-Tenant route appears in primary platform sidebar.
 9. First Tenant Admin from create wizard is not recreated via Additional User journey.
-10. E-commerce bootstrap is not exposed.
+10. Online Store bootstrap exposes **initial readiness only** (DRAFT/ACTIVE); Click & Collect / FMO remain Tenant Admin.
 
-## E-commerce bootstrap (LOCKED — GAP 5)
+## E-commerce bootstrap (GAP 5 — SUPERSEDED 2026-08-12)
+
+> **SUPERSEDED** — Product-owner approval 2026-08-12 reopened Selected-Tenant Online Store as **optional bootstrap**.  
+> Authority: [[Selected_Tenant_Online_Store_Bootstrap_Contract]] (LOCKED / APPROVED).  
+> Canonical journey: SA-ST-UJ-011 → SA-UJ-057. Hub statuses: NOT_ENTITLED / NOT_STARTED / CONFIGURED (`DECISION_REQUIRED` retired).
+
+### Historical locked text (retained for traceability)
 
 Platform Admin Selected-Tenant **does not** include online-store / e-commerce bootstrap in Phase 1.
 
-| Topic | Decision |
+| Topic | Historical decision |
 |---|---|
 | SA e-commerce setup APIs | **Not created** |
 | SA e-commerce setup UI | **Not created** |
 | Owner | Tenant Admin post-handoff |
 | Blocks Phase 1 | **No** |
+
+### Current locked decision (post-supersession)
+
+| Topic | Decision |
+|---|---|
+| SA Online Store bootstrap | **IN_SCOPE_OPTIONAL_BOOTSTRAP_CAPABILITY** |
+| APIs | `GET/PUT .../bootstrap/online-store` |
+| Permission | `platform.tenants.bootstrap.online_store.manage` |
+| `storeStatus` vocabulary | `DRAFT` \| `ACTIVE` |
+| Click & Collect / FMO / `is_collection_point` | Still **not** SA — Tenant Admin |

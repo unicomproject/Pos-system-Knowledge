@@ -15,15 +15,15 @@ Companion: [[Selected_Tenant_Mode_Contract]]
 
 | Status | Count | IDs |
 |---|---:|---|
-| **Accepted** | 9 | SA-ST-UJ-001, 002, 003, 005, 006, 007, 008, 009, 010 |
+| **Accepted** | 10 | SA-ST-UJ-001, 002, 003, 005, 006, 007, 008, 009, 010, 011 |
 | **Rejected as journey / merged to UX** | 1 | SA-ST-UJ-004 → **ST-UX-001** mandatory context banner requirement |
 | **Deferred** | 0 | — |
 
 ## Global register mapping (canonical)
 
-Registered in [[../00_Global_User_Journey_Register]] as **SA-UJ-048…056**.
+Registered in [[../00_Global_User_Journey_Register]] as **SA-UJ-048…057**.
 
-**Implementation status (2026-08-12 Phase 3.6 backend closure):**
+**Implementation status (2026-08-12):**
 
 | Canonical ID | Backend | Frontend (Angular) | Global status |
 |---|---|---|---|
@@ -31,8 +31,9 @@ Registered in [[../00_Global_User_Journey_Register]] as **SA-UJ-048…056**.
 | SA-UJ-049 | Tenant APIs only (client switch) | Switch UX pending | **NOT_STARTED** |
 | SA-UJ-050 | Client exit only | Exit UX pending | **NOT_STARTED** |
 | SA-UJ-051…056 | Bootstrap mutation APIs closed | Selected-Tenant screens pending | **PARTIAL** |
+| SA-UJ-057 | GET/PUT `.../bootstrap/online-store` + hub module closed | ST-07 Angular pending | **PARTIAL** |
 
-Documentation lock unchanged. Locked business/product contracts were not rewritten for implementation.
+Online Store bootstrap backend closed 2026-08-12; Angular remains pending (journey not COMPLETE).
 
 | Canonical ID | Discovery ID | Journey Name |
 |---|---|---|
@@ -45,8 +46,9 @@ Documentation lock unchanged. Locked business/product contracts were not rewritt
 | SA-UJ-054 | SA-ST-UJ-008 | Add Additional Tenant User |
 | SA-UJ-055 | SA-ST-UJ-009 | Manually Onboard Initial Products |
 | SA-UJ-056 | SA-ST-UJ-010 | Import Initial Products via CSV |
+| SA-UJ-057 | SA-ST-UJ-011 | Configure Initial Online Store |
 
-Global journey count: **172** (Super Admin = 56). ST-UX-001 is **not** counted as a journey.
+Global journey count: **173** (Super Admin = 57). ST-UX-001 is **not** counted as a journey.
 
 ---
 
@@ -278,6 +280,35 @@ Global journey count: **172** (Super Admin = 56). ST-UX-001 is **not** counted a
 
 ---
 
+## SA-ST-UJ-011 — Configure Initial Online Store
+
+| Field | Value |
+|---|---|
+| **Canonical ID** | SA-UJ-057 |
+| **Parent Flow** | Product / Channel Initial Onboarding |
+| **Screen** | ST-07 |
+| **Purpose** | Set minimum Online Store readiness for an entitled tenant |
+| **Actor** | Platform User |
+| **Trigger** | Setup Hub → Online Store → Configure |
+| **Preconditions** | Effective `online_store`; `platform.tenants.bootstrap.online_store.manage`; selected-tenant context |
+| **Main Flow** | 1. Open ST-07 → 2. Set `storeStatus` (DRAFT/ACTIVE) → 3. Optionally set `taxDisplayMode` → 4. Save (PUT + Idempotency-Key) → 5. Return to hub CONFIGURED |
+| **Alternative Flow** | Not entitled → NOT_ENTITLED; C&C notice when entitled but FMO missing (save still allowed) |
+| **Error Flow** | 403 permission/entitlement; 409 suspended; 400 invalid status |
+| **Success Outcome** | `online_store.defaults` persisted; hub Online Store → `CONFIGURED` when ACTIVE |
+| **Mandatory/Conditional** | **CONDITIONAL** — entitlement `online_store` |
+| **Permission** | `platform.tenants.bootstrap.online_store.manage` |
+| **Feature Entitlement** | `online_store` |
+| **API Dependency** | `GET/PUT .../bootstrap/online-store` |
+| **DB Dependency** | `tenant_settings` key `online_store.defaults` |
+| **Audit Event** | `platform.tenant_bootstrap.online_store_configured` |
+| **Related TA Journey** | Tenant Admin storefront / Online Store settings |
+| **Excluded** | Click & Collect FMO; branding/SEO; channel matrix; `is_collection_point` |
+| **Implementation status** | **PARTIAL** (backend closed; Angular pending) |
+
+Contract: [[Selected_Tenant_Online_Store_Bootstrap_Contract]]
+
+---
+
 ## Parent flow model
 
 | Parent Flow | Atomic journeys |
@@ -288,3 +319,4 @@ Global journey count: **172** (Super Admin = 56). ST-UX-001 is **not** counted a
 | Tenant Role / Permission Initial Setup | SA-ST-UJ-007 |
 | Additional Tenant User Initial Setup | SA-ST-UJ-008 |
 | Product Initial Onboarding | SA-ST-UJ-009, 010 |
+| Product / Channel Initial Onboarding | SA-ST-UJ-011 |

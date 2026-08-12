@@ -13,7 +13,10 @@
 | `platform.tenants.bootstrap.users.manage` | Add bootstrap user | SA-ST-UJ-008 | `/configure/users/create` | `POST /bootstrap/users` | Grant | User limit | `user_created` |
 | `platform.tenants.bootstrap.products.manage` | Manual product bootstrap | SA-ST-UJ-009 | `/configure/products/manual` | `POST /bootstrap/products` | Grant | Catalog module | `product_created` |
 | `platform.tenants.bootstrap.products.import` | CSV product bootstrap | SA-ST-UJ-010 | `/configure/products/import` | import endpoints | Grant | Catalog module | `products_imported` |
+| `platform.tenants.bootstrap.online_store.manage` | Initial Online Store bootstrap | SA-ST-UJ-011 / SA-UJ-057 | `/configure/online-store` | `GET/PUT /bootstrap/online-store` | Grant | Effective `online_store` | `online_store_configured` |
 
 **Switch (002) and Exit (003)** use `bootstrap.access` + `tenants.view` — no additional permission.
 
-**Confirmation:** No unnecessary permissions created. Eight bootstrap codes + existing `tenants.view`.
+**Confirmation:** No unnecessary permissions created. Nine bootstrap codes + existing `tenants.view`.
+
+Companion: [[Selected_Tenant_Online_Store_Permission_Entitlement]]

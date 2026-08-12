@@ -15,6 +15,12 @@
       <button type="button" onclick="setViewport('w-1024')">1024</button>
       <button type="button" onclick="setViewport('w-768')">768</button>
     </div>
+    <div class="group">
+      <button type="button" onclick="setHubOs('not_started')" class="active">OS: Not started</button>
+      <button type="button" onclick="setHubOs('configured')">OS: Configured</button>
+      <button type="button" onclick="setHubOs('not_entitled')">OS: Not entitled</button>
+    </div>
+    <span class="proto-note">APPROVED · Online Store ST-07</span>
     <a class="btn" href="index.html">Index</a>
   </div>
   <div id="viewport" class="viewport-frame w-1440">
@@ -102,13 +108,17 @@
                 <a href="product-import.html" class="btn btn-secondary btn-sm">Import CSV</a>
               </div>
             </div>
-            <div class="module-card disabled">
+
+            <!-- Online Store — optional bootstrap (APPROVED) -->
+            <div class="module-card" id="os-card">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                 <h3>Online Store</h3>
-                <span class="chip chip-entitled">DECISION_REQUIRED</span>
+                <span class="chip chip-neutral" id="os-chip">NOT STARTED</span>
               </div>
-              <p>Not approved for Selected-Tenant bootstrap in this release.</p>
-              <button class="btn btn-secondary btn-sm" disabled>Not available</button>
+              <p id="os-desc">Set initial Online Store readiness for entitled tenants. Branding, merchandising, and Click &amp; Collect remain Tenant Admin.</p>
+              <div class="summary" id="os-summary">Status: DRAFT · Entitlement: online_store</div>
+              <div class="dep hidden" id="os-dep">Plan does not include Online Store</div>
+              <a href="online-store.html" class="btn btn-primary btn-sm" id="os-cta">Configure</a>
             </div>
           </div>
 
@@ -116,6 +126,9 @@
             <h3>Tenant Admin Handoff</h3>
             <p style="margin:0;font-size:0.875rem;color:var(--text-secondary);">
               Tenant Admin invitation: <strong>Sent</strong> · Operational setup: <strong>Optional</strong> · Activation is not blocked by bootstrap completion.
+            </p>
+            <p style="margin:0.75rem 0 0;font-size:0.75rem;color:var(--text-muted);">
+              Online Store card: derived <code>NOT_ENTITLED</code> / <code>NOT_STARTED</code> / <code>CONFIGURED</code> — <code>DECISION_REQUIRED</code> retired (GAP 5 SUPERSEDED).
             </p>
           </div>
         </div>
@@ -126,8 +139,56 @@
     function setViewport(cls) {
       const v = document.getElementById('viewport');
       v.className = 'viewport-frame ' + cls;
-      document.querySelectorAll('.proto-toolbar button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.proto-toolbar .group:first-of-type button').forEach(b => b.classList.remove('active'));
       event.target.classList.add('active');
+    }
+    function setHubOs(state) {
+      const card = document.getElementById('os-card');
+      const chip = document.getElementById('os-chip');
+      const desc = document.getElementById('os-desc');
+      const summary = document.getElementById('os-summary');
+      const dep = document.getElementById('os-dep');
+      const cta = document.getElementById('os-cta');
+      document.querySelectorAll('.proto-toolbar .group:nth-of-type(2) button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      card.classList.remove('disabled');
+      dep.classList.add('hidden');
+      cta.classList.remove('hidden');
+      cta.removeAttribute('aria-disabled');
+      cta.style.pointerEvents = '';
+      cta.style.opacity = '';
+
+      if (state === 'not_started') {
+        chip.className = 'chip chip-neutral';
+        chip.textContent = 'NOT STARTED';
+        desc.textContent = 'Set initial Online Store readiness for entitled tenants. Branding, merchandising, and Click & Collect remain Tenant Admin.';
+        summary.textContent = 'Status: DRAFT · Entitlement: online_store';
+        cta.className = 'btn btn-primary btn-sm';
+        cta.textContent = 'Configure';
+        cta.href = 'online-store.html';
+      } else if (state === 'configured') {
+        chip.className = 'chip chip-success';
+        chip.textContent = 'CONFIGURED';
+        desc.textContent = 'Initial Online Store readiness is set. Ongoing storefront management remains with Tenant Admin.';
+        summary.textContent = 'Status: ACTIVE · Tax display: MATCH_TENANT';
+        cta.className = 'btn btn-secondary btn-sm';
+        cta.textContent = 'Review';
+        cta.href = 'online-store.html';
+      } else if (state === 'not_entitled') {
+        card.classList.add('disabled');
+        chip.className = 'chip chip-entitled';
+        chip.textContent = 'NOT ENTITLED';
+        desc.textContent = 'This tenant plan does not include Online Store. No Super Admin bootstrap action is required.';
+        summary.textContent = 'Feature: online_store = false';
+        dep.classList.remove('hidden');
+        cta.className = 'btn btn-secondary btn-sm';
+        cta.textContent = 'Not available';
+        cta.removeAttribute('href');
+        cta.setAttribute('aria-disabled', 'true');
+        cta.style.pointerEvents = 'none';
+        cta.style.opacity = '0.7';
+      }
     }
   </script>
 </body>

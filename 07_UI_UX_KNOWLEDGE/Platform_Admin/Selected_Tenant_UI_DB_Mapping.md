@@ -58,6 +58,19 @@ See [[../../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Product_Bootstrap_Co
 
 See [[../../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Product_Import_Contract]] — column table.
 
+## ST-07 Configure Initial Online Store
+
+| UI Label | Domain Attribute | DB | Required | Default | Editable |
+|---|---|---|---|---|---|
+| Store status | `storeStatus` | `tenant_settings.setting_value` → `online_store.defaults.storeStatus` | Yes | `DRAFT` | Yes (`DRAFT` \| `ACTIVE`) |
+| Tax display mode | `taxDisplayMode` | same JSON → `taxDisplayMode` | No | `MATCH_TENANT` | Yes (optional bootstrap) |
+
+**Not mapped (deferred to Tenant Admin):** branding, SEO, channel visibility, Click & Collect FMO, business hours, orders.  
+**Forbidden:** `is_collection_point` on outlets.
+
+See [[../../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Online_Store_Bootstrap_Contract]] · [[../../05_BACKEND_ARCHITECTURE/Selected_Tenant_Online_Store_UI_API_DB_Mapping]].
+
 ## Hub module states
 
-**DERIVED ONLY** — see [[../../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Setup_Hub_Status_Model]]. No DB persistence.
+**DERIVED ONLY** — see [[../../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Setup_Hub_Status_Model]]. No DB persistence.  
+Online Store card: [[../../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Online_Store_Hub_Status_Derivation]].

@@ -78,6 +78,7 @@ Frontend route guards and menu filtering are UX only. Backend service checks are
 | Selected-Tenant bootstrap user create | `platform.tenants.bootstrap.users.manage` |
 | Selected-Tenant bootstrap product create | `platform.tenants.bootstrap.products.manage` |
 | Selected-Tenant bootstrap product import | `platform.tenants.bootstrap.products.import` |
+| Selected-Tenant bootstrap online store GET/PUT | `platform.tenants.bootstrap.online_store.manage` |
 
 Selected-Tenant bootstrap APIs additionally require:
 

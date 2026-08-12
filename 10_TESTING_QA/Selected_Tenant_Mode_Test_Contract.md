@@ -32,6 +32,20 @@ QA acceptance for Selected-Tenant Mode documentation, UI prototypes, and future 
 | ST-QA-017 | Sidebar | No ST modules in platform sidebar |
 | ST-QA-018 | First TA not duplicated | Add User screen copy clarifies additional users only |
 
+## Online Store bootstrap (ST-07 / SA-UJ-057)
+
+See [[Selected_Tenant_Online_Store_QA_Contract]] for full ST-OS-* matrix. Summary:
+
+| ID | Scenario | Expected |
+|---|---|---|
+| ST-OS-001 | Entitled DRAFT → ACTIVE | Hub CONFIGURED |
+| ST-OS-002 | Not entitled | NOT_ENTITLED; PUT 403 |
+| ST-OS-003 | Missing permission | 403 |
+| ST-OS-004 | Suspended mutation | 409 |
+| ST-OS-006 | C&C/FMO missing | Save OK; notice |
+| ST-OS-009 | Idempotent PUT | Same result |
+| ST-OS-013 | No FMO post from SA | Rejected / out of journey |
+
 ## Security / backend acceptance
 
 | ID | Scenario | Expected |
@@ -54,10 +68,11 @@ Independent review performed against static prototypes:
 6. Selected tenant always obvious — **PASS**
 7. Platform identity preserved — **PASS**
 8. Cross-tenant risks avoided in UX — **PASS**
-9. TA-only actions excluded — **PASS**
-10. E-commerce excluded — **PASS**
+9. TA-only actions excluded — **PASS** (C&C/FMO remain TA; OS readiness only)
+10. Full e-commerce ops excluded from SA — **PASS** (optional OS bootstrap APPROVED; GAP 5 SUPERSEDED)
 11. Conditional setup clear — **PASS**
 12. Activation separate from ops setup — **PASS**
 13. First TA not duplicated — **PASS**
 14. Error states covered in shell-states.html — **PASS**
 15. Consistent with Super Admin design system — **PASS**
+16. Online Store ST-07 APPROVED — **PASS** (`DRAFT`/`ACTIVE`; hub NOT_ENTITLED/NOT_STARTED/CONFIGURED)

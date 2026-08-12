@@ -12,24 +12,26 @@ Canonical **one-row-per-journey** master index for OneVerz EPOS atomic user jour
 
 | Attribute | Value |
 |---|---|
-| Register version | **172** (locked 2026-08-12) |
+| Register version | **173** (locked 2026-08-12) |
 | Previous provisional count | 163 (superseded) |
-| Selected-Tenant Phase 2.5 | 9 journeys registered as SA-UJ-048 through SA-UJ-056 |
+| Previous locked count | 172 (Selected-Tenant Phase 2.5; SA-UJ-048–056) |
+| Selected-Tenant Online Store | SA-UJ-057 registered (**PARTIAL** — backend closed; Angular pending) |
 | ST-UX-001 | Cross-cutting requirement - **not counted** |
 
 ## Surface summary
 
 | Surface | Total | Complete | Partial | Not Started | Blocked |
 |---|---:|---:|---:|---:|---:|
-| Super Admin | 56 | 45 | 8 | 3 | 0 |
+| Super Admin | 57 | 45 | 9 | 3 | 0 |
 | Tenant Admin | 62 | 26 | 11 | 25 | 0 |
 | Cashier POS | 36 | 21 | 9 | 4 | 2 |
 | E-commerce Customer | 18 | 12 | 5 | 1 | 0 |
-| **GRAND TOTAL** | **172** | **104** | **33** | **33** | **2** |
+| **GRAND TOTAL** | **173** | **104** | **34** | **33** | **2** |
 
-Arithmetic: 104 + 33 + 33 + 2 = 172
+Arithmetic: 104 + 34 + 33 + 2 = 173
 
-Selected-Tenant update (2026-08-12): SA-UJ-048 + SA-UJ-051…056 moved **NOT_STARTED → PARTIAL** after backend closure. SA-UJ-049/050 remain **NOT_STARTED** (frontend-dependent).
+Selected-Tenant update (2026-08-12): SA-UJ-048 + SA-UJ-051…056 moved **NOT_STARTED → PARTIAL** after backend closure. SA-UJ-049/050 remain **NOT_STARTED** (frontend-dependent).  
+Online Store lock (2026-08-12): SA-UJ-057 registered; after Online Store bootstrap backend closure → **PARTIAL** (Angular pending).
 
 ## Super Admin vs Tenant Admin - Selected-Tenant ownership
 
@@ -45,6 +47,7 @@ NOT duplicates (actor, surface, permission namespace, business purpose, audit at
 - Create Role (SA-UJ-053 vs TA-UJ-024)
 - Add User (SA-UJ-054 vs TA-UJ-017)
 - Product Onboarding (SA-UJ-055/056 vs TA-UJ-027+)
+- Online Store readiness (SA-UJ-057 vs TA storefront ops)
 
 ## Cross-cutting requirements (not journeys)
 
@@ -71,6 +74,7 @@ Rejected as journey: SA-ST-UJ-004 merged to ST-UX-001.
 | SA-UJ-054 | SA-ST-UJ-008 | Add Additional Tenant User | PARTIAL |
 | SA-UJ-055 | SA-ST-UJ-009 | Manually Onboard Initial Products | PARTIAL |
 | SA-UJ-056 | SA-ST-UJ-010 | Import Initial Products via CSV | PARTIAL |
+| SA-UJ-057 | SA-ST-UJ-011 | Configure Initial Online Store | PARTIAL |
 
 Existing SA-UJ-001 through SA-UJ-047 **unchanged**. SA-UJ-047 remains Browse Platform Login Audit Logs.
 
@@ -253,10 +257,11 @@ One row per journey. Implementation status reflects **production code**, not doc
 | SA-UJ-054 | SA-ST-UJ-008 | SA | Platform Admin | Additional Tenant User Initial Setup | Add Additional Tenant User | Setup Hub Additional Users Add User | Additional tenant user created or invite queued | Y | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-008]] | platform.tenants.bootstrap.users.manage | User limit | Role exists | Backend closed Phase 3.6; hashed invite; Angular pending |
 | SA-UJ-055 | SA-ST-UJ-009 | SA | Platform Admin | Product Initial Onboarding | Manually Onboard Initial Products | Setup Hub Product Onboarding Add Products | Products available for POS/inventory | Y | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-009]] | platform.tenants.bootstrap.products.manage | Catalog module | Product entitlement | Backend closed; opening stock ledger; Angular pending |
 | SA-UJ-056 | SA-ST-UJ-010 | SA | Platform Admin | Product Initial Onboarding | Import Initial Products via CSV | Setup Hub Import CSV | Valid rows imported | Y | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-010]] | platform.tenants.bootstrap.products.import | Catalog module | Product entitlement | Backend closed; partial-success import; Angular pending |
+| SA-UJ-057 | SA-ST-UJ-011 | SA | Platform Admin | Product / Channel Initial Onboarding | Configure Initial Online Store | Setup Hub Online Store Configure | Online Store bootstrap settings persisted; hub CONFIGURED | Y | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-011]] | platform.tenants.bootstrap.online_store.manage | online_store | Selected-tenant context; entitled | Backend closed (GET/PUT bootstrap/online-store + hub); Angular pending |
 
 ## Surface indexes
 
-- Super Admin (56): [[Platform_Admin/CANONICAL_USER_JOURNEY_INDEX]]
+- Super Admin (57): [[Platform_Admin/CANONICAL_USER_JOURNEY_INDEX]]
 - Tenant Admin (62): [[Tenant_Admin/CANONICAL_USER_JOURNEY_INDEX]]
 - Cashier POS (36): [[Cashier/CANONICAL_USER_JOURNEY_INDEX]]
 - E-commerce (18): [[Ecommerce/CANONICAL_USER_JOURNEY_INDEX]]
@@ -266,11 +271,13 @@ One row per journey. Implementation status reflects **production code**, not doc
 - [[Platform_Admin/Selected_Tenant_Mode_Contract]]
 - [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register]]
 - [[Platform_Admin/Selected_Tenant_Journey_Readiness_Matrix]]
+- [[Platform_Admin/Selected_Tenant_Online_Store_Bootstrap_Contract]]
 
 ## Register history
 
 | Version | Date | Change |
 |---|---|---|
 | 163 (provisional) | 2026-08-12 | Final validation pass - audit output only |
-| **172 (canonical)** | 2026-08-12 | +9 Selected-Tenant SA journeys (SA-UJ-048 through SA-UJ-056); ST-UX-001 excluded |
+| 172 (canonical) | 2026-08-12 | +9 Selected-Tenant SA journeys (SA-UJ-048 through SA-UJ-056); ST-UX-001 excluded |
+| **173 (canonical)** | 2026-08-12 | +1 SA-UJ-057 Configure Initial Online Store (optional bootstrap); GAP 5 SUPERSEDED; status PARTIAL after backend |
 

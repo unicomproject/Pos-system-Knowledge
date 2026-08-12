@@ -21,6 +21,8 @@ Searched active Second Brain for conflicting statements. Applied locked product 
 | 9 | `platform.tenants.update` "tenant setup" | Generic permission | Granular `platform.tenants.bootstrap.*` | **UPDATED** — Permission_Code_List |
 | 10 | Impersonation (none explicit) | — | Platform identity only; no TA impersonation | **NO_CONFLICT** — affirmed in contract |
 | 11 | E-commerce SA bootstrap | Deck implied online store setup | **OUT OF SCOPE** Phase 1 | **UPDATED** — contract + hub card removed |
+
+> Row 11 **SUPERSEDED 2026-08-12**: Optional SA Online Store bootstrap APPROVED ([[Selected_Tenant_Online_Store_Bootstrap_Contract]]; SA-UJ-057). Historical OUT OF SCOPE retained above for traceability. Click & Collect / FMO still Tenant Admin.
 | 12 | `catalog.products.import` deferred for TA UI | No TA import UI | Platform bootstrap import under separate permission | **NO_CONFLICT** — different actor/surface |
 | 13 | Included_Features "setup support" | Ambiguous mandatory | Required capability, conditional steps | **UPDATED** — operating model |
 | 14 | Hub IN_PROGRESS state | Implied in prototypes | **Removed** — derived model only | **UPDATED** — Setup Hub Status Model |

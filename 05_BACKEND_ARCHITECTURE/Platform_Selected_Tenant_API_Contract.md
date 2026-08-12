@@ -194,3 +194,63 @@ Base: `/api/v1/platform-admin/tenants/{tenantId}/bootstrap`
 ## GET `/products/import/{importId}/errors.csv`
 
 Returns error CSV per [[Selected_Tenant_Product_Import_Contract]].
+
+---
+
+## GET `/online-store`
+
+| | |
+|---|---|
+| Journey | SA-ST-UJ-011 / SA-UJ-057 |
+| Permission | `platform.tenants.bootstrap.online_store.manage` |
+| Entitlement | Effective `online_store` (else 403 not_entitled) |
+
+**Response 200:**
+
+```json
+{
+  "entitled": true,
+  "storeStatus": "DRAFT",
+  "taxDisplayMode": "MATCH_TENANT",
+  "clickCollectEntitled": false,
+  "clickCollectConfigured": false,
+  "dependencyNotice": null
+}
+```
+
+`storeStatus` vocabulary (LOCKED): `DRAFT` | `ACTIVE`.
+
+---
+
+## PUT `/online-store`
+
+| | |
+|---|---|
+| Journey | SA-ST-UJ-011 / SA-UJ-057 |
+| Permission | `platform.tenants.bootstrap.online_store.manage` |
+| Entitlement | Effective `online_store` |
+| Idempotency | `Idempotency-Key` **required** |
+
+**Request:**
+
+```json
+{
+  "storeStatus": "ACTIVE",
+  "taxDisplayMode": "MATCH_TENANT"
+}
+```
+
+`taxDisplayMode` optional; default `MATCH_TENANT`.
+
+**Response 200:** Updated settings DTO (same shape as GET).
+
+**400:** Validation (invalid `storeStatus`)  
+**403:** Permission / not entitled  
+**404:** Tenant  
+**409:** Suspended tenant; idempotency conflict  
+
+**Audit:** `platform.tenant_bootstrap.online_store_configured`
+
+Contract: [[../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Online_Store_Bootstrap_Contract]]
+
+> Implementation note: endpoints are **contract-locked**; production backend evidence pending (SA-UJ-057 = NOT_STARTED until closed).

@@ -39,7 +39,7 @@ The deck labels the actor as `Super Admin`, but the Second Brain should use `Pla
 
 Canonical contract: [[Selected_Tenant_Mode_Contract]]
 
-Global register: [[../00_Global_User_Journey_Register]] — **172 journeys** (Super Admin = 56).
+Global register: [[../00_Global_User_Journey_Register]] — **173 journeys** (Super Admin = 57).
 
 | # | Flow / artifact | Mode | Discovery IDs | Canonical IDs |
 |---|---|---|---|---|
@@ -49,7 +49,9 @@ Global register: [[../00_Global_User_Journey_Register]] — **172 journeys** (Su
 | ST-3 | Tenant Role / Permission Initial Setup | Selected-Tenant | SA-ST-UJ-007 | SA-UJ-053 |
 | ST-4 | Additional Tenant User Initial Setup | Selected-Tenant | SA-ST-UJ-008 | SA-UJ-054 |
 | ST-5 | Product Initial Onboarding | Selected-Tenant | SA-ST-UJ-009, 010 | SA-UJ-055, 056 |
-| — | E-commerce bootstrap | **OUT OF SCOPE** Phase 1 | — | — |
+| ST-6 | Configure Initial Online Store | Selected-Tenant | SA-ST-UJ-011 | SA-UJ-057 |
+
+> L52 historical: E-commerce bootstrap **OUT OF SCOPE** Phase 1 — **SUPERSEDED 2026-08-12** by [[Selected_Tenant_Online_Store_Bootstrap_Contract]] (optional SA bootstrap; Click & Collect remains Tenant Admin).
 
 Entry path: Tenant Detail → Configure Tenant → Setup Hub (`/admin/tenants/:tenantId/configure`).
 

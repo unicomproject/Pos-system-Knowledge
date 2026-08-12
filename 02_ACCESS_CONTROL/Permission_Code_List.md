@@ -62,18 +62,19 @@ Selected-Tenant Mode uses **platform bootstrap permissions** — distinct from t
 | platform.tenants.bootstrap.users.manage | Add additional bootstrap tenant user | SA-ST-UJ-008 / ST-05 |
 | platform.tenants.bootstrap.products.manage | Manual bootstrap product onboarding | SA-ST-UJ-009 / ST-06A |
 | platform.tenants.bootstrap.products.import | CSV bootstrap product import | SA-ST-UJ-010 / ST-06B |
+| platform.tenants.bootstrap.online_store.manage | Configure initial Online Store bootstrap | SA-ST-UJ-011 / ST-07 |
 
 **Entry also requires** `platform.tenants.view`.
 
 Default assignment (target seed — **NOT IMPLEMENTED**):
 
-| Platform Role | bootstrap.access | outlets | tills | roles | users | products | import |
-|---|---|---|---|---|---|---|---|
-| Super Administrator | Grant | Grant | Grant | Grant | Grant | Grant | Grant |
-| Support Admin | Explicit only | Explicit | Explicit | Explicit | Explicit | Explicit | Explicit |
-| Billing Admin | Deny | Deny | Deny | Deny | Deny | Deny | Deny |
+| Platform Role | bootstrap.access | outlets | tills | roles | users | products | import | online_store |
+|---|---|---|---|---|---|---|---|---|
+| Super Administrator | Grant | Grant | Grant | Grant | Grant | Grant | Grant | Grant |
+| Support Admin | Explicit only | Explicit | Explicit | Explicit | Explicit | Explicit | Explicit | Explicit |
+| Billing Admin | Deny | Deny | Deny | Deny | Deny | Deny | Deny | Deny |
 
-Contract: [[../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Mode_Contract]]
+Contract: [[../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Mode_Contract]] · Online Store: [[../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Online_Store_Bootstrap_Contract]]
 
 #### Platform Dashboard page vs widget permissions
 

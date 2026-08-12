@@ -88,9 +88,18 @@ Wizard Tenant Admin counts as 1.
 
 ### Online Store (hub card)
 
-| Status | Always show |
+| Condition | Status |
 |---|---|
-| `DECISION_REQUIRED` / hidden | **Not rendered** in Selected-Tenant Phase 1 — e-commerce bootstrap OUT OF SCOPE |
+| Effective `online_store` = false | `NOT_ENTITLED` |
+| Entitled AND `storeStatus` missing or `DRAFT` | `NOT_STARTED` |
+| Entitled AND `storeStatus` = `ACTIVE` | `CONFIGURED` |
+
+`DECISION_REQUIRED` is **retired**. Click & Collect is informational notice only — does not set `BLOCKED`.
+
+Derivation: [[Selected_Tenant_Online_Store_Hub_Status_Derivation]]  
+Contract: [[Selected_Tenant_Online_Store_Bootstrap_Contract]]
+
+> Historical (SUPERSEDED 2026-08-12): card not rendered / `DECISION_REQUIRED` — GAP 5 OUT OF SCOPE.
 
 ## API response shape (`GET /bootstrap/summary`)
 

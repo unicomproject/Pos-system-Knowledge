@@ -15,12 +15,14 @@ flowchart TD
     C -->|Users Add User| G[Add User ST-05]
     C -->|Products Add| H[Manual Product ST-06A]
     C -->|Products Import CSV| I[CSV Import ST-06B]
+    C -->|Online Store Configure| J[Online Store ST-07]
     D --> C
     E --> C
     F --> C
     G --> C
     H --> C
     I --> C
+    J --> C
     C -->|Exit Tenant Context| B
     C -->|Switch Tenant| B2[Another Tenant Detail]
     B2 --> C2[Setup Hub other tenant]
@@ -39,6 +41,10 @@ flowchart LR
     C --> E3{Products entitled?}
     E3 -->|No| NE3[NOT ENTITLED]
     E3 -->|Yes| P[Product paths]
+    C --> E4{Online Store entitled?}
+    E4 -->|No| NE4[NOT ENTITLED]
+    E4 -->|Yes + DRAFT| OS1[NOT STARTED → ST-07]
+    E4 -->|Yes + ACTIVE| OS2[CONFIGURED]
     C --> S{Tenant SUSPENDED?}
     S -->|Yes| RO[Read-only hub]
 ```
@@ -67,4 +73,19 @@ Prototype file: `prototypes/selected-tenant/shell-states.html`
 | ST-05 | SA-ST-UJ-008 |
 | ST-06A | SA-ST-UJ-009 |
 | ST-06B | SA-ST-UJ-010 |
+| ST-07 | SA-ST-UJ-011 → SA-UJ-057 |
 | ST-SHELL-* | SA-ST-UJ-001/002/003 + error contracts |
+
+## Online Store (ST-07) — APPROVED
+
+| Screen | Journey | Notes |
+|---|---|---|
+| ST-07 | SA-ST-UJ-011 → SA-UJ-057 | Optional bootstrap; entitlement `online_store` |
+| Hub Online Store card | Derived NOT_STARTED / CONFIGURED / NOT_ENTITLED | `DECISION_REQUIRED` retired |
+
+Entry remains: Tenant Detail → Configure Tenant → Setup Hub → Online Store.  
+No permanent Platform sidebar item.
+
+`storeStatus`: `DRAFT` | `ACTIVE`. `taxDisplayMode`: optional `MATCH_TENANT`.
+
+See [[../../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Online_Store_Bootstrap_Contract]].

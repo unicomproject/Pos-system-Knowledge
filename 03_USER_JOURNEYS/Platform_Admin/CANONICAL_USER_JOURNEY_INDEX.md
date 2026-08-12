@@ -5,7 +5,7 @@
 
 # Super Admin Canonical User Journey Index
 
-**56 journeys** (SA-UJ-001 through SA-UJ-056). Includes 9 Selected-Tenant bootstrap journeys (048 through 056).
+**57 journeys** (SA-UJ-001 through SA-UJ-057). Includes 10 Selected-Tenant bootstrap journeys (048 through 057).
 
 | Journey ID | Legacy/Discovery ID | Parent Flow | Journey Name | Status | Completion % | Documentation Reference |
 |---|---|---|---|---|---:|---|
@@ -66,3 +66,4 @@
 | SA-UJ-054 | SA-ST-UJ-008 | Additional Tenant User Initial Setup | Add Additional Tenant User | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-008]] |
 | SA-UJ-055 | SA-ST-UJ-009 | Product Initial Onboarding | Manually Onboard Initial Products | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-009]] |
 | SA-UJ-056 | SA-ST-UJ-010 | Product Initial Onboarding | Import Initial Products via CSV | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-010]] |
+| SA-UJ-057 | SA-ST-UJ-011 | Product / Channel Initial Onboarding | Configure Initial Online Store | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-011]] |

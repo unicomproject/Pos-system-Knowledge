@@ -57,6 +57,23 @@
 | Journey | SA-ST-UJ-010 |
 | Note | Upload/preview/result are steps within one journey |
 
+### ST-07 Configure Initial Online Store — APPROVED
+
+| Attribute | Value |
+|---|---|
+| Discovery journey | SA-ST-UJ-011 |
+| Canonical | SA-UJ-057 |
+| Scope type | IN_SCOPE_OPTIONAL_BOOTSTRAP_CAPABILITY |
+| Permission | `platform.tenants.bootstrap.online_store.manage` |
+| Entitlement | Effective `online_store` |
+| Fields | `storeStatus` required (`DRAFT`\|`ACTIVE`); `taxDisplayMode` optional (`MATCH_TENANT`) |
+| Deferred | Branding, SEO, C&C/FMO, channel matrix, hours, orders |
+| Backend | `GET/PUT .../bootstrap/online-store` (`Idempotency-Key` on PUT) |
+| Audit | `platform.tenant_bootstrap.online_store_configured` |
+| Hub card | NOT_STARTED / CONFIGURED / NOT_ENTITLED (`DECISION_REQUIRED` retired) |
+| Count impact | +1 → SA **57** / Total **173** (locked) |
+| Doc-lock status | SA-UJ-057 = **NOT_STARTED** until backend evidence |
+
 ### ST-SHELL variants
 
 | ID | Purpose |

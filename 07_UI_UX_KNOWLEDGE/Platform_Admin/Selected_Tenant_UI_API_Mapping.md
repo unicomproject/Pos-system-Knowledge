@@ -16,9 +16,13 @@
 | ST-06B | SA-ST-UJ-010 | Upload CSV | `POST /bootstrap/products/import/validate` | multipart | 201 batch | 400 | `bootstrap.products.import` | catalog | — |
 | ST-06B | SA-ST-UJ-010 | Commit Import | `POST /bootstrap/products/import/{id}/commit` | — | 200 | 409 in-flight | `bootstrap.products.import` | catalog | `products_imported` |
 | ST-06B | SA-ST-UJ-010 | Download template | `GET /bootstrap/products/import/template` | — | 200 csv | 403 | `bootstrap.products.import` | catalog | — |
+| ST-07 | SA-ST-UJ-011 | Load Online Store | `GET /bootstrap/online-store` | — | 200 settings | 403 entitlement | `bootstrap.online_store.manage` | `online_store` | — |
+| ST-07 | SA-ST-UJ-011 | Save Online Store | `PUT /bootstrap/online-store` | `{ storeStatus, taxDisplayMode? }` | 200 | 400/403/409 | `bootstrap.online_store.manage` | `online_store` | `online_store_configured` |
 
 Full API schemas: [[../../05_BACKEND_ARCHITECTURE/Platform_Selected_Tenant_API_Contract]]
 
 Product fields: [[../../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Product_Bootstrap_Contract]]
 
 CSV columns: [[../../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Product_Import_Contract]]
+
+Online Store: [[../../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Online_Store_Bootstrap_Contract]] · [[../../05_BACKEND_ARCHITECTURE/Selected_Tenant_Online_Store_UI_API_DB_Mapping]]

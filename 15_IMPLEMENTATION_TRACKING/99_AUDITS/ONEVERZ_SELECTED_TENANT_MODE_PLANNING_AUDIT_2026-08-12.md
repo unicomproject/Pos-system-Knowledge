@@ -1,7 +1,7 @@
 <!-- title: Selected Tenant Mode Planning Audit -->
 <!-- status: Active -->
 <!-- date: 2026-08-12 -->
-<!-- note: Global journey count superseded by 172 canonical register — see ONEVERZ_GLOBAL_USER_JOURNEY_REGISTER_UPDATE_2026-08-12.md -->
+<!-- note: Global journey count superseded by 173 canonical register (SA-UJ-057 Online Store) — prior 172 note retained historically -->
 
 # ONEVERZ Selected-Tenant Mode Planning Audit
 
@@ -35,12 +35,18 @@ Phase 1 planning audit before visual direction and static prototypes (mandatory 
 
 ## Remaining decisions
 
-- E-commerce selected-tenant bootstrap: **DECISION_REQUIRED**
+- E-commerce selected-tenant bootstrap: **SUPERSEDED** — see below (APPROVED optional bootstrap)
 - Durable setup hub status persistence: **PRODUCT DECISION**
 - Collection point attribute mapping: **CONTRACT_GAP**
 - Bootstrap product minimum field set: **CONTRACT_GAP**
 
-## E-commerce bootstrap (GAP 5 — LOCKED)
+## E-commerce bootstrap (GAP 5 — SUPERSEDED 2026-08-12)
+
+> **SUPERSEDED** by product-owner approval 2026-08-12.  
+> Authority: [[Selected_Tenant_Online_Store_Bootstrap_Contract]] · Audit: [[ONEVERZ_SELECTED_TENANT_ONLINE_STORE_SCOPE_REOPEN_2026-08-12]].  
+> Canonical: SA-ST-UJ-011 → SA-UJ-057; total **173** / SA **57**; hub NOT_ENTITLED / NOT_STARTED / CONFIGURED.
+
+### Historical locked text (retained)
 
 **Platform Admin Selected-Tenant e-commerce bootstrap = OUT OF CURRENT APPROVED IMPLEMENTATION SCOPE.**
 
@@ -48,7 +54,11 @@ Phase 1 planning audit before visual direction and static prototypes (mandatory 
 - No Super Admin e-commerce bootstrap APIs or UI in Phase 1.
 - Does not block Selected-Tenant Phase 1 implementation.
 
-## Contract lock pack (Phase 2.5)
+### Current decision
+
+Optional SA Online Store readiness bootstrap (`storeStatus` DRAFT|ACTIVE; `taxDisplayMode` optional). Click & Collect / FMO remain Tenant Admin. No `is_collection_point`.
+
+## Contract lock pack (Phase 2.5 + Online Store)
 
 | Document | Status |
 |---|---|
@@ -56,6 +66,7 @@ Phase 1 planning audit before visual direction and static prototypes (mandatory 
 | [[Selected_Tenant_Product_Bootstrap_Contract]] | LOCKED |
 | [[Selected_Tenant_Product_Import_Contract]] | LOCKED |
 | [[Selected_Tenant_Setup_Hub_Status_Model]] | LOCKED |
+| [[Selected_Tenant_Online_Store_Bootstrap_Contract]] | LOCKED / APPROVED |
 | [[ST-UX-001_Selected_Tenant_Context_Requirement]] | LOCKED |
 | [[Selected_Tenant_Journey_Readiness_Matrix]] | LOCKED |
 | [[../../02_ACCESS_CONTROL/Selected_Tenant_Permission_Final_Matrix]] | LOCKED |

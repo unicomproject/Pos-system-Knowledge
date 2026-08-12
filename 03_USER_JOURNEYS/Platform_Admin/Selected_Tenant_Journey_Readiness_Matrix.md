@@ -17,6 +17,7 @@ One row per accepted atomic journey. **Lock-ready** = documentation complete for
 | SA-UJ-054 | SA-ST-UJ-008 Add User | Yes | Yes | Yes | Yes | Yes | Yes | Yes | email unique | `Idempotency-Key` | Yes | Yes | ST-05 | Yes | Yes | ST-QA-018 | **YES** |
 | SA-UJ-055 | SA-ST-UJ-009 Manual Product | Yes | Yes | Yes | Yes | Yes | Yes | Yes | product graph | `Idempotency-Key` | Yes | Yes | ST-06A | Yes | Yes | ST-QA-011 | **YES** |
 | SA-UJ-056 | SA-ST-UJ-010 CSV Import | Yes | Yes | Yes | Yes | Yes | Yes | Yes | batch lock | `Idempotency-Key` on commit | Yes | Yes | ST-06B | Yes | Yes | ST-QA-013 | **YES** |
+| SA-UJ-057 | SA-ST-UJ-011 Online Store | Yes | Yes | Yes | Yes | Yes | Yes | Yes | settings upsert | `Idempotency-Key` on PUT | Yes | Yes | ST-07 | Yes | Yes | ST-OS-001…013 | **YES** |
 
 ## Cross-cutting requirement
 
@@ -39,6 +40,8 @@ Updated 2026-08-12 after Selected-Tenant **backend** Phase 3.6 closure (full sui
 | SA-UJ-054 | PASS | Pending | **PARTIAL** — backend closed |
 | SA-UJ-055 | PASS | Pending | **PARTIAL** — backend closed |
 | SA-UJ-056 | PASS | Pending | **PARTIAL** — backend closed |
+| SA-UJ-057 | PASS (`GET/PUT .../bootstrap/online-store` + hub) | Pending | **PARTIAL** — backend closed; Angular pending |
 
 Route family: `/api/v1/platform-admin/tenants/{tenantId}/bootstrap/*`.  
-**No journey is globally COMPLETE** until Selected-Tenant Angular ships.
+**No journey is globally COMPLETE** until Selected-Tenant Angular ships.  
+SA-UJ-057 is **PARTIAL** after Online Store bootstrap backend closure; remains non-COMPLETE until Selected-Tenant Angular ships.
