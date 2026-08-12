@@ -21,27 +21,27 @@ One row per accepted atomic journey. **Lock-ready** = documentation complete for
 
 ## Cross-cutting requirement
 
-| ID | Type | Lock-ready |
-|---|---|---|
-| ST-UX-001 Context indicator | UX/security | **YES** |
+| ID | Type | Lock-ready | Implementation |
+|---|---|---|---|
+| ST-UX-001 Context indicator | UX/security | **YES** | **PASS** (implemented; **not counted** as a journey) |
 
 ## Implementation status (production code)
 
-Updated 2026-08-12 after Selected-Tenant **backend** Phase 3.6 closure (full suite green). Locked docs unchanged.
+Updated 2026-08-12 after Selected-Tenant **Angular production merge** (`a2330d4`) + backend closed (`5b7e5b0`). Locked product contracts unchanged. Runtime backend integration **ENVIRONMENT_BLOCKED** (localhost:5150 unavailable).
 
-| Canonical ID | Backend | Angular UI | Status note |
-|---|---|---|---|
-| SA-UJ-048 | PASS (`GET /bootstrap/summary`) | Pending | **PARTIAL** — hub API ready; shell UX not started |
-| SA-UJ-049 | N/A (client) | Pending | **NOT_STARTED** — frontend-dependent |
-| SA-UJ-050 | N/A (client) | Pending | **NOT_STARTED** — frontend-dependent |
-| SA-UJ-051 | PASS | Pending | **PARTIAL** — backend closed |
-| SA-UJ-052 | PASS | Pending | **PARTIAL** — backend closed |
-| SA-UJ-053 | PASS | Pending | **PARTIAL** — backend closed |
-| SA-UJ-054 | PASS | Pending | **PARTIAL** — backend closed |
-| SA-UJ-055 | PASS | Pending | **PARTIAL** — backend closed |
-| SA-UJ-056 | PASS | Pending | **PARTIAL** — backend closed |
-| SA-UJ-057 | PASS (`GET/PUT .../bootstrap/online-store` + hub) | Pending | **PARTIAL** — backend closed; Angular pending |
+| Canonical ID | Backend | Angular UI | Runtime E2E | Status note |
+|---|---|---|---|---|
+| SA-UJ-048 | PASS (`GET /bootstrap/summary`) | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-049 | N/A (client) | **PASS** (switch shipped) | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-050 | N/A (client) | **PASS** (exit shipped) | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-051 | PASS | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-052 | PASS | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-053 | PASS | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-054 | PASS | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-055 | PASS | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-056 | PASS | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-057 | PASS (`GET/PUT .../bootstrap/online-store` + hub) | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
 
 Route family: `/api/v1/platform-admin/tenants/{tenantId}/bootstrap/*`.  
-**No journey is globally COMPLETE** until Selected-Tenant Angular ships.  
-SA-UJ-057 is **PARTIAL** after Online Store bootstrap backend closure; remains non-COMPLETE until Selected-Tenant Angular ships.
+**No journey is globally COMPLETE** — Angular shipped and unit/build green (577 passed; `ng build` succeeded), but runtime E2E remains **ENVIRONMENT_BLOCKED**.  
+SA-UJ-049 and SA-UJ-050 moved **NOT_STARTED → PARTIAL** after Angular switch/exit shipped.

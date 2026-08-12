@@ -23,17 +23,17 @@ Companion: [[Selected_Tenant_Mode_Contract]]
 
 Registered in [[../00_Global_User_Journey_Register]] as **SA-UJ-048…057**.
 
-**Implementation status (2026-08-12):**
+**Implementation status (2026-08-12 — Angular production merge):**
 
 | Canonical ID | Backend | Frontend (Angular) | Global status |
 |---|---|---|---|
-| SA-UJ-048 | `GET .../bootstrap/summary` + access policy | Setup Hub shell pending | **PARTIAL** |
-| SA-UJ-049 | Tenant APIs only (client switch) | Switch UX pending | **NOT_STARTED** |
-| SA-UJ-050 | Client exit only | Exit UX pending | **NOT_STARTED** |
-| SA-UJ-051…056 | Bootstrap mutation APIs closed | Selected-Tenant screens pending | **PARTIAL** |
-| SA-UJ-057 | GET/PUT `.../bootstrap/online-store` + hub module closed | ST-07 Angular pending | **PARTIAL** |
+| SA-UJ-048 | `GET .../bootstrap/summary` + access policy | Setup Hub / context shell shipped (`a2330d4`) | **PARTIAL** (~88%) |
+| SA-UJ-049 | Tenant APIs only (client switch) | Switch UX shipped (`a2330d4`) | **PARTIAL** (~85%) |
+| SA-UJ-050 | Client exit only | Exit UX shipped (`a2330d4`) | **PARTIAL** (~85%) |
+| SA-UJ-051…056 | Bootstrap mutation APIs closed | Selected-Tenant screens shipped (`a2330d4`) | **PARTIAL** (~88%) |
+| SA-UJ-057 | GET/PUT `.../bootstrap/online-store` + hub module closed | ST-07 Angular shipped (`a2330d4`) | **PARTIAL** (~88%) |
 
-Online Store bootstrap backend closed 2026-08-12; Angular remains pending (journey not COMPLETE).
+Angular production merged frontend `a2330d4` / backend `5b7e5b0`; unit tests 577 passed; `ng build` succeeded. Runtime E2E **ENVIRONMENT_BLOCKED** (localhost:5150 unavailable). Journeys remain **PARTIAL** (not COMPLETE) until runtime E2E. ST-UX-001 = **PASS** (implemented; not counted).
 
 | Canonical ID | Discovery ID | Journey Name |
 |---|---|---|
@@ -61,6 +61,7 @@ Global journey count: **173** (Super Admin = 57). ST-UX-001 is **not** counted a
 | Requirement | Banner shows tenant name, code, status, plan summary; Exit Tenant Context action always available |
 | Contract reference | [[Selected_Tenant_Mode_Contract#selected-tenant-context]] |
 | Prototype | All `ST-*` screens and `ST-SHELL-*` variants |
+| Implementation status | **PASS** (implemented in Angular production `a2330d4`; **not counted** as a journey) |
 
 ---
 
@@ -303,7 +304,7 @@ Global journey count: **173** (Super Admin = 57). ST-UX-001 is **not** counted a
 | **Audit Event** | `platform.tenant_bootstrap.online_store_configured` |
 | **Related TA Journey** | Tenant Admin storefront / Online Store settings |
 | **Excluded** | Click & Collect FMO; branding/SEO; channel matrix; `is_collection_point` |
-| **Implementation status** | **PARTIAL** (backend closed; Angular pending) |
+| **Implementation status** | **PARTIAL** (Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED) |
 
 Contract: [[Selected_Tenant_Online_Store_Bootstrap_Contract]]
 

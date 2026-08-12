@@ -15,23 +15,24 @@ Canonical **one-row-per-journey** master index for OneVerz EPOS atomic user jour
 | Register version | **173** (locked 2026-08-12) |
 | Previous provisional count | 163 (superseded) |
 | Previous locked count | 172 (Selected-Tenant Phase 2.5; SA-UJ-048–056) |
-| Selected-Tenant Online Store | SA-UJ-057 registered (**PARTIAL** — backend closed; Angular pending) |
-| ST-UX-001 | Cross-cutting requirement - **not counted** |
+| Selected-Tenant Online Store | SA-UJ-057 registered (**PARTIAL** — Angular production merged; runtime E2E ENVIRONMENT_BLOCKED) |
+| ST-UX-001 | Cross-cutting requirement - **PASS (implemented); not counted** |
 
 ## Surface summary
 
 | Surface | Total | Complete | Partial | Not Started | Blocked |
 |---|---:|---:|---:|---:|---:|
-| Super Admin | 57 | 45 | 9 | 3 | 0 |
+| Super Admin | 57 | 45 | 11 | 1 | 0 |
 | Tenant Admin | 62 | 26 | 11 | 25 | 0 |
 | Cashier POS | 36 | 21 | 9 | 4 | 2 |
 | E-commerce Customer | 18 | 12 | 5 | 1 | 0 |
-| **GRAND TOTAL** | **173** | **104** | **34** | **33** | **2** |
+| **GRAND TOTAL** | **173** | **104** | **36** | **31** | **2** |
 
-Arithmetic: 104 + 34 + 33 + 2 = 173
+Arithmetic: 104 + 36 + 31 + 2 = 173
 
 Selected-Tenant update (2026-08-12): SA-UJ-048 + SA-UJ-051…056 moved **NOT_STARTED → PARTIAL** after backend closure. SA-UJ-049/050 remain **NOT_STARTED** (frontend-dependent).  
-Online Store lock (2026-08-12): SA-UJ-057 registered; after Online Store bootstrap backend closure → **PARTIAL** (Angular pending).
+Online Store lock (2026-08-12): SA-UJ-057 registered; after Online Store bootstrap backend closure → **PARTIAL** (Angular pending).  
+Angular production merge (2026-08-12): SA-UJ-048…057 all **PARTIAL** (Angular shipped `a2330d4`; backend closed `5b7e5b0`; runtime E2E **ENVIRONMENT_BLOCKED** — localhost:5150 unavailable). SA-UJ-049/050 moved **NOT_STARTED → PARTIAL**. ST-UX-001 **PASS** (implemented; not counted). SA-UJ-024 remains sole Super Admin **NOT_STARTED**.
 
 ## Super Admin vs Tenant Admin - Selected-Tenant ownership
 
@@ -66,8 +67,8 @@ Rejected as journey: SA-ST-UJ-004 merged to ST-UX-001.
 | Canonical ID | Legacy / Discovery ID | Journey Name | Status |
 |---|---|---|---|
 | SA-UJ-048 | SA-ST-UJ-001 | Enter Selected-Tenant Context | PARTIAL |
-| SA-UJ-049 | SA-ST-UJ-002 | Switch Selected Tenant | NOT_STARTED |
-| SA-UJ-050 | SA-ST-UJ-003 | Exit Selected-Tenant Context | NOT_STARTED |
+| SA-UJ-049 | SA-ST-UJ-002 | Switch Selected Tenant | PARTIAL |
+| SA-UJ-050 | SA-ST-UJ-003 | Exit Selected-Tenant Context | PARTIAL |
 | SA-UJ-051 | SA-ST-UJ-005 | Create Outlet for Selected Tenant | PARTIAL |
 | SA-UJ-052 | SA-ST-UJ-006 | Create Till for Selected Tenant Outlet | PARTIAL |
 | SA-UJ-053 | SA-ST-UJ-007 | Create Tenant Role | PARTIAL |
@@ -248,16 +249,16 @@ One row per journey. Implementation status reflects **production code**, not doc
 | EC-UJ-016 | - | EC | E-commerce Customer | - | Cancel Order | - | - | Y | COMPLETE | 85 | - | - | - | - | - |
 | EC-UJ-017 | - | EC | E-commerce Customer | - | Edit Profile | - | - | Y | COMPLETE | 85 | - | - | - | - | - |
 | EC-UJ-018 | - | EC | E-commerce Customer | - | Manage Addresses | - | - | Y | NOT_STARTED | 20 | - | - | - | - | - |
-| SA-UJ-048 | SA-ST-UJ-001 | SA | Platform Admin | Selected-Tenant Mode Shell | Enter Selected-Tenant Context | Click Configure Tenant on Tenant Detail | Setup Hub loads with context banner and module cards | Y | PARTIAL | 40 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-001]] | platform.tenants.view, platform.tenants.bootstrap.access | None | Tenant exists | Backend summary API closed; Angular Setup Hub pending |
-| SA-UJ-049 | SA-ST-UJ-002 | SA | Platform Admin | Selected-Tenant Mode Shell | Switch Selected Tenant | Tenant picker or Configure Tenant on another tenant | New tenant context active; no stale prior-tenant data | Y | NOT_STARTED | 0 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-002]] | platform.tenants.bootstrap.access | None | SA-UJ-048 or equivalent entry | Frontend-dependent; backend does not own switch session |
-| SA-UJ-050 | SA-ST-UJ-003 | SA | Platform Admin | Selected-Tenant Mode Shell | Exit Selected-Tenant Context | Click Exit Tenant Context | Platform Mode restored; tenant-scoped routes blocked | Y | NOT_STARTED | 0 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-003]] | platform.tenants.view | None | Active selected-tenant context | Frontend-dependent client cache clear |
-| SA-UJ-051 | SA-ST-UJ-005 | SA | Platform Admin | Outlet / Collection Point Initial Setup | Create Outlet for Selected Tenant | Setup Hub Outlet Setup Configure | Outlet record created for selected tenant | Y | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-005]] | platform.tenants.bootstrap.outlets.manage | Outlet module | Selected-tenant context | Backend closed Phase 3.6; Angular pending |
-| SA-UJ-052 | SA-ST-UJ-006 | SA | Platform Admin | Till Initial Setup | Create Till for Selected Tenant Outlet | Setup Hub Till Setup Configure | Till created pending device binding | Y | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-006]] | platform.tenants.bootstrap.tills.manage | Till/POS module | Active outlet HARD | Backend closed Phase 3.6; Angular pending |
-| SA-UJ-053 | SA-ST-UJ-007 | SA | Platform Admin | Tenant Role / Permission Initial Setup | Create Tenant Role | Setup Hub Roles and Permissions Configure | Role available for user assignment | Y | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-007]] | platform.tenants.bootstrap.roles.manage | Permission catalog | Selected-tenant context | Backend closed Phase 3.6; Angular pending |
-| SA-UJ-054 | SA-ST-UJ-008 | SA | Platform Admin | Additional Tenant User Initial Setup | Add Additional Tenant User | Setup Hub Additional Users Add User | Additional tenant user created or invite queued | Y | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-008]] | platform.tenants.bootstrap.users.manage | User limit | Role exists | Backend closed Phase 3.6; hashed invite; Angular pending |
-| SA-UJ-055 | SA-ST-UJ-009 | SA | Platform Admin | Product Initial Onboarding | Manually Onboard Initial Products | Setup Hub Product Onboarding Add Products | Products available for POS/inventory | Y | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-009]] | platform.tenants.bootstrap.products.manage | Catalog module | Product entitlement | Backend closed; opening stock ledger; Angular pending |
-| SA-UJ-056 | SA-ST-UJ-010 | SA | Platform Admin | Product Initial Onboarding | Import Initial Products via CSV | Setup Hub Import CSV | Valid rows imported | Y | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-010]] | platform.tenants.bootstrap.products.import | Catalog module | Product entitlement | Backend closed; partial-success import; Angular pending |
-| SA-UJ-057 | SA-ST-UJ-011 | SA | Platform Admin | Product / Channel Initial Onboarding | Configure Initial Online Store | Setup Hub Online Store Configure | Online Store bootstrap settings persisted; hub CONFIGURED | Y | PARTIAL | 75 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-011]] | platform.tenants.bootstrap.online_store.manage | online_store | Selected-tenant context; entitled | Backend closed (GET/PUT bootstrap/online-store + hub); Angular pending |
+| SA-UJ-048 | SA-ST-UJ-001 | SA | Platform Admin | Selected-Tenant Mode Shell | Enter Selected-Tenant Context | Click Configure Tenant on Tenant Detail | Setup Hub loads with context banner and module cards | Y | PARTIAL | 88 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-001]] | platform.tenants.view, platform.tenants.bootstrap.access | None | Tenant exists | Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-049 | SA-ST-UJ-002 | SA | Platform Admin | Selected-Tenant Mode Shell | Switch Selected Tenant | Tenant picker or Configure Tenant on another tenant | New tenant context active; no stale prior-tenant data | Y | PARTIAL | 85 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-002]] | platform.tenants.bootstrap.access | None | SA-UJ-048 or equivalent entry | Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-050 | SA-ST-UJ-003 | SA | Platform Admin | Selected-Tenant Mode Shell | Exit Selected-Tenant Context | Click Exit Tenant Context | Platform Mode restored; tenant-scoped routes blocked | Y | PARTIAL | 85 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-003]] | platform.tenants.view | None | Active selected-tenant context | Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-051 | SA-ST-UJ-005 | SA | Platform Admin | Outlet / Collection Point Initial Setup | Create Outlet for Selected Tenant | Setup Hub Outlet Setup Configure | Outlet record created for selected tenant | Y | PARTIAL | 88 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-005]] | platform.tenants.bootstrap.outlets.manage | Outlet module | Selected-tenant context | Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-052 | SA-ST-UJ-006 | SA | Platform Admin | Till Initial Setup | Create Till for Selected Tenant Outlet | Setup Hub Till Setup Configure | Till created pending device binding | Y | PARTIAL | 88 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-006]] | platform.tenants.bootstrap.tills.manage | Till/POS module | Active outlet HARD | Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-053 | SA-ST-UJ-007 | SA | Platform Admin | Tenant Role / Permission Initial Setup | Create Tenant Role | Setup Hub Roles and Permissions Configure | Role available for user assignment | Y | PARTIAL | 88 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-007]] | platform.tenants.bootstrap.roles.manage | Permission catalog | Selected-tenant context | Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-054 | SA-ST-UJ-008 | SA | Platform Admin | Additional Tenant User Initial Setup | Add Additional Tenant User | Setup Hub Additional Users Add User | Additional tenant user created or invite queued | Y | PARTIAL | 88 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-008]] | platform.tenants.bootstrap.users.manage | User limit | Role exists | Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-055 | SA-ST-UJ-009 | SA | Platform Admin | Product Initial Onboarding | Manually Onboard Initial Products | Setup Hub Product Onboarding Add Products | Products available for POS/inventory | Y | PARTIAL | 88 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-009]] | platform.tenants.bootstrap.products.manage | Catalog module | Product entitlement | Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-056 | SA-ST-UJ-010 | SA | Platform Admin | Product Initial Onboarding | Import Initial Products via CSV | Setup Hub Import CSV | Valid rows imported | Y | PARTIAL | 88 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-010]] | platform.tenants.bootstrap.products.import | Catalog module | Product entitlement | Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-057 | SA-ST-UJ-011 | SA | Platform Admin | Product / Channel Initial Onboarding | Configure Initial Online Store | Setup Hub Online Store Configure | Online Store bootstrap settings persisted; hub CONFIGURED | Y | PARTIAL | 88 | [[Platform_Admin/Selected_Tenant_Atomic_Journey_Register#SA-ST-UJ-011]] | platform.tenants.bootstrap.online_store.manage | online_store | Selected-tenant context; entitled | Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
 
 ## Surface indexes
 
@@ -280,4 +281,5 @@ One row per journey. Implementation status reflects **production code**, not doc
 | 163 (provisional) | 2026-08-12 | Final validation pass - audit output only |
 | 172 (canonical) | 2026-08-12 | +9 Selected-Tenant SA journeys (SA-UJ-048 through SA-UJ-056); ST-UX-001 excluded |
 | **173 (canonical)** | 2026-08-12 | +1 SA-UJ-057 Configure Initial Online Store (optional bootstrap); GAP 5 SUPERSEDED; status PARTIAL after backend |
+| 173 (status only) | 2026-08-12 | Selected-Tenant Angular production merge (`a2330d4`): SA-UJ-048…057 **PARTIAL** (~85–88%); SA-UJ-049/050 NOT_STARTED→PARTIAL; ST-UX-001 PASS (not counted); runtime E2E ENVIRONMENT_BLOCKED; SA 45C/11P/1NS; Grand 104C/36P/31NS/2B |
 
