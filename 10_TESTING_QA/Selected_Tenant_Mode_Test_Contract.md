@@ -76,3 +76,15 @@ Independent review performed against static prototypes:
 14. Error states covered in shell-states.html — **PASS**
 15. Consistent with Super Admin design system — **PASS**
 16. Online Store ST-07 APPROVED — **PASS** (`DRAFT`/`ACTIVE`; hub NOT_ENTITLED/NOT_STARTED/CONFIGURED)
+
+## Angular production evidence (2026-08-12)
+
+Selected-Tenant Angular production merged to frontend `origin/main` (`a2330d4e5ccb5e3b6eb065068eaf4ee70730f327`); backend closed on `origin/main` (`5b7e5b0b3dc7d37db8785c29d6bf3b951dd2ce13`).
+
+| Check | Result |
+|---|---|
+| Angular unit tests | **577 passed** |
+| `ng build` | **succeeded** |
+| Runtime backend integration / E2E | **ENVIRONMENT_BLOCKED** (localhost:5150 unavailable) |
+
+Journey status implication: SA-UJ-048…057 remain **PARTIAL** (not COMPLETE) until runtime E2E can execute. ST-UX-001 = **PASS** (implemented; not counted). Full evidence: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/ONEVERZ_SELECTED_TENANT_ANGULAR_IMPLEMENTATION_EVIDENCE_2026-08-12]].
