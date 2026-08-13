@@ -27,13 +27,13 @@ Registered in [[../00_Global_User_Journey_Register]] as **SA-UJ-048…057**.
 
 | Canonical ID | Backend | Frontend (Angular) | Global status |
 |---|---|---|---|
-| SA-UJ-048 | `GET .../bootstrap/summary` + access policy | Setup Hub / context shell shipped (`a2330d4`) | **PARTIAL** (~88%) |
-| SA-UJ-049 | Tenant APIs only (client switch) | Switch UX shipped (`a2330d4`) | **PARTIAL** (~85%) |
-| SA-UJ-050 | Client exit only | Exit UX shipped (`a2330d4`) | **PARTIAL** (~85%) |
-| SA-UJ-051…056 | Bootstrap mutation APIs closed | Selected-Tenant screens shipped (`a2330d4`) | **PARTIAL** (~88%) |
-| SA-UJ-057 | GET/PUT `.../bootstrap/online-store` + hub module closed | ST-07 Angular shipped (`a2330d4`) | **PARTIAL** (~88%) |
+| SA-UJ-048 | `GET .../bootstrap/summary` + access policy | Setup Hub / context shell + runtime E2E | **COMPLETE** (100%) |
+| SA-UJ-049 | Tenant APIs only (client switch) | Switch UX + tenant isolation runtime | **COMPLETE** (100%) |
+| SA-UJ-050 | Client exit only | Exit UX + context clear + options rehydrate | **COMPLETE** (100%) |
+| SA-UJ-051…056 | Bootstrap mutation APIs closed | Screens + live mutation/DB evidence | **COMPLETE** (100%) |
+| SA-UJ-057 | GET/PUT `.../bootstrap/online-store` + hub module closed | ST-07 + live entitled/not-entitled E2E | **COMPLETE** (100%) |
 
-Angular production merged frontend `a2330d4` / backend `5b7e5b0`; unit tests 577 passed; `ng build` succeeded. Runtime E2E **ENVIRONMENT_BLOCKED** (localhost:5150 unavailable). Journeys remain **PARTIAL** (not COMPLETE) until runtime E2E. ST-UX-001 = **PASS** (implemented; not counted).
+Runtime E2E closed 2026-08-13 against backend `0245053` / Angular `8587e04`. Evidence: [[../../15_IMPLEMENTATION_TRACKING/99_AUDITS/ONEVERZ_SELECTED_TENANT_FINAL_RUNTIME_E2E_CLOSURE_2026-08-13]]. ST-UX-001 = **PASS** (not counted).
 
 | Canonical ID | Discovery ID | Journey Name |
 |---|---|---|
@@ -304,7 +304,7 @@ Global journey count: **173** (Super Admin = 57). ST-UX-001 is **not** counted a
 | **Audit Event** | `platform.tenant_bootstrap.online_store_configured` |
 | **Related TA Journey** | Tenant Admin storefront / Online Store settings |
 | **Excluded** | Click & Collect FMO; branding/SEO; channel matrix; `is_collection_point` |
-| **Implementation status** | **PARTIAL** (Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED) |
+| **Implementation status** | **COMPLETE** (runtime E2E closed 2026-08-13; BE `0245053`; FE `8587e04`) |
 
 Contract: [[Selected_Tenant_Online_Store_Bootstrap_Contract]]
 

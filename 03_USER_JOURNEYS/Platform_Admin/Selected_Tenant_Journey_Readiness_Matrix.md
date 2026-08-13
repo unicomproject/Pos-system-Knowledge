@@ -31,17 +31,16 @@ Updated 2026-08-12 after Selected-Tenant **Angular production merge** (`a2330d4`
 
 | Canonical ID | Backend | Angular UI | Runtime E2E | Status note |
 |---|---|---|---|---|
-| SA-UJ-048 | PASS (`GET /bootstrap/summary`) | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
-| SA-UJ-049 | N/A (client) | **PASS** (switch shipped) | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
-| SA-UJ-050 | N/A (client) | **PASS** (exit shipped) | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
-| SA-UJ-051 | PASS | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
-| SA-UJ-052 | PASS | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
-| SA-UJ-053 | PASS | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
-| SA-UJ-054 | PASS | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
-| SA-UJ-055 | PASS | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
-| SA-UJ-056 | PASS | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
-| SA-UJ-057 | PASS (`GET/PUT .../bootstrap/online-store` + hub) | **PASS** | ENVIRONMENT_BLOCKED | **PARTIAL** — Angular production merged a2330d4; backend closed; runtime E2E ENVIRONMENT_BLOCKED |
+| SA-UJ-048 | PASS (`GET /bootstrap/summary`) | **PASS** | **PASS** (live API+DB 2026-08-13) | **COMPLETE** — runtime E2E closed; BE `0245053`; FE `8587e04` |
+| SA-UJ-049 | N/A (client) | **PASS** (switch shipped) | **PASS** (tenant B isolation + cross-tenant till reject) | **COMPLETE** — runtime E2E closed; BE `0245053`; FE `8587e04` |
+| SA-UJ-050 | N/A (client) | **PASS** (exit shipped) | **PASS** (context clear + options rehydrate) | **COMPLETE** — runtime E2E closed; BE `0245053`; FE `8587e04` |
+| SA-UJ-051 | PASS | **PASS** | **PASS** (POST outlets 201 + hub CONFIGURED) | **COMPLETE** — runtime E2E closed; BE `0245053`; FE `8587e04` |
+| SA-UJ-052 | PASS | **PASS** | **PASS** (POST tills 201 + cross-tenant reject) | **COMPLETE** — runtime E2E closed; BE `0245053`; FE `8587e04` |
+| SA-UJ-053 | PASS | **PASS** | **PASS** (POST roles 201 + options reload) | **COMPLETE** — runtime E2E closed; BE `0245053`; FE `8587e04` |
+| SA-UJ-054 | PASS | **PASS** | **PASS** (POST users 201 + invite secret) | **COMPLETE** — runtime E2E closed; BE `0245053`; FE `8587e04` |
+| SA-UJ-055 | PASS | **PASS** | **PASS** (product + opening stock DB) | **COMPLETE** — runtime E2E closed; BE `0245053`; FE `8587e04` |
+| SA-UJ-056 | PASS | **PASS** | **PASS** (validate/commit/retry/errors.csv) | **COMPLETE** — runtime E2E closed; BE `0245053`; FE `8587e04` |
+| SA-UJ-057 | PASS (`GET/PUT .../bootstrap/online-store` + hub) | **PASS** | **PASS** (entitled + NOT_ENTITLED) | **COMPLETE** — runtime E2E closed; BE `0245053`; FE `8587e04` |
 
 Route family: `/api/v1/platform-admin/tenants/{tenantId}/bootstrap/*`.  
-**No journey is globally COMPLETE** — Angular shipped and unit/build green (577 passed; `ng build` succeeded), but runtime E2E remains **ENVIRONMENT_BLOCKED**.  
-SA-UJ-049 and SA-UJ-050 moved **NOT_STARTED → PARTIAL** after Angular switch/exit shipped.
+SA-UJ-048…057 are **COMPLETE** after final independent runtime E2E (2026-08-13). Outlet/role authoritative picker = **RESOLVED**. Evidence: [[../../15_IMPLEMENTATION_TRACKING/99_AUDITS/ONEVERZ_SELECTED_TENANT_FINAL_RUNTIME_E2E_CLOSURE_2026-08-13]].

@@ -87,4 +87,4 @@ Selected-Tenant Angular production merged to frontend `origin/main` (`a2330d4e5c
 | `ng build` | **succeeded** |
 | Runtime backend integration / E2E | **ENVIRONMENT_BLOCKED** (localhost:5150 unavailable) |
 
-Journey status implication: SA-UJ-048…057 remain **PARTIAL** (not COMPLETE) until runtime E2E can execute. ST-UX-001 = **PASS** (implemented; not counted). Full evidence: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/ONEVERZ_SELECTED_TENANT_ANGULAR_IMPLEMENTATION_EVIDENCE_2026-08-12]].
+Journey status implication: SA-UJ-048…057 = **COMPLETE** after final independent runtime E2E (2026-08-13). ST-UX-001 = **PASS** (implemented; not counted). Full evidence: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/ONEVERZ_SELECTED_TENANT_FINAL_RUNTIME_E2E_CLOSURE_2026-08-13]].
