@@ -266,6 +266,34 @@ and commits all close records atomically. Existing route is implemented but
 production-blocked. Canonical:
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]].
 
+### Cash Drawer contract clarification — 2026-08-13
+
+Physical Open Drawer reuses existing HardwareCash endpoints (IMPLEMENTED):
+
+| Method | Route | Role |
+|---|---|---|
+| POST | `/api/v1/pos/hardware/drawer/operations` | Register drawer open operation |
+| PUT | `/api/v1/pos/hardware/drawer/operations/{operationId}/finalize` | Finalize result |
+| POST | `/api/v1/pos/hardware/drawer/operations/manual-open` | Manual / no-sale open |
+| GET | `/api/v1/pos/hardware/drawer/operations/history` | History by device |
+| GET | `/api/v1/pos/hardware/drawer/operations/{operationId}` | Status by id |
+| GET | `/api/v1/pos/hardware/drawer/operations/by-request/{requestId}` | Idempotent lookup |
+
+Financial Cash Drawer APIs are **APPROVED_TARGET_NOT_IMPLEMENTED** (no current
+controller under `/api/v1/pos/cash-drawer`):
+
+| Method | Route | Status | Role |
+|---|---|---|---|
+| GET | `/api/v1/pos/cash-drawer/summary?deviceId=` | APPROVED_TARGET_NOT_IMPLEMENTED | Backend-authoritative till cash summary |
+| GET | `/api/v1/pos/cash-drawer/movements` | APPROVED_TARGET_NOT_IMPLEMENTED | Recent movements (paginated) |
+| POST | `/api/v1/pos/cash-drawer/movements` | APPROVED_TARGET_NOT_IMPLEMENTED | Create `CASH_IN` / `CASH_OUT` / `CASH_DROP` |
+
+Do not invent duplicate till/open/close endpoints for Cash Drawer. Permissions:
+`cash_drawer.view`, `cash_drawer.manage`, `cash_drawer.movement.create`,
+`pos.till.close`. Canonical:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]],
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
+
 ### Device activation contract clarification — 2026-08-10
 
 No new activation endpoint is required. `POST /api/v1/devices/activate` reuses

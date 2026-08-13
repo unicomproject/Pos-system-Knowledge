@@ -1,7 +1,7 @@
 <!-- title: POS App UI Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-11 -->
+<!-- last_updated: 2026-08-13 -->
 
 # POS App UI Rules
 
@@ -161,6 +161,23 @@ Canonical:
 Till close must show counted cash, expected cash, variance, and close note.
 
 Cash in/out must require type, amount, and reason.
+
+### Cash Drawer UI contract (2026-08-13)
+
+- Title **Cash Drawer** and subtitle inside the main **white** content card
+  below the standard POS top bar.
+- No back-arrow; no “Continue to Dashboard”.
+- Normal POS bottom navigation remains available.
+- Simplified summary: Till, Status, Opening Cash, Cash Sales, Current Expected
+  Cash (backend-authoritative Expected Cash).
+- Actions: Open Drawer, Cash In, Cash Out/Drop, Close Till.
+- Recent movements newest first; colour is semantic only.
+- Phone + Tablet + Desktop; reuse `TenantAdminBreakpoints`.
+- Orange primary / black shell via shared tokens only — no feature hex.
+
+Canonical:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]],
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
 
 ## Device UI Rules
 

@@ -176,7 +176,8 @@ PR/commit reference is recorded.
 | Flutter | Sales | Email Receipt | In Progress | - | `scanner_inte` | Form/UI exists; delivery API completion not verified |
 | Flutter | Sales | Return / Refund | Testing | - | `scanner_inte` + backend `main` | Full authoritative workflow and broad automated coverage exist |
 | Flutter | Sales | Exchange | Testing | - | `scanner_inte` + backend `main` | Implemented as Return resolution branch with preview/completion |
-| Flutter | Cash Drawer | Cash In / Cash Out | In Progress | - | `scanner_inte` | Flutter forms exist; backend mutation wiring is absent |
+| Flutter | Cash Drawer | Cash Drawer Management | Second Brain aligned; implementation pending | 2026-08-13 | Docs + code evidence | Financial `/pos/cash-drawer/*` APPROVED_TARGET_NOT_IMPLEMENTED; Cash In/Out FRONTEND_ONLY; hardware drawer REUSE. [[Flutter/Hardware/Cash_Drawer_Second_Brain_Alignment_2026-08-13]] |
+| Flutter | Cash Drawer | Cash In / Cash Out | FRONTEND_ONLY | 2026-08-13 | `lib/features/cash_drawer` | Forms exist; no Dio mutation; local in-memory movements only |
 | Flutter | Sales | Park / Recall | Completed | 2026-08-07 | Current working tree | Chunk 3 authenticated E2E accepted on the existing route/provider: filters, authoritative summaries, View, Recall, non-empty-cart safety, Cancel/no-hard-delete, responsive runtime and 44/44 focused tests passed; safe runtime pagination-volume/role-switch/fault-injection limits are documented. |
 | Flutter | Hardware | HID / Camera Barcode Scanner | Testing | - | Current working tree | Chunk 3 code and automation implemented; TB-00D/camera/POS80 physical matrix pending |
 | Flutter | Hardware | Hardware Testing Workflow | Testing | - | Current working tree | Authoritative versioned printer config and backend test-log lifecycle wired; scanner screen and physical matrix pending |

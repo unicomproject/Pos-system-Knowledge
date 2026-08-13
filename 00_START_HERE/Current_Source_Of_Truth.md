@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-13 -->
 
 
 # Current Source Of Truth
@@ -48,6 +48,23 @@ trusts caller `ExpectedCash` (fallback opening float) and does not insert
 `cash_reconciliations`. Target uses backend-authoritative Expected Cash and one
 atomic session + reconciliation + CLOSED-event transaction. No new table,
 attribute, migration or permission is required.
+
+Cashier **Cash Drawer** requirements are governed by
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]] and
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
+Physical Open Drawer reuses `/api/v1/pos/hardware/drawer/*` and
+[[../12_INTEGRATIONS/Cash_Drawer_Integration]]. Close Till is reused, not
+duplicated. Financial summary/movements APIs
+(`GET/POST /api/v1/pos/cash-drawer/...`) are **APPROVED_TARGET_NOT_IMPLEMENTED**.
+No new Cash Drawer table or UI-only summary columns are approved. Current
+runtime cash ledger is `till_cash_movements` (+ cash sales from
+`sales_payments`); long-term ERD target remains `cash_movements` +
+`cash_movement_types` — dual-write is forbidden. Cash In/Out/Drop are online
+backend-authoritative. Permissions reuse `cash_drawer.view`,
+`cash_drawer.manage`, `cash_drawer.movement.create`, `pos.till.close`.
+Alignment evidence:
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Second_Brain_Alignment_2026-08-13]].
+Do not mark Cash Drawer Complete from documentation alone.
 
 Tenant-configurable pre-authentication POS Login Branding is governed by
 [[../04_MODULE_KNOWLEDGE/02_Tenant_Foundation/04_POS_Login_Branding_Functional_Rules]]

@@ -1,7 +1,7 @@
 <!-- title: Flutter Cashier POS Implementation Map -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-13 -->
 
 
 # Flutter Cashier POS Implementation Map
@@ -16,6 +16,14 @@
 > **PENDING**. Canonical:
 > [[Flutter_Open_Till_Screen_Implementation_Specification]],
 > [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]].
+
+> Cash Drawer (2026-08-13): Second Brain production alignment complete.
+> Financial `/api/v1/pos/cash-drawer/*` APIs are APPROVED_TARGET_NOT_IMPLEMENTED.
+> Flutter Cash In/Out remains FRONTEND_ONLY. Physical Open Drawer reuses
+> `/api/v1/pos/hardware/drawer/*`. Canonical:
+> [[Flutter_Cash_Drawer_Management_Implementation_Specification]],
+> [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]],
+> [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Second_Brain_Alignment_2026-08-13]].
 
 ## Purpose
 
@@ -63,7 +71,7 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 | Returns & Exchanges | Count | `GET /api/v1/pos/returns/sales/search` | Step 1 integrated; exact `returns.view` |
 | Customer Management | Count | customers APIs | Wired (`/pos/customers`); separate approved checkout selector remains pending |
 | Parked Sales | Device-local count/dialog | Backend `/api/v1/pos/holds` exists but is not called by Flutter | Partial/disconnected |
-| Cash Drawer | Balance | drawer detail API | Partial (balance only) |
+| Cash Drawer | Balance + actions | Target `/api/v1/pos/cash-drawer/*`; hardware drawer reused | Partial UI; financial APIs NOT_IMPLEMENTED; Cash In/Out FRONTEND_ONLY |
 | Online Orders | Placeholder | none | UI only |
 
 ### Dashboard implementation update (2026-07-24)
@@ -218,7 +226,7 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 | Returns & Exchanges | Count | `GET /api/v1/pos/returns/sales/search` | Step 1 integrated; exact `returns.view` |
 | Customer Management | Count | customers APIs | Wired (`/pos/customers`); not the approved full-screen checkout selector |
 | Parked Sales | Device-local count/dialog | Backend `/api/v1/pos/holds` exists but is not called by Flutter | Partial/disconnected |
-| Cash Drawer | Balance | drawer detail API | Partial (balance only) |
+| Cash Drawer | Balance + actions | Target `/api/v1/pos/cash-drawer/*`; hardware drawer reused | Partial UI; financial APIs NOT_IMPLEMENTED; Cash In/Out FRONTEND_ONLY |
 | Online Orders | Placeholder | none | UI only |
 
 ### Dashboard implementation update (2026-07-24)

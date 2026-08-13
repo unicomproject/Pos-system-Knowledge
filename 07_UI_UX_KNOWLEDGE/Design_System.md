@@ -1,7 +1,7 @@
 <!-- title: Design System -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-11 -->
+<!-- last_updated: 2026-08-13 -->
 
 # Design System
 
@@ -132,6 +132,22 @@ The Flutter POS canonical primary action is
 **orange**, not the navy→violet `PosPrimaryActionButton` gradient. Prefer
 shared/orange tokenized CTA styling for that screen; do not introduce blue or
 purple Open Till primary actions.
+
+**Cashier POS Cash Drawer / cash-control exception (2026-08-13):** Cash Drawer
+and related Cash In / Cash Out·Drop / Close Till Cashier surfaces use the
+approved Cashier POS visual direction:
+
+| Purpose | Hex (docs only) | Shared token — never hard-code hex in feature widgets |
+|---|---|---|
+| Primary orange | `#FF6A00` | `TenantAdminColors.posHomeAccentOrange` |
+| Shell / workspace black | `#000000` / `#030303` | `TenantAdminColors.posHomeDarkBackground` / `background` |
+| Success / error / info | semantic | `TenantAdminColors.success`, `danger`, and existing info tokens |
+
+White content surface; semantic green/red/(info)blue for movement styling.
+Touch-friendly enterprise layout. **Do not** globally overwrite Tenant Admin or
+Platform Admin themes. Feature code must not use direct `Color(0x...)`, `#hex`,
+or a feature-local `CashDrawerColors` file. Canonical:
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
 
 ## Form Rules
 

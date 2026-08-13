@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Technical Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-13 -->
 
 # Hardware Operations, Till Session & Cash Control Technical Contract
 
@@ -14,7 +14,7 @@ new OneVerz POS MVP scope images and the uploaded Unified Commerce database desi
 
 | Area | Contract |
 |---|---|
-| API groups | `/api/v1/tills/current-session`, `/api/v1/tills/open`, `/api/v1/tills/close` |
+| API groups | `/api/v1/tills/current-session`, `/api/v1/tills/open`, `/api/v1/tills/close`, `/api/v1/pos/hardware/drawer/*`; approved target `/api/v1/pos/cash-drawer/*` |
 | Request format | Typed request DTOs; no raw map payloads in application layer |
 | Response format | Typed response DTOs with safe fields only |
 | Error format | Standard API error response |
@@ -28,7 +28,9 @@ new OneVerz POS MVP scope images and the uploaded Unified Commerce database desi
 | `/api/v1/tills/current-session` | Resolve the assigned open till session |
 | `/api/v1/tills/open` | Open the assigned till with opening float |
 | `/api/v1/tills/close` | Close the open session with counted cash and variance reason |
-| Cash movement / hardware test | No verified Cashier mutation API currently exists |
+| `/api/v1/pos/hardware/drawer/*` | Physical cash-drawer operations (IMPLEMENTED) |
+| `/api/v1/pos/cash-drawer/summary` | Cash Drawer authoritative summary — **APPROVED_TARGET_NOT_IMPLEMENTED** |
+| `/api/v1/pos/cash-drawer/movements` | List / create manual movements — **APPROVED_TARGET_NOT_IMPLEMENTED** |
 
 ### Open Till reuse clarification — 2026-08-11
 
@@ -48,6 +50,13 @@ blocked. Target: calculate expected cash server-side and atomically write the
 closed session, one reconciliation and one CLOSED event. Full contract:
 [[05_Close_Till_Feature]].
 
+### Cash Drawer production clarification — 2026-08-13
+
+Cash Drawer reuses till session APIs and physical drawer APIs above. Financial
+summary/list/create endpoints under `/api/v1/pos/cash-drawer/*` are approved
+targets and are **not** implemented. Full contract: [[06_Cash_Drawer_Feature]]
+and [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
+
 ## Database Contract
 
 | Table | Contract |
@@ -56,9 +65,14 @@ closed session, one reconciliation and one CLOSED event. Full contract:
 | `hardware_device_assignments` | Used by this module |
 | `hardware_test_logs` | Used by this module |
 | `till_sessions` | Used by this module |
-| `till_cash_movements` | Canonical cash-movement table; existing writes are partial and cashier mutation API is absent |
+| `cash_movement_types` | Type catalog / affects_expected_cash configuration |
+| `till_cash_movements` | **Current runtime** financial movement ledger; cashier mutation API absent |
+| `cash_movements` | SCHEMA_ONLY / long-term ERD target; do not dual-write with `till_cash_movements` |
+| `cash_drawer_operations` | Physical Open Drawer audit (implemented) |
 | `cash_reconciliations` | Schema exists; current Close Till write is missing |
 | `cash_count_denominations` | Used by this module |
+
+**No new Cash Drawer summary/history table or UI-only expected-cash columns.**
 
 ## Hardware Readiness UI Mapping
 
@@ -149,6 +163,7 @@ Test coverage must include:
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/02_Functional_Rules]]
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]]
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]]
+- [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]]
 
 ## Barcode scanner device contract (2026-07-29)
 

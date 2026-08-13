@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-13 -->
 
 # Hardware Operations, Till Session & Cash Control Module Overview
 
@@ -21,8 +21,8 @@ merchandising, attractions, and temporary retail locations.
 | Module | `Hardware_Till_Cash_Control` |
 | Module number | 08 |
 | Primary users | Cashier, Store Manager, Tenant Admin |
-| Frontend surfaces | Till open/close, Cash in/out, Hardware testing, Printer/scanner/drawer/card reader status, Hardware readiness monitoring |
-| API groups | Verified Cashier APIs: `/api/v1/tills/current-session`, `/api/v1/tills/open`, `/api/v1/tills/close`; hardware/cash-movement test APIs are not implemented |
+| Frontend surfaces | Till open/close, Cash Drawer (summary/actions/movements), Cash in/out, Hardware testing, Printer/scanner/drawer/card reader status, Hardware readiness monitoring |
+| API groups | Verified: `/api/v1/tills/current-session`, `/api/v1/tills/open`, `/api/v1/tills/close`, `/api/v1/pos/hardware/drawer/*`. Approved target (not implemented): `/api/v1/pos/cash-drawer/summary`, `/api/v1/pos/cash-drawer/movements` |
 
 ## Main Tables
 
@@ -32,7 +32,10 @@ merchandising, attractions, and temporary retail locations.
 | `hardware_device_assignments` | Used by this module |
 | `hardware_test_logs` | Used by this module |
 | `till_sessions` | Used by this module |
-| `till_cash_movements` | Schema foundation exists; cashier mutation API is not wired |
+| `cash_movement_types` | Type catalog / `affects_expected_cash` (read today) |
+| `till_cash_movements` | **Current runtime** financial movement ledger (partial writes; no cashier Cash In/Out API yet) |
+| `cash_movements` | Schema present; **SCHEMA_ONLY** (no app writer); long-term ERD target with `cash_movement_types` |
+| `cash_drawer_operations` | Physical Open Drawer audit (implemented) |
 | `cash_reconciliations` | Schema exists; current Close Till does not persist it |
 | `cash_count_denominations` | Used by this module |
 
@@ -47,8 +50,12 @@ merchandising, attractions, and temporary retail locations.
   Windows Local Print Agent on an explicitly allowed private LAN.
 - Printer process health, printer readiness, and paper completion are separate
   states; spooler acceptance does not prove that paper printed successfully.
-- Current hardware-test logging and cashier Cash In/Out are not end-to-end
-  implemented; schema presence is not operational API behavior.
+- Current hardware-test logging and cashier Cash In/Out financial APIs are not
+  end-to-end implemented; schema presence is not operational API behavior.
+- Cash Drawer screen contract is documented in [[06_Cash_Drawer_Feature]];
+  financial `/pos/cash-drawer/*` APIs remain APPROVED_TARGET_NOT_IMPLEMENTED.
+- One financial cash-movement ledger is mandatory; do not dual-write
+  `till_cash_movements` and `cash_movements`.
 - Close Till route and CLOSED event exist, but production close is blocked until
   Expected Cash is backend-calculated and `cash_reconciliations` is committed.
 
@@ -82,6 +89,9 @@ merchandising, attractions, and temporary retail locations.
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/03_Technical_Contract]]
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]]
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]]
+- [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]]
+- [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]]
+- [[../../12_INTEGRATIONS/Cash_Drawer_Integration]]
 
 
 ## Tenant Admin Monitoring Surface (2026-08-01)
