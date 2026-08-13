@@ -279,9 +279,15 @@ The production popup adds dynamic ID-based option resolution, one image slot, qu
 | Non-sale copies | Device printer policy + deterministic copy identity | Implemented; physical pending |
 | Copy audit recovery | Per-copy pending audit, audit-only retry | Implemented |
 
-## Cash Payment Screen Target (2026-08-04)
+## Cash Payment Screen Target (2026-08-14)
 
-The new Cash Payment screen redesign is fully documented but its implementation remains pending/not completed by this task. See the dedicated specification: [[Flutter_Cash_Payment_Screen_Implementation_Specification]]. Documentation Status: Documentation Ready.
+Cash Payment redesign is **implemented** and matches the approved Order Summary | Cash Payment composition.
+
+- Route: `/pos/new-sale/payment/cash` → `PosCashPaymentScreen`
+- Fixed viewport layout (no page scroll); compact fonts/paddings; item list may scroll inside the summary card only
+- Right panel: single CASH PAYMENT card (Amount Received + Quick chips + keypad + CHANGE DUE + COMPLETE SALE)
+- Status tracking: [[../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Cash_Payment_Screen_Redesign_Implementation_Status]]
+- Spec: [[Flutter_Cash_Payment_Screen_Implementation_Specification]]
 
 ## Related Files
 

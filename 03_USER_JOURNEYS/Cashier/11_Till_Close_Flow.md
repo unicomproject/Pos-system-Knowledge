@@ -106,6 +106,11 @@ test and logout-failure recovery evidence remain gaps.
 - Sensitive actions write audit records where required.
 - UI state and backend state stay consistent after completion.
 
+## Visual Direction
+
+Approved orange Close Till presentation (including Save Draft outline + solid Close Till CTA):
+[[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Close_Till_Orange_Visual_Direction]]
+
 ## Related Files
 
 - [[../../01_RELEASE_SCOPE/Release_1_Scope]]

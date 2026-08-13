@@ -25,6 +25,13 @@ Removed dark scaffold frame and unnecessary margins on cashier Open Till screen.
 Layout now uses full-screen `Row` with stretched setup sidebar and embedded open
 till form on tablet.
 
+### Orange visual alignment (2026-08-14)
+
+Open Till primary accents/CTA now follow OneVerz orange
+(`TenantAdminColors.posHomeAccentOrange`). Canonical visual contract:
+[[../../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Close_Till_Orange_Visual_Direction]]
+and status [[Open_Close_Till_Orange_Theme_Implementation_Status]].
+
 ## API Dependency
 
 | API | Status |
