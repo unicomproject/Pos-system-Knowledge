@@ -1,7 +1,7 @@
 <!-- title: POS Operations -->
 <!-- status: Updated -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-07 -->
+<!-- last_updated: 2026-08-11 -->
 <!-- source: 21_POS Operations ERD image -->
 
 # 21. POS Operations
@@ -490,6 +490,18 @@ FK(pos_device_id) REFERENCES pos_devices(id)
 CHECK(event_type IN ('OPENED', 'CLOSED', 'PAUSED', 'RESUMED', 'CASH_IN', 'CASH_OUT', 'NOTE'))
 CHECK(amount IS NULL OR amount >= 0)
 ```
+
+### Runtime write behaviour (verified 2026-08-11)
+
+| Operation | Writes `till_session_events`? |
+|---|---|
+| Open Till (`POST /api/v1/tills/open`) | **No** — creates `till_sessions` only; no `OPENED` row |
+| Close Till (`POST /api/v1/tills/close`) | **Yes** — `CLOSED` via `TillSessionEvent.RecordClosed` |
+
+Schema allows `OPENED`, but Open Till does not currently emit it. This is a
+documented implementation gap, not a reason to invent a new Open Till API or
+table. Feature contract:
+[[../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]].
 
 ---
 

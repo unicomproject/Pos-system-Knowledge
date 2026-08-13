@@ -1,8 +1,7 @@
 <!-- title: End Shift And Close Till Implementation Status -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-10 -->
-
+<!-- last_updated: 2026-08-12 -->
 
 # End Shift And Close Till Implementation Status
 
@@ -10,49 +9,80 @@
 
 | Item | Value |
 |---|---|
-| Platform | Flutter |
-| Module | Cash Drawer / Till |
-| Feature | Close till + End Shift logout |
-| Status | Completed |
-| Completed Date | 2026-07-09 |
-| Branch | `POS_UI` / `Log_in_01` (merged) |
-| PR / Commit | `a58e446`, `d04ecf0` |
-| Tests | Manual / widget coverage partial |
+| Platform | Flutter + backend dependency |
+| Feature | Close Till and End Shift |
+| Documentation | Complete for production implementation |
+| Screen/API wiring | Implemented |
+| Production status | **Blocked — Chunk 3 runtime acceptance incomplete** |
+| Blockers | Post-fix runtime build plus balanced/short/over, concurrency, security, failure, responsive and End Shift evidence are still required |
+| Runtime acceptance | Started 2026-08-12; release-critical matrix not completed |
 
-## Feature Summary
+Chunk 1 backend remediation and Chunk 2 Flutter implementation are present in
+the current working trees. Production status remains blocked until the full
+Chunk 3 runtime matrix is executed against a build containing those changes.
 
-Cashier sidebar **End Shift** replaces direct logout when till session is open.
-Flow: End Shift → `/pos/cash-drawer/close-till?endShift=true` →
-`POST /api/v1/tills/close` success → clear session → `/tenant-login`.
+## Implemented Current Behaviour
 
-Normal close-till (without end shift) re-bootstraps POS session and returns to
-post-login route.
+- End Shift routes to `/pos/cash-drawer/close-till?endShift=true`.
+- Normal Close Till uses `/pos/cash-drawer/close-till`.
+- Existing componentized form accepts counted cash, mismatch reason and note.
+- `POST /api/v1/tills/close` is integrated.
+- Normal success refreshes POS bootstrap; End Shift success clears auth and opens
+  tenant login.
+- Failure does not intentionally log out or report local CLOSED success.
 
-## Integration Status
+## Chunk 3 Runtime Acceptance — 2026-08-12
 
-| Step | Status | API |
-|---|---|---|
-| Open till required check | Integrated | `GET /api/v1/tills/current-session` |
-| Close till form | Integrated | UI + local form state |
-| Close till submit | Integrated | `POST /api/v1/tills/close` |
-| End shift logout | Integrated | No extra API; uses tenant session clear |
-| Tenant Admin logout | Unchanged | Separate sidebar/logout path |
+- Backend API listened on `http://localhost:5150`; PostgreSQL listened on 5432;
+  the authenticated Pixel Tablet Flutter runtime was available.
+- Real context resolved as Development Main Store / Front Till 01 / Kavin.
+- Read-only PostgreSQL evidence found open session `TS-0167`
+  (`6b873b84-b926-4b55-af8e-45f416879a7c`) with zero opening float.
+- Runtime Close Till loaded the authoritative zero expected cash and displayed
+  `Balanced`, but the running build exposed a legacy purple primary action.
+- The Close Till action now explicitly uses centralized OneVerz orange token
+  `TenantAdminColors.posHomeAccentOrange`; analyze passed and 11 focused tests
+  passed. The running APK was not rebuilt after this correction.
+- No Close Till submission was made during this acceptance attempt. The open
+  session was preserved; no new reconciliation or CLOSED event was created.
+- Balanced, Short, Over, repeated-submit, real PostgreSQL concurrency,
+  permission/device/till/tenant negatives, network/rollback, normal navigation,
+  End Shift, post-fix Phone/Tablet/Desktop and desktop keyboard acceptance remain
+  unverified. Production readiness must not be claimed.
 
-## Tenant Admin Impact
+## Backend Remediation State
 
-None. End Shift is cashier POS sidebar only.
+The current workspace implements server-authoritative Expected Cash, ignores
+caller authority, atomically persists reconciliation/session/event, validates
+canonical reasons and note length, and protects concurrent close. Previous
+Chunk 1 regression evidence is 1,883 passed with a clean Release build. Chunk 3
+still requires real runtime/database proof of those behaviours.
 
-## Files Changed
+No new permission, table, attribute or migration is required by the verified
+schema. Existing API routes are reused; their implementation/read model changes.
 
-```text
-lib/features/pos_shell/presentation/widgets/sidebar/pos_sidebar.dart
-lib/features/cash_drawer/presentation/screens/pos_close_till_screen.dart
-lib/features/cash_drawer/presentation/providers/cash_drawer_provider.dart
-lib/features/till/data/datasources/till_remote_datasource.dart
-```
+## Required Verification
+
+| Gate | Required result |
+|---|---|
+| Backend focused tests | authoritative expected, balanced/variance, rollback, concurrency |
+| Flutter focused tests | state, validation, one tap, navigation, responsive layout |
+| Authenticated E2E | real normal close and End Shift behavior |
+| Database read-only evidence | one session, reconciliation and CLOSED event |
+| Failure evidence | no logout/fake close/duplicate on known failure |
+
+## Change History
+
+| Date | Correction |
+|---|---|
+| 2026-07-09 | Route, API and logout wiring recorded as completed |
+| 2026-08-11 | Reclassified production feature to Blocked after source/schema audit |
+| 2026-08-12 | Chunk 1/2 implementation present; Chunk 3 runtime started and remains blocked pending full post-fix acceptance matrix |
 
 ## Related Files
 
+- [[../../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]]
+- [[../../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Close_Till_Screen_Implementation_Specification]]
 - [[../../Backend/OutletTillDevice/Till_Session_Open_Close_Implementation_Status]]
 - [[../../../03_USER_JOURNEYS/Cashier/11_Till_Close_Flow]]
-- [[../Full_Feature_Status_Index]]
+- [[../../Full_Feature_Status_Index]]

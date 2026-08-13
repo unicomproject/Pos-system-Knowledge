@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-10 -->
+<!-- last_updated: 2026-08-13 -->
 
 
 # Current Source Of Truth
@@ -27,6 +27,44 @@ The 2026-08-05 documentation audit is the current traceability layer: [[../15_IM
 Chunk 2 security authority is the approved [[../13_DECISIONS_AND_CHANGES/FLOW_4_SECURE_TEST_HOST_TOKEN_AND_FIXTURE_CONTRACT_2026-08-05]], with threat model [[../09_SECURITY_AND_COMPLIANCE/FLOW_4_TEST_FIXTURE_TOKEN_THREAT_MODEL_2026-08-05]] and implementation contract [[../10_TESTING_QA/FLOW_4_SECURE_LIFECYCLE_FIXTURE_IMPLEMENTATION_CONTRACT_2026-08-05]]. Chunk 3 must use a separate non-HTTP test CLI/hybrid, production token/hash primitives, cumulative environment/database/credential guards, one-time process-local secret handoff and ownership-bound cleanup. No production fixture endpoint, DI registration or Swagger route is authorized. This approval does not increase the 59/64 verified P0 count; fixture runtime and security proof remain pending.
 
 ## Highest Priority Decision
+
+Cashier **Open Till** requirements are governed by
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]] and
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Till_Screen_Implementation_Specification]].
+Backend Open/Current-session APIs are **EXISTING / REUSE**. New API, table, DB
+attribute, permission and migration are **NOT REQUIRED**. Open Till is
+**online backend-authoritative** (no fake offline OPEN). Approved UI: reuse
+Dashboard Top Bar, OneVerz **orange** theme (not blue/purple), white parent
+surface, bold/dark important text, Phone + Tablet + Desktop. Flutter alignment
+to that contract remains **PENDING**; documentation readiness does not mark
+implementation Complete.
+
+Cashier **Close Till / End Shift** requirements are governed by
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]] and
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Close_Till_Screen_Implementation_Specification]].
+The existing screen, `POST /api/v1/tills/close`, `pos.till.close`, tables and
+CLOSED event are reusable. Production status is **BLOCKED**: current backend
+trusts caller `ExpectedCash` (fallback opening float) and does not insert
+`cash_reconciliations`. Target uses backend-authoritative Expected Cash and one
+atomic session + reconciliation + CLOSED-event transaction. No new table,
+attribute, migration or permission is required.
+
+Cashier **Cash Drawer** requirements are governed by
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]] and
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
+Physical Open Drawer reuses `/api/v1/pos/hardware/drawer/*` and
+[[../12_INTEGRATIONS/Cash_Drawer_Integration]]. Close Till is reused, not
+duplicated. Financial summary/movements APIs
+(`GET/POST /api/v1/pos/cash-drawer/...`) are **APPROVED_TARGET_NOT_IMPLEMENTED**.
+No new Cash Drawer table or UI-only summary columns are approved. Current
+runtime cash ledger is `till_cash_movements` (+ cash sales from
+`sales_payments`); long-term ERD target remains `cash_movements` +
+`cash_movement_types` — dual-write is forbidden. Cash In/Out/Drop are online
+backend-authoritative. Permissions reuse `cash_drawer.view`,
+`cash_drawer.manage`, `cash_drawer.movement.create`, `pos.till.close`.
+Alignment evidence:
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Second_Brain_Alignment_2026-08-13]].
+Do not mark Cash Drawer Complete from documentation alone.
 
 Tenant-configurable pre-authentication POS Login Branding is governed by
 [[../04_MODULE_KNOWLEDGE/02_Tenant_Foundation/04_POS_Login_Branding_Functional_Rules]]
@@ -124,12 +162,14 @@ for protected business decisions.
 
 Allowed offline/cached areas include product lookup, barcode lookup, product
 grid/search, price/tax calculation, active cart save/restore, cash sale, receipt
-print, park/hold sale, current till session, recent customer basic lookup,
+print, park/hold sale, current till session (restore of an already
+backend-confirmed OPEN session only), recent customer basic lookup,
 pending inventory movement, and sync outbox.
 
 Backend-final areas include final inventory quantity, synchronized Discount and
 final sale total, card/QR payment, refund,
-exchange, future/deferred loyalty or store credit, and till final close.
+exchange, future/deferred loyalty or store credit, **till open**, and till final
+close. Do not invent a local-only successful Open Till.
 
 ## Platform Source Rule
 

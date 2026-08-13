@@ -1,9 +1,23 @@
 <!-- title: Cash Payment Screen Redesign Implementation Status -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-05 -->
+<!-- last_updated: 2026-08-13 -->
 
 # Cash Payment Screen Redesign Implementation Status
+
+## 2026-08-13 — Authoritative Total and Submission Safety Follow-up
+
+- Cash tender amounts are calculated against a current, backend-authoritative
+  checkout summary only.
+- The screen blocks loading, refresh, failure and stale-fingerprint states.
+- A final fingerprint check runs immediately before submission.
+- `start-payment` does not serialize a client payable total; the backend
+  recalculates and the success provider records response `grandTotal`, discount,
+  cash received and change due.
+- Focused Flutter pricing/payment tests and backend checkout repository tests
+  pass. No new backend API, schema or migration was required for this fix.
+- Authenticated runtime acceptance of the exact offer transaction remains
+  pending; do not infer it from automated tests alone.
 
 ## Tracking Summary
 - **Implementation Status:** Complete

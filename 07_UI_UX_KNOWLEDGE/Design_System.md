@@ -1,7 +1,7 @@
 <!-- title: Design System -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-10 -->
+<!-- last_updated: 2026-08-13 -->
 
 # Design System
 
@@ -41,6 +41,13 @@ This is not a generic POS theme.
 | Success | Use status styling, not decorative color overload |
 | Warning | Use clear warning state for stock, expiry, payment, till variance |
 | Error | Strong red/error state with text explanation |
+
+**Open Till (2026-08-11):** The approved Open Till primary action / accent colour
+is OneVerz **orange**. Do not treat blue or purple/violet as the approved Open
+Till primary. Reuse existing orange theme tokens (for example
+`posHomeAccentOrange` / `posHomeOrangeStart` / `posHomeOrangeEnd`). Screen
+contract:
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Till_Screen_Implementation_Specification]].
 
 Do not create a colorful consumer app style.
 
@@ -120,6 +127,27 @@ The Flutter POS canonical primary action is
 - Back, Cancel, and Close remain outlined/neutral. Delete, Void, Reject, and
   other destructive actions retain semantic red styling.
 - Feature code must not duplicate the navy-to-violet primary gradient.
+
+**Open Till exception to violet shared CTA:** Open Till’s approved primary is
+**orange**, not the navy→violet `PosPrimaryActionButton` gradient. Prefer
+shared/orange tokenized CTA styling for that screen; do not introduce blue or
+purple Open Till primary actions.
+
+**Cashier POS Cash Drawer / cash-control exception (2026-08-13):** Cash Drawer
+and related Cash In / Cash Out·Drop / Close Till Cashier surfaces use the
+approved Cashier POS visual direction:
+
+| Purpose | Hex (docs only) | Shared token — never hard-code hex in feature widgets |
+|---|---|---|
+| Primary orange | `#FF6A00` | `TenantAdminColors.posHomeAccentOrange` |
+| Shell / workspace black | `#000000` / `#030303` | `TenantAdminColors.posHomeDarkBackground` / `background` |
+| Success / error / info | semantic | `TenantAdminColors.success`, `danger`, and existing info tokens |
+
+White content surface; semantic green/red/(info)blue for movement styling.
+Touch-friendly enterprise layout. **Do not** globally overwrite Tenant Admin or
+Platform Admin themes. Feature code must not use direct `Color(0x...)`, `#hex`,
+or a feature-local `CashDrawerColors` file. Canonical:
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
 
 ## Form Rules
 

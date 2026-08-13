@@ -444,14 +444,23 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `returns.create` | Continue from Step 1 into Step 2 Sale Summary and later shared create steps |
 | `refunds.view` / `exchanges.view` | Branch view only; do not unlock shared Step 1 search |
 | `refunds.create` / `exchanges.create` | Branch processing after resolution is selected |
-| `cash_drawer.view` / `cash_drawer.manage` | Cash drawer nav |
-| `cash_drawer.movement.create` | Create authorized Cash In/Out movement when backend flow exists |
+| `cash_drawer.view` | View Cash Drawer screen / nav |
+| `cash_drawer.manage` | Physical/manual Open Drawer management |
+| `cash_drawer.movement.create` | Create authorized Cash In / Cash Out / Cash Drop (canonical; seed + API enforce required) |
 | `notifications.view` | Notification bell |
-| `pos.till.open` | Till open flow (`canOpenPosTill`) |
-| `pos.till.close` | End Shift / close currently assigned open till session |
+| `pos.till.open` | Till open flow (`canOpenPosTill`); backend Open Till authority |
+| `pos.till.close` | End Shift / close currently assigned open till session / Close Till action |
 | `pos.hardware.settings` | Configure/test Local Print Agent for the activated POS device |
 | `tenant.till.manage` | Device activation gate (`canActivatePosDevice`) |
 | `till.session.view` | Home header till status chip |
+
+Canonical Open Till permission remains `pos.till.open`. No new Open Till
+permission is required. Feature contract:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]].
+
+Canonical Close Till permission remains `pos.till.close`; no new permission is
+required for reconciliation or End Shift. Feature contract:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]].
 
 `canActivatePosDevice` is a Flutter visibility/action capability only. The
 backend `POST /api/v1/devices/activate` independently enforces
@@ -476,10 +485,16 @@ Receipt printing and hardware configuration are separate:
 activated-device Local Print Agent settings/testing surface.
 
 Permission visibility does not prove implementation. In particular,
-`cash_drawer.manage` currently gates Flutter surfaces without verified drawer
-pulse execution. `pos.hardware.settings` exists, but backend hardware-test-log
-persistence is not wired. No distinct merchant-copy or sensitive-reprint
+`cash_drawer.manage` gates physical Open Drawer (hardware path exists).
+`cash_drawer.movement.create` is defined in constants but was **not seeded /
+not API-enforced** as of 2026-08-13 code evidence; Flutter currently gates Cash
+In/Drop with `cash_drawer.manage` — align to the canonical mapping before
+production. `pos.hardware.settings` exists, but backend hardware-test-log
+persistence is not fully wired. No distinct merchant-copy or sensitive-reprint
 permission is approved; do not invent one.
+
+Cash Drawer feature contract:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]].
 
 ## Seed Data Rule
 
