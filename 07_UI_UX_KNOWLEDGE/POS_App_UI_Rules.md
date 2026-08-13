@@ -1,7 +1,7 @@
 <!-- title: POS App UI Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-13 -->
 
 # POS App UI Rules
 
@@ -142,9 +142,42 @@ separate approved release decision activates it.
 
 Till open must show opening cash/float entry when required.
 
+Approved Open Till UI contract (2026-08-11):
+
+- Reuse the existing Dashboard Top Bar / POS shell header — do not create an
+  Open Till-only top bar.
+- OneVerz **orange** primary theme (not blue/purple).
+- Main content on a full **white** parent surface; preserve component-wise form
+  cards (float, keypad, quick amounts, note, till summary, CTA).
+- Important text dark and strong/bold.
+- Responsive Phone + Tablet + Desktop without overflow/clipping/unusable
+  targets.
+- Online backend confirmation only; never claim OPEN locally first.
+
+Canonical:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]],
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Till_Screen_Implementation_Specification]].
+
 Till close must show counted cash, expected cash, variance, and close note.
 
 Cash in/out must require type, amount, and reason.
+
+### Cash Drawer UI contract (2026-08-13)
+
+- Title **Cash Drawer** and subtitle inside the main **white** content card
+  below the standard POS top bar.
+- No back-arrow; no “Continue to Dashboard”.
+- Normal POS bottom navigation remains available.
+- Simplified summary: Till, Status, Opening Cash, Cash Sales, Current Expected
+  Cash (backend-authoritative Expected Cash).
+- Actions: Open Drawer, Cash In, Cash Out/Drop, Close Till.
+- Recent movements newest first; colour is semantic only.
+- Phone + Tablet + Desktop; reuse `TenantAdminBreakpoints`.
+- Orange primary / black shell via shared tokens only — no feature hex.
+
+Canonical:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]],
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
 
 ## Device UI Rules
 

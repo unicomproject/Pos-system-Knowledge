@@ -1,9 +1,13 @@
 <!-- title: Tenant Role And Permission Setup Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-08-12 -->
+<!-- parent_mode: Selected-Tenant Mode -->
+<!-- atomic_journey: SA-ST-UJ-007 -->
 
 # Tenant Role And Permission Setup Flow
+
+> **Reconciled 2026-08-12.** Macro parent for **additional** tenant role bootstrap. Bootstrap Tenant Admin role is provisioned at tenant create — not this flow. Atomic journey: **SA-ST-UJ-007**.
 
 ## Purpose
 

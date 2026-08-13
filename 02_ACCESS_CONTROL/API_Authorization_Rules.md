@@ -1,7 +1,7 @@
 <!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-10 -->
+<!-- last_updated: 2026-08-12 -->
 
 # API Authorization Rules
 
@@ -71,8 +71,24 @@ Frontend route guards and menu filtering are UX only. Backend service checks are
 | Platform audit logs (R1 login/security) | `platform.audit.view` → `GET /api/v1/platform-admin/audit-logs` |
 | Platform integrations | `platform.integrations.manage` |
 | Return policy templates | Respective `platform.return_policy_templates.*` action code |
+| Selected-Tenant bootstrap summary | `platform.tenants.bootstrap.access` + `platform.tenants.view` |
+| Selected-Tenant bootstrap outlet create | `platform.tenants.bootstrap.outlets.manage` |
+| Selected-Tenant bootstrap till create | `platform.tenants.bootstrap.tills.manage` |
+| Selected-Tenant bootstrap role create | `platform.tenants.bootstrap.roles.manage` |
+| Selected-Tenant bootstrap user create | `platform.tenants.bootstrap.users.manage` |
+| Selected-Tenant bootstrap product create | `platform.tenants.bootstrap.products.manage` |
+| Selected-Tenant bootstrap product import | `platform.tenants.bootstrap.products.import` |
+| Selected-Tenant bootstrap online store GET/PUT | `platform.tenants.bootstrap.online_store.manage` |
 
-Do not use umbrella-only checks such as `platform.subscriptions.manage` where granular codes already exist.
+Selected-Tenant bootstrap APIs additionally require:
+
+- Valid platform JWT (not tenant-user token)
+- Route `tenantId` authorized for caller
+- Tenant lifecycle allows mutation (block `SUSPENDED` / `CANCELLED` mutations)
+- Effective feature entitlement for module
+- Audit attribution with `platform_user_id` + `tenant_id`
+
+Contract: [[../05_BACKEND_ARCHITECTURE/Platform_Selected_Tenant_API_Contract]]
 
 ## Tenant Admin API Rules
 
@@ -110,6 +126,24 @@ Activation must never accept client tenant identity as authority, log/store the
 raw activation code, or persist partial trusted state after failure. Existing
 same-device trusted resolution may be idempotent; a `USED` code must not re-pair
 a changed fingerprint.
+
+### POS Open Till authorization
+
+| Endpoint | Canonical authorization |
+|---|---|
+| `GET /api/v1/devices/current` | Authenticated `TenantOnly`; trusted ACTIVE device + active assignment within tenant |
+| `GET /api/v1/tills/current-session` | `TenantOnly` + any of `pos.till.open`, `pos.till.close`, `till.session.view`; trusted device context |
+| `POST /api/v1/tills/open` | `TenantOnly` + **`pos.till.open`**; trusted ACTIVE device; active till assignment; requested till match; ACTIVE till; opening float >= 0; reject duplicate OPEN (`till_session.already_open`) |
+| `POST /api/v1/tills/close` | `TenantOnly` + **`pos.till.close`**; trusted ACTIVE device; active assignment and requested-till match; ACTIVE till; one open session; non-negative Counted Cash; approved reason for non-zero variance; backend-authoritative Expected Cash |
+
+No new permission is required. Flutter open-till visibility is UX only; backend
+authorization remains final. Open Till is not offline-authoritative. Canonical:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]].
+
+No new Close Till permission is required. Flutter visibility is UX only. Current
+backend route enforces `pos.till.close`, but expected-cash authority, approved
+reason validation and reconciliation persistence remain production blockers.
+Canonical: [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]].
 
 ### POS Customer API authorization
 
@@ -162,6 +196,7 @@ cashier input is directly rejected, not routed to manager approval. See
 | Exchange | POS entitlement, permission, exchange validation |
 | Cash in/out | Cash drawer entitlement, permission, open till |
 | Close till | Till permission, open till, cash count validation |
+| Open till | `pos.till.open`, trusted ACTIVE device, active assignment, ACTIVE till, opening float >= 0, no duplicate OPEN session |
 
 ## Storefront Customer Authentication Rules
 

@@ -1,7 +1,7 @@
 <!-- title: Platform Admin UI Rules -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- last_updated: 2026-08-12 -->
 
 
 # Platform Admin UI Rules
@@ -37,7 +37,9 @@ Release 1 Platform Admin navigation includes:
 | Platform Login Audit | Platform login security audit |
 | Platform Settings | Platform-level settings |
 
-Do not expose tenant POS operational modules (outlets, tills, products, alerts, platform reports) in Release 1 primary navigation. Tenant-context catalog/report routes may exist behind guards but are not platform sidebar items.
+Do not expose tenant POS operational modules (outlets, tills, products, alerts, platform reports) in Release 1 primary navigation.
+
+**Selected-Tenant Mode (2026-08-12):** Bootstrap configuration is entered from **Tenant Detail → Configure Tenant** only. It uses `/admin/tenants/:tenantId/configure/*` routes and a persistent tenant context banner (ST-UX-001). Do not add bootstrap modules to the platform sidebar. Visual contract: [[Platform_Admin/Selected_Tenant_Visual_Direction]].
 
 ## Dashboard Rules
 

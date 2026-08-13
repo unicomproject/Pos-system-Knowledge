@@ -238,7 +238,7 @@ issues. No backend, database, migration or customer API contract changed.
 | Tenant login | Flutter uses `POST /api/v1/tenant-auth/login` | Integrated |
 | POS home / till / device | Unified-Commerce controllers merged on `POS_UI` | Integrated |
 | Close till + End Shift | Sidebar End Shift → close till → logout | Integrated |
-| Open Till layout | Full-screen tablet layout fix | Completed |
+| Open Till layout | Historical tablet layout fix (2026-07-10); approved UI contract PENDING | See [[../Till/Open_Till_Screen_Layout_Implementation_Status]] |
 | `GET /api/v1/pos/products` | Backend + Flutter list wiring | In Review (branch) |
 | Catalog mock fallback | `pos_catalog_fallback_data.dart` removed | Real data only |
 | Checkout / receipt APIs | Still absent in `E_POS.Api` | Blocked |

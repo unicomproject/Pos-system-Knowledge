@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ST-01 — Selected-Tenant Setup Hub</title>
+  <link rel="stylesheet" href="prototype.css" />
+</head>
+<body>
+  <div class="proto-toolbar">
+    <strong>ST-01 Setup Hub</strong>
+    <div class="group">
+      <button type="button" onclick="setViewport('w-1440')" class="active">1440</button>
+      <button type="button" onclick="setViewport('w-1280')">1280</button>
+      <button type="button" onclick="setViewport('w-1024')">1024</button>
+      <button type="button" onclick="setViewport('w-768')">768</button>
+    </div>
+    <div class="group">
+      <button type="button" onclick="setHubOs('not_started')" class="active">OS: Not started</button>
+      <button type="button" onclick="setHubOs('configured')">OS: Configured</button>
+      <button type="button" onclick="setHubOs('not_entitled')">OS: Not entitled</button>
+    </div>
+    <span class="proto-note">APPROVED · Online Store ST-07</span>
+    <a class="btn" href="index.html">Index</a>
+  </div>
+  <div id="viewport" class="viewport-frame w-1440">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">OneVerz Admin</div>
+        <nav>
+          <a href="#">Dashboard</a>
+          <a href="#" class="active"><span>Tenants</span></a>
+          <a href="#"><span>Subscription Plans</span></a>
+          <a href="#"><span>Billing</span></a>
+        </nav>
+      </aside>
+      <div class="main">
+        <div class="topbar">Platform Admin · Sarah Chen</div>
+        <div class="page">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="#">Tenants</a> / <a href="#">ABC Retail</a> / <span>Configure</span>
+          </nav>
+          <h1 class="page-title">Initial Setup</h1>
+          <p class="page-desc">Optional assisted bootstrap for this tenant. Ongoing operations remain with Tenant Admin.</p>
+
+          <div class="tenant-context" role="region" aria-label="Selected tenant context">
+            <div class="identity">
+              <div class="name">ABC Retail</div>
+              <div class="meta">
+                <span class="chip chip-code">TEN-ABC-001</span>
+                <span class="chip chip-active">ACTIVE</span>
+                <span class="chip chip-plan">Pro Plan</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+              <a href="shell-states.html#switch" class="btn btn-secondary btn-sm">Switch Tenant</a>
+              <a href="#" class="btn btn-secondary btn-sm">Exit Tenant Context</a>
+            </div>
+          </div>
+
+          <div class="hub-grid">
+            <div class="module-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <h3>Outlet Setup</h3>
+                <span class="chip chip-neutral">NOT STARTED</span>
+              </div>
+              <p>Create the first outlet for POS and fulfilment bootstrap.</p>
+              <div class="summary">Current: 0 outlets</div>
+              <a href="create-outlet.html" class="btn btn-primary btn-sm">Configure</a>
+            </div>
+            <div class="module-card disabled">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <h3>Till Setup</h3>
+                <span class="chip chip-neutral">BLOCKED</span>
+              </div>
+              <p>Create a till for an active outlet.</p>
+              <div class="dep">Requires at least one active outlet</div>
+              <div class="summary">Current: 0 tills</div>
+              <button class="btn btn-secondary btn-sm" disabled title="Create an outlet first">Configure</button>
+            </div>
+            <div class="module-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <h3>Roles &amp; Permissions</h3>
+                <span class="chip chip-success">CONFIGURED</span>
+              </div>
+              <p>Bootstrap Tenant Admin role exists. Add custom roles if needed.</p>
+              <div class="summary">Default TA role provisioned at create</div>
+              <a href="create-role.html" class="btn btn-secondary btn-sm">Configure</a>
+            </div>
+            <div class="module-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <h3>Additional Users</h3>
+                <span class="chip chip-neutral">NOT STARTED</span>
+              </div>
+              <p>Add staff beyond the first Tenant Admin from wizard.</p>
+              <div class="summary">1 Tenant Admin (wizard)</div>
+              <a href="add-user.html" class="btn btn-primary btn-sm">Add User</a>
+            </div>
+            <div class="module-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <h3>Product Onboarding</h3>
+                <span class="chip chip-neutral">NOT STARTED</span>
+              </div>
+              <p>Seed initial catalog manually or via CSV.</p>
+              <div class="summary">Current: 0 products</div>
+              <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                <a href="product-manual.html" class="btn btn-primary btn-sm">Add Products</a>
+                <a href="product-import.html" class="btn btn-secondary btn-sm">Import CSV</a>
+              </div>
+            </div>
+
+            <!-- Online Store — optional bootstrap (APPROVED) -->
+            <div class="module-card" id="os-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <h3>Online Store</h3>
+                <span class="chip chip-neutral" id="os-chip">NOT STARTED</span>
+              </div>
+              <p id="os-desc">Set initial Online Store readiness for entitled tenants. Branding, merchandising, and Click &amp; Collect remain Tenant Admin.</p>
+              <div class="summary" id="os-summary">Status: DRAFT · Entitlement: online_store</div>
+              <div class="dep hidden" id="os-dep">Plan does not include Online Store</div>
+              <a href="online-store.html" class="btn btn-primary btn-sm" id="os-cta">Configure</a>
+            </div>
+          </div>
+
+          <div class="handoff-panel">
+            <h3>Tenant Admin Handoff</h3>
+            <p style="margin:0;font-size:0.875rem;color:var(--text-secondary);">
+              Tenant Admin invitation: <strong>Sent</strong> · Operational setup: <strong>Optional</strong> · Activation is not blocked by bootstrap completion.
+            </p>
+            <p style="margin:0.75rem 0 0;font-size:0.75rem;color:var(--text-muted);">
+              Online Store card: derived <code>NOT_ENTITLED</code> / <code>NOT_STARTED</code> / <code>CONFIGURED</code> — <code>DECISION_REQUIRED</code> retired (GAP 5 SUPERSEDED).
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function setViewport(cls) {
+      const v = document.getElementById('viewport');
+      v.className = 'viewport-frame ' + cls;
+      document.querySelectorAll('.proto-toolbar .group:first-of-type button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+    function setHubOs(state) {
+      const card = document.getElementById('os-card');
+      const chip = document.getElementById('os-chip');
+      const desc = document.getElementById('os-desc');
+      const summary = document.getElementById('os-summary');
+      const dep = document.getElementById('os-dep');
+      const cta = document.getElementById('os-cta');
+      document.querySelectorAll('.proto-toolbar .group:nth-of-type(2) button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      card.classList.remove('disabled');
+      dep.classList.add('hidden');
+      cta.classList.remove('hidden');
+      cta.removeAttribute('aria-disabled');
+      cta.style.pointerEvents = '';
+      cta.style.opacity = '';
+
+      if (state === 'not_started') {
+        chip.className = 'chip chip-neutral';
+        chip.textContent = 'NOT STARTED';
+        desc.textContent = 'Set initial Online Store readiness for entitled tenants. Branding, merchandising, and Click & Collect remain Tenant Admin.';
+        summary.textContent = 'Status: DRAFT · Entitlement: online_store';
+        cta.className = 'btn btn-primary btn-sm';
+        cta.textContent = 'Configure';
+        cta.href = 'online-store.html';
+      } else if (state === 'configured') {
+        chip.className = 'chip chip-success';
+        chip.textContent = 'CONFIGURED';
+        desc.textContent = 'Initial Online Store readiness is set. Ongoing storefront management remains with Tenant Admin.';
+        summary.textContent = 'Status: ACTIVE · Tax display: MATCH_TENANT';
+        cta.className = 'btn btn-secondary btn-sm';
+        cta.textContent = 'Review';
+        cta.href = 'online-store.html';
+      } else if (state === 'not_entitled') {
+        card.classList.add('disabled');
+        chip.className = 'chip chip-entitled';
+        chip.textContent = 'NOT ENTITLED';
+        desc.textContent = 'This tenant plan does not include Online Store. No Super Admin bootstrap action is required.';
+        summary.textContent = 'Feature: online_store = false';
+        dep.classList.remove('hidden');
+        cta.className = 'btn btn-secondary btn-sm';
+        cta.textContent = 'Not available';
+        cta.removeAttribute('href');
+        cta.setAttribute('aria-disabled', 'true');
+        cta.style.pointerEvents = 'none';
+        cta.style.opacity = '0.7';
+      }
+    }
+  </script>
+</body>
+</html>

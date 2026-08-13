@@ -1,7 +1,7 @@
 <!-- title: Routing And Guards -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-07-20 -->
+<!-- last_updated: 2026-08-12 -->
 
 
 # Routing And Guards
@@ -27,13 +27,27 @@ Routes improve UX but backend remains authoritative.
 | `/admin/platform-users` | admin | Platform | auth, permission |
 | `/admin/roles-permissions` | admin | Platform | auth, permission (`platform.permissions.view`) |
 | `/admin/settings/system` | admin | Platform | auth, permission |
-| `/admin/tenant/:tenantId/outlets` | admin | Tenant | auth, tenant-context, permission |
-| `/admin/tenant/:tenantId/tills` | admin | Tenant | auth, tenant-context, permission |
-| `/admin/tenant/:tenantId/users` | admin | Tenant | auth, tenant-context, permission |
-| `/admin/tenant/:tenantId/roles-permissions` | admin | Tenant | auth, tenant-context, permission |
-| `/admin/tenant/:tenantId/products` | products | Tenant | auth, tenant-context, permission, feature |
-| `/admin/tenant/:tenantId/categories` | categories | Tenant | auth, tenant-context, permission, feature |
-| `/admin/tenant/:tenantId/reports` | reports | Tenant | auth, tenant-context, permission, feature |
+| `/admin/tenants/:tenantId/configure` | bootstrap | Selected-Tenant | auth, tenant-context, permission (`platform.tenants.bootstrap.access`) |
+| `/admin/tenants/:tenantId/configure/outlets/create` | bootstrap | Selected-Tenant | auth, tenant-context, permission (`platform.tenants.bootstrap.outlets.manage`), feature |
+| `/admin/tenants/:tenantId/configure/tills/create` | bootstrap | Selected-Tenant | auth, tenant-context, permission (`platform.tenants.bootstrap.tills.manage`), feature, outlet-dependency |
+| `/admin/tenants/:tenantId/configure/roles/create` | bootstrap | Selected-Tenant | auth, tenant-context, permission (`platform.tenants.bootstrap.roles.manage`) |
+| `/admin/tenants/:tenantId/configure/users/create` | bootstrap | Selected-Tenant | auth, tenant-context, permission (`platform.tenants.bootstrap.users.manage`) |
+| `/admin/tenants/:tenantId/configure/products/manual` | bootstrap | Selected-Tenant | auth, tenant-context, permission (`platform.tenants.bootstrap.products.manage`), feature |
+| `/admin/tenants/:tenantId/configure/products/import` | bootstrap | Selected-Tenant | auth, tenant-context, permission (`platform.tenants.bootstrap.products.import`), feature |
+
+### Legacy tenant-context routes (deprecated — do not implement)
+
+The following routes predate the Selected-Tenant bootstrap contract and must not be used for new implementation:
+
+| Legacy route | Replacement |
+|---|---|
+| `/admin/tenant/:tenantId/outlets` | `/admin/tenants/:tenantId/configure/outlets/create` |
+| `/admin/tenant/:tenantId/tills` | `/admin/tenants/:tenantId/configure/tills/create` |
+| `/admin/tenant/:tenantId/users` | `/admin/tenants/:tenantId/configure/users/create` |
+| `/admin/tenant/:tenantId/roles-permissions` | `/admin/tenants/:tenantId/configure/roles/create` |
+| `/admin/tenant/:tenantId/products` | `/admin/tenants/:tenantId/configure/products/manual` |
+
+Contract: [[../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Mode_Contract]]
 
 ## Required Guards
 

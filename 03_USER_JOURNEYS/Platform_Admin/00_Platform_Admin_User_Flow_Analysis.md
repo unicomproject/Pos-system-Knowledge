@@ -1,7 +1,7 @@
 <!-- title: Platform Admin User Flow Analysis -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-27 -->
+<!-- last_updated: 2026-08-12 -->
 
 # Platform Admin User Flow Analysis
 
@@ -34,6 +34,30 @@ The deck labels the actor as `Super Admin`, but the Second Brain should use `Pla
 17. Platform User Password Reset Flow — [[17_Platform_User_Password_Reset_Flow]] · [[SA-P1-06_Platform_Admin_User_Password_Reset_Implementation]].
 18. Tenant Onboarding Email Flows — [[18_Tenant_Onboarding_Email_Flows]] · [[../../12_INTEGRATIONS/Email_Event_And_Template_Catalog]].
 19. Authentication Email Flows — [[19_Authentication_Email_Flows]].
+
+## Selected-Tenant Mode (Added 2026-08-12)
+
+Canonical contract: [[Selected_Tenant_Mode_Contract]]
+
+Global register: [[../00_Global_User_Journey_Register]] — **173 journeys** (Super Admin = 57).
+
+| # | Flow / artifact | Mode | Discovery IDs | Canonical IDs |
+|---|---|---|---|---|
+| ST-0 | Selected-Tenant Mode Shell | Selected-Tenant | SA-ST-UJ-001, 002, 003 | SA-UJ-048, 049, 050 |
+| ST-1 | Outlet / Collection Point Initial Setup | Selected-Tenant | SA-ST-UJ-005 | SA-UJ-051 |
+| ST-2 | Till Initial Setup | Selected-Tenant | SA-ST-UJ-006 | SA-UJ-052 |
+| ST-3 | Tenant Role / Permission Initial Setup | Selected-Tenant | SA-ST-UJ-007 | SA-UJ-053 |
+| ST-4 | Additional Tenant User Initial Setup | Selected-Tenant | SA-ST-UJ-008 | SA-UJ-054 |
+| ST-5 | Product Initial Onboarding | Selected-Tenant | SA-ST-UJ-009, 010 | SA-UJ-055, 056 |
+| ST-6 | Configure Initial Online Store | Selected-Tenant | SA-ST-UJ-011 | SA-UJ-057 |
+
+> L52 historical: E-commerce bootstrap **OUT OF SCOPE** Phase 1 — **SUPERSEDED 2026-08-12** by [[Selected_Tenant_Online_Store_Bootstrap_Contract]] (optional SA bootstrap; Click & Collect remains Tenant Admin).
+
+Entry path: Tenant Detail → Configure Tenant → Setup Hub (`/admin/tenants/:tenantId/configure`).
+
+UX requirement **ST-UX-001**: persistent selected-tenant context banner on all Selected-Tenant screens.
+
+Prototype pack: [[../../07_UI_UX_KNOWLEDGE/Platform_Admin/prototypes/selected-tenant/]]
 
 ## Scope Alignment
 

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ST-06A — Manual Product Bootstrap</title>
+  <link rel="stylesheet" href="prototype.css" />
+</head>
+<body>
+  <div class="proto-toolbar"><strong>ST-06A Manual Product</strong><a class="btn" href="setup-hub.html">Hub</a></div>
+  <div class="viewport-frame w-1280">
+    <div class="app-shell">
+      <aside class="sidebar"><div class="brand">OneVerz</div><nav><a href="#" class="active">Tenants</a></nav></aside>
+      <div class="main">
+        <div class="topbar">Platform Admin</div>
+        <div class="page">
+          <nav class="breadcrumb"><a href="setup-hub.html">Configure</a> / Add Product</nav>
+          <h1 class="page-title">Manual Initial Product</h1>
+          <div class="tenant-context" role="region" aria-label="Selected tenant context">
+            <div class="identity"><div class="name">ABC Retail</div></div>
+            <a href="setup-hub.html" class="btn btn-secondary btn-sm">Exit Tenant Context</a>
+          </div>
+          <form class="form-card" onsubmit="return false;">
+            <div class="field"><label>Product Name *</label><input type="text" /></div>
+            <div class="field-row">
+              <div class="field"><label>SKU *</label><input type="text" /></div>
+              <div class="field"><label>Sale Price *</label><input type="number" step="0.01" placeholder="0.00" /></div>
+            </div>
+            <div class="field">
+              <label>Category</label>
+              <select><option>— None —</option><option>Grocery</option></select>
+            </div>
+            <div class="field-row">
+              <div class="field"><label>Opening Stock</label><input type="number" min="0" value="0" /></div>
+              <div class="field"><label>Outlet (if stock &gt; 0)</label><select><option>Main Store</option></select></div>
+            </div>
+            <p class="hint" style="margin-top:-0.5rem;">Bootstrap minimum set — not full Tenant Admin 8-step wizard.</p>
+            <div class="form-footer">
+              <a href="setup-hub.html" class="btn btn-secondary">Cancel</a>
+              <button class="btn btn-primary">Save Product</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

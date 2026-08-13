@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OneVerz Super Admin — UI-3C Operation Status (Premium Blue Prototype)</title>
+  <style>
+    /* OneVerz Super Admin UI-3C — Premium Blue visual prototype (design review only) */
+    :root {
+      --primary: #0b5cff;
+      --primary-hover: #004de6;
+      --primary-active: #003cbd;
+      --primary-soft: #eff6ff;
+      --primary-border: #bfdbfe;
+      --sidebar: #0f172a;
+      --sidebar-text: #cbd5e1;
+      --sidebar-active: #0b5cff;
+      --bg-page: #f8fafc;
+      --surface: #ffffff;
+      --surface-secondary: #f1f5f9;
+      --border: #e2e8f0;
+      --border-subtle: #f1f5f9;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --success: #047857;
+      --success-bg: #ecfdf5;
+      --success-border: #a7f3d0;
+      --warning: #b45309;
+      --warning-bg: #fffbeb;
+      --warning-border: #fde68a;
+      --danger: #b42318;
+      --danger-bg: #fef3f2;
+      --danger-border: #fecdca;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --focus-ring: 0 0 0 4px rgba(11, 92, 255, 0.15);
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; font-family: var(--font); color: var(--text-primary); background: #0b1220; }
+    button { font: inherit; cursor: pointer; border: none; }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a:focus-visible, button:focus-visible { outline: 3px solid #84adff; outline-offset: 2px; }
+
+    /* Prototype chrome (not production) */
+    .proto-toolbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem;
+      padding: 0.65rem 1rem; background: #1e293b; color: #e2e8f0;
+      border-bottom: 1px solid #334155; font-size: 0.8125rem;
+    }
+    .proto-toolbar strong { color: #93c5fd; font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    .proto-toolbar .group { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+    .proto-toolbar button {
+      background: #334155; color: #f8fafc; border-radius: var(--radius-pill);
+      padding: 0.35rem 0.75rem; font-size: 0.75rem; font-weight: 600;
+    }
+    .proto-toolbar button.active { background: var(--primary); }
+    .proto-toolbar button:hover { filter: brightness(1.08); }
+    .proto-toolbar .divider { width: 1px; height: 1.25rem; background: #475569; }
+    .proto-note { color: #94a3b8; font-size: 0.7rem; margin-left: auto; }
+
+    .viewport-frame {
+      margin: 0 auto; background: var(--bg-page); min-height: calc(100vh - 52px);
+      transition: max-width 0.25s ease;
+    }
+    .viewport-frame.w-1440 { max-width: 1440px; }
+    .viewport-frame.w-1280 { max-width: 1280px; }
+    .viewport-frame.w-1024 { max-width: 1024px; }
+    .viewport-frame.w-768 { max-width: 768px; }
+
+    .app-shell { display: grid; grid-template-columns: 16.5rem 1fr; min-height: calc(100vh - 52px); }
+
+    .sidebar {
+      background: var(--sidebar); color: var(--sidebar-text);
+      padding: 1rem 0.75rem; display: flex; flex-direction: column; gap: 0.25rem;
+    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; padding: 0 0.5rem 1.25rem; color: inherit; text-decoration: none; }
+    .brand:hover { text-decoration: none; }
+    .brand-icon {
+      width: 2rem; height: 2rem; border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #3b82f6, #0b5cff);
+      display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 0.7rem;
+    }
+    .brand strong { display: block; color: #f8fafc; font-size: 0.9375rem; }
+    .brand small { color: #94a3b8; font-size: 0.7rem; }
+    .nav-item {
+      display: flex; align-items: center; gap: 0.65rem; padding: 0.55rem 0.75rem;
+      border-radius: var(--radius-md); color: inherit; font-size: 0.875rem; font-weight: 500;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.06); text-decoration: none; }
+    .nav-item.active { background: var(--sidebar-active); color: #fff; }
+    .sidebar-footer { margin-top: auto; padding-top: 1rem; font-size: 0.75rem; color: #64748b; }
+
+    .main { display: flex; flex-direction: column; min-width: 0; }
+    .topbar {
+      display: flex; align-items: center; justify-content: flex-end; gap: 1rem;
+      padding: 0.75rem 1.5rem; background: var(--surface); border-bottom: 1px solid var(--border);
+    }
+    .avatar {
+      width: 2.25rem; height: 2.25rem; border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff;
+      display: grid; place-items: center; font-size: 0.75rem; font-weight: 700;
+    }
+
+    .page { padding: 1.25rem 1.5rem 2rem; display: grid; gap: 1rem; }
+
+    /* PageHeader concept */
+    .page-header {
+      display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    }
+    .page-header .eyebrow {
+      font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--text-muted); margin: 0 0 0.25rem;
+    }
+    .page-header h1 { margin: 0; font-size: clamp(1.35rem, 2.2vw, 1.75rem); line-height: 1.2; }
+    .page-header .desc { margin: 0.35rem 0 0; color: var(--text-secondary); font-size: 0.9375rem; max-width: 36rem; }
+    .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    /* Buttons (UI-1 concept) */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+      min-height: 2.5rem; padding: 0 1rem; border-radius: var(--radius-md);
+      font-size: 0.875rem; font-weight: 600; border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { background: var(--surface); border-color: var(--border); color: var(--text-primary); }
+    .btn-secondary:hover { background: var(--surface-secondary); }
+    .btn-ghost { background: transparent; color: var(--text-secondary); }
+    .btn-ghost:hover { background: var(--surface-secondary); color: var(--text-primary); }
+    .btn-warning { background: #dc6803; color: #fff; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Status surface */
+    .status-surface {
+      border-radius: var(--radius-lg); padding: 1.25rem 1.35rem;
+      display: grid; grid-template-columns: auto 1fr auto; gap: 1rem 1.25rem; align-items: center;
+      box-shadow: var(--shadow-md); border: 1px solid transparent;
+    }
+    .status-surface.running,
+    .status-surface.payment-pending,
+    .status-surface.activation-pending,
+    .status-surface.long-running {
+      background: linear-gradient(135deg, #0a3d91 0%, #0b5cff 48%, #003cbd 100%);
+      color: #fff; border-color: rgba(255,255,255,0.12);
+    }
+    .status-surface.success {
+      background: var(--surface); border-color: var(--success-border);
+      box-shadow: var(--shadow-sm);
+    }
+    .status-surface.failure {
+      background: var(--surface); border-color: var(--danger-border);
+      box-shadow: var(--shadow-sm);
+    }
+    .status-surface.poll-error {
+      background: var(--surface); border-color: var(--border);
+    }
+    .status-surface.not-found {
+      background: var(--surface); border-color: var(--border);
+    }
+
+    .status-icon {
+      width: 3.25rem; height: 3.25rem; border-radius: 50%;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .status-surface.running .status-icon,
+    .status-surface.payment-pending .status-icon,
+    .status-surface.activation-pending .status-icon,
+    .status-surface.long-running .status-icon {
+      background: rgba(255,255,255,0.15); color: #fff;
+    }
+    .status-surface.success .status-icon { background: var(--success-bg); color: var(--success); }
+    .status-surface.failure .status-icon { background: var(--danger-bg); color: var(--danger); }
+    .status-surface.poll-error .status-icon { background: var(--warning-bg); color: var(--warning); }
+    .status-surface.not-found .status-icon { background: var(--surface-secondary); color: var(--text-muted); }
+
+    .status-copy h2 { margin: 0 0 0.35rem; font-size: 1.25rem; line-height: 1.3; }
+    .status-surface.running .status-copy p,
+    .status-surface.payment-pending .status-copy p,
+    .status-surface.activation-pending .status-copy p,
+    .status-surface.long-running .status-copy p { color: rgba(255,255,255,0.88); margin: 0; font-size: 0.875rem; }
+    .status-surface.success .status-copy p,
+    .status-surface.failure .status-copy p,
+    .status-surface.poll-error .status-copy p,
+    .status-surface.not-found .status-copy p { color: var(--text-secondary); margin: 0; font-size: 0.875rem; }
+
+    .tenant-identity { margin-top: 0.65rem; display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; align-items: baseline; }
+    .tenant-identity strong { font-size: 1.05rem; }
+    .tenant-identity span { font-size: 0.8125rem; opacity: 0.85; }
+    .status-surface.success .tenant-identity strong,
+    .status-surface.failure .tenant-identity strong { color: var(--text-primary); }
+    .status-surface.success .tenant-identity span,
+    .status-surface.failure .tenant-identity span { color: var(--text-muted); opacity: 1; }
+
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.7rem;
+      border-radius: var(--radius-pill); font-size: 0.75rem; font-weight: 700; white-space: nowrap;
+    }
+    .status-surface.running .status-badge,
+    .status-surface.long-running .status-badge { background: rgba(255,255,255,0.18); color: #fff; }
+    .status-surface.payment-pending .status-badge { background: rgba(255,255,255,0.18); color: #fff; }
+    .status-surface.activation-pending .status-badge { background: rgba(255,255,255,0.18); color: #fff; }
+    .badge-info { background: var(--primary-soft); color: #1d4ed8; }
+    .badge-success { background: var(--success-bg); color: var(--success); }
+    .badge-warning { background: var(--warning-bg); color: var(--warning); }
+    .badge-danger { background: var(--danger-bg); color: var(--danger); }
+    .status-dot { width: 0.4rem; height: 0.4rem; border-radius: 50%; background: currentColor; }
+
+    .spinner {
+      width: 1.75rem; height: 1.75rem; border: 3px solid rgba(255,255,255,0.25);
+      border-top-color: #fff; border-radius: 50%; animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+    .pulse { animation: pulse 1.8s ease-in-out infinite; }
+
+    /* Lifecycle timeline */
+    .timeline-panel {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 1.1rem 1.25rem; box-shadow: var(--shadow-sm);
+    }
+    .timeline-panel h3 {
+      margin: 0 0 1rem; font-size: 0.8125rem; font-weight: 700;
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted);
+    }
+    .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; list-style: none; margin: 0; padding: 0; }
+    .timeline li {
+      position: relative; padding: 0 0.75rem 0 0; min-width: 0;
+    }
+    .timeline li:not(:last-child)::after {
+      content: ""; position: absolute; top: 1.1rem; left: calc(1.1rem + 0.5rem); right: 0;
+      height: 3px; background: var(--border); z-index: 0;
+    }
+    .timeline li.complete:not(:last-child)::after { background: var(--success); }
+    .timeline li.current:not(:last-child)::after {
+      background: linear-gradient(90deg, var(--primary) 50%, var(--border) 50%);
+    }
+    .timeline li.failed:not(:last-child)::after { background: var(--danger-border); }
+
+    .node {
+      position: relative; z-index: 1; display: grid; gap: 0.35rem;
+    }
+    .node-marker {
+      width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center;
+      font-size: 0.75rem; font-weight: 800; border: 2px solid var(--border); background: var(--surface-secondary);
+      color: var(--text-muted);
+    }
+    .timeline li.complete .node-marker { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+    .timeline li.current .node-marker {
+      background: var(--primary-soft); border-color: var(--primary); color: var(--primary);
+      box-shadow: var(--focus-ring);
+    }
+    .timeline li.current.pulse-node .node-marker { animation: pulse 1.8s ease-in-out infinite; }
+    .timeline li.waiting .node-marker { background: var(--surface); }
+    .timeline li.failed .node-marker { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+
+    .node-label { font-size: 0.8125rem; font-weight: 700; color: var(--text-primary); line-height: 1.25; }
+    .node-state { font-size: 0.75rem; color: var(--text-muted); line-height: 1.3; }
+
+    /* Context + guidance */
+    .context-grid {
+      display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1rem;
+    }
+    .panel {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 1rem 1.15rem; box-shadow: var(--shadow-sm);
+    }
+    .panel h3 { margin: 0 0 0.75rem; font-size: 0.9375rem; }
+    .meta-grid { display: grid; gap: 0.55rem; }
+    .meta-row { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.8125rem; }
+    .meta-row dt { color: var(--text-muted); margin: 0; }
+    .meta-row dd { margin: 0; font-weight: 600; text-align: right; }
+
+    .guidance {
+      background: var(--primary-soft); border: 1px solid var(--primary-border);
+      border-radius: var(--radius-lg); padding: 1rem 1.15rem;
+    }
+    .guidance.warning-tone { background: var(--warning-bg); border-color: var(--warning-border); }
+    .guidance.danger-tone { background: var(--danger-bg); border-color: var(--danger-border); }
+    .guidance h3 { margin: 0 0 0.4rem; font-size: 0.9375rem; }
+    .guidance p { margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.45; }
+
+    .actions-bar {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 1rem 1.15rem;
+    }
+    .actions-bar .left { font-size: 0.8125rem; color: var(--text-muted); max-width: 28rem; line-height: 1.4; }
+    .actions-bar .right { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; }
+
+    .alert {
+      border-radius: var(--radius-md); padding: 0.75rem 1rem; font-size: 0.875rem; font-weight: 600;
+      display: none;
+    }
+    .alert.show { display: block; }
+    .alert-error { background: var(--danger-bg); border: 1px solid var(--danger-border); color: var(--danger); }
+    .alert-info { background: var(--primary-soft); border: 1px solid var(--primary-border); color: #1d4ed8; }
+
+    .support-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .timeline { grid-template-columns: repeat(2, 1fr); row-gap: 1rem; }
+      .timeline li:not(:last-child)::after { display: none; }
+      .context-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .page { padding: 1rem; }
+      .status-surface { grid-template-columns: 1fr; text-align: left; }
+      .status-badge { justify-self: start; }
+      .timeline { grid-template-columns: 1fr; }
+      .timeline li { display: grid; grid-template-columns: auto 1fr; gap: 0.75rem; padding: 0; }
+      .timeline li:not(:last-child)::after {
+        display: block; top: 2.4rem; left: 1.05rem; width: 3px; height: calc(100% - 0.5rem); right: auto;
+      }
+      .node { grid-column: 2; }
+      .node-marker { grid-row: 1 / span 2; }
+      .actions-bar { flex-direction: column; align-items: stretch; }
+      .actions-bar .right { display: grid; width: 100%; }
+      .actions-bar .right .btn { width: 100%; }
+    }
+
+    /* Hide states */
+    [data-visible="false"] { display: none !important; }
+
+    /* A11y annotation (hidden visually, for reviewers) */
+    .a11y-notes {
+      position: fixed; bottom: 0; right: 0; max-width: 18rem;
+      background: rgba(15,23,42,0.92); color: #cbd5e1; font-size: 0.65rem;
+      padding: 0.5rem 0.65rem; border-top-left-radius: var(--radius-md);
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .a11y-notes:focus-within, .a11y-notes:hover { opacity: 1; pointer-events: auto; }
+  </style>
+</head>
+<body>
+  <!-- PROTOTYPE ONLY — not production UI -->
+  <div class="proto-toolbar" role="toolbar" aria-label="Prototype State Preview">
+    <strong>Prototype State Preview</strong>
+    <div class="group" id="stateButtons"></div>
+    <span class="divider" aria-hidden="true"></span>
+    <div class="group" aria-label="Viewport preview">
+      <span style="color:#94a3b8;font-size:0.7rem;">Width</span>
+      <button type="button" data-width="1440" class="width-btn active">1440</button>
+      <button type="button" data-width="1280" class="width-btn">1280</button>
+      <button type="button" data-width="1024" class="width-btn">1024</button>
+      <button type="button" data-width="768" class="width-btn">768</button>
+    </div>
+    <span class="proto-note">Design review artifact — not production</span>
+  </div>
+
+  <div class="viewport-frame w-1440" id="viewportFrame">
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Platform administration">
+        <a class="brand" href="#">
+          <span class="brand-icon" aria-hidden="true">OV</span>
+          <span><strong>OneVerz</strong><small>Platform Administration</small></span>
+        </a>
+        <a class="nav-item" href="#">Dashboard</a>
+        <a class="nav-item" href="#">Tenants</a>
+        <a class="nav-item" href="#">Onboarding Drafts</a>
+        <a class="nav-item" href="#">Subscriptions</a>
+        <a class="nav-item" href="#">Billing</a>
+        <div class="sidebar-footer">OneVerz Platform · v2.4.0</div>
+      </aside>
+
+      <div class="main">
+        <header class="topbar">
+          <span class="avatar" aria-hidden="true">PA</span>
+        </header>
+
+        <main class="page" id="mainContent" aria-live="polite" aria-atomic="true">
+          <!-- PageHeader -->
+          <header class="page-header">
+            <div>
+              <p class="eyebrow">Platform Admin</p>
+              <h1 id="pageTitle">Tenant Setup Status</h1>
+              <p class="desc">Track tenant creation and the post-submit payment, activation, and invitation lifecycle.</p>
+            </div>
+            <div class="header-actions">
+              <button type="button" class="btn btn-ghost" id="btnBackTenants">Back to Tenants</button>
+              <button type="button" class="btn btn-secondary" id="btnRefresh">Refresh Status</button>
+            </div>
+          </header>
+
+          <!-- Transport error (poll) — separate from operation failure -->
+          <div class="alert alert-error" id="pollErrorBanner" role="alert">
+            We couldn't refresh the latest status. The last known operation state is shown below.
+          </div>
+
+          <!-- Premium status surface -->
+          <section class="status-surface running" id="statusSurface" aria-labelledby="statusHeadline">
+            <div class="status-icon" id="statusIconWrap" aria-hidden="true">
+              <div class="spinner" id="statusSpinner"></div>
+              <svg id="statusSvg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="status-copy">
+              <h2 id="statusHeadline">Tenant setup is in progress</h2>
+              <p id="statusSubcopy">The tenant has been submitted and provisioning is continuing.</p>
+              <div class="tenant-identity" id="tenantIdentity">
+                <strong id="tenantName">Colombo Arena Retail</strong>
+                <span id="tenantCode">TEN-00248</span>
+              </div>
+              <p class="support-meta" id="updatedMeta">Updated just now</p>
+            </div>
+            <span class="status-badge" id="overallBadge"><span class="status-dot"></span><span id="overallBadgeText">Processing</span></span>
+          </section>
+
+          <!-- Lifecycle timeline (4 dimensions — NOT UI-3A wizard) -->
+          <section class="timeline-panel" aria-labelledby="timelineHeading">
+            <h3 id="timelineHeading">Post-submit lifecycle</h3>
+            <ol class="timeline" id="timeline" role="list">
+              <li class="node-item complete" data-step="provisioning" role="listitem">
+                <div class="node">
+                  <div class="node-marker" aria-hidden="true">✓</div>
+                  <div class="node-label">Tenant created</div>
+                  <div class="node-state" id="stateProvisioning">Completed</div>
+                </div>
+              </li>
+              <li class="node-item current pulse-node" data-step="payment" role="listitem">
+                <div class="node">
+                  <div class="node-marker" aria-hidden="true">2</div>
+                  <div class="node-label">Payment setup</div>
+                  <div class="node-state" id="statePayment">Pending</div>
+                </div>
+              </li>
+              <li class="node-item waiting" data-step="activation" role="listitem">
+                <div class="node">
+                  <div class="node-marker" aria-hidden="true">3</div>
+                  <div class="node-label">Tenant activation</div>
+                  <div class="node-state" id="stateActivation">Waiting</div>
+                </div>
+              </li>
+              <li class="node-item waiting" data-step="invitation" role="listitem">
+                <div class="node">
+                  <div class="node-marker" aria-hidden="true">4</div>
+                  <div class="node-label">Tenant Admin invitation</div>
+                  <div class="node-state" id="stateInvitation">Waiting</div>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          <!-- Context -->
+          <div class="context-grid">
+            <section class="panel" aria-labelledby="tenantContextHeading">
+              <h3 id="tenantContextHeading">Tenant &amp; operation context</h3>
+              <dl class="meta-grid">
+                <div class="meta-row"><dt>Tenant status</dt><dd id="metaTenantStatus">—</dd></div>
+                <div class="meta-row"><dt>Payment status</dt><dd id="metaPaymentStatus">—</dd></div>
+                <div class="meta-row"><dt>Invitation status</dt><dd id="metaInvitationStatus">—</dd></div>
+                <div class="meta-row"><dt>Subscription plan</dt><dd id="metaPlan">Pro · Monthly</dd></div>
+                <div class="meta-row" id="failureRow" data-visible="false"><dt>Reference</dt><dd id="metaFailureCode">—</dd></div>
+                <div class="meta-row"><dt>Operation ID</dt><dd id="metaOperationId" style="font-family:monospace;font-size:0.75rem;">a1b2c3d4-…</dd></div>
+              </dl>
+            </section>
+
+            <section class="guidance" id="guidancePanel" aria-labelledby="guidanceHeading">
+              <h3 id="guidanceHeading">What happens next</h3>
+              <p id="guidanceText">Provisioning is running. Payment, activation, and invitation stages will update as the backend lifecycle progresses.</p>
+            </section>
+          </div>
+
+          <!-- Actions -->
+          <section class="actions-bar" aria-label="Available actions">
+            <p class="left" id="actionsHint">Actions remain permission- and lifecycle-controlled by the backend.</p>
+            <div class="right" id="actionButtons">
+              <button type="button" class="btn btn-secondary" id="actionRefresh">Refresh Status</button>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <aside class="a11y-notes" tabindex="0" aria-label="Accessibility design notes">
+    H1: page title · aria-live=polite on main (meaningful transitions only in production) · timeline list semantics · status text not color-only · focus-visible on controls
+  </aside>
+
+  <script>
+    /* Prototype-only state model — maps to real backend lifecycle dimensions (Planning Audit) */
+    const STATES = {
+      running: {
+        label: 'Running',
+        surfaceClass: 'running',
+        headline: 'Tenant setup is in progress',
+        subcopy: 'The tenant has been submitted and provisioning is continuing.',
+        badge: 'Processing',
+        badgeClass: '',
+        showSpinner: true,
+        showPollError: false,
+        tenantName: 'Colombo Arena Retail',
+        tenantCode: 'TEN-00248',
+        updated: 'Updated just now',
+        tenantStatus: 'Provisioning',
+        paymentStatus: 'Not started',
+        invitationStatus: 'Not eligible',
+        guidanceTitle: 'What happens next',
+        guidanceText: 'Provisioning is running. Payment, activation, and invitation stages will update as the backend lifecycle progresses.',
+        guidanceTone: '',
+        actionsHint: 'You can refresh status manually. No numeric progress is available from the operation contract.',
+        timeline: [
+          { step: 'provisioning', class: 'current pulse-node', marker: '●', label: 'Tenant created', state: 'In progress' },
+          { step: 'payment', class: 'waiting', marker: '2', label: 'Payment setup', state: 'Waiting' },
+          { step: 'activation', class: 'waiting', marker: '3', label: 'Tenant activation', state: 'Waiting' },
+          { step: 'invitation', class: 'waiting', marker: '4', label: 'Tenant Admin invitation', state: 'Waiting' }
+        ],
+        actions: [{ label: 'Refresh Status', variant: 'secondary', id: 'refresh' }]
+      },
+      paymentPending: {
+        label: 'Payment Pending',
+        surfaceClass: 'payment-pending',
+        headline: 'Tenant created — payment setup pending',
+        subcopy: 'Core tenant provisioning completed. Manual payment setup is the current pending lifecycle stage.',
+        badge: 'Payment pending',
+        badgeClass: 'badge-warning',
+        showSpinner: false,
+        showPollError: false,
+        tenantName: 'Colombo Arena Retail',
+        tenantCode: 'TEN-00248',
+        updated: 'Updated 2 min ago',
+        tenantStatus: 'Pending payment',
+        paymentStatus: 'Awaiting payment',
+        invitationStatus: 'Not eligible',
+        guidanceTitle: 'Payment is separate from failure',
+        guidanceText: 'The tenant record exists. Complete manual payment review to advance activation. This is not an operation failure.',
+        guidanceTone: 'warning-tone',
+        actionsHint: 'Open payment review when billing permissions allow.',
+        timeline: [
+          { step: 'provisioning', class: 'complete', marker: '✓', label: 'Tenant created', state: 'Completed' },
+          { step: 'payment', class: 'current', marker: '●', label: 'Payment setup', state: 'Awaiting payment' },
+          { step: 'activation', class: 'waiting', marker: '3', label: 'Tenant activation', state: 'Waiting' },
+          { step: 'invitation', class: 'waiting', marker: '4', label: 'Tenant Admin invitation', state: 'Waiting' }
+        ],
+        actions: [
+          { label: 'Open payment review', variant: 'primary', id: 'payment' },
+          { label: 'Refresh Status', variant: 'secondary', id: 'refresh' }
+        ]
+      },
+      activationPending: {
+        label: 'Activation Pending',
+        surfaceClass: 'activation-pending',
+        headline: 'Payment approved — activation pending',
+        subcopy: 'Tenant creation succeeded. Activation and invitation lifecycle stages are still in progress.',
+        badge: 'Activation pending',
+        badgeClass: 'badge-info',
+        showSpinner: false,
+        showPollError: false,
+        tenantName: 'Colombo Arena Retail',
+        tenantCode: 'TEN-00248',
+        updated: 'Updated 8 min ago',
+        tenantStatus: 'Pending activation',
+        paymentStatus: 'Paid',
+        invitationStatus: 'Queued',
+        guidanceTitle: 'Invitation is queued, not delivered',
+        guidanceText: 'Use "Queued" or "Pending" wording only. Do not claim the invitation email was delivered unless the backend guarantees it.',
+        guidanceTone: '',
+        actionsHint: 'Activate tenant when eligible. Invitation delivery continues asynchronously.',
+        timeline: [
+          { step: 'provisioning', class: 'complete', marker: '✓', label: 'Tenant created', state: 'Completed' },
+          { step: 'payment', class: 'complete', marker: '✓', label: 'Payment setup', state: 'Paid' },
+          { step: 'activation', class: 'current', marker: '●', label: 'Tenant activation', state: 'Pending activation' },
+          { step: 'invitation', class: 'waiting', marker: '4', label: 'Tenant Admin invitation', state: 'Queued' }
+        ],
+        actions: [
+          { label: 'Activate tenant', variant: 'primary', id: 'activate' },
+          { label: 'View Tenant', variant: 'secondary', id: 'view' },
+          { label: 'Refresh Status', variant: 'secondary', id: 'refresh' }
+        ]
+      },
+      success: {
+        label: 'Success',
+        surfaceClass: 'success',
+        headline: 'Tenant setup complete',
+        subcopy: 'Tenant creation, payment, activation, and invitation lifecycle stages are complete.',
+        badge: 'Complete',
+        badgeClass: 'badge-success',
+        showSpinner: false,
+        showPollError: false,
+        tenantName: 'Colombo Arena Retail',
+        tenantCode: 'TEN-00248',
+        updated: 'Completed Aug 11, 2026 · 1:42 PM',
+        tenantStatus: 'Active',
+        paymentStatus: 'Paid',
+        invitationStatus: 'Sent',
+        guidanceTitle: 'Ready for handoff',
+        guidanceText: 'Open the tenant record to continue operational setup. Create Another Tenant remains a low-priority secondary action.',
+        guidanceTone: '',
+        actionsHint: 'Primary next step: open the created tenant.',
+        timeline: [
+          { step: 'provisioning', class: 'complete', marker: '✓', label: 'Tenant created', state: 'Completed' },
+          { step: 'payment', class: 'complete', marker: '✓', label: 'Payment setup', state: 'Paid' },
+          { step: 'activation', class: 'complete', marker: '✓', label: 'Tenant activation', state: 'Active' },
+          { step: 'invitation', class: 'complete', marker: '✓', label: 'Tenant Admin invitation', state: 'Sent' }
+        ],
+        actions: [
+          { label: 'View Tenant', variant: 'primary', id: 'view' },
+          { label: 'Back to Tenants', variant: 'secondary', id: 'back' },
+          { label: 'Create Another Tenant', variant: 'ghost', id: 'create' }
+        ]
+      },
+      failure: {
+        label: 'Failure',
+        surfaceClass: 'failure',
+        headline: 'Tenant setup needs attention',
+        subcopy: 'Some tenant setup work may already be complete. Review the lifecycle and choose a safe recovery action.',
+        badge: 'Retry eligible',
+        badgeClass: 'badge-danger',
+        showSpinner: false,
+        showPollError: false,
+        showFailure: true,
+        failureCode: 'delivery_outbox_failed',
+        tenantName: 'Colombo Arena Retail',
+        tenantCode: 'TEN-00248',
+        updated: 'Updated 4 min ago',
+        tenantStatus: 'Pending activation',
+        paymentStatus: 'Paid',
+        invitationStatus: 'Failed',
+        guidanceTitle: 'Partial provisioning possible',
+        guidanceText: 'Do not recommend blindly restarting Create Tenant. Retry processing only re-queues eligible async delivery work—it does not recreate the tenant.',
+        guidanceTone: 'danger-tone',
+        actionsHint: 'Retry appears only when backend marks the operation retry-eligible.',
+        timeline: [
+          { step: 'provisioning', class: 'complete', marker: '✓', label: 'Tenant created', state: 'Completed' },
+          { step: 'payment', class: 'complete', marker: '✓', label: 'Payment setup', state: 'Paid' },
+          { step: 'activation', class: 'complete', marker: '✓', label: 'Tenant activation', state: 'Active' },
+          { step: 'invitation', class: 'failed', marker: '!', label: 'Tenant Admin invitation', state: 'Failed' }
+        ],
+        actions: [
+          { label: 'Retry Processing', variant: 'warning', id: 'retry' },
+          { label: 'View Tenant', variant: 'secondary', id: 'view' },
+          { label: 'Back to Tenants', variant: 'ghost', id: 'back' }
+        ]
+      },
+      longRunning: {
+        label: 'Long Running',
+        surfaceClass: 'long-running',
+        headline: 'Tenant setup is taking longer than usual',
+        subcopy: 'You can safely leave this page and return using this operation link. Refresh status when you return.',
+        badge: 'Still processing',
+        badgeClass: '',
+        showSpinner: true,
+        showPollError: false,
+        tenantName: 'Colombo Arena Retail',
+        tenantCode: 'TEN-00248',
+        updated: 'Updated 6 min ago',
+        tenantStatus: 'Provisioning',
+        paymentStatus: 'Not started',
+        invitationStatus: 'Not eligible',
+        guidanceTitle: 'Deep-link reliable',
+        guidanceText: 'Planning audit confirms deep-link refresh works. No fake ETA or percentage should be shown.',
+        guidanceTone: '',
+        actionsHint: 'Manual refresh remains available.',
+        timeline: [
+          { step: 'provisioning', class: 'current pulse-node', marker: '●', label: 'Tenant created', state: 'In progress' },
+          { step: 'payment', class: 'waiting', marker: '2', label: 'Payment setup', state: 'Waiting' },
+          { step: 'activation', class: 'waiting', marker: '3', label: 'Tenant activation', state: 'Waiting' },
+          { step: 'invitation', class: 'waiting', marker: '4', label: 'Tenant Admin invitation', state: 'Waiting' }
+        ],
+        actions: [{ label: 'Refresh Status', variant: 'secondary', id: 'refresh' }]
+      },
+      pollError: {
+        label: 'Poll Error',
+        surfaceClass: 'poll-error',
+        headline: 'Unable to refresh status',
+        subcopy: 'This is a transport error—not proof that tenant provisioning failed.',
+        badge: 'Refresh needed',
+        badgeClass: 'badge-warning',
+        showSpinner: false,
+        showPollError: true,
+        tenantName: 'Colombo Arena Retail',
+        tenantCode: 'TEN-00248',
+        updated: 'Last known update · 3 min ago',
+        tenantStatus: 'Pending payment',
+        paymentStatus: 'Awaiting payment',
+        invitationStatus: 'Not eligible',
+        guidanceTitle: 'Last known state preserved',
+        guidanceText: 'Show the last known operation state when safe. Do not infer failure from a polling/network error.',
+        guidanceTone: 'warning-tone',
+        actionsHint: 'Try refresh again or return to Tenants.',
+        timeline: [
+          { step: 'provisioning', class: 'complete', marker: '✓', label: 'Tenant created', state: 'Completed' },
+          { step: 'payment', class: 'current', marker: '●', label: 'Payment setup', state: 'Awaiting payment' },
+          { step: 'activation', class: 'waiting', marker: '3', label: 'Tenant activation', state: 'Waiting' },
+          { step: 'invitation', class: 'waiting', marker: '4', label: 'Tenant Admin invitation', state: 'Waiting' }
+        ],
+        actions: [
+          { label: 'Refresh Status', variant: 'primary', id: 'refresh' },
+          { label: 'Back to Tenants', variant: 'secondary', id: 'back' }
+        ]
+      },
+      notFound: {
+        label: 'Not Found',
+        surfaceClass: 'not-found',
+        headline: 'Operation not found',
+        subcopy: 'This operation reference could not be loaded. It may be invalid or no longer available.',
+        badge: 'Not found',
+        badgeClass: '',
+        showSpinner: false,
+        showPollError: false,
+        hideTenant: true,
+        tenantName: '',
+        tenantCode: '',
+        updated: '',
+        tenantStatus: '—',
+        paymentStatus: '—',
+        invitationStatus: '—',
+        guidanceTitle: 'Safe exit',
+        guidanceText: 'Return to Tenants. Do not expose security-sensitive details.',
+        guidanceTone: '',
+        actionsHint: '',
+        timeline: [
+          { step: 'provisioning', class: 'waiting', marker: '—', label: 'Tenant created', state: 'Unavailable' },
+          { step: 'payment', class: 'waiting', marker: '—', label: 'Payment setup', state: 'Unavailable' },
+          { step: 'activation', class: 'waiting', marker: '—', label: 'Tenant activation', state: 'Unavailable' },
+          { step: 'invitation', class: 'waiting', marker: '—', label: 'Tenant Admin invitation', state: 'Unavailable' }
+        ],
+        actions: [{ label: 'Back to Tenants', variant: 'primary', id: 'back' }]
+      }
+    };
+
+    const stateButtons = document.getElementById('stateButtons');
+    const statusSurface = document.getElementById('statusSurface');
+    const pollErrorBanner = document.getElementById('pollErrorBanner');
+    const statusSpinner = document.getElementById('statusSpinner');
+    const statusSvg = document.getElementById('statusSvg');
+    const actionButtons = document.getElementById('actionButtons');
+    const failureRow = document.getElementById('failureRow');
+    const tenantIdentity = document.getElementById('tenantIdentity');
+
+    let currentState = 'running';
+
+    Object.keys(STATES).forEach((key) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = STATES[key].label;
+      btn.dataset.state = key;
+      if (key === currentState) btn.classList.add('active');
+      btn.addEventListener('click', () => applyState(key));
+      stateButtons.appendChild(btn);
+    });
+
+    document.querySelectorAll('.width-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.width-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        const frame = document.getElementById('viewportFrame');
+        frame.className = 'viewport-frame w-' + btn.dataset.width;
+      });
+    });
+
+    function applyTimeline(items) {
+      const lis = document.querySelectorAll('#timeline .node-item');
+      items.forEach((item, i) => {
+        const li = lis[i];
+        li.className = 'node-item ' + item.class;
+        li.querySelector('.node-marker').textContent = item.marker;
+        li.querySelector('.node-label').textContent = item.label;
+        li.querySelector('.node-state').textContent = item.state;
+      });
+    }
+
+    function applyState(key) {
+      currentState = key;
+      const s = STATES[key];
+      document.querySelectorAll('#stateButtons button').forEach((b) => {
+        b.classList.toggle('active', b.dataset.state === key);
+      });
+
+      statusSurface.className = 'status-surface ' + s.surfaceClass;
+      document.getElementById('statusHeadline').textContent = s.headline;
+      document.getElementById('statusSubcopy').textContent = s.subcopy;
+      document.getElementById('updatedMeta').textContent = s.updated;
+      document.getElementById('metaTenantStatus').textContent = s.tenantStatus;
+      document.getElementById('metaPaymentStatus').textContent = s.paymentStatus;
+      document.getElementById('metaInvitationStatus').textContent = s.invitationStatus;
+
+      const badge = document.getElementById('overallBadge');
+      badge.className = 'status-badge ' + (s.badgeClass || '');
+      if (!s.badgeClass && s.surfaceClass.includes('running') || s.surfaceClass.includes('long-running') || s.surfaceClass.includes('payment') || s.surfaceClass.includes('activation')) {
+        badge.className = 'status-badge';
+      }
+      document.getElementById('overallBadgeText').textContent = s.badge;
+
+      statusSpinner.style.display = s.showSpinner ? 'block' : 'none';
+      statusSvg.style.display = s.showSpinner ? 'none' : 'block';
+      if (s.surfaceClass === 'success') {
+        statusSvg.innerHTML = '<path d="M20 6 9 17l-5-5"/>';
+        statusSvg.style.color = 'var(--success)';
+      } else if (s.surfaceClass === 'failure') {
+        statusSvg.innerHTML = '<path d="M18 6 6 18M6 6l12 12"/>';
+        statusSvg.style.color = 'var(--danger)';
+      } else if (s.surfaceClass === 'poll-error') {
+        statusSvg.innerHTML = '<path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>';
+        statusSvg.style.color = 'var(--warning)';
+      } else if (s.surfaceClass === 'not-found') {
+        statusSvg.innerHTML = '<path d="M9.09 9a3 3 0 1 1 5.82 1c0 2-3 3-3 3m.08 4h.01"/>';
+        statusSvg.style.color = 'var(--text-muted)';
+      } else {
+        statusSvg.style.display = 'none';
+      }
+
+      pollErrorBanner.classList.toggle('show', !!s.showPollError);
+
+      tenantIdentity.style.display = s.hideTenant ? 'none' : 'flex';
+      document.getElementById('tenantName').textContent = s.tenantName;
+      document.getElementById('tenantCode').textContent = s.tenantCode;
+
+      failureRow.dataset.visible = s.showFailure ? 'true' : 'false';
+      if (s.showFailure) document.getElementById('metaFailureCode').textContent = s.failureCode;
+
+      const guidance = document.getElementById('guidancePanel');
+      guidance.className = 'guidance ' + (s.guidanceTone || '');
+      document.getElementById('guidanceHeading').textContent = s.guidanceTitle;
+      document.getElementById('guidanceText').textContent = s.guidanceText;
+      document.getElementById('actionsHint').textContent = s.actionsHint;
+
+      applyTimeline(s.timeline);
+
+      actionButtons.innerHTML = '';
+      s.actions.forEach((a) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-' + a.variant;
+        btn.textContent = a.label;
+        btn.addEventListener('click', () => { /* prototype only */ });
+        actionButtons.appendChild(btn);
+      });
+
+      document.getElementById('pageTitle').textContent =
+        key === 'running' || key === 'longRunning' ? 'Creating Tenant' : 'Tenant Setup Status';
+    }
+
+    applyState('running');
+  </script>
+</body>
+</html>
