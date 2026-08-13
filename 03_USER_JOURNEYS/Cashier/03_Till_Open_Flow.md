@@ -101,6 +101,11 @@ New API / table / attribute / permission: **NOT REQUIRED**.
 - UI state matches backend-confirmed session.
 - Approved UI contract (Dashboard Top Bar, orange theme, white parent, bold dark text, phone/tablet/desktop) satisfied when Flutter alignment is done.
 
+## Visual Direction
+
+Approved orange Open Till presentation:
+[[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Close_Till_Orange_Visual_Direction]]
+
 ## Related Files
 
 - [[../../01_RELEASE_SCOPE/Release_1_Scope]]

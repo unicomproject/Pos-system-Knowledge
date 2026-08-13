@@ -50,7 +50,14 @@ Chunk 3 runtime matrix is executed against a build containing those changes.
   End Shift, post-fix Phone/Tablet/Desktop and desktop keyboard acceptance remain
   unverified. Production readiness must not be claimed.
 
-## Backend Remediation State
+### Orange visual alignment (2026-08-14)
+
+Close Till primary CTA, Save Draft outline, counted-cash focus border and info
+icons use OneVerz orange tokens. Canonical visual contract:
+[[../../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Close_Till_Orange_Visual_Direction]]
+and status [[../Till/Open_Close_Till_Orange_Theme_Implementation_Status]].
+
+## Integration Status
 
 The current workspace implements server-authoritative Expected Cash, ignores
 caller authority, atomically persists reconciliation/session/event, validates

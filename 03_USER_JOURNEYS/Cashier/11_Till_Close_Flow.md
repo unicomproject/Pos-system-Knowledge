@@ -107,6 +107,11 @@ not accepted journey behavior.
 - Offline close, denominations, manager approval, report printing, accounting
   day close and durable draft storage.
 
+## Visual Direction
+
+Approved orange Close Till presentation (including Save Draft outline + solid Close Till CTA):
+[[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Close_Till_Orange_Visual_Direction]]
+
 ## Related Files
 
 - [[../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]]

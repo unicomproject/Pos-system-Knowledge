@@ -32,6 +32,13 @@ Canonical specs:
 - [[../../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]]
 - [[../../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Till_Screen_Implementation_Specification]]
 
+### Orange visual alignment (2026-08-14)
+
+Open Till primary accents/CTA now follow OneVerz orange
+(`TenantAdminColors.posHomeAccentOrange`). Canonical visual contract:
+[[../../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Close_Till_Orange_Visual_Direction]]
+and status [[Open_Close_Till_Orange_Theme_Implementation_Status]].
+
 ## API Dependency
 
 | API | Status |
