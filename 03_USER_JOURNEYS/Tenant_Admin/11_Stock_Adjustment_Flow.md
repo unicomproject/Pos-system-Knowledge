@@ -1,9 +1,26 @@
 <!-- title: Tenant Admin Stock Adjustment Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-08-15 -->
 
 # Tenant Admin Stock Adjustment Flow
+
+**TA-UJ-047 — LOCKED FOR CURRENT INVENTORY RELEASE**
+
+## Contract lock (current Inventory release)
+
+```text
+Journey contract: LOCKED FOR CURRENT INVENTORY RELEASE
+Prototype: APPROVED
+Implementation Audit: PASS
+UI/UX Contract: LOCKED
+Implementation Contract: LOCKED
+Frontend Implementation: NOT STARTED
+Backend Implementation: NOT STARTED
+QA Execution: NOT STARTED
+```
+
+Canonical lock: [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Lock_Manifest]]
 
 ## Purpose
 
@@ -79,3 +96,29 @@ Stock adjustment is saved and audited.
 ## Related Files
 
 - 06_DATABASE_KNOWLEDGE/Tables/18_Stock_Adjustment_Transfer_And_Stocktake.md
+- 07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Approved_UI_Prototype.md
+- 07_UI_UX_KNOWLEDGE/Inventory_UI_Prototype_Screen_Registry.md
+
+## Approved UI Prototype Reference
+
+Prototype Status: APPROVED
+
+Implementation Audit: PASS
+
+UI/UX Contract: LOCKED
+
+Implementation: NOT STARTED
+
+Prototype grouping: INV-UJ-04 Stock Adjustment
+
+Related Prototype Screens:
+
+- INV-UJ04-S01 `15_stock_adjustment_dashboard.html`
+- INV-UJ04-S02 `16_stock_adjustment_select.html`
+- INV-UJ04-S03 `17_stock_adjustment_enter.html`
+- INV-UJ04-S04 `18_stock_adjustment_review.html`
+- INV-UJ04-S05 `19_stock_adjustment_success.html`
+
+Canonical pack: `07_UI_UX_KNOWLEDGE/prototypes/inventory_ui_prototype_29_screens/inventory_html_prototype/`
+
+This flow's existing business steps are unchanged. Production statuses for the 29-screen release: **DRAFT** and **POSTED**. Pending-approval queue is deferred. Negative stock is forbidden for Tenant Admin adjustments. Implementation audit: [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Implementation_Audit]].

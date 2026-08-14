@@ -1,9 +1,25 @@
 <!-- title: Stock Adjustment, Transfer & Stocktake Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-15 -->
 
 # Stock Adjustment, Transfer & Stocktake Module Overview
+
+## Contract lock
+
+```text
+Inventory Contract Version: v1.0
+Status: LOCKED
+Prototype: APPROVED
+Implementation Audit: PASS
+UI/UX Contract: LOCKED
+Implementation Contract: LOCKED
+Frontend Implementation: NOT STARTED
+Backend Implementation: NOT STARTED
+QA Execution: NOT STARTED
+```
+
+Canonical lock: [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Lock_Manifest]]
 
 ## Purpose
 
@@ -74,3 +90,27 @@ merchandising, attractions, and temporary retail locations.
 
 - [[04_MODULE_KNOWLEDGE/18_Stock_Adjustment_Transfer_Stocktake/02_Functional_Rules]]
 - [[04_MODULE_KNOWLEDGE/18_Stock_Adjustment_Transfer_Stocktake/03_Technical_Contract]]
+- [[07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Approved_UI_Prototype]]
+- [[07_UI_UX_KNOWLEDGE/Inventory_UI_Prototype_Screen_Registry]]
+
+## Approved UI Prototype Reference
+
+Prototype Status: APPROVED
+
+Implementation Audit: PASS
+
+UI/UX Contract: LOCKED
+
+Implementation Contract: LOCKED
+
+Frontend Implementation: NOT STARTED
+
+Backend Implementation: NOT STARTED
+
+Related prototype grouping for this module's adjustment surface: INV-UJ-04 (screens 15–19).
+
+## Current 29-screen implementation scope
+
+IN SCOPE from this module: stock adjustment form (TA-UJ-047).
+
+DEFERRED: Transfer workflow, Stocktake session, Variance review. Transfer tables remain in schema. Flow 14 remains Deferred. Not a 29-screen blocker (GAP-INV-006 DEFERRED).

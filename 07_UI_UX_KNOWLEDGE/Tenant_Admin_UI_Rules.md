@@ -66,3 +66,23 @@ The top-level menu order is:
 - [[../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Sidebar_Navigation]]
 - [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Tenant_Admin_Layout]]
 - [[Tenant_Admin_Product_List_UI_UX_Specification]]
+- [[Tenant_Admin_Inventory_Lock_Manifest]]
+- [[Tenant_Admin_Inventory_Approved_UI_Prototype]]
+- [[Inventory_UI_Prototype_Screen_Registry]]
+- [[Tenant_Admin_Inventory_Implementation_Audit]]
+
+
+## Inventory production shell vs prototype chrome (LOCKED)
+
+```text
+LOCKED:
+Inventory workspace/content contract
+
+LOCKED:
+Current canonical Tenant Admin shell/navigation (this document)
+
+NOT LOCKED:
+Prototype-only obsolete outer chrome where it conflicts with the current canonical application shell
+```
+
+Inventory is top-level item 8. Prototype Settings-nested white sidebar / POS till chrome must not override this shell.

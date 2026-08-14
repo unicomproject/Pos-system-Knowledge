@@ -1,13 +1,28 @@
 <!-- title: Tenant Admin Stock Out Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-08-15 -->
 
 # Tenant Admin Stock Out Flow
+
+## Contract lock (current Inventory release)
+
+```text
+DEFERRED
+NOT PART OF CURRENT IMPLEMENTATION LOCK
+```
+
+This journey remains documented. It is not implementation-ready for the 29-screen Inventory release.
+
+Canonical lock: [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Lock_Manifest]]
 
 ## Purpose
 
 Defines reducing stock with reason capture, validation, and audit tracking.
+
+## Current 29-screen implementation scope
+
+**DEFERRED / OUT OF CURRENT 29-SCREEN SCOPE.** Canonical journey retained. Do not implement UI from this flow in the 29-screen release.
 
 ## Actor
 
@@ -77,3 +92,18 @@ Stock is reduced and movement is audited.
 ## Related Files
 
 - 06_DATABASE_KNOWLEDGE/Tables/17_Reservations_Stock_Movements_Serial_And_Cost_Allocation.md
+- 07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Approved_UI_Prototype.md
+
+## Approved UI Prototype Reference
+
+Prototype Status: APPROVED (29-screen Inventory pack)
+
+Implementation Audit: Pending
+
+UI/UX Lock: Pending
+
+Related Prototype Screens:
+
+- None in the approved 29-screen Inventory prototype pack
+
+AUDIT GAP closed: TA-UJ-048 is **DEFERRED / OUT OF CURRENT 29-SCREEN SCOPE**. Journey retained. Not an implementation blocker.

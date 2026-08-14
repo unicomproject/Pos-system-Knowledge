@@ -1,13 +1,32 @@
 <!-- title: Tenant Admin Stock In Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-08-15 -->
 
 # Tenant Admin Stock In Flow
+
+**TA-UJ-046 — LOCKED FOR CURRENT INVENTORY RELEASE**
+
+## Contract lock (current Inventory release)
+
+```text
+Journey contract: LOCKED FOR CURRENT INVENTORY RELEASE
+Prototype: APPROVED
+Implementation Audit: PASS
+UI/UX Contract: LOCKED
+Implementation Contract: LOCKED
+Frontend Implementation: NOT STARTED
+Backend Implementation: NOT STARTED
+QA Execution: NOT STARTED
+```
+
+Canonical lock: [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Lock_Manifest]]
 
 ## Purpose
 
 Defines receiving stock with quantity capture, source details, and audit tracking.
+
+Production UI label: **Stock Receiving**. Canonical ID remains TA-UJ-046.
 
 ## Actor
 
@@ -77,3 +96,31 @@ Received stock is added and audited.
 ## Related Files
 
 - 06_DATABASE_KNOWLEDGE/Tables/17_Reservations_Stock_Movements_Serial_And_Cost_Allocation.md
+- 07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Approved_UI_Prototype.md
+- 07_UI_UX_KNOWLEDGE/Inventory_UI_Prototype_Screen_Registry.md
+
+## Approved UI Prototype Reference
+
+Prototype Status: APPROVED
+
+Implementation Audit: PASS
+
+UI/UX Contract: LOCKED
+
+Implementation: NOT STARTED
+
+Prototype grouping: INV-UJ-03 Stock Receiving
+
+Related Prototype Screens:
+
+- INV-UJ03-S01 `08_stock_receiving_dashboard.html`
+- INV-UJ03-S02 `09_new_stock_receipt_select.html`
+- INV-UJ03-S03 `10_receiving_enter_details.html`
+- INV-UJ03-S04 `11_receiving_review.html`
+- INV-UJ03-S05 `12_receiving_confirm.html`
+- INV-UJ03-S06 `13_receiving_success.html`
+- INV-UJ03-S07 `14_serial_number_registry.html`
+
+Canonical pack: `07_UI_UX_KNOWLEDGE/prototypes/inventory_ui_prototype_29_screens/inventory_html_prototype/`
+
+This flow's existing business steps are unchanged. Production UI label is **Stock Receiving** (TA-UJ-046 retained; Stock In is alias). Supplier is a required name on the receipt, not a full supplier-master module. Stock increases only on Confirm Receive. Implementation audit: [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Implementation_Audit]].

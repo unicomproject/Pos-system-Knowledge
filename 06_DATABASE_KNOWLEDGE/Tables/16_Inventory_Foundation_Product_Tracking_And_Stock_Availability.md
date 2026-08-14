@@ -320,3 +320,17 @@ CHECK(max_stock_quantity IS NULL OR min_stock_quantity IS NULL OR max_stock_quan
 CHECK(lead_time_days IS NULL OR lead_time_days >= 0)
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 ```
+
+## Related Files
+
+- 07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Approved_UI_Prototype.md
+- 07_UI_UX_KNOWLEDGE/Inventory_UI_Prototype_Screen_Registry.md
+
+This table document is unchanged. Channel allocation UI in the approved prototype pack (`INV-UJ-05`) is registered separately. Table definitions and constraints are not modified by prototype registration.
+
+
+## 29-screen Inventory mapping (LOCKED)
+
+Canonical mapping for the current Inventory release: [[Inventory_29_Screen_Schema_Mapping]].
+
+`inventory_balances` is the authoritative current-quantity projection. Channel allocation (Model B) uses `inventory_channel_allocations` and does not reduce on-hand.

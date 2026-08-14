@@ -1,7 +1,7 @@
 ﻿<!-- title: Global User Journey Register -->
 <!-- status: Canonical -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-13 -->
+<!-- last_updated: 2026-08-15 -->
 <!-- supersedes: Provisional 163-candidate register (2026-08-12 audit) -->
 
 # Global User Journey Register
@@ -12,7 +12,7 @@ Canonical **one-row-per-journey** master index for OneVerz EPOS atomic user jour
 
 | Attribute | Value |
 |---|---|
-| Register version | **173** (locked 2026-08-12) |
+| Register version | **175** (Inventory contract lock 2026-08-15; was 173 locked 2026-08-12) |
 | Previous provisional count | 163 (superseded) |
 | Previous locked count | 172 (Selected-Tenant Phase 2.5; SA-UJ-048–056) |
 | Selected-Tenant Online Store | SA-UJ-057 registered (**COMPLETE** — runtime E2E closed 2026-08-13) |
@@ -23,12 +23,14 @@ Canonical **one-row-per-journey** master index for OneVerz EPOS atomic user jour
 | Surface | Total | Complete | Partial | Not Started | Blocked |
 |---|---:|---:|---:|---:|---:|
 | Super Admin | 57 | 55 | 1 | 1 | 0 |
-| Tenant Admin | 62 | 26 | 11 | 25 | 0 |
+| Tenant Admin | 64 | 26 | 11 | 27 | 0 |
 | Cashier POS | 36 | 21 | 9 | 4 | 2 |
 | E-commerce Customer | 18 | 12 | 5 | 1 | 0 |
-| **GRAND TOTAL** | **173** | **114** | **26** | **31** | **2** |
+| **GRAND TOTAL** | **175** | **114** | **26** | **33** | **2** |
 
-Arithmetic: 114 + 26 + 31 + 2 = 173
+Arithmetic: 114 + 26 + 33 + 2 = 175
+
+TA-UJ-063 Opening Stock and TA-UJ-064 Channel Stock Allocation added 2026-08-15. Inventory 29-screen UI/UX + implementation contracts LOCKED. Journey implementation status remains NOT_STARTED.
 
 Selected-Tenant final runtime E2E closure (2026-08-13): SA-UJ-048…057 moved **PARTIAL → COMPLETE** against live PostgreSQL + backend `0245053` + Angular `8587e04`. ST-UX-001 remains **PASS** (not counted). Evidence: [[../../15_IMPLEMENTATION_TRACKING/99_AUDITS/ONEVERZ_SELECTED_TENANT_FINAL_RUNTIME_E2E_CLOSURE_2026-08-13]]. SA-UJ-024 remains sole Super Admin **NOT_STARTED**.
 
@@ -176,7 +178,7 @@ One row per journey. Implementation status reflects **production code**, not doc
 | TA-UJ-043 | - | TA | Tenant Admin | - | Edit Brand | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | TA-UJ-044 | - | TA | Tenant Admin | - | Delete Brand | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | TA-UJ-045 | - | TA | Tenant Admin | - | View Inventory / Current Stock | - | - | Y | NOT_STARTED | 20 | - | - | - | - | - |
-| TA-UJ-046 | - | TA | Tenant Admin | - | Stock In | - | - | Y | NOT_STARTED | 25 | - | - | - | - | - |
+| TA-UJ-046 | - | TA | Tenant Admin | - | Stock Receiving (alias Stock In) | - | - | Y | NOT_STARTED | 25 | - | - | - | - | - |
 | TA-UJ-047 | - | TA | Tenant Admin | - | Stock Adjustment | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
 | TA-UJ-048 | - | TA | Tenant Admin | - | Stock Out | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
 | TA-UJ-049 | - | TA | Tenant Admin | - | Stock Count | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
@@ -193,6 +195,8 @@ One row per journey. Implementation status reflects **production code**, not doc
 | TA-UJ-060 | - | TA | Tenant Admin | - | Manage C&C Order Status (Staff) | - | - | Y | NOT_STARTED | 25 | - | - | - | - | - |
 | TA-UJ-061 | - | TA | Tenant Admin | - | Manage Expiry / Offer Discounts | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
 | TA-UJ-062 | - | TA | Tenant Admin | - | Monitor Device / Hardware Readiness | - | - | Y | PARTIAL | 50 | - | - | - | - | - |
+| TA-UJ-063 | - | TA | Tenant Admin | - | Opening Stock | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
+| TA-UJ-064 | - | TA | Tenant Admin | - | Channel Stock Allocation | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
 | POS-UJ-001 | - | POS | Cashier | - | Cashier Login | - | - | Y | COMPLETE | 95 | - | - | - | - | - |
 | POS-UJ-002 | - | POS | Cashier | - | Cashier Logout | - | - | Y | COMPLETE | 95 | - | - | - | - | - |
 | POS-UJ-003 | - | POS | Cashier | - | Activate/Trust Device | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
@@ -261,7 +265,7 @@ One row per journey. Implementation status reflects **production code**, not doc
 ## Surface indexes
 
 - Super Admin (57): [[Platform_Admin/CANONICAL_USER_JOURNEY_INDEX]]
-- Tenant Admin (62): [[Tenant_Admin/CANONICAL_USER_JOURNEY_INDEX]]
+- Tenant Admin (64): [[Tenant_Admin/CANONICAL_USER_JOURNEY_INDEX]]
 - Cashier POS (36): [[Cashier/CANONICAL_USER_JOURNEY_INDEX]]
 - E-commerce (18): [[Ecommerce/CANONICAL_USER_JOURNEY_INDEX]]
 
@@ -281,4 +285,5 @@ One row per journey. Implementation status reflects **production code**, not doc
 | **173 (canonical)** | 2026-08-12 | +1 SA-UJ-057 Configure Initial Online Store (optional bootstrap); GAP 5 SUPERSEDED; status PARTIAL after backend |
 | 173 (status only) | 2026-08-12 | Selected-Tenant Angular production merge (`a2330d4`): SA-UJ-048…057 **PARTIAL** (~85–88%); SA-UJ-049/050 NOT_STARTED→PARTIAL; ST-UX-001 PASS (not counted); runtime E2E ENVIRONMENT_BLOCKED; SA 45C/11P/1NS; Grand 104C/36P/31NS/2B |
 | 173 (status only) | 2026-08-13 | Selected-Tenant final runtime E2E: SA-UJ-048…057 **PARTIAL→COMPLETE**; ST-UX-001 PASS (not counted); SA 55C/1P/1NS; Grand **114C/26P/31NS/2B**; BE `0245053` / FE `8587e04` |
+| **175 (canonical)** | 2026-08-15 | +2 Tenant Admin Inventory journeys TA-UJ-063 Opening Stock, TA-UJ-064 Channel Stock Allocation. Inventory 29-screen UI/UX + implementation contract lock. Grand **114C/26P/33NS/2B** |
 

@@ -358,6 +358,11 @@ permission rows for aliases.
 | inventory.stock.adjust | Adjust stock |
 | inventory.movements.view | View movement history |
 | inventory.alerts.view | View low/expiry stock alerts |
+| inventory.opening_stock.manage | Post opening stock |
+| inventory.receiving.manage | Receive stock |
+| inventory.serials.view | View serial registry |
+| inventory.channel_allocation.view | View channel allocations |
+| inventory.channel_allocation.manage | Confirm channel allocations |
 
 Only confirmed platform actions should be seeded.
 
@@ -504,6 +509,9 @@ setup, API authorization attributes, UI checks, and test cases.
 Never rename a permission code casually after development starts.
 
 ## Related Files
+
+- [[Tenant_Admin_Inventory_Permission_Matrix]]
+- [[Tenant_Admin_Inventory_Permission_R1_Registration]]
 
 - [[Backend_Driven_Permission_Catalog]]
 - [[Access_Control_Overview]]

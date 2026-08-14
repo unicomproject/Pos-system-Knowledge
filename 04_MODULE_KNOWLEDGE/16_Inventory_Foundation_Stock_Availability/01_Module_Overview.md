@@ -1,75 +1,61 @@
 <!-- title: Inventory Foundation, Product Tracking & Stock Availability Module Overview -->
 <!-- status: Active -->
-<!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-15 -->
 
-# Inventory Foundation, Product Tracking & Stock Availability Module Overview
+# Inventory Foundation — Module Overview
+
+## Contract lock
+
+```text
+Inventory Contract Version: v1.0
+Status: LOCKED
+Prototype: APPROVED
+Implementation Audit: PASS
+UI/UX Contract: LOCKED
+Implementation Contract: LOCKED
+Frontend Implementation: NOT STARTED
+Backend Implementation: NOT STARTED
+QA Execution: NOT STARTED
+```
+
+Canonical lock: [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Lock_Manifest]]
 
 ## Purpose
 
-Manage inventory locations, product inventory settings, batches, inventory balances, channel allocations, serial numbers, cost layers, and reorder rules.
+Canonical live module folder for inventory locations, tracking settings, balances, channel allocations, serials, batches, cost layers, and reorder rules.
 
-This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
-responsive online store, offline-capable operation, click and collect, multi-device
-support, and low-cost hardware usage for events, stalls, food and beverage,
-merchandising, attractions, and temporary retail locations.
+Schema source of truth remains:
 
-## MVP Position
+`06_DATABASE_KNOWLEDGE/Tables/16_Inventory_Foundation_Product_Tracking_And_Stock_Availability.md`
 
-| Item | Decision |
-|---|---|
-| Module | `Inventory_Foundation_Stock_Availability` |
-| Module number | 16 |
-| Primary users | Tenant Admin, Store Manager, Cashier consumer, Online store consumer |
-| Frontend surfaces | Inventory overview, Stock availability display, Batch/expiry screen, Low-stock alerts |
-| API groups | `/api/v1/inventory/locations`, `/api/v1/inventory/balances`, `/api/v1/inventory/batches`, `/api/v1/inventory/reorder-rules`, `/api/v1/pos/stock-availability` |
+## Module number
 
-## Main Tables
+16
 
-| Table | Role |
-|---|---|
-| `inventory_locations` | Used by this module |
-| `product_inventory_settings` | Used by this module |
-| `product_batches` | Used by this module |
-| `inventory_balances` | Used by this module |
-| `inventory_channel_allocations` | Used by this module |
-| `serial_numbers` | Used by this module |
-| `inventory_cost_layers` | Used by this module |
-| `inventory_reorder_rules` | Used by this module |
+## Primary users
 
-## Core Business Rules
+Tenant Admin (29-screen Inventory implementation). Store staff consume balances via POS; not this UI pack.
 
-- Availability is computed from on-hand, reserved, damaged/quarantine, and channel allocation rules.
-- Batches support expiry tracking and expiry discounts.
-- Serial numbers apply only when product tracking requires them.
-- Channel allocation can reserve stock for POS, online store, or click and collect.
-- Final stock authority is backend, not device cache.
+## Current 29-screen implementation scope
 
-## Access Summary
+IN SCOPE from this module:
 
-| Control | Rule |
-|---|---|
-| Authentication | Required for protected staff/customer/admin actions |
-| Tenant status | Tenant must be active or allowed for the requested operation |
-| Feature entitlement | Required when this module is plan or add-on controlled |
-| Permission | Required for staff/admin protected actions |
-| Tenant isolation | Tenant-owned records must never leak across tenants |
-| Audit/event history | Required for sensitive status, payment, inventory, auth, and access changes |
+- Locations and balances (overview, current stock, product detail)
+- Opening stock posting against balances
+- Channel allocations (Model B)
+- Serial identity used by receiving/registry
+- Batch/expiry when product tracking requires it
 
-## Dependencies
+DEFERRED from this module for the 29-screen release:
 
-- [[../10_Product_Core/01_Module_Overview]]
-- [[../17_Reservations_Stock_Movements_Serial_Cost/01_Module_Overview]]
-- [[../28_Offline_Operation_Sync/01_Module_Overview]]
-
-## Out Of Scope
-
-- Supplier purchase ordering
-- Offline conflict resolution ownership
-- Accounting inventory valuation reports
-- Delivery route inventory
+- Reorder automation / supplier reorder
+- Full alerts workspace (dashboard KPI subset is in scope)
+- Cost-layer accounting beyond storing unit cost on opening/receiving movements
 
 ## Related Files
 
-- [[04_MODULE_KNOWLEDGE/16_Inventory_Foundation_Stock_Availability/02_Functional_Rules]]
-- [[04_MODULE_KNOWLEDGE/16_Inventory_Foundation_Stock_Availability/03_Technical_Contract]]
+- [[02_Inventory_Business_Rules]]
+- [[03_Inventory_Quantity_Model]]
+- [[../../06_DATABASE_KNOWLEDGE/Tables/16_Inventory_Foundation_Product_Tracking_And_Stock_Availability]]
+- [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Implementation_Audit]]

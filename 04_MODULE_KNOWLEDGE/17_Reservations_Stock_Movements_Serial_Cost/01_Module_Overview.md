@@ -1,74 +1,59 @@
 <!-- title: Reservations, Stock Movements, Serial & Cost Allocation Module Overview -->
 <!-- status: Active -->
-<!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-15 -->
 
-# Reservations, Stock Movements, Serial & Cost Allocation Module Overview
+# Reservations, Stock Movements, Serial & Cost — Module Overview
+
+## Contract lock
+
+```text
+Inventory Contract Version: v1.0
+Status: LOCKED
+Prototype: APPROVED
+Implementation Audit: PASS
+UI/UX Contract: LOCKED
+Implementation Contract: LOCKED
+Frontend Implementation: NOT STARTED
+Backend Implementation: NOT STARTED
+QA Execution: NOT STARTED
+```
+
+Canonical lock: [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Lock_Manifest]]
 
 ## Purpose
 
-Control stock reservations, reservation lines/allocations, stock movement ledgers, movement references, serial movement records, and cost allocations.
+Canonical live module folder for reservations and the append-only stock ledger.
 
-This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
-responsive online store, offline-capable operation, click and collect, multi-device
-support, and low-cost hardware usage for events, stalls, food and beverage,
-merchandising, attractions, and temporary retail locations.
+Schema source of truth remains:
 
-## MVP Position
+`06_DATABASE_KNOWLEDGE/Tables/17_Reservations_Stock_Movements_Serial_And_Cost_Allocation.md`
 
-| Item | Decision |
-|---|---|
-| Module | `Reservations_Stock_Movements_Serial_Cost` |
-| Module number | 17 |
-| Primary users | Backend system, Cashier, Store Manager, Online checkout |
-| Frontend surfaces | Reservation status, Stock movement history, Order hold/checkout stock lock, Serial movement audit |
-| API groups | `/api/v1/inventory/reservations`, `/api/v1/inventory/stock-movements`, `/api/v1/inventory/serials`, `/api/v1/inventory/cost-allocations` |
+## Module number
 
-## Main Tables
+17
 
-| Table | Role |
-|---|---|
-| `inventory_reservations` | Used by this module |
-| `inventory_reservation_lines` | Used by this module |
-| `inventory_reservation_allocations` | Used by this module |
-| `stock_movements` | Used by this module |
-| `stock_movement_references` | Used by this module |
-| `stock_movement_serials` | Used by this module |
-| `stock_movement_cost_allocations` | Used by this module |
+## Current 29-screen implementation scope
 
-## Core Business Rules
+IN SCOPE:
 
-- Stock movements are append-only.
-- Reservations protect stock during cart checkout, click and collect, or held POS flows.
-- Movement reference links stock changes to order, sale, return, exchange, adjustment, or sync source.
-- Serial movement must match serial-number tracked products.
-- Cost allocation is recorded separately from sale price.
+- `stock_movements` as the append-only ledger for Opening Stock, Receiving, and Adjustment
+- `stock_movement_references` linking movements to opening/receipt/adjustment documents
+- `stock_movement_serials` when serial-tracked receiving occurs
+- `idempotency_key` on movements
 
-## Access Summary
+DEFERRED:
 
-| Control | Rule |
-|---|---|
-| Authentication | Required for protected staff/customer/admin actions |
-| Tenant status | Tenant must be active or allowed for the requested operation |
-| Feature entitlement | Required when this module is plan or add-on controlled |
-| Permission | Required for staff/admin protected actions |
-| Tenant isolation | Tenant-owned records must never leak across tenants |
-| Audit/event history | Required for sensitive status, payment, inventory, auth, and access changes |
+- Creating/editing reservations from Tenant Admin Inventory UI (reservations are POS/order-owned)
+- Full movement-history workspace (TA-UJ-050). Product detail shows a recent-movements panel only.
 
-## Dependencies
+## Authoritative stock
 
-- [[../16_Inventory_Foundation_Stock_Availability/01_Module_Overview]]
-- [[../20_Unified_Order_Sales/01_Module_Overview]]
-- [[../25_Return_Inspection_Exchange/01_Module_Overview]]
-
-## Out Of Scope
-
-- Manual stocktake counting
-- Supplier invoice processing
-- Payment refund settlement
-- Customer consent records
+- **Mutable current quantities:** `inventory_balances`
+- **Append-only history:** `stock_movements`
+- Balances must equal the sum of posted movements for that balance row (enforced in the posting transaction, not by UI).
 
 ## Related Files
 
-- [[04_MODULE_KNOWLEDGE/17_Reservations_Stock_Movements_Serial_Cost/02_Functional_Rules]]
-- [[04_MODULE_KNOWLEDGE/17_Reservations_Stock_Movements_Serial_Cost/03_Technical_Contract]]
+- [[../16_Inventory_Foundation_Stock_Availability/02_Inventory_Business_Rules]]
+- [[../../06_DATABASE_KNOWLEDGE/Tables/17_Reservations_Stock_Movements_Serial_And_Cost_Allocation]]

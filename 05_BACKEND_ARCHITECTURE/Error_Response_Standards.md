@@ -54,6 +54,15 @@ Errors must be safe, consistent, and useful without exposing sensitive internals
 | SYNC_CONFLICT | Offline sync item has conflict |
 | SYNC_BATCH_INVALID | Sync batch is invalid or rejected |
 | pos_holds.system_pos_channel_unavailable | Canonical system POS sales-channel configuration is unavailable; cashier payload is not at fault |
+| OPENING_STOCK_ALREADY_POSTED | Opening stock already posted for location+SKU |
+| OPENING_STOCK_NOT_ELIGIBLE | Opening stock blocked because movements already exist |
+| INSUFFICIENT_STOCK | Adjustment decrease exceeds available |
+| DUPLICATE_SERIAL | Serial already exists for product/tenant |
+| ALLOCATION_EXCEEDS_AVAILABLE | Channel allocation math invalid |
+| CONCURRENT_UPDATE | Inventory row_version / expected-available conflict |
+| SERIAL_COUNT_MISMATCH | Serial count does not match quantity |
+| PRODUCT_NOT_TRACKED | Product is not stock-tracked |
+| BUNDLE_NOT_STOCKED | Bundle parent cannot hold stock |
 
 ## Security Rule
 
@@ -74,3 +83,4 @@ Payment errors must be safe and must not expose card data or provider secrets.
 - [[API_Standards]]
 - [[Offline_Operation_Architecture]]
 - [[Audit_Log_Standards]]
+- [[Tenant_Admin_Inventory_API_Contract]]

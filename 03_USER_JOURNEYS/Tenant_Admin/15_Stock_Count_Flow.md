@@ -1,13 +1,28 @@
 <!-- title: Tenant Admin Stock Count Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-08-15 -->
 
 # Tenant Admin Stock Count Flow
+
+## Contract lock (current Inventory release)
+
+```text
+DEFERRED
+NOT PART OF CURRENT IMPLEMENTATION LOCK
+```
+
+This journey remains documented. It is not implementation-ready for the 29-screen Inventory release.
+
+Canonical lock: [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Lock_Manifest]]
 
 ## Purpose
 
 Defines stock count/stocktake workflow for physical count and reconciliation.
+
+## Current 29-screen implementation scope
+
+**DEFERRED / OUT OF CURRENT 29-SCREEN SCOPE.** The Inventory Dashboard Stock Count tile is visible but must not open this wizard.
 
 ## Actor
 
@@ -77,3 +92,20 @@ Stock count is saved and inventory is reconciled/audited according to policy.
 ## Related Files
 
 - 06_DATABASE_KNOWLEDGE/Tables/18_Stock_Adjustment_Transfer_And_Stocktake.md
+- 07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Approved_UI_Prototype.md
+
+## Approved UI Prototype Reference
+
+Prototype Status: APPROVED (29-screen Inventory pack)
+
+Implementation Audit: Pending
+
+UI/UX Lock: Pending
+
+Related Prototype Screens:
+
+- INV-UJ01-S01 `01_inventory_dashboard.html` (Stock Count quick-action tile only)
+
+No Stock Count wizard screens are included in the 29-screen pack.
+
+AUDIT GAP closed: TA-UJ-049 is **DEFERRED / OUT OF CURRENT 29-SCREEN SCOPE**. Dashboard Stock Count tile remains visible and must not open a stocktake wizard. Not a 29-screen blocker.

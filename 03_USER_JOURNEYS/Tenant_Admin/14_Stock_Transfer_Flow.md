@@ -1,13 +1,28 @@
 <!-- title: Tenant Admin Stock Transfer Flow -->
 <!-- status: Deferred -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-08-15 -->
 
 # Tenant Admin Stock Transfer Flow
+
+## Contract lock (current Inventory release)
+
+```text
+DEFERRED
+NOT PART OF CURRENT IMPLEMENTATION LOCK
+```
+
+This journey remains documented. It is not implementation-ready for the 29-screen Inventory release.
+
+Canonical lock: [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Lock_Manifest]]
 
 ## Purpose
 
 Documents transfer between outlets shown in the deck, but marks it deferred unless approved for MVP.
+
+## Current 29-screen implementation scope
+
+**DEFERRED / OUT OF CURRENT 29-SCREEN SCOPE.** Consistent with this file's Deferred status. Not a 29-screen blocker.
 
 ## Actor
 
@@ -75,6 +90,21 @@ For current MVP, this flow should remain documented/deferred unless scope is app
 
 - 01_RELEASE_SCOPE/Excluded_Features.md
 - 06_DATABASE_KNOWLEDGE/Tables/18_Stock_Adjustment_Transfer_And_Stocktake.md
+- 07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Approved_UI_Prototype.md
+
+## Approved UI Prototype Reference
+
+Prototype Status: APPROVED (29-screen Inventory pack)
+
+Implementation Audit: Pending
+
+UI/UX Lock: Pending
+
+Related Prototype Screens:
+
+- None in the approved 29-screen Inventory prototype pack
+
+AUDIT GAP closed: stock transfer remains **DEFERRED / OUT OF CURRENT 29-SCREEN SCOPE** (Flow 14). Module 18 transfer tables are retained. Not a 29-screen blocker.
 
 ## Implementation Notes
 

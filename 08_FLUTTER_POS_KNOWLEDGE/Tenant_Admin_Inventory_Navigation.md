@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin Inventory Navigation -->
 <!-- status: Active — dual Inventory contexts documented; alias gap recorded -->
 <!-- system: OneVerz POS MVP POS -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-15 -->
 <!-- doc_type: Architecture approval — documentation only -->
 
 # Tenant Admin Inventory Navigation
@@ -53,3 +53,53 @@ Approved top-level label is **Inventory**. Current label is **Stock**. Renaming 
 - [[Tenant_Admin_Product_Management_Navigation]]
 - [[Tenant_Admin_Settings_Shared_Layout_Architecture]]
 - [[Tenant_Admin_Settings_Layout_Implementation_Status]]
+- [[../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Approved_UI_Prototype]]
+- [[../07_UI_UX_KNOWLEDGE/Inventory_UI_Prototype_Screen_Registry]]
+
+## Approved UI Prototype Reference
+
+Prototype Status: APPROVED
+
+Implementation Audit: PASS
+
+UI/UX Contract: LOCKED
+
+Implementation Contract: LOCKED
+
+Frontend Implementation: NOT STARTED
+
+Backend Implementation: NOT STARTED
+
+Canonical HTML/CSS pack:
+
+```text
+07_UI_UX_KNOWLEDGE/prototypes/inventory_ui_prototype_29_screens/inventory_html_prototype/
+```
+
+**Production shell:** Tenant Admin shared black sidebar; Inventory is top-level (label Inventory). Routes may keep `/tenant-admin/stock/*` as aliases; canonical `/tenant-admin/inventory/*`.
+
+**Prototype content:** the 29-screen workspace is the visual contract. Prototype Settings-nesting / white sidebar / POS till chrome is **not** the production shell (GAP-INV-008 RESOLVED).
+
+
+## Frontend implementation contract (LOCKED)
+
+Do not lock the Flutter widget tree.
+
+Locked:
+
+- route destination (`/tenant-admin/inventory/*` canonical; `/tenant-admin/stock/*` alias)
+- screen responsibilities (29 approved screens)
+- visual contract (approved prototype workspace)
+- data requirements
+- interaction contract
+- permission requirements
+- loading/error/empty states
+- responsive rules
+
+```text
+Reusable Flutter component structure remains an implementation decision.
+
+Flutter must reproduce the locked UI/UX result and behaviour.
+```
+
+Canonical lock: [[../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Lock_Manifest]]

@@ -1,11 +1,11 @@
-﻿<!-- title: Tenant Admin Canonical User Journey Index -->
+<!-- title: Tenant Admin Canonical User Journey Index -->
 <!-- status: Canonical -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-15 -->
 <!-- parent: [[../00_Global_User_Journey_Register]] -->
 
 # Tenant Admin Canonical User Journey Index
 
-**62 journeys**.
+**64 journeys**.
 
 | Journey ID | Journey Name | Status | Completion % |
 |---|---|---|---:|
@@ -55,7 +55,7 @@
 | TA-UJ-043 | Edit Brand | COMPLETE | 90 |
 | TA-UJ-044 | Delete Brand | COMPLETE | 90 |
 | TA-UJ-045 | View Inventory / Current Stock | NOT_STARTED | 20 |
-| TA-UJ-046 | Stock In | NOT_STARTED | 25 |
+| TA-UJ-046 | Stock Receiving (alias Stock In) | NOT_STARTED | 25 |
 | TA-UJ-047 | Stock Adjustment | NOT_STARTED | 10 |
 | TA-UJ-048 | Stock Out | NOT_STARTED | 10 |
 | TA-UJ-049 | Stock Count | NOT_STARTED | 10 |
@@ -72,3 +72,60 @@
 | TA-UJ-060 | Manage C&C Order Status (Staff) | NOT_STARTED | 25 |
 | TA-UJ-061 | Manage Expiry / Offer Discounts | NOT_STARTED | 5 |
 | TA-UJ-062 | Monitor Device / Hardware Readiness | PARTIAL | 50 |
+| TA-UJ-063 | Opening Stock | NOT_STARTED | 5 |
+| TA-UJ-064 | Channel Stock Allocation | NOT_STARTED | 5 |
+
+## Current 29-screen Inventory implementation scope
+
+IN SCOPE: TA-UJ-045, TA-UJ-063, TA-UJ-046, TA-UJ-047, TA-UJ-064.
+
+DEFERRED (remain in index; not 29-screen blockers): TA-UJ-048 Stock Out, TA-UJ-049 Stock Count, TA-UJ-050 Movement History workspace, TA-UJ-051 Alerts workspace, TA-UJ-054 Inventory Report, Flow 14 Transfer.
+
+## Approved UI Prototype Reference (Inventory)
+
+Prototype Status: APPROVED
+
+Implementation Audit: PASS
+
+UI/UX Contract: LOCKED
+
+Implementation Contract: LOCKED
+
+Frontend Implementation: NOT STARTED
+
+Backend Implementation: NOT STARTED
+
+QA Execution: NOT STARTED
+
+Prototype grouping IDs `INV-UJ-01` … `INV-UJ-05` do **not** replace canonical `TA-UJ-*` IDs.
+
+Contract lock for the current Inventory release (implementation status remains NOT_STARTED):
+
+```text
+TA-UJ-045 — LOCKED FOR CURRENT INVENTORY RELEASE
+TA-UJ-063 — LOCKED FOR CURRENT INVENTORY RELEASE
+TA-UJ-046 — LOCKED FOR CURRENT INVENTORY RELEASE
+TA-UJ-047 — LOCKED FOR CURRENT INVENTORY RELEASE
+TA-UJ-064 — LOCKED FOR CURRENT INVENTORY RELEASE
+```
+
+Deferred journeys TA-UJ-048, TA-UJ-049, TA-UJ-050, TA-UJ-051, TA-UJ-054 and Flow 14 Transfer remain **NOT LOCKED** / **NOT PART OF CURRENT IMPLEMENTATION LOCK**.
+
+Lock Manifest: [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Lock_Manifest]]
+
+| Prototype grouping | Canonical journey | Screens |
+|---|---|---|
+| INV-UJ-01 Inventory Overview / Current Stock | TA-UJ-045 | INV-UJ01-S01 … S03 |
+| INV-UJ-02 Opening Stock | TA-UJ-063 | INV-UJ02-S01 … S04 |
+| INV-UJ-03 Stock Receiving | TA-UJ-046 | INV-UJ03-S01 … S07 |
+| INV-UJ-04 Stock Adjustment | TA-UJ-047 | INV-UJ04-S01 … S05 |
+| INV-UJ-05 Channel Stock Allocation | TA-UJ-064 | INV-UJ05-S01 … S10 |
+
+Canonical docs:
+
+- [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Implementation_Audit]]
+- [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Approved_UI_Prototype]]
+- [[../../07_UI_UX_KNOWLEDGE/Inventory_UI_Prototype_Screen_Registry]]
+- [[16_Opening_Stock_Flow]]
+- [[17_Channel_Stock_Allocation_Flow]]
+- [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Inventory_Lock_Manifest]]
