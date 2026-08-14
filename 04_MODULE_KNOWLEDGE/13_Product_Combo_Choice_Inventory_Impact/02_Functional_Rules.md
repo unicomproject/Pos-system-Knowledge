@@ -74,3 +74,12 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 - [[04_MODULE_KNOWLEDGE/13_Product_Combo_Choice_Inventory_Impact/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/13_Product_Combo_Choice_Inventory_Impact/03_Technical_Contract]]
+
+## Selected Outlet and Inventory Logic
+Use the Tenant Admin header Outlet. Available Stock is Outlet-specific.
+Changing Outlet: refreshes candidate stock, configured component stock, recalculates Supports Bundles, Bundle availability, and Limiting Component. Changing Outlet does NOT modify Bundle component configuration.
+
+## Batch / Expiry / Serial Inherited Behavior
+- **Batch**: Use component usable batch stock.
+- **Expiry**: Expired stock excluded. Actual sale follows FEFO.
+- **Serial**: No serial selected during Bundle setup. Usable serial count controls availability. Exact serial selected at POS sale.

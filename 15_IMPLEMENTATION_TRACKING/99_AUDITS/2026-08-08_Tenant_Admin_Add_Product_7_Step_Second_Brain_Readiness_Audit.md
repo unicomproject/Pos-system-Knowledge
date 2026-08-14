@@ -1,4 +1,4 @@
-# 2026-08-08 Tenant Admin Add Product 8-Step Second Brain Readiness Audit Report
+# 2026-08-08 Tenant Admin Add Product 7-Step Second Brain Readiness Audit Report
 
 **Date**: 2026-08-08  
 **Audit Scope**: Tenant Admin Add Product / Product Setup (Reference UI 2 Alignment)  
@@ -48,17 +48,17 @@
 - `03_USER_JOURNEYS/Tenant_Admin/09_Product_Management_Flow.md`
 
 ## H. New Files Created
-- `04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_8_Step_Contract.md`
-- `07_UI_UX_KNOWLEDGE/Tenant_Admin_Add_Product_8_Step_UI_UX_Specification.md`
-- `08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Add_Product_8_Step_Flutter_Implementation_Specification.md`
-- `15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-08-08_Tenant_Admin_Add_Product_8_Step_Second_Brain_Readiness_Audit.md`
+- `04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract.md`
+- `07_UI_UX_KNOWLEDGE/Tenant_Admin_Add_Product_7_Step_UI_UX_Specification.md`
+- `08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Add_Product_7_Step_Flutter_Implementation_Specification.md`
+- `15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-08-08_Tenant_Admin_Add_Product_7_Step_Second_Brain_Readiness_Audit.md`
 
 ## I. Existing Knowledge Reused
 - Canonical Database tables (`products`, `product_variants`, `product_images`, `product_barcodes`, `product_channel_visibility`).
 - Permission seed constants (`catalog.products.create`, `catalog.products.update`, `catalog.products.publish`).
 
 ## J. Missing Knowledge Added
-- Full 8-step wizard lifecycle & Step 4 canonical naming ("Product Configuration").
+- Full 7-Step wizard lifecycle & Step 4 canonical naming ("Product Configuration").
 - Complete Step 1 Field -> API -> Domain -> DB traceability matrix.
 - Product Image Upload & Rollback contract.
 - Status & Options cross-step state synchronization matrix.
@@ -77,4 +77,4 @@
 100% Complete coverage across UI, DTO, Domain, Database, Permission, Validation, Error Handling, and Test Cases.
 
 ## N. Final Readiness Verdict
-**SECOND BRAIN READY FOR 8-STEP ADD PRODUCT IMPLEMENTATION**
+**SECOND BRAIN READY FOR 7-Step ADD PRODUCT IMPLEMENTATION**
