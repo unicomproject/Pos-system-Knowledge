@@ -62,9 +62,9 @@ Rules:
 - Values from current application context / providers
 - Responsive without overflow
 
-## Shared White Sidebar (Required)
+## Shared Black Sidebar (Required)
 
-**Final visual decision:** white / very light sidebar — **not** a dark-blue full sidebar.
+**Final visual decision:** solid black sidebar, white text/icons and orange active state. Product and its active Brand child are orange on the Brand route.
 
 See [[Tenant_Admin_Sidebar_Navigation]] for:
 
@@ -82,7 +82,7 @@ Fixed black footer on **all** approved Tenant Admin screens.
 
 Items: Home · New Sale · Orders · Customers · Settings
 
-On Tenant Admin Settings / catalog pages: Settings active (orange icon, orange label, orange bottom indicator).
+Settings is active only for Settings ownership. On the Brand route, Settings is not active; Product and Brand are active.
 
 Rules: shared reusable component; fixed; must not scroll away; must not cover content; safe-area aware; real routes; permission + feature checks; never duplicated per page.
 
@@ -91,20 +91,19 @@ Rules: shared reusable component; fixed; must not scroll away; must not cover co
 ```text
 TenantAdminSharedShell
 ├── Shared Header
-├── Shared White Sidebar
+├── Shared Black Sidebar
 │   ├── Products expanded
 │   └── Brands active
 ├── BrandsManagementScreen
 │   ├── Breadcrumb
-│   ├── Page Header Card
-│   ├── Search and Filter Card
-│   ├── Brand Table Card
-│   └── Optional Brand Details Side Panel
+│   └── One continuous white workspace
+│       ├── First region: breadcrumb/header/Add/search/table/pagination
+│       └── Second region: permanent Brand Details/no-selection/form
 └── Shared Fixed Footer
-    └── Settings active
+    └── Settings inactive on Brand route
 ```
 
-Brand table fields: Brand Logo, Brand Name, Code, Product Count, Sort Order, Status, Updated On, Actions.
+Brand table fields: Brand Logo, Brand Name, Code, Product Count, Status, Updated On, Actions. Sort Order is form-only.
 
 ## Routing Inspection Baseline (2026-07-29 — Do Not Invent)
 

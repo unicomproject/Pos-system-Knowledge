@@ -67,7 +67,7 @@ Sidebar: [[Tenant_Admin_Sidebar_Navigation]]
 ## Shared Header / Footer Responsive Rules
 
 - Header fixed; must not scroll with content; compact chips on narrow widths without overflow
-- Footer fixed; all five items usable; Settings active styling preserved on Settings/catalog pages
+- Footer fixed; all five items usable; active ownership follows the route. Brand keeps Product/Brand active and Settings inactive.
 - Main content height subtracts header + footer (+ safe area on mobile)
 
 ## Scrolling Rules

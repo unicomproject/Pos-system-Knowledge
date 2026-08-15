@@ -298,6 +298,8 @@ permission rows for aliases.
 | catalog.brands.update | Update brands |
 | catalog.brands.delete | Delete/deactivate brands |
 | catalog.brands.manage | Manage all brand actions |
+
+Brand permission reconciliation: CURRENT CRUD operations use their matching permission or `catalog.brands.manage`. Logo mutation uses update/manage, but the current response reload can require view/manage; this is a P1 current defect. TARGET: internal post-mutation reload succeeds for update/manage without weakening the public detail endpoint. Flutter aliases are UX controls only; backend authorization remains authoritative.
 | catalog.collections.view | View collections |
 | catalog.collections.create | Create collections |
 | catalog.collections.update | Update collections |

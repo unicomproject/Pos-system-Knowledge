@@ -1,71 +1,61 @@
-<!-- title: Brands Management Screen Specification -->
-<!-- status: Active -->
-<!-- system: OneVerz POS MVP POS -->
-<!-- last_updated: 2026-07-29 -->
-<!-- doc_type: Screen specification — shared shell composition -->
+<!-- title: Tenant Admin Brand Management Canonical UI Contract -->
+<!-- status: Active canonical target; implementation not verified -->
+<!-- last_updated: 2026-08-12 -->
+# Tenant Admin Brand Management — Canonical UI Contract
 
-# Brands Management Screen Specification
+## Truth labels
 
-## Purpose
+- **CURRENT SOURCE:** Flutter is NOT READY. The list is mounted in `TenantAdminPageScaffold`; Add/Edit opens a desktop `showGeneralDialog` with dark barrier or a responsive bottom sheet. There is no `selectedBrandId`, permanent details region, no-selection state, row selection, or pagination UI. Edit receives incomplete list-summary data. The black/orange sidebar exists, but the footer marks Brand as Settings-active.
+- **TARGET CONTRACT:** Rules below are mandatory future behavior.
+- **IMPLEMENTATION STATUS:** TARGET — TO BE IMPLEMENTED. Flutter must align with a verified Backend/DB contract.
 
-Brands Management is the reference screen for [[Tenant_Admin_Settings_Shared_Layout_Architecture]].
+## Final workspace and shell
 
-**Host:** `TenantAdminSharedShell`  
-**Sidebar:** Shared white sidebar — Products expanded, Brands active  
-**Footer:** Fixed black footer — Settings active
+Use one continuous white workspace with two internal regions separated only by a subtle 1px divider. Do not use two Cards, a detachable panel, modal, dialog, drawer, floating surface, separate right Scaffold, shadow, large gutter, or dark barrier on desktop/laptop.
 
-## Target Structure
+The shared shell is black with white text/icons and orange active state. Product and Brand are active; Settings is not active. Product children are exactly: Add Product; Categories & Subcategories; Brand.
 
-```text
-TenantAdminSharedShell
-├── Shared Header
-├── Shared White Sidebar
-│   ├── Products expanded
-│   └── Brands active
-├── BrandsManagementScreen
-│   ├── Breadcrumb
-│   ├── Page Header Card
-│   ├── Search and Filter Card
-│   ├── Brand Table Card
-│   └── Optional Brand Details Side Panel
-└── Shared Fixed Footer
-    └── Settings active
-```
+### First region ownership
 
-Do **not** omit shared header/sidebar/footer. Do **not** duplicate them inside `BrandsManagementScreen`.
+1. Breadcrumb: `Product / Brand / Brand Management`.
+2. Header: `Brands Management` at left and orange `+ Add Brand` at right, wholly before the divider.
+3. `Search brands...`.
+4. Brand table.
+5. Pagination.
 
-## Brand Table Fields
+### Second region ownership
 
-| Column | Rule |
+Permanent heading: `Brand Details`. Initial state is `selectedBrandId = null`; list load must not select a row or call detail automatically. Center a Brand-specific neutral icon, `No brand selected`, and `Select a brand from the list to view its details.` without an extra Card.
+
+Row click sets the ID, highlights only that row with a restrained orange tint, calls `GET /api/v1/brands/{id}`, and shows loading/error only in the second region while retaining the list. No navigation or modal.
+
+## Add, edit, cancel and delete
+
+- Add switches the existing second region to Create mode with empty Name/Code, null/empty Description, SortOrder 0, no image, ACTIVE. Cancel returns to no selection.
+- Edit must use full detail, never list summary. Field order is Name*, Code*, Description, Sort Order, Brand Image, Status, Cancel/Save Brand. The permanent desktop region has no X.
+- Cancel Edit restores persisted detail and retains selection.
+- After deleting the selected Brand: clear selection, refresh list, do not select another row, and restore no-selection wording.
+- Delete dialog: Cancel orange outlined; Delete orange filled; include Brand name, loading state and duplicate-submit prevention.
+
+## Table contract
+
+Exactly: Brand Logo; Brand Name; Code; Product Count; Status; Updated On; Actions. Exclude Sort Order, Description, Slug, Created On and ID. All desktop/tablet headers and cell contents are centered. Widths are proportional: Logo small; Name/Code medium; Product Count/Status/Actions medium-small; Updated On wider. Mobile cards are exempt.
+
+## Form contracts
+
+| Field | Target |
 |---|---|
-| Brand Logo | Real media — no fake logos |
-| Brand Name | API name |
-| Code | API code |
-| Product Count | Server-calculated — no fake counts |
-| Sort Order | API/DB supported |
-| Status | API status |
-| Updated On | API `updatedAt` |
-| Actions | Edit / Delete per permission |
+| Brand Name | required, trimmed, max 150 |
+| Code | required, trimmed, max 80, canonical uppercase, tenant-unique; allowed characters, deleted-code reuse and restore semantics unresolved |
+| Description | optional, max 255, `0/255` counter, returned by detail and preserved on unrelated edit |
+| Sort Order | integer, default 0, >=0, helper `Lower numbers appear first`; form only |
+| Image | JPEG/JPG or PNG, max 2 MB, recommended 400×200px; preview/change; explicit partial-success error |
+| Status | ACTIVE or INACTIVE only; DELETED internal |
 
-## Permissions
+## Search and pagination
 
-| Action | Flutter | Backend |
-|---|---|---|
-| View | `tenant.brands.view` | `catalog.brands.view` |
-| Create | `tenant.brands.create` | `catalog.brands.create` |
-| Update | `tenant.brands.update` | `catalog.brands.update` |
-| Delete | `tenant.brands.delete` | `catalog.brands.delete` |
+Server search Name+Code with 300–500ms/shared debounce, stale-response protection, clear behavior and reset to page 1. Initial size 10. Footer: `Showing X to Y of Z brands` left; `[10 ▼] [‹] [1] [›]` right, orange current page. Size/search reset page 1; deletion from an invalid final page moves to the previous valid page.
 
-## Route
+## Responsive and accessibility
 
-`/tenant-admin/brands` (existing)
-
-## Related Files
-
-- [[Tenant_Admin_Settings_Shared_Layout_Architecture]]
-- [[Tenant_Admin_Sidebar_Navigation]]
-- [[Tenant_Admin_Product_Management_Navigation]]
-- [[Tenant_Admin_Settings_Responsive_Design]]
-- [[Tenant_Admin_Settings_Component_Catalogue]]
-- [[Tenant_Admin_Settings_Layout_Implementation_Status]]
-- [[Brand_Collection_CRUD_Implementation_Status]]
+Verify 1920×1080, 1600×900, 1440×900, 1366×768, 1280×720, 1180×820 and 1024×768. Desktop/laptop shows both regions. Tablet may use the approved responsive sheet pattern when necessary. Provide row-selection semantics, accessible Add/Change Image/pagination labels, Edit/Delete tooltips, keyboard/focus behavior, text scaling, non-color-only status and approximately 44×44 targets.

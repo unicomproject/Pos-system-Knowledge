@@ -53,7 +53,7 @@ Typed model example: `TenantAdminSidebarItemModel` — key, label, icon, route, 
 
 `TenantAdminFooterNavigation` items: Home, New Sale, Orders, Customers, Settings.
 
-On Settings/catalog pages: Settings active (orange icon, label, bottom indicator).
+Settings is active only for Settings ownership. On Brand, Product/Brand are active and Settings is inactive.
 
 **Supersedes:** earlier catalogue statements that marked this footer as Excluded from Tenant Admin.
 
@@ -79,17 +79,16 @@ On Settings/catalog pages: Settings active (orange icon, label, bottom indicator
 ```text
 TenantAdminSharedShell
 ├── Shared Header
-├── Shared White Sidebar
+├── Shared Black Sidebar
 │   ├── Products expanded
 │   └── Brands active
 ├── BrandsManagementScreen
 │   ├── Breadcrumb
-│   ├── Page Header Card
-│   ├── Search and Filter Card
-│   ├── Brand Table Card
-│   └── Optional Brand Details Side Panel
+│   └── One continuous white Brand workspace
+│       ├── First region: breadcrumb/header/Add/search/table/pagination
+│       └── Second region: permanent details/no-selection/form
 └── Shared Fixed Footer
-    └── Settings active
+    └── Settings inactive on Brand route
 ```
 
 ## Current Code Name Mapping (Truthful)

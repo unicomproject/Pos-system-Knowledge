@@ -1566,3 +1566,14 @@ Response structure (Proposed):
 ```
 
 *Note*: `stockValue` reuses the canonical Inventory valuation logic (Sum of `remaining_quantity * unit_cost`). Open orders rely on canonical `SalesOrder` statuses (Not `COMPLETED` and not `CANCELLED`).
+## Tenant Admin Brand API reconciliation (2026-08-12)
+
+CURRENT SOURCE: `/api/v1/brands` supports GET list, GET detail, POST, PUT and DELETE; `POST /api/v1/brands/{id}/logo` uploads media. List/detail responses currently omit Description, SortOrder and ProductCount; paging omits totalPages. SortOrder is not accepted or persisted. Brand remains NOT READY.
+
+TARGET — TO BE IMPLEMENTED:
+
+- `GET /api/v1/brands?pageNumber&pageSize&search` returns summaries plus pageNumber/pageSize/totalCount/totalPages. Summary includes ID, code, name, resolved logo/media, server-derived ProductCount, status and updatedAt.
+- `GET /api/v1/brands/{id}` returns complete editable Description, SortOrder and media in addition to current canonical fields.
+- POST/PUT accept code, name, Description, SortOrder and status. BrandSlug is unresolved; keep current behavior pending decision.
+- Logo upload remains Update/Manage-authorized. Its internal post-mutation reload must not demand unrelated View permission; public detail GET remains View/Manage protected.
+- Brand boundary accepts JPEG/PNG up to 2 MB. Shared Product/Category media capability is not globally changed.

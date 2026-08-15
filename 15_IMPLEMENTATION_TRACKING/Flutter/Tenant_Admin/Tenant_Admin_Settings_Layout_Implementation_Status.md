@@ -34,7 +34,7 @@ Canonical docs:
 
 ## Checklist
 
-- [x] White sidebar visual decision approved
+- [x] Black sidebar / white foreground / orange active visual decision approved
 - [x] Sidebar menu order approved
 - [x] Products nested menu approved
 - [x] Shared header approved
@@ -42,7 +42,7 @@ Canonical docs:
 - [x] Responsive behaviour documented
 - [x] Existing routes inspected (2026-07-29)
 - [x] Existing permissions / menu catalog inspected (2026-07-29)
-- [ ] Shared white sidebar implemented
+- [x] Shared black sidebar tokens present in current source
 - [ ] Shared shell (`TenantAdminSharedShell`) implemented / aligned
 - [ ] Product child routes verified against approved list
 - [ ] Desktop verified
@@ -62,16 +62,16 @@ Canonical docs:
 | Inventory label | Approved "Inventory"; current catalog uses "Stock" |
 | Menu extras | Reports, Billing, Activity present in current catalog; not in approved top-level order |
 | Orders footer | Still unavailable |
-| Dark sidebar | Current `TenantAdminSidebar` still dark navy gradient |
+| Brand footer ownership | Current Brand route marks Settings active; target keeps Product/Brand active and Settings inactive. |
 
 ## Remaining Implementation Actions
 
-1. Restyle shared sidebar to white/light tokens (active light purple)
+1. Preserve the approved black/white/orange sidebar and correct route-specific active ownership.
 2. Reorder top-level menu to approved list; add Online Store + Hardware when routes/permissions exist
 3. Align Products children to approved list; resolve Inventory dual-context without duplicate screens
 4. Align shell naming/structure to `TenantAdminSharedShell` + catalogue components
 5. Verify desktop / tablet / mobile / overflow
-6. Add tests for sidebar order, expand/active, permissions, footer Settings active
+6. Add tests for sidebar order, expand/active, permissions, and Settings inactive on Brand.
 
 ## Related
 

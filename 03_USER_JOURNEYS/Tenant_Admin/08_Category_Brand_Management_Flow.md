@@ -1,74 +1,29 @@
-<!-- title: Tenant Admin Category Brand Management Flow -->
-<!-- status: Active -->
-<!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- status: Active canonical target; implementation partial -->
+<!-- last_updated: 2026-08-12 -->
+# Tenant Admin Category and Brand Management Flow
 
-# Tenant Admin Category Brand Management Flow
+Category behavior remains governed by its own current contracts. This document locks the reconciled Brand journey.
 
-## Purpose
+## Current Brand source
 
-Defines category and brand creation for product organization.
+Brand CRUD is tenant-protected, but Flutter currently opens Add/Edit in a modal/right overlay, has no selection state, and edits from an incomplete list summary. **P0 CURRENT DATA INTEGRITY DEFECT:** because list/detail responses omit Description, changing only Name can submit null and erase an existing Description.
 
-## Actor
+## Target Brand journey
 
-Tenant Admin
+1. Open `/tenant-admin/brands`; load list only.
+2. Keep `selectedBrandId = null`; do not request detail because list data arrived.
+3. Show `No brand selected` and `Select a brand from the list to view its details.` in the permanent right region.
+4. Row click sets Brand ID, highlights only that row, calls `GET /api/v1/brands/{id}`, and loads full detail in the right region while list stays mounted.
+5. Edit uses full Name, Code, Description, SortOrder, image/media and Status. Regression: with Description `Original description` and SortOrder 5, changing only Name preserves both values after save.
+6. `+ Add Brand` switches the same right region to Create with empty Name/Code, null Description, SortOrder 0, no image and ACTIVE. Cancel returns to no selection.
+7. Delete confirmation names the Brand. If the selected Brand is deleted, clear selection, refresh list, select no replacement, and restore no-selection state.
 
-## Source
+## Rules
 
-Derived from `Slide 8 - Category / Brand Management Flow` in `tenant-full-journey.pptx` and aligned to OneVerz POS MVP Second Brain scope.
+- Authentication and operation-specific Brand permission/Manage override are mandatory; tenant context is server-resolved.
+- Code is trimmed, max 80, uppercase canonical and tenant-unique. Allowed characters, deleted-code reuse and restore semantics remain unresolved.
+- Name is required/trimmed/max 150; Description optional/max 255; SortOrder integer/default 0/nonnegative; editable status ACTIVE/INACTIVE.
+- Product mapping accepts nullable BrandId but target DB integrity requires a same-tenant composite FK.
+- Image partial failure must state: `Brand details were saved, but the image upload failed.`
 
-## Trigger
-
-Tenant Admin opens category or brand management.
-
-## Preconditions
-
-- Tenant Admin has catalog management permission.
-
-## Main Flow
-
-| Step | Action | System Behavior |
-|---:|---|---|
-| 1 | Open category/brand management | System opens category/brand list. |
-| 2 | View existing categories/brands | System displays existing records. |
-| 3 | Click add category/brand | Tenant Admin starts new record. |
-| 4 | Enter name | Tenant Admin enters category or brand name. |
-| 5 | Add description if needed | Tenant Admin adds optional description. |
-| 6 | Set status | Tenant Admin sets active/inactive. |
-| 7 | Validate details | System checks required fields and duplicates. |
-| 8 | Save category/brand | System saves record. |
-| 9 | Available for product mapping | Category/brand can be selected on products. |
-
-## Data Used Or Captured
-
-- Category name
-- Brand name
-- Description
-- Status
-
-## Access And Security Rules
-
-- Tenant Admin must be authenticated unless the flow is a setup/payment link flow before first login.
-- Tenant status, feature entitlement, permission, and outlet access must be enforced where applicable.
-- Tenant-owned data must be isolated by tenant context resolved server-side.
-- All create/update/status actions should be audit logged.
-- Category/brand data must be tenant-scoped.
-
-## Validation And Error Cases
-
-- Duplicate name
-- Missing name
-- Permission denied
-
-## Outcome
-
-Category or brand is available for product setup.
-
-## Related Modules
-
-- 09_Catalog_Master_Data
-- 10_Product_Core
-
-## Related Files
-
-- 06_DATABASE_KNOWLEDGE/Tables/10_Catalog_Master_Data_And_Product_Core.md
+Implementation status: **TARGET — TO BE IMPLEMENTED** except verified existing CRUD/security elements documented in `04_Tenant_Admin_Brand_Management_Fresh_Source_Truth.md`.

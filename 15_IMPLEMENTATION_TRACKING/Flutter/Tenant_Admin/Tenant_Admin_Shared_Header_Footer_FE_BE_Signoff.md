@@ -103,11 +103,11 @@ If tracking catalog work that shipped in the same effort:
 
 | Item | Status |
 |---|---|
-| Brand CRUD + logo upload | Already existed |
-| `SortOrder` + migration `20260728103522_AddBrandSortOrder` | Done |
-| `ProductCount` projection (exclude DELETED) | Done |
-| Permissions `catalog.brands.*` / Flutter aliases | Done |
-| Targeted unit / API / integration Brand tests | Passed |
+| Brand CRUD + logo upload | VERIFIED EXISTING / PARTIAL |
+| `SortOrder` backend/DB/migration | MISSING — TARGET TO BE IMPLEMENTED; the previously named migration does not exist |
+| `ProductCount` projection | MISSING — TARGET TO BE IMPLEMENTED |
+| Permissions `catalog.brands.*` / Flutter aliases | VERIFIED EXISTING / PARTIAL; logo reload chain defect remains |
+| Brand tests | PARTIAL; reconciled target coverage is TO IMPLEMENT |
 
 Detail: [[Brand_Collection_CRUD_Implementation_Status]]
 

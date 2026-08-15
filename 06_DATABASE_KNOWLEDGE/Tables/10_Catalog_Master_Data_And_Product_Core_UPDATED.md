@@ -138,7 +138,8 @@ Purpose: Stores tenant brand master records.
 | `brand_name` | varchar(150) |  | NOT NULL | Display name |
 | `brand_slug` | varchar(180) |  | NOT NULL | URL/display slug |
 | `description` | text |  | NULL | Optional description |
-| `logo_url` | varchar(500) |  | NULL | Brand logo URL |
+| `logo_media_asset_id` | uuid | FK | NULL | CURRENT: tenant-composite FK to media_assets; resolved URL is projected, not stored here |
+| `sort_order` | integer |  | TARGET — TO BE IMPLEMENTED: NOT NULL DEFAULT 0 | CURRENT source/migrations/snapshot do not contain this column |
 | `status` | varchar(40) |  | NOT NULL | Record status |
 | `created_at` | timestamptz |  | NOT NULL | Created timestamp |
 | `created_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
@@ -156,6 +157,7 @@ UNIQUE(tenant_id, brand_code)
 UNIQUE(tenant_id, brand_slug)
 UNIQUE(tenant_id, id)
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
+TARGET CHECK(sort_order >= 0) — TO BE IMPLEMENTED
 ```
 
 ## `collections`
@@ -303,7 +305,7 @@ Indexes / Constraints / Notes:
 PK(id)
 FK(tenant_id) REFERENCES tenants(id)
 FK(business_type_id) REFERENCES business_types(id)
-FK(tenant_id, brand_id) REFERENCES brands(tenant_id, id)
+TARGET — TO BE IMPLEMENTED: FK(tenant_id, brand_id) REFERENCES brands(tenant_id, id) ON DELETE RESTRICT. CURRENT database source has no Product→Brand FK or BrandId index; application validation only.
 FK(tenant_id, return_policy_id) REFERENCES return_policies(tenant_id, id)
 FK(published_by_tenant_user_id) REFERENCES tenant_users(id)
 FK(archived_by_tenant_user_id) REFERENCES tenant_users(id)
