@@ -1,14 +1,22 @@
 <!-- title: Cash Drawer Integration -->
 <!-- status: Draft -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-13 -->
 
 # Cash Drawer Integration
 
 ## Purpose
 
-Define the printer-driven cash-drawer architecture and record the current
-foundation without claiming unfinished business triggers or physical movement.
+Define the printer-driven **physical** cash-drawer architecture and record the
+current foundation without claiming unfinished financial Cash In/Out APIs.
+
+Financial Cash Drawer screen / movements authority lives in:
+
+- [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]]
+
+This integration document covers **hardware pulse only**. Physical Open Drawer
+must not create financial cash movements.
 
 ## Scope
 
@@ -69,8 +77,10 @@ Missing end-to-end persistence is a production gap.
 ## Permission And Business Rules
 
 Existing codes are `cash_drawer.view`, `cash_drawer.manage` and
-`cash_drawer.movement.create`. Backend remains authority. Open till and assigned
-activated device are required. No merchant-copy or receipt permission implies
+`cash_drawer.movement.create`. Physical Open Drawer uses `cash_drawer.manage`.
+Manual Cash In/Out/Drop uses `cash_drawer.movement.create` (seed/enforce gap as
+of 2026-08-13). Backend remains authority. Open till and assigned activated
+device are required. No merchant-copy or receipt permission implies
 drawer-open permission.
 
 ## Security Rules
@@ -116,14 +126,19 @@ Implemented. Local Agent pulse generation, validation, dedicated endpoint, RAW s
 
 ## Known Gaps
 
-Physical drawer verification.
-
+- Physical drawer verification (hardware pulse).
+- Financial Cash Drawer APIs and Flutter Cash In/Out backend wiring — see
+  [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
 
 ## Implementation Sequence
 
 Hardware Chunk 4 follows device configuration/test-audit foundation and printer
-acceptance.
+acceptance. Cash Drawer financial implementation is a separate chunk plan after
+Second Brain alignment (2026-08-13).
 
 ## Related Files
 
 - [[POS_Hardware_Integration]]
+- [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]]
+- [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Second_Brain_Alignment_2026-08-13]]

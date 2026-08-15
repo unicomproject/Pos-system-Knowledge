@@ -20,17 +20,20 @@ Covers the user interface, interaction, Quick Amount calculation, manual amount 
 - User has `sales.checkout` and `payments.cash.accept` permissions.
 
 ## Screen Structure
-Based on the target composition, the screen comprises:
+Based on the approved Cash Payment visual (2026-08-14):
 - **Shared POS Header:** Existing shell.
 - **Main Content Width Ratio:**
   - **Order Summary Section:** Exactly 2/5 of available width.
   - **Cash Payment Section:** Exactly 3/5 of available width.
-- **Order Summary Card (2/5):** Independent card containing cart item rows, subtotal, discount, tax, and large orange Total Due footer.
-- **Cash Payment 3/5 Parent Area:**
-  - **Quick Amount Card:** Independent card with dynamically generated values, OTHER AMOUNT button, Total Due card (orange emphasis), and Change Due card (green emphasis).
-  - **Amount Received Card:** Independent card displaying the currently selected or entered cash amount, and the numeric keypad (Digits 0-9, 00, backspace, and clear).
-  - **Bottom Action Card:** Independent card containing EXACT CASH (flex 1) and COMPLETE SALE (flex 2).
-- **Print Receipt Preference:** No pre-sale Print Receipt button on the Cash Payment screen. Existing post-sale receipt flow remains unchanged.
+- **Order Summary Card (2/5):** Independent card with cart rows, subtotal/discount/tax, and light-orange Total Due footer (navy label + orange amount).
+- **Cash Payment Card (3/5):** Single independent card containing:
+  - Amount Received display with Due hint
+  - Quick Amount chips (EXACT + rounded suggestions) aligned beside Amount Received
+  - Numeric keypad (0–9, 00, disabled `.`, tall backspace, clear)
+  - Change Due bar (green)
+  - Complete Sale primary CTA (subtitle: Complete the transaction)
+- **Layout constraint:** Fixed viewport fit — **no page-level scroll**. Compact typography/spacing. Item list may scroll inside Order Summary only when item count exceeds available height.
+- **Print Receipt Preference:** No pre-sale Print Receipt button on the Cash Payment screen.
 - **Shared POS Footer/Navigation:** Existing shell.
 
 *Note: Product names, images, quantities, prices, item count, tax value, outlet name, till name, notification count, and total amount must not be hardcoded. They are derived from the runtime state.*
@@ -47,10 +50,11 @@ Based on the target composition, the screen comprises:
 ### Quick Amount Calculation
 Quick Amounts are dynamically generated based on the backend Total Due, and are strictly a Flutter presentation convenience. They are never sent to or persisted by the backend directly.
 - **Rules:**
-  1. Option 1: Exact Total Due.
+  1. Option 1: Exact Total Due (chip labeled `EXACT …`).
   2. Option 2: The next higher LKR 1,000 boundary.
-  3. Remove duplicate values.
-  4. Hide unused Quick Amount grid slots (do not fill with hardcoded values like 10,000, 25,000).
+  3. Option 3: Option 2 + LKR 1,000.
+  4. Remove duplicate values.
+  5. Hide unused Quick Amount slots (do not fill with hardcoded values like 10,000, 25,000 unless generated).
 - **Calculation Logic:**
   ```
   exactAmount = totalDue
@@ -58,11 +62,13 @@ Quick Amounts are dynamically generated based on the backend Total Due, and are 
       nextRoundedAmount = totalDue + 1000
   else:
       nextRoundedAmount = ceiling(totalDue / 1000) * 1000
+  thirdAmount = nextRoundedAmount + 1000
   ```
 - **Approved Examples:**
-  - Total Due LKR 1,700 → Quick Amounts: LKR 1,700 and LKR 2,000
-  - Total Due LKR 16,280 → Quick Amounts: LKR 16,280 and LKR 17,000
-  - Total Due LKR 2,000 → Quick Amounts: LKR 2,000 and LKR 3,000
+  - Total Due LKR 1,700 → Quick Amounts: LKR 1,700, LKR 2,000, LKR 3,000
+  - Total Due LKR 8,500 → Quick Amounts: LKR 8,500, LKR 9,000, LKR 10,000
+  - Total Due LKR 16,280 → Quick Amounts: LKR 16,280, LKR 17,000, LKR 18,000
+  - Total Due LKR 2,000 → Quick Amounts: LKR 2,000, LKR 3,000, LKR 4,000
 - Regenerate when checkout summary changes.
 
 ### Amount Entry Logic

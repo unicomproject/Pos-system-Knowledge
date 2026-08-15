@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-13 -->
 
 # Hardware Operations, Till Session & Cash Control Functional Rules
 
@@ -50,6 +50,13 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Do not hardcode role names such as cashier, manager, or administrator as authorization logic.
 - Cash In/Cash Drop forms are currently frontend-only and must not show a
   persisted-success outcome until a backend mutation succeeds.
+- Cash Drawer main screen must follow [[06_Cash_Drawer_Feature]] and
+  [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]]:
+  title inside white content card, no back-arrow / Continue-to-Dashboard,
+  bottom nav available, orange/black Cashier POS tokens via shared theme only,
+  Phone + Tablet + Desktop.
+- Open Drawer is hardware-only and must not create financial movements.
+- Expected Cash is backend-authoritative; Flutter totals are preview only.
 - Scanner/printer package or adapter presence is not physical verification.
 - Hardware Testing must show Local Agent unreachable, unauthorized, incompatible
   contract, printer unavailable, and ready states without exposing the API key.
@@ -70,6 +77,18 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Backend database remains final truth for sale totals, stock, payments, refunds, exchanges, permissions, and sync acceptance.
 - Offline operations must be marked pending until accepted by backend sync.
 - Conflicts must be visible; do not silently overwrite backend truth.
+- **Open Till** is online backend-authoritative. Do not fake OPEN offline, claim
+  local-only success, or let the cashier operate as if a till was opened without
+  backend confirmation. Cached current-session restore applies only to an already
+  confirmed OPEN session. See [[04_Open_Till_Feature]].
+- **Close Till** is online backend-authoritative. Expected Cash is calculated by
+  the backend from canonical session cash activity; Flutter supplies Counted Cash,
+  an approved variance reason when required and an optional note. Session close,
+  `cash_reconciliations` and CLOSED event commit atomically. Current code does not
+  yet meet the first and reconciliation requirements. See [[05_Close_Till_Feature]].
+- **Cash In / Cash Out / Cash Drop** are online backend-authoritative until an
+  approved offline cash-control contract exists. Do not silently queue high-risk
+  cash-control mutations. See [[06_Cash_Drawer_Feature]].
 
 ## Error Rules
 
@@ -93,6 +112,9 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/03_Technical_Contract]]
+- [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]]
+- [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]]
+- [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]]
 
 
 ## Tenant Admin Till Hardware Functional Rules Addendum (2026-08-01)

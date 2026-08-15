@@ -1,7 +1,7 @@
 <!-- title: Developer Reading Guide -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-10 -->
+<!-- last_updated: 2026-08-12 -->
 
 
 # Developer Reading Guide
@@ -66,6 +66,18 @@ Always read source-of-truth and scope rules first.
     [[../03_USER_JOURNEYS/Cashier/02_Device_Activation_Flow]] and
     [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Device_Activation_Screen_Implementation_Specification]];
     modify the existing screen and reuse the Login branding panel.
+11. For Open Till, read
+    [[../03_USER_JOURNEYS/Cashier/03_Till_Open_Flow]],
+    [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]] and
+    [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Till_Screen_Implementation_Specification]];
+    reuse existing open/current-session APIs and the Dashboard Top Bar; do not
+    invent API/table/permission or offline OPEN.
+12. For Close Till or End Shift, read
+    [[../03_USER_JOURNEYS/Cashier/11_Till_Close_Flow]],
+    [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]] and
+    [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Close_Till_Screen_Implementation_Specification]];
+    reuse current routes/schema/permission, but fix backend expected-cash authority
+    and reconciliation persistence before production acceptance.
 
 ## Online Store Developer Reading Path
 

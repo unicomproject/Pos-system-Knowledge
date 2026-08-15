@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ST-07 — Configure Initial Online Store</title>
+  <link rel="stylesheet" href="prototype.css" />
+</head>
+<body>
+  <div class="proto-toolbar">
+    <strong>ST-07 Online Store Bootstrap</strong>
+    <div class="group">
+      <button type="button" onclick="setState('default')" class="active">Default</button>
+      <button type="button" onclick="setState('validation')">Validation</button>
+      <button type="button" onclick="setState('not_entitled')">Not entitled</button>
+      <button type="button" onclick="setState('dependency')">C&amp;C notice</button>
+      <button type="button" onclick="setState('success')">Success</button>
+    </div>
+    <span class="proto-note">APPROVED · SA-ST-UJ-011 / SA-UJ-057</span>
+    <a class="btn" href="setup-hub.html">Hub</a>
+  </div>
+  <div id="viewport" class="viewport-frame w-1280">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">OneVerz</div>
+        <nav>
+          <a href="#" class="active"><span>Tenants</span></a>
+          <a href="#"><span>Subscription Plans</span></a>
+          <a href="#"><span>Billing</span></a>
+        </nav>
+      </aside>
+      <div class="main">
+        <div class="topbar">Platform Admin · Sarah Chen</div>
+        <div class="page">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="setup-hub.html">Configure</a> / <span>Online Store</span>
+          </nav>
+          <h1 class="page-title">Configure Initial Online Store</h1>
+          <p class="page-desc">Minimum assisted store readiness only. Full storefront, Click &amp; Collect, and channel merchandising stay with Tenant Admin.</p>
+
+          <div class="tenant-context" role="region" aria-label="Selected tenant context">
+            <div class="identity">
+              <div class="name">ABC Retail</div>
+              <div class="meta">
+                <span class="chip chip-code">TEN-ABC-001</span>
+                <span class="chip chip-active">ACTIVE</span>
+                <span class="chip chip-plan">Pro Plan</span>
+                <span class="chip chip-info" id="entitlement-chip">online_store</span>
+              </div>
+            </div>
+            <a href="setup-hub.html" class="btn btn-secondary btn-sm">Exit Tenant Context</a>
+          </div>
+
+          <div id="alert-success" class="alert alert-success hidden">Initial Online Store readiness saved for ABC Retail. Hub status will show CONFIGURED.</div>
+          <div id="alert-not-entitled" class="alert alert-warning hidden">This tenant is not entitled to Online Store (<code>online_store</code>). Configuration is unavailable.</div>
+          <div id="alert-dependency" class="alert alert-warning hidden">Click &amp; Collect is entitled but collection points are not configured yet. That remains a Tenant Admin task (fulfillment_method_outlets + business hours). Online Store readiness can still be saved.</div>
+
+          <div id="blocked-panel" class="state-panel hidden">
+            <h2>Online Store not entitled</h2>
+            <p>Plan feature <code>online_store</code> is off for this tenant. No Super Admin bootstrap is required.</p>
+            <a href="setup-hub.html" class="btn btn-secondary">Back to Setup Hub</a>
+          </div>
+
+          <form class="form-card" id="os-form" onsubmit="return false;">
+            <div class="field" id="field-status">
+              <label for="storeStatus">Store status *</label>
+              <select id="storeStatus">
+                <option value="DRAFT">DRAFT</option>
+                <option value="ACTIVE" selected>ACTIVE</option>
+              </select>
+              <p class="hint">Maps to <code>online_store.defaults.storeStatus</code>. Locked vocabulary: <code>DRAFT</code> (initial) · <code>ACTIVE</code> (approved readiness).</p>
+              <p class="err-msg hidden" id="err-status">Store status is required.</p>
+            </div>
+            <div class="field">
+              <label for="taxDisplayMode">Tax display mode</label>
+              <select id="taxDisplayMode">
+                <option value="MATCH_TENANT" selected>MATCH_TENANT</option>
+              </select>
+              <p class="hint">Optional bootstrap field · <code>online_store.defaults.taxDisplayMode</code></p>
+            </div>
+
+            <div class="field" style="margin-top:1.25rem;">
+              <label>Deferred to Tenant Admin</label>
+              <ul style="margin:0.35rem 0 0;padding-left:1.25rem;font-size:0.875rem;color:var(--text-secondary);">
+                <li>Branding, banners, SEO, theme</li>
+                <li>Product-by-product online channel visibility</li>
+                <li>Click &amp; Collect / collection outlets (FMO)</li>
+                <li>Business hours, policies, order operations</li>
+              </ul>
+            </div>
+
+            <div class="form-footer">
+              <a href="setup-hub.html" class="btn btn-secondary">Cancel</a>
+              <button class="btn btn-primary" type="submit" id="save-btn">Save Online Store</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function setState(s) {
+      document.getElementById('alert-success').classList.add('hidden');
+      document.getElementById('alert-not-entitled').classList.add('hidden');
+      document.getElementById('alert-dependency').classList.add('hidden');
+      document.getElementById('err-status').classList.add('hidden');
+      document.getElementById('blocked-panel').classList.add('hidden');
+      document.getElementById('os-form').classList.remove('hidden');
+      document.getElementById('save-btn').disabled = false;
+      document.getElementById('entitlement-chip').textContent = 'online_store';
+      document.getElementById('entitlement-chip').className = 'chip chip-info';
+      document.querySelectorAll('.proto-toolbar .group button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (s === 'validation') {
+        document.getElementById('err-status').classList.remove('hidden');
+        document.getElementById('field-status').classList.add('error');
+      } else {
+        document.getElementById('field-status').classList.remove('error');
+      }
+      if (s === 'not_entitled') {
+        document.getElementById('alert-not-entitled').classList.remove('hidden');
+        document.getElementById('blocked-panel').classList.remove('hidden');
+        document.getElementById('os-form').classList.add('hidden');
+        document.getElementById('entitlement-chip').textContent = 'online_store off';
+        document.getElementById('entitlement-chip').className = 'chip chip-entitled';
+      }
+      if (s === 'dependency') {
+        document.getElementById('alert-dependency').classList.remove('hidden');
+      }
+      if (s === 'success') {
+        document.getElementById('alert-success').classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>

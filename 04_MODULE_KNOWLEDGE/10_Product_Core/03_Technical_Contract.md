@@ -1,108 +1,40 @@
 <!-- title: Product Core Technical Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-11 -->
 
 # Product Core Technical Contract
 
 ## Purpose
 
-Defines the implementation contract for `Product_Core`. This contract is based on
-new OneVerz POS MVP scope images and the uploaded Unified Commerce database design.
+Defines the technical implementation contract for `Product_Core` in the OneVerz POS MVP scope.
 
 ## API Contract
 
 | Area | Contract |
 |---|---|
-| API groups | `/api/v1/tenant-admin/products`, `/api/v1/tenant-admin/products/imports`, `/api/v1/pos/products`, `/api/v1/storefront/products` |
-| Request format | Typed request DTOs; no raw map payloads in application layer |
-| Response format | Typed response DTOs with safe fields only |
-| Error format | Standard API error response |
-| Tenant context | Resolved server-side for tenant-owned records |
-| Auth | Staff/customer/platform auth boundary must match module surface |
-
-## API Groups
-
-| API Group | Purpose |
-|---|---|
-| `/api/v1/tenant-admin/products` | Tenant Admin Product CRUD and List filters |
-| `/api/v1/tenant-admin/products/imports` | CSV batch upload, validation, and commit |
-| `/api/v1/pos/products` | Cashier POS product search and segments |
-| `/api/v1/storefront/products` | Storefront public product browse |
+| API groups | `/api/v1/tenant-admin/products`, `/api/v1/tenant-admin/products/draft`, `/api/v1/tenant-admin/products/{id}/setup`, `/api/v1/pos/products`, `/api/v1/storefront/products` |
+| Draft API Pipeline | Single `PUT /api/v1/tenant-admin/products/{productId}/draft` endpoint supporting polymorphic step graph payloads (`currentSetupStep=1..8`). |
+| Request format | Typed request DTOs (`SaveProductDraftRequest`); step-specific graphs passed via polymorphic payload structures. |
+| Response format | Typed `ProductDraftResponse` and `ProductSetupWizardDto` with full setup projections. |
+| Tenant context | Resolved server-side for tenant-owned records. |
 
 ## Database Contract
 
-| Table | Contract |
+| Table | Role |
 |---|---|
-| `products` | Stores parent product records, setup steps, status, and audit parameters. |
-| `product_variants` | Stores sellable variant details, SKU, and barcode links. |
-| `product_import_batches` | Stores metadata for CSV product import runs. |
-| `product_import_rows` | Stores row-level parsed and validated import records. |
+| `products` | Stores parent product records, setup steps (`current_setup_step`), status, and row version. |
+| `product_variants` | Stores sellable variant details, SKU, `variant_name` (`displayLabel`), `is_sellable` (`included`), `option_combination_hash` (`char(64)`), and UOM links for VARIANT products. |
+| `product_options` | Stores product option headers owned by tenant. |
+| `product_option_values` | Stores product option values owned by tenant (`image_media_asset_id`). |
+| `product_variant_option_values` | Maps `product_variants` to `product_option_values`. |
 
-Entity mappings must preserve exact table names, column names, tenant foreign keys,
-unique constraints, CHECK constraints, hash-only token rules, and append-only
-history/ledger behavior where applicable.
+> [!NOTE]
+> Database Migration Required: **NO**. All required tables and columns already exist in EF Core ModelSnapshot.
 
-## Frontend Contract
+## Related Specifications
 
-- Use feature-owned folders and typed services/providers.
-- Widgets/components must not call HTTP APIs directly.
-- Use DTOs in data layer, domain/view models in UI layer.
-- Permission and entitlement checks are UX helpers only; backend remains final authority.
-- Browser online store and Flutter business app must share backend rules but keep separate user/auth surfaces.
-
-## Backend Contract
-
-- Controllers stay thin.
-- Application services own use cases.
-- Domain entities/value objects hold stable business invariants.
-- Repository interfaces stay in application layer; EF implementations stay in infrastructure layer.
-- Audit/event rows are written for sensitive state changes.
-- Idempotency keys are required for retryable commands that can create duplicates.
-
-## Permission And Entitlement Contract
-
-- Permission codes must be database-seeded and module-scoped.
-- Do not create one giant global enum as the source of truth.
-- Tenant feature entitlement must be checked before tenant staff permission where the feature is plan-controlled.
-- Customer-facing actions use customer account/session rules, not tenant staff role permissions.
-
-## Test Contract
-
-Test coverage must include:
-
-- Happy path for each primary API group.
-- Missing authentication.
-- Permission denied or customer access denied.
-- Feature disabled / entitlement missing.
-- Tenant isolation failure.
-- Validation failure.
-- Duplicate/conflict behavior.
-- Safe error display.
-- Audit/event/history creation where required.
-- Offline/cache behavior where this module touches POS, checkout, order, inventory, payment, or sync.
-
-## Implementation Sequence
-
-1. Confirm scope and table coverage from this module file.
-2. Create DTOs, validators, and application service methods.
-3. Create repository interface and EF repository/mapping if missing.
-4. Add entitlement, permission, tenant, outlet, till, device, customer, or offline checks as relevant.
-5. Build frontend route/screen/component/provider/service.
-6. Add loading, empty, error, denied, feature-disabled, offline, and conflict states.
-7. Add unit/integration/API/widget tests.
-8. Review against new OneVerz POS MVP module boundaries.
-
-## Out Of Scope
-
-- Price list calculation
-- Tax rule ownership
-- Stock movement ledger
-- Customer cart persistence
-
-## Related Files
-
-- [[04_MODULE_KNOWLEDGE/10_Product_Core/01_Module_Overview]]
-- [[04_MODULE_KNOWLEDGE/10_Product_Core/02_Functional_Rules]]
-- [[04_MODULE_KNOWLEDGE/10_Product_Core/04_Tenant_Admin_Product_List_And_Import_Contract]]
-- [[../../06_DATABASE_KNOWLEDGE/Tables/15_Product_Import_Batches_And_Rows]]
+- [[../12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification]]
+- [[Tenant_Admin_Product_Type_Tracking_Specification]]
+- [[Tenant_Admin_Product_Units_Pack_Conversion_Specification]]
+- [[05_Tenant_Admin_Add_Product_8_Step_Contract]]

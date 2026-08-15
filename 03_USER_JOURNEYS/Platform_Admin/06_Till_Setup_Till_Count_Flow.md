@@ -1,9 +1,13 @@
 <!-- title: Till Setup And Till Count Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-08-12 -->
+<!-- parent_mode: Selected-Tenant Mode -->
+<!-- atomic_journey: SA-ST-UJ-006 -->
 
 # Till Setup And Till Count Flow
+
+> **Reconciled 2026-08-12.** Macro parent for bootstrap till creation. Atomic journey: **SA-ST-UJ-006**. Device binding and hardware setup are **Tenant Admin** only.
 
 ## Purpose
 

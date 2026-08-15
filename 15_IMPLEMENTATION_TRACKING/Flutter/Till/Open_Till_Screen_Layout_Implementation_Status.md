@@ -1,8 +1,7 @@
 <!-- title: Open Till Screen Layout Implementation Status -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-10 -->
-
+<!-- last_updated: 2026-08-11 -->
 
 # Open Till Screen Layout Implementation Status
 
@@ -12,40 +11,49 @@
 |---|---|
 | Platform | Flutter |
 | Module | Till |
-| Feature | Open Till tablet full-screen layout |
-| Status | Completed |
-| Completed Date | 2026-07-10 |
-| Branch | `Sale_Screen` (uncommitted at audit) |
-| PR / Commit | - |
-| Tests | Pass (`open_till_form_test.dart` 3/3) |
+| Feature | Open Till screen (approved UI contract) |
+| Requirements | **DOCUMENTED** |
+| Backend contract | **EXISTING / REUSE** |
+| New API / table / attribute / permission | **NOT REQUIRED** |
+| Frontend vs approved contract | **COMPLETED** |
+| Production runtime / E2E acceptance | **PASSED (2026-08-11)** |
 
 ## Feature Summary
 
-Removed dark scaffold frame and unnecessary margins on cashier Open Till screen.
-Layout now uses full-screen `Row` with stretched setup sidebar and embedded open
-till form on tablet.
+Open Till Flutter presentation aligns with the approved 2026-08-11 contract:
+Dashboard Top Bar reuse via `PosShellScaffold` (`isDashboard: true`), OneVerz
+orange theme, white parent surface, bold/dark important text, and Phone +
+Tablet + Desktop responsive behaviour. Authenticated Local Development E2E,
+DB session verification, already-open conflict, offline failure safety, and
+focused automated tests passed.
+
+Canonical specs:
+
+- [[../../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]]
+- [[../../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Till_Screen_Implementation_Specification]]
+
+### Orange visual alignment (2026-08-14)
+
+Open Till primary accents/CTA now follow OneVerz orange
+(`TenantAdminColors.posHomeAccentOrange`). Canonical visual contract:
+[[../../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Close_Till_Orange_Visual_Direction]]
+and status [[Open_Close_Till_Orange_Theme_Implementation_Status]].
 
 ## API Dependency
 
 | API | Status |
 |---|---|
-| `POST /api/v1/tills/open` | Integrated (pre-existing) |
 | `GET /api/v1/devices/current` | Integrated (bootstrap) |
+| `GET /api/v1/tills/current-session` | Integrated |
+| `POST /api/v1/tills/open` | Integrated |
 
-Screen data comes from device bootstrap and form defaults, not a separate open
-till fetch API.
+## Known Gaps (documented, non-blocking)
 
-## Files Changed
-
-```text
-lib/features/till/presentation/screens/till_open_screen.dart
-lib/features/till/presentation/widgets/open_till_form.dart
-lib/shared/widgets/pos_setup_sidebar.dart (stretchVertically)
-test/features/till/open_till_form_test.dart
-```
+- Opening note `0/100` remains UI-only (backend `opening_note` is unconstrained text).
+- Open Till does **not** write `till_session_events.OPENED` (Close writes `CLOSED`). Classified as documented non-blocking future gap.
 
 ## Related Files
 
 - [[../../../03_USER_JOURNEYS/Cashier/03_Till_Open_Flow]]
 - [[../../Backend/OutletTillDevice/Till_Session_Open_Close_Implementation_Status]]
-- [[../Full_Feature_Status_Index]]
+- [[../../Full_Feature_Status_Index]]

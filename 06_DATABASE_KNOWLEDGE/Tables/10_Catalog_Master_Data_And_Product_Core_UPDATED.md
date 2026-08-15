@@ -424,6 +424,51 @@ Indexes / Constraints / Notes:
 - Only entity tables visible in the uploaded ERD image are included.
 - Tenant-owned tables include `tenant_id` for data isolation.
 
+## `product_unit_settings`
+
+Purpose: Stores product-specific unit model setup and pack conversion attributes.
+
+| Attribute | Type | Key | Null | Reference / Note |
+| --- | --- | --- | --- | --- |
+| `id` | uuid | PK | NOT NULL | Primary key |
+| `tenant_id` | uuid | FK | NOT NULL | References tenants(id) |
+| `product_id` | uuid | FK | NOT NULL | References products(id); UNIQUE per product |
+| `unit_model` | varchar(40) | | NOT NULL | CHECK ('SINGLE_UNIT', 'MULTIPLE_UNITS') |
+| `base_uom_id` | uuid | FK | NOT NULL | References unit_of_measures(id) |
+| `selling_uom_id` | uuid | FK | NOT NULL | References unit_of_measures(id) |
+| `purchase_uom_id` | uuid | FK | NOT NULL | References unit_of_measures(id) |
+| `outer_pack_uom_id` | uuid | FK | NULL | References unit_of_measures(id) |
+| `items_per_purchase_unit` | numeric(18,4) | | NULL | Items in 1 Purchase Unit |
+| `purchase_units_per_outer_pack` | numeric(18,4) | | NULL | Purchase Units in 1 Outer Pack |
+| `allow_decimal_quantity` | boolean | | NOT NULL DEFAULT false | Controls fractional quantities |
+| `status` | varchar(30) | | NOT NULL DEFAULT 'ACTIVE' | Status |
+| `created_at` | timestamptz | | NOT NULL | Created timestamp |
+| `created_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+| `updated_at` | timestamptz | | NOT NULL | Updated timestamp |
+| `updated_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+
+## `product_unit_conversions`
+
+Purpose: Stores pre-calculated conversion factors to Base Unit for every active unit level of a product.
+
+| Attribute | Type | Key | Null | Reference / Note |
+| --- | --- | --- | --- | --- |
+| `id` | uuid | PK | NOT NULL | Primary key |
+| `tenant_id` | uuid | FK | NOT NULL | References tenants(id) |
+| `product_id` | uuid | FK | NOT NULL | References products(id) |
+| `uom_id` | uuid | FK | NOT NULL | References unit_of_measures(id) |
+| `unit_level` | varchar(40) | | NOT NULL | CHECK ('BASE', 'SELLING', 'PURCHASE', 'OUTER_PACK') |
+| `conversion_to_base_factor` | numeric(18,4) | | NOT NULL | Multiplier to get Base Units |
+| `is_base_unit` | boolean | | NOT NULL DEFAULT false | Base Unit marker |
+| `is_selling_unit` | boolean | | NOT NULL DEFAULT false | Selling Unit marker |
+| `is_purchase_unit` | boolean | | NOT NULL DEFAULT false | Purchase Unit marker |
+| `is_outer_pack_unit` | boolean | | NOT NULL DEFAULT false | Outer Pack Unit marker |
+| `status` | varchar(30) | | NOT NULL DEFAULT 'ACTIVE' | Status |
+| `created_at` | timestamptz | | NOT NULL | Created timestamp |
+| `created_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+| `updated_at` | timestamptz | | NOT NULL | Updated timestamp |
+| `updated_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+
 ## Related Files
 
 - [[11_Product_Mapping_Media_Attributes_And_Channel_Visibility]]

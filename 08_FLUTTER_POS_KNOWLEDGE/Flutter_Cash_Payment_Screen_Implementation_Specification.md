@@ -15,12 +15,13 @@ This specification details the frontend implementation strategy for the Cash Pay
 
 ## Screen / Component Composition
 Require component-wise separation (do not write one monolithic screen file):
-- `CashPaymentScreen` (Main scaffolding, shared header/footer usage. Order Summary is flex 2, Cash Payment is flex 3).
-- `OrderSummarySection` (Displays cart totals and items as a single independent card).
-- `QuickAmountGrid` (Displays dynamically generated exact and rounded amounts. Includes Total Due and Change Due as inner cards).
-- `AmountEntrySection` (Shows entered amount and toggles, inside an independent Amount Received card).
-- `NumericKeypad` (Handles digit input, clear, backspace).
-- `PaymentActionFooter` (Contains EXACT CASH and COMPLETE SALE controls. Does not contain Print Receipt).
+- `CashPaymentScreen` (Main scaffolding, shared header/footer usage. Order Summary is flex 2, Cash Payment is flex 3). Fixed viewport — no page scroll; compact spacing/fonts.
+- `OrderSummarySection` (Displays cart totals and items as a single independent card with light-orange Total Due footer).
+- `CashPaymentTenderPanel` (Single card: Amount Received + Quick Amount chips + NumericKeypad + Change Due + Complete Sale).
+- `QuickAmountChips` (Exact + next 1000 + next+1000; selected orange border).
+- `AmountEntrySection` (Shows entered amount and Due hint).
+- `NumericKeypad` (Digits 0-9, 00, disabled decimal, tall backspace, clear).
+- `PaymentActionFooter` (Complete Sale only inside tender panel; no pre-sale Print Receipt).
 
 ## State Management (Typed View State)
 State must be typed and explicitly managed via Riverpod:
