@@ -20,7 +20,7 @@ These rules must be applied before creating backend APIs, Flutter screens, respo
   - SIMPLE: Auto-bypassed / `NOT_APPLICABLE`.
   - VARIANT: Renders Variant Configuration (`Tenant_Admin_Product_Variant_Configuration_Specification`).
   - BUNDLE: Renders Kit Component Assembly.
-- Step 4 for VARIANT mode defines options, values, Cartesian matrix, display labels, variant inclusion toggles (`Include Variant`), and variant image overrides. It does NOT configure SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility (belonging to Steps 5, 6, and 7).
+- Step 4 for VARIANT mode defines options, values, Cartesian matrix, display labels, variant inclusion toggles (`Include Variant`), and variant image overrides. It does NOT configure SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility (belonging to Step 1).
 - Inactive products cannot be sold through POS or online store.
 - POS may cache product reference data, but backend remains final authority.
 

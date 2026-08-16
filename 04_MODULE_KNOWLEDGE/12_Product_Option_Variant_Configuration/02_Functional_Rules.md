@@ -19,10 +19,10 @@ These rules must be applied before creating backend APIs, Flutter screens, respo
   - Page Heading: `Variant Configuration`.
   - Toggle Label: **`Include Variant`** (CANONICAL MANDATE: NEVER use "Availability" for this toggle).
   - Step 4 defines options, option values, Cartesian matrix generation, display labels, variant inclusion toggles, and variant image overrides.
-  - Step 4 MUST NOT include SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility controls (belonging to Steps 5, 6, and 7).
+  - Step 4 MUST NOT include SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility controls (belonging to Step 1).
   - Image fallback priority: Exact Variant Override $\rightarrow$ Colour Group Image (`product_option_values.image_media_asset_id`) $\rightarrow$ Step 1 Primary Product Image $\rightarrow$ Standard Placeholder.
   - Delete Variant Action: Archives combination tombstone (`status = 'ARCHIVED'`). Operational variants with history cannot be deleted. Tombstoned combinations NEVER automatically resurrect upon regeneration.
-  - Variant Lifecycle: Wizard draft variants remain in `DRAFT` status until Step 8 publishes them.
+  - Variant Lifecycle: Wizard draft variants remain in `DRAFT` status until Step 7 publishes them.
   - Variant UOM: Inherited from Step 3 if Track Inventory is ON; resolved via canonical system default UOM resolver if OFF.
 - POS variant resolution uses option and option-value IDs, completes required groups, disables values that cannot yield an eligible variant, clears incompatible choices, and requires exactly one match. See [[../../21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 

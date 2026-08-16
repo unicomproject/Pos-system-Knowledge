@@ -14,7 +14,7 @@
 
 ## Status Assessment
 - **Legacy Product CRUD**: Completed (but deprecated).
-- **8-Step Setup Wizard Backend & APIs**: In Progress.
+- **7-Step Setup Wizard Backend & APIs**: In Progress.
 - Refer to [Product_Wizard_Setup_Flow_Implementation_Status](file:///C:/Users/user/Desktop/E-Pos/Pos-system-Knowledge/15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/Product_CRUD_Implementation_Status.md) for full details.
 
 ## Related Specifications

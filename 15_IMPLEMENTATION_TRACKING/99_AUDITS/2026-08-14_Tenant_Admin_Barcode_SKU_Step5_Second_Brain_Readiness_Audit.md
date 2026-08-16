@@ -13,7 +13,7 @@
 - Duplicate SKUs and Barcodes within the request are rejected with specific field errors.
 - Duplicate SKUs and Barcodes in the database (tenant-scoped) are rejected with `product.duplicate_sku` and `product.duplicate_barcode`.
 - Barcodes can be assigned at the product level (`product_variant_id = NULL`) or the variant level.
-- Additional barcodes support specific UOMs and scan quantities.
+
 
 ## 3. Business Rules & Validation
 - **Save Draft:** Allows incomplete states. SKUs are not strictly required. Validates lengths (max 100 chars) and uniqueness.
@@ -21,7 +21,7 @@
 - Barcode Types: `EAN-13`, `UPC-A`, `CODE-128`, etc.
 
 ## 4. API Contract Status
-- `SaveProductDraftRequest` explicitly supports `BaseSku`, `ParentProductBarcode`, `VariantIdentifiers`, and `AdditionalBarcodes`.
+- `SaveProductDraftRequest` explicitly supports `BaseSku`, `ParentProductBarcode`, and `VariantIdentifiers`.
 - The draft response DTOs (`ProductDraftResponseDto` and `ProductSetupWizardDto`) expose these fields to restore the UI state.
 - **Status:** IMPLEMENTATION READY.
 

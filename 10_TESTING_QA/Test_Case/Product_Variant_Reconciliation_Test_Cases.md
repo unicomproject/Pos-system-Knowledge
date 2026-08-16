@@ -59,9 +59,9 @@ Specifies the automated integration test cases for Step 4 Variant Configuration,
 1. Create new Included Variant.
 2. Toggle Include Variant OFF.
 3. Toggle Include Variant ON.
-4. Complete Wizard (Step 8).
+4. Complete Wizard (Step 7).
 **Assertion:**
-- Included variants remain in `DRAFT` status with `is_sellable=true` until Step 8.
+- Included variants remain in `DRAFT` status with `is_sellable=true` until Step 7.
 - Excluded variants remain in `DRAFT` status with `is_sellable=false`.
 - Step 4 NEVER publishes variants.
 

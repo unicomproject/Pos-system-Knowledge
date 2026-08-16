@@ -14,7 +14,7 @@
 
 ## Status Assessment
 - **Legacy Product CRUD**: Completed (but deprecated).
-- **8-Step Setup Wizard Backend & APIs**: In Progress.
+- **7-Step Setup Wizard Backend & APIs**: In Progress.
 - **Flutter Setup Wizard frontend UI**: In Progress.
 - **Database schemas & Migrations**: Setup ready (Reuse and extend model defined).
 - **Permissions alignment**: Catalogue updated, backend enforcement checks pending.

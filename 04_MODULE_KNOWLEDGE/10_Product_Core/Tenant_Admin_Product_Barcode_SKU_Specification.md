@@ -32,23 +32,22 @@ The canonical rule for identifier storage is that **every sellable product must 
 ## 3. Main Flows & Validations
 
 ### 3.1 Main Flow
-1. **Load State**: API returns existing identifier configuration including the auto-generated Base SKU or explicitly set SKUs/barcodes, plus additional barcode mappings by UOM.
+1. **Load State**: API returns existing identifier configuration including the auto-generated Base SKU or explicitly set SKUs/barcodes.
 2. **Assign Identifiers**: User enters SKU/Barcode values for the Base SKU or specific Variant SKUs.
 3. **Scanner Interaction Boundary**: Barcode scanners act as standard HID keyboard emulators. The UI input fields process the trailing Enter/Return keystroke to finalize the scanned value. 
 4. **Save Draft / Save & Continue**: Client triggers validation and persistence via `PUT /api/v1/tenant-admin/products/{productId}/draft`.
 
 ### 3.2 Alternate Flows
 - **Auto Generate SKU**: System generates an SKU sequence based on the internal `product_code` (e.g. `PRODCODE-001`). If clicked, overrides the current value.
-- **Add Additional Barcode**: User opens the "Add Additional Barcode" drawer to assign an alternative barcode (e.g., EAN vs UPC, or for an Outer Pack UOM).
-- **Edit / Delete Barcode**: User modifies or removes an additional barcode via drawers/modals.
+- **Inline Editing**: User can override the system-generated SKU or input a custom Primary Barcode for any active variant directly in the data grid.
 
-### 3.3 Duplicate Barcode Details Drawer (Projection)
+### 3.3  (Projection)
 We utilize **Approach B: Structured conflict metadata returned by the Step 5 validation/save response.**
 If a duplicate barcode or SKU is detected, the API returns a `409 Conflict` containing a structured duplicate projection payload:
 ```json
 {
   "errorCode": "product.duplicate_barcode",
-  "message": ".",
+  "message": "Duplicate barcode detected.",
   "conflictDetails": {
     "barcode": "8901234567890",
     "barcodeType": "EAN-13",
@@ -116,18 +115,6 @@ Types: `EAN-13`, `EAN-8`, `UPC-A`, `CODE-128`, `CODE-39`. (Backend constants ret
       "productVariantId": "guid...",
       "sku": "VAR-SKU-01",
       "barcode": "8901234567891"
-    }
-  ],
-  "additionalBarcodes": [
-    {
-      "barcodeId": "guid...", 
-      "barcode": "8901234567892",
-      "barcodeType": "EAN-13",
-      "productVariantId": null,
-      "uomId": "guid...",
-      "quantityPerScan": 6,
-      "isPrimary": false,
-      "status": "ACTIVE"
     }
   ]
 }
