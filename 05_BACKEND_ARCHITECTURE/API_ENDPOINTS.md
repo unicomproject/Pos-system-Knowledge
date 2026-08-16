@@ -349,6 +349,27 @@ Base route: `/api/v1/tenant-admin/products` · Controller: `TenantAdminProductsC
 | POST | `/api/v1/tenant-admin/products/imports/{importId}/commit` | `catalog.products.import` | Commit valid rows in batch to database |
 | GET | `/api/v1/tenant-admin/products/imports/{importId}/errors.csv` | `catalog.products.import` | Export validation failures CSV log |
 
+### Step 5 Barcode & SKU Payload & Duplicate Projection
+`PUT /api/v1/tenant-admin/products/{productId}/draft` accepts `UpdateProductDraftStep5RequestDto`.
+On duplicate detection, the endpoint returns a `409 Conflict` containing a structured duplicate projection payload:
+```json
+{
+  "errorCode": "product.duplicate_barcode",
+  "message": "Duplicate barcode detected.",
+  "conflictDetails": {
+    "barcode": "8901234567890",
+    "barcodeType": "EAN-13",
+    "productId": "...",
+    "productName": "Conflicting Product",
+    "productStructure": "SIMPLE",
+    "productVariantId": null,
+    "sku": "SKU-999",
+    "assignedLevel": "PRODUCT",
+    "status": "ACTIVE"
+  }
+}
+```
+
 Note: Legacy route `/api/v1/products` is maintained as compatibility alias pointing to the same application layer logic. Duplicate controller implementation must be retired.
 
 ---

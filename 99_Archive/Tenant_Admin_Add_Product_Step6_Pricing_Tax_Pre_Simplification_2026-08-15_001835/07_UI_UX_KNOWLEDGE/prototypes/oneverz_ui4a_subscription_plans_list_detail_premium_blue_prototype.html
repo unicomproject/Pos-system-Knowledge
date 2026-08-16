@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OneVerz Super Admin — UI-4A Subscription Plans List + Detail (Premium Blue Prototype)</title>
+  <!--
+    Prototype-only sample data.
+    Production renders live API data.
+    Design review artifact — not production Angular source.
+  -->
+  <style>
+    :root {
+      --primary: #0b5cff;
+      --primary-hover: #004de6;
+      --primary-active: #003cbd;
+      --primary-soft: #eff6ff;
+      --primary-border: #bfdbfe;
+      --sidebar: #0f172a;
+      --sidebar-text: #cbd5e1;
+      --sidebar-active: #0b5cff;
+      --bg-page: #f8fafc;
+      --surface: #ffffff;
+      --surface-secondary: #f1f5f9;
+      --border: #e2e8f0;
+      --border-subtle: #f1f5f9;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --success: #047857;
+      --success-bg: #ecfdf5;
+      --success-border: #a7f3d0;
+      --warning: #b45309;
+      --warning-bg: #fffbeb;
+      --danger: #b42318;
+      --danger-bg: #fef3f2;
+      --danger-border: #fecdca;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-pill: 9999px;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; font-family: var(--font); color: var(--text-primary); background: #0b1220; }
+    button { font: inherit; cursor: pointer; border: none; background: none; }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible {
+      outline: 3px solid #84adff; outline-offset: 2px;
+    }
+
+    /* —— Prototype review chrome (NOT production) —— */
+    .proto-toolbar {
+      position: sticky; top: 0; z-index: 200;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem;
+      padding: 0.65rem 1rem; background: #1e293b; color: #e2e8f0;
+      border-bottom: 1px solid #334155; font-size: 0.8125rem;
+    }
+    .proto-toolbar strong {
+      color: #93c5fd; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .proto-toolbar .group { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+    .proto-toolbar button {
+      background: #334155; color: #f8fafc; border-radius: var(--radius-pill);
+      padding: 0.35rem 0.75rem; font-size: 0.75rem; font-weight: 600;
+    }
+    .proto-toolbar button.active { background: var(--primary); }
+    .proto-toolbar button:hover { filter: brightness(1.08); }
+    .proto-toolbar .divider { width: 1px; height: 1.25rem; background: #475569; }
+    .proto-note { color: #94a3b8; font-size: 0.7rem; margin-left: auto; max-width: 22rem; }
+
+    .viewport-frame {
+      margin: 0 auto; background: var(--bg-page); min-height: calc(100vh - 52px);
+      transition: max-width 0.25s ease; overflow-x: hidden;
+    }
+    .viewport-frame.w-1440 { max-width: 1440px; }
+    .viewport-frame.w-1280 { max-width: 1280px; }
+    .viewport-frame.w-1024 { max-width: 1024px; }
+    .viewport-frame.w-768 { max-width: 768px; }
+
+    .app-shell { display: grid; grid-template-columns: 16.5rem 1fr; min-height: calc(100vh - 52px); }
+    .sidebar {
+      background: var(--sidebar); color: var(--sidebar-text);
+      padding: 1rem 0.75rem; display: flex; flex-direction: column; gap: 0.25rem;
+    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; padding: 0 0.5rem 1.25rem; color: inherit; text-decoration: none; }
+    .brand:hover { text-decoration: none; }
+    .brand-icon {
+      width: 2rem; height: 2rem; border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #3b82f6, #0b5cff);
+      display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 0.7rem;
+    }
+    .brand strong { display: block; color: #f8fafc; font-size: 0.9375rem; }
+    .brand small { color: #94a3b8; font-size: 0.7rem; }
+    .nav-item {
+      display: flex; align-items: center; gap: 0.65rem; padding: 0.55rem 0.75rem;
+      border-radius: var(--radius-md); color: inherit; font-size: 0.875rem; font-weight: 500;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.06); text-decoration: none; }
+    .nav-item.active { background: var(--sidebar-active); color: #fff; }
+    .nav-item svg { width: 1.05rem; height: 1.05rem; flex-shrink: 0; opacity: 0.9; }
+    .sidebar-footer { margin-top: auto; padding-top: 1rem; font-size: 0.75rem; color: #64748b; }
+
+    .main { display: flex; flex-direction: column; min-width: 0; }
+    .topbar {
+      display: flex; align-items: center; justify-content: flex-end; gap: 1rem;
+      padding: 0.75rem 1.5rem; background: var(--surface); border-bottom: 1px solid var(--border);
+    }
+    .avatar {
+      width: 2.25rem; height: 2.25rem; border-radius: 50%;
+      background: linear-gradient(135deg, #0b5cff, #3b82f6); color: #fff;
+      display: grid; place-items: center; font-size: 0.75rem; font-weight: 700;
+    }
+
+    .page { padding: 1.25rem 1.5rem 2rem; display: grid; gap: 1rem; min-width: 0; }
+
+    /* PageHeader (UI-1 concept) */
+    .page-header {
+      display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 1rem;
+      padding-bottom: 1rem; border-bottom: 1px solid var(--border-subtle);
+    }
+    .breadcrumbs {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem;
+      font-size: 0.8125rem; color: var(--text-muted); margin: 0 0 0.35rem;
+    }
+    .breadcrumbs a { color: var(--text-muted); font-weight: 500; }
+    .breadcrumbs a:hover { color: var(--primary); }
+    .breadcrumbs .sep { opacity: 0.5; }
+    .breadcrumbs .current { color: var(--text-secondary); font-weight: 600; }
+    .page-header h1 { margin: 0; font-size: clamp(1.35rem, 2.2vw, 1.75rem); line-height: 1.2; }
+    .page-header .desc { margin: 0.35rem 0 0; color: var(--text-secondary); font-size: 0.9375rem; max-width: 38rem; }
+    .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+      min-height: 2.5rem; padding: 0 1rem; border-radius: var(--radius-md);
+      font-size: 0.875rem; font-weight: 600; border: 1px solid transparent; white-space: nowrap;
+    }
+    .btn svg { width: 1rem; height: 1rem; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { background: var(--surface); border-color: var(--border); color: var(--text-primary); }
+    .btn-secondary:hover { background: var(--surface-secondary); }
+    .btn-ghost { background: transparent; color: var(--text-secondary); }
+    .btn-ghost:hover { background: var(--surface-secondary); color: var(--text-primary); }
+    .btn-danger { background: var(--surface); border-color: var(--danger-border); color: var(--danger); }
+    .btn-danger:hover { background: var(--danger-bg); }
+    .btn-sm { min-height: 2rem; padding: 0 0.75rem; font-size: 0.8125rem; }
+
+    /* StatusBadge */
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      padding: 0.28rem 0.65rem; border-radius: var(--radius-pill);
+      font-size: 0.75rem; font-weight: 700; white-space: nowrap;
+    }
+    .badge-draft { background: var(--surface-secondary); color: var(--text-secondary); }
+    .badge-active { background: var(--success-bg); color: var(--success); }
+    .badge-retired { background: #f1f5f9; color: #64748b; border: 1px solid var(--border); }
+    .badge-dot { width: 0.4rem; height: 0.4rem; border-radius: 50%; background: currentColor; }
+
+    /* Catalog context band — NOT analytics */
+    .catalog-band {
+      background: linear-gradient(135deg, #0a3d91 0%, #0b5cff 52%, #003cbd 100%);
+      color: #fff; border-radius: var(--radius-lg); padding: 1rem 1.25rem;
+      display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: center;
+      box-shadow: var(--shadow-md); border: 1px solid rgba(255,255,255,0.12);
+    }
+    .catalog-band-icon {
+      width: 2.75rem; height: 2.75rem; border-radius: 50%;
+      background: rgba(255,255,255,0.15); display: grid; place-items: center;
+    }
+    .catalog-band-icon svg { width: 1.35rem; height: 1.35rem; }
+    .catalog-band h2 { margin: 0 0 0.25rem; font-size: 1rem; font-weight: 700; }
+    .catalog-band p { margin: 0; font-size: 0.8125rem; color: rgba(255,255,255,0.88); line-height: 1.45; max-width: 42rem; }
+    .filter-chip {
+      display: inline-flex; margin-top: 0.55rem; padding: 0.2rem 0.55rem;
+      background: rgba(255,255,255,0.16); border-radius: var(--radius-pill);
+      font-size: 0.7rem; font-weight: 600;
+    }
+
+    /* Filters */
+    .filter-bar {
+      display: grid; grid-template-columns: minmax(12rem, 1.4fr) repeat(2, minmax(9rem, 11rem)) auto;
+      gap: 0.65rem; align-items: end;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 0.85rem 1rem; box-shadow: var(--shadow-sm);
+    }
+    .field { display: grid; gap: 0.3rem; min-width: 0; }
+    .field label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); }
+    .field input, .field select {
+      width: 100%; min-height: 2.4rem; padding: 0 0.75rem;
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      background: var(--surface); color: var(--text-primary); font-size: 0.875rem;
+    }
+    .field input:focus, .field select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(11,92,255,0.12); outline: none; }
+    .filter-actions { display: flex; gap: 0.4rem; align-items: center; padding-bottom: 0.1rem; }
+
+    /* Table card */
+    .table-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm); overflow: hidden;
+    }
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table.data-table {
+      width: 100%; border-collapse: collapse; font-size: 0.875rem; min-width: 42rem;
+    }
+    .data-table th {
+      text-align: left; padding: 0.7rem 1rem; font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted);
+      background: #f8fafc; border-bottom: 1px solid var(--border); white-space: nowrap;
+    }
+    .data-table td {
+      padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-subtle);
+      vertical-align: middle; color: var(--text-secondary);
+    }
+    .data-table tbody tr { transition: background 0.12s ease; }
+    .data-table tbody tr:hover { background: #f8fbff; }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+
+    .plan-cell { display: grid; gap: 0.15rem; min-width: 0; }
+    .plan-cell strong { color: var(--text-primary); font-size: 0.9375rem; font-weight: 700; }
+    .plan-cell code {
+      font-family: ui-monospace, Consolas, monospace; font-size: 0.75rem;
+      color: var(--text-muted); background: var(--surface-secondary);
+      padding: 0.1rem 0.4rem; border-radius: 4px; width: fit-content;
+    }
+    .price-cell { display: grid; gap: 0.1rem; }
+    .price-cell strong { color: var(--text-primary); font-weight: 700; }
+    .price-cell span { font-size: 0.75rem; color: var(--text-muted); }
+    .num-cell { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text-primary); }
+    .meta-cell { font-size: 0.8125rem; color: var(--text-muted); white-space: nowrap; }
+
+    .pagination {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: 0.75rem; padding: 0.85rem 1rem; border-top: 1px solid var(--border);
+      background: #fafbfc;
+    }
+    .pagination-info { font-size: 0.8125rem; color: var(--text-muted); }
+    .pagination-controls { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; }
+    .page-btn {
+      min-width: 2rem; height: 2rem; padding: 0 0.5rem; border-radius: var(--radius-md);
+      border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary);
+      font-size: 0.8125rem; font-weight: 600;
+    }
+    .page-btn:hover:not(:disabled) { background: var(--surface-secondary); }
+    .page-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* States */
+    .state-panel {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 2.5rem 1.5rem; text-align: center; box-shadow: var(--shadow-sm);
+    }
+    .state-panel h2 { margin: 0 0 0.4rem; font-size: 1.125rem; }
+    .state-panel p { margin: 0 auto 1.25rem; color: var(--text-secondary); font-size: 0.9375rem; max-width: 28rem; }
+    .state-icon {
+      width: 3rem; height: 3rem; margin: 0 auto 1rem; border-radius: 50%;
+      display: grid; place-items: center; background: var(--primary-soft); color: var(--primary);
+    }
+    .state-icon.error { background: var(--danger-bg); color: var(--danger); }
+    .state-actions { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+
+    /* Skeleton */
+    .skel {
+      height: 0.85rem; border-radius: 6px; background: linear-gradient(90deg, #eef2f6 25%, #f8fafc 50%, #eef2f6 75%);
+      background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .skel-row td { padding: 1rem; }
+
+    /* Detail workspace */
+    .identity-surface {
+      display: grid; grid-template-columns: auto 1fr auto; gap: 1rem 1.25rem; align-items: center;
+      padding: 1.25rem 1.35rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+    }
+    .identity-surface.tone-active,
+    .identity-surface.tone-draft {
+      background: linear-gradient(135deg, #0a3d91 0%, #0b5cff 48%, #003cbd 100%);
+      color: #fff; border: 1px solid rgba(255,255,255,0.12);
+    }
+    .identity-surface.tone-retired {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text-primary);
+    }
+    .identity-icon {
+      width: 3.25rem; height: 3.25rem; border-radius: 50%; display: grid; place-items: center;
+    }
+    .tone-active .identity-icon, .tone-draft .identity-icon { background: rgba(255,255,255,0.15); color: #fff; }
+    .tone-retired .identity-icon { background: var(--surface-secondary); color: var(--text-muted); }
+    .identity-icon svg { width: 1.5rem; height: 1.5rem; }
+    .identity-copy h2 { margin: 0 0 0.3rem; font-size: 1.3rem; line-height: 1.25; }
+    .identity-copy p { margin: 0; font-size: 0.875rem; }
+    .tone-active .identity-copy p, .tone-draft .identity-copy p { color: rgba(255,255,255,0.88); }
+    .tone-retired .identity-copy p { color: var(--text-secondary); }
+    .identity-meta {
+      margin-top: 0.65rem; display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; align-items: baseline;
+      font-size: 0.8125rem;
+    }
+    .identity-meta code {
+      font-family: ui-monospace, Consolas, monospace; padding: 0.15rem 0.45rem; border-radius: 4px;
+    }
+    .tone-active .identity-meta code, .tone-draft .identity-meta code {
+      background: rgba(255,255,255,0.16); color: #fff;
+    }
+    .tone-retired .identity-meta code { background: var(--surface-secondary); color: var(--text-muted); }
+    .tone-active .identity-badge, .tone-draft .identity-badge {
+      background: rgba(255,255,255,0.18); color: #fff;
+    }
+
+    .summary-grid {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem;
+    }
+    .panel {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 1.1rem 1.25rem; box-shadow: var(--shadow-sm);
+    }
+    .panel h3 {
+      margin: 0 0 0.85rem; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--text-muted);
+    }
+    .meta-dl {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.85rem 1.25rem; margin: 0;
+    }
+    .meta-dl div { display: grid; gap: 0.2rem; min-width: 0; }
+    .meta-dl dt { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+    .meta-dl dd { margin: 0; font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); }
+
+    .feature-groups { display: grid; gap: 0.85rem; }
+    .feature-group {
+      border: 1px solid var(--border-subtle); border-radius: var(--radius-md);
+      padding: 0.75rem 0.9rem; background: #fafbfc;
+    }
+    .feature-group h4 {
+      margin: 0 0 0.5rem; font-size: 0.8125rem; font-weight: 700; color: var(--text-primary);
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .feature-group ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.35rem; }
+    .feature-group li {
+      display: flex; align-items: flex-start; gap: 0.45rem;
+      font-size: 0.8125rem; color: var(--text-secondary);
+    }
+    .feature-group li svg { width: 0.9rem; height: 0.9rem; color: var(--success); flex-shrink: 0; margin-top: 0.1rem; }
+
+    .usage-stat {
+      display: flex; align-items: center; gap: 1rem; padding: 0.85rem 1rem;
+      background: var(--primary-soft); border: 1px solid var(--primary-border); border-radius: var(--radius-md);
+    }
+    .usage-stat strong { font-size: 1.5rem; color: var(--primary); font-variant-numeric: tabular-nums; }
+    .usage-stat span { font-size: 0.8125rem; color: var(--text-secondary); display: block; }
+    .usage-stat .label { font-weight: 700; color: var(--text-primary); margin-bottom: 0.15rem; }
+
+    .actions-bar {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+      padding: 1rem 1.15rem; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+    }
+    .actions-hint { flex: 1 1 12rem; font-size: 0.8125rem; color: var(--text-muted); margin: 0; }
+
+    .hidden { display: none !important; }
+
+    /* Confirmation dialog (UI-1 concept) */
+    .dialog-backdrop {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45);
+      display: grid; place-items: center; z-index: 300; padding: 1rem;
+    }
+    .dialog {
+      width: min(26rem, 100%); background: var(--surface); border-radius: var(--radius-lg);
+      border: 1px solid var(--border); box-shadow: var(--shadow-md); padding: 1.25rem 1.35rem;
+    }
+    .dialog h3 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+    .dialog p { margin: 0 0 1.15rem; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.45; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
+
+    @media (max-width: 1024px) {
+      .app-shell { grid-template-columns: 4.25rem 1fr; }
+      .brand strong, .brand small, .nav-item span, .sidebar-footer { display: none; }
+      .brand { justify-content: center; padding-inline: 0; }
+      .nav-item { justify-content: center; }
+      .filter-bar { grid-template-columns: 1fr 1fr; }
+      .filter-bar .search-field { grid-column: 1 / -1; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .meta-dl { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar {
+        flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.25rem;
+        padding: 0.65rem;
+      }
+      .brand { padding: 0 0.5rem 0 0; }
+      .brand strong, .nav-item span { display: none; }
+      .sidebar-footer { display: none; }
+      .page { padding: 1rem; }
+      .filter-bar { grid-template-columns: 1fr; }
+      .identity-surface { grid-template-columns: auto 1fr; }
+      .identity-surface .identity-badge { grid-column: 1 / -1; justify-self: start; }
+      .meta-dl { grid-template-columns: 1fr; }
+      .catalog-band { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- DESIGN-REVIEW HELPER — not a production requirement -->
+  <div class="proto-toolbar" role="region" aria-label="Prototype review controls">
+    <strong>Review only</strong>
+    <div class="group" aria-label="Screen">
+      <button type="button" class="active" data-screen="list" onclick="setScreen('list')">Plans List</button>
+      <button type="button" data-screen="detail" onclick="setScreen('detail')">Plan Detail</button>
+    </div>
+    <div class="divider" aria-hidden="true"></div>
+    <div class="group" aria-label="List states" id="list-state-group">
+      <button type="button" class="active" data-list-state="normal" onclick="setListState('normal')">Normal</button>
+      <button type="button" data-list-state="filtered" onclick="setListState('filtered')">Filtered</button>
+      <button type="button" data-list-state="empty" onclick="setListState('empty')">Empty</button>
+      <button type="button" data-list-state="filtered-empty" onclick="setListState('filtered-empty')">Filtered empty</button>
+      <button type="button" data-list-state="loading" onclick="setListState('loading')">Loading</button>
+      <button type="button" data-list-state="error" onclick="setListState('error')">Error</button>
+    </div>
+    <div class="group hidden" aria-label="Detail states" id="detail-state-group">
+      <button type="button" class="active" data-detail-state="active" onclick="setDetailState('active')">Active</button>
+      <button type="button" data-detail-state="draft" onclick="setDetailState('draft')">Draft</button>
+      <button type="button" data-detail-state="retired" onclick="setDetailState('retired')">Retired</button>
+      <button type="button" data-detail-state="loading" onclick="setDetailState('loading')">Loading</button>
+      <button type="button" data-detail-state="not-found" onclick="setDetailState('not-found')">Not found</button>
+      <button type="button" data-detail-state="error" onclick="setDetailState('error')">Error</button>
+    </div>
+    <div class="divider" aria-hidden="true"></div>
+    <div class="group" aria-label="Viewport width">
+      <button type="button" class="active" data-width="1440" onclick="setWidth(1440)">1440</button>
+      <button type="button" data-width="1280" onclick="setWidth(1280)">1280</button>
+      <button type="button" data-width="1024" onclick="setWidth(1024)">1024</button>
+      <button type="button" data-width="768" onclick="setWidth(768)">768</button>
+    </div>
+    <span class="proto-note">Prototype sample data only. Production uses live plan APIs. UI-4B create/edit and UI-5 billing are out of scope.</span>
+  </div>
+
+  <div class="viewport-frame w-1440" id="viewport">
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Primary">
+        <a class="brand" href="#">
+          <span class="brand-icon">OV</span>
+          <span>
+            <strong>OneVerz</strong>
+            <small>Platform Admin</small>
+          </span>
+        </a>
+        <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg><span>Dashboard</span></a>
+        <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span>Tenants</span></a>
+        <a class="nav-item active" href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 4v16"/></svg><span>Subscriptions</span></a>
+        <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg><span>Billing</span></a>
+        <div class="sidebar-footer">OneVerz Platform · v2.4.0</div>
+      </aside>
+
+      <div class="main">
+        <header class="topbar">
+          <span style="font-size:0.8125rem;color:var(--text-muted)">Platform session</span>
+          <span class="avatar" aria-hidden="true">PA</span>
+        </header>
+
+        <!-- ===================== PLAN LIST ===================== -->
+        <div class="page" id="screen-list">
+          <header class="page-header">
+            <div>
+              <h1>Subscription Plans</h1>
+              <p class="desc">Manage the subscription plans available across the OneVerz platform.</p>
+            </div>
+            <div class="header-actions">
+              <button type="button" class="btn btn-primary" onclick="alert('Prototype: navigates to /admin/subscriptions/create (UI-4B — not prototyped here).')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                Create Plan
+              </button>
+            </div>
+          </header>
+
+          <section class="catalog-band" aria-labelledby="catalog-band-title">
+            <div class="catalog-band-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>
+            </div>
+            <div>
+              <h2 id="catalog-band-title">Platform plan catalog</h2>
+              <p id="catalog-band-copy">Define commercial plans used during tenant onboarding and assignment. Plans move from Draft to Active when published, and can be Retired when no longer offered for new assignments.</p>
+              <span class="filter-chip hidden" id="active-filter-chip"></span>
+            </div>
+          </section>
+
+          <div class="filter-bar" role="search" aria-label="Plan filters">
+            <div class="field search-field">
+              <label for="plan-search">Search</label>
+              <input id="plan-search" type="search" placeholder="Search by plan name or code" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="status-filter">Status</label>
+              <select id="status-filter">
+                <option value="">All statuses</option>
+                <option value="draft">Draft</option>
+                <option value="active">Active</option>
+                <option value="retired">Retired</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="cycle-filter">Billing cycle</label>
+              <select id="cycle-filter">
+                <option value="">All cycles</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+                <option value="one_time">One-time</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button type="button" class="btn btn-ghost btn-sm" id="reset-filters" onclick="resetFilters()">Reset</button>
+            </div>
+          </div>
+
+          <!-- Normal / Filtered table -->
+          <div class="table-card" id="list-table-block">
+            <div class="table-scroll" tabindex="0" aria-label="Subscription plans table">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Plan</th>
+                    <th scope="col">Commercial terms</th>
+                    <th scope="col">Billing cycle</th>
+                    <th scope="col">Active tenants</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Updated</th>
+                    <th scope="col"><span class="sr-only">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody id="plan-tbody">
+                  <!-- filled by JS -->
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination" aria-label="Pagination">
+              <p class="pagination-info" id="page-info">Showing 1–5 of 5 plans · newest updates first</p>
+              <div class="pagination-controls">
+                <button type="button" class="page-btn" disabled aria-label="Previous page">‹</button>
+                <button type="button" class="page-btn active" aria-current="page" aria-label="Page 1">1</button>
+                <button type="button" class="page-btn" disabled aria-label="Next page">›</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-card hidden" id="list-loading">
+            <div class="table-scroll">
+              <table class="data-table" aria-busy="true" aria-label="Loading subscription plans">
+                <thead>
+                  <tr><th>Plan</th><th>Commercial terms</th><th>Billing cycle</th><th>Active tenants</th><th>Status</th><th>Updated</th><th></th></tr>
+                </thead>
+                <tbody>
+                  <tr class="skel-row"><td colspan="7"><div class="skel" style="width:92%"></div></td></tr>
+                  <tr class="skel-row"><td colspan="7"><div class="skel" style="width:78%"></div></td></tr>
+                  <tr class="skel-row"><td colspan="7"><div class="skel" style="width:86%"></div></td></tr>
+                  <tr class="skel-row"><td colspan="7"><div class="skel" style="width:70%"></div></td></tr>
+                  <tr class="skel-row"><td colspan="7"><div class="skel" style="width:80%"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="state-panel hidden" id="list-empty">
+            <div class="state-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>
+            </div>
+            <h2>No subscription plans yet</h2>
+            <p>Create the first plan to make it available for tenant onboarding and assignment.</p>
+            <div class="state-actions">
+              <button type="button" class="btn btn-primary" onclick="alert('Prototype: /admin/subscriptions/create (UI-4B).')">Create Plan</button>
+            </div>
+          </div>
+
+          <div class="state-panel hidden" id="list-filtered-empty">
+            <div class="state-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            </div>
+            <h2>No plans match your current filters</h2>
+            <p>Try clearing search or adjusting status and billing cycle filters.</p>
+            <div class="state-actions">
+              <button type="button" class="btn btn-secondary" onclick="setListState('normal'); resetFilters();">Reset filters</button>
+            </div>
+          </div>
+
+          <div class="state-panel hidden" id="list-error">
+            <div class="state-icon error" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+            </div>
+            <h2>Unable to load subscription plans</h2>
+            <p>We couldn’t retrieve the plan catalog. Check your connection and try again.</p>
+            <div class="state-actions">
+              <button type="button" class="btn btn-primary" onclick="setListState('normal')">Try again</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================== PLAN DETAIL ===================== -->
+        <div class="page hidden" id="screen-detail">
+          <div id="detail-content">
+            <header class="page-header">
+              <div>
+                <nav class="breadcrumbs" aria-label="Breadcrumb">
+                  <a href="#" onclick="setScreen('list'); return false;">Subscription Plans</a>
+                  <span class="sep" aria-hidden="true">/</span>
+                  <span class="current" id="detail-crumb">Professional</span>
+                </nav>
+                <h1 id="detail-title">Professional</h1>
+                <p class="desc" id="detail-desc">Catalog plan used for tenant onboarding and commercial assignment.</p>
+              </div>
+              <div class="header-actions" id="detail-header-actions">
+                <!-- filled by state -->
+              </div>
+            </header>
+
+            <section class="identity-surface tone-active" id="identity-surface" aria-labelledby="identity-heading">
+              <div class="identity-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 14h8"/></svg>
+              </div>
+              <div class="identity-copy">
+                <h2 id="identity-heading">Professional</h2>
+                <p id="identity-subcopy">Available for new tenant assignments and onboarding plan selection.</p>
+                <div class="identity-meta">
+                  <code id="identity-code">PLAN-PRO</code>
+                  <span id="identity-updated">Updated 11 Aug 2026, 09:40</span>
+                </div>
+              </div>
+              <span class="badge identity-badge" id="identity-badge"><span class="badge-dot" aria-hidden="true"></span>Active</span>
+            </section>
+
+            <div class="summary-grid">
+              <section class="panel" aria-labelledby="commercial-heading">
+                <h3 id="commercial-heading">Commercial terms</h3>
+                <dl class="meta-dl" id="commercial-dl">
+                  <div><dt>Price</dt><dd>4,999.00 LKR</dd></div>
+                  <div><dt>Currency</dt><dd>LKR</dd></div>
+                  <div><dt>Billing cycle</dt><dd>Monthly</dd></div>
+                  <div><dt>Trial days</dt><dd>Not configured</dd></div>
+                </dl>
+              </section>
+
+              <section class="panel" aria-labelledby="usage-heading">
+                <h3 id="usage-heading">Plan usage</h3>
+                <div class="usage-stat">
+                  <strong id="usage-count">12</strong>
+                  <div>
+                    <span class="label">Active tenants</span>
+                    <span>Tenants currently on this plan with an Active subscription. Trial and past-due are not included.</span>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <section class="panel" aria-labelledby="features-heading">
+              <h3 id="features-heading">Included capabilities</h3>
+              <p style="margin: -0.35rem 0 0.85rem; font-size: 0.8125rem; color: var(--text-muted);">Summary only. Tenant-specific entitlement overrides are managed on the tenant record.</p>
+              <div class="feature-groups" id="feature-groups">
+                <div class="feature-group">
+                  <h4>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
+                    POS Core
+                  </h4>
+                  <ul>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Checkout &amp; receipts</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Product catalog</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Shift management</li>
+                  </ul>
+                </div>
+                <div class="feature-group">
+                  <h4>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M5 7l1 12h12l1-12"/></svg>
+                    Inventory
+                  </h4>
+                  <ul>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Stock levels</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Transfers</li>
+                  </ul>
+                </div>
+                <div class="feature-group">
+                  <h4>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16"/></svg>
+                    Limits
+                  </h4>
+                  <ul>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Max outlets: 5</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Max tills: 15</li>
+                    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Max users: 25</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel" aria-labelledby="meta-heading">
+              <h3 id="meta-heading">Lifecycle &amp; metadata</h3>
+              <dl class="meta-dl">
+                <div><dt>Created</dt><dd id="meta-created">02 Jul 2026, 14:12</dd></div>
+                <div><dt>Last updated</dt><dd id="meta-updated">11 Aug 2026, 09:40</dd></div>
+                <div><dt>Plan code</dt><dd><code id="meta-code" style="font-family:ui-monospace,Consolas,monospace;font-size:0.85rem;">PLAN-PRO</code></dd></div>
+                <div><dt>Lifecycle</dt><dd id="meta-lifecycle">Active — available for new assignments</dd></div>
+              </dl>
+            </section>
+
+            <section class="actions-bar" aria-label="Plan actions">
+              <p class="actions-hint" id="actions-hint">Lifecycle actions follow plan status and operator permissions. Billing invoices and payments are managed under Billing.</p>
+              <div id="detail-actions" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
+            </section>
+          </div>
+
+          <div class="table-card hidden" id="detail-loading" style="padding:1.25rem;display:grid;gap:1rem;">
+            <div class="skel" style="height:4.5rem;width:100%"></div>
+            <div class="skel" style="height:7rem;width:100%"></div>
+            <div class="skel" style="height:10rem;width:100%"></div>
+          </div>
+
+          <div class="state-panel hidden" id="detail-not-found">
+            <div class="state-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            </div>
+            <h2>Subscription plan not found</h2>
+            <p>This plan reference could not be loaded. It may be invalid or no longer available.</p>
+            <div class="state-actions">
+              <button type="button" class="btn btn-primary" onclick="setScreen('list')">Back to Plans</button>
+            </div>
+          </div>
+
+          <div class="state-panel hidden" id="detail-error">
+            <div class="state-icon error" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+            </div>
+            <h2>Unable to load this subscription plan</h2>
+            <p>We couldn’t refresh the plan details. Try again or return to the catalog.</p>
+            <div class="state-actions">
+              <button type="button" class="btn btn-primary" onclick="setDetailState('active')">Try again</button>
+              <button type="button" class="btn btn-secondary" onclick="setScreen('list')">Back to Plans</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog-backdrop hidden" id="confirm-dialog" role="presentation">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <h3 id="confirm-title">Retire this plan?</h3>
+      <p id="confirm-message">Archiving removes the plan from new tenant assignments. Existing tenant relationships are not deleted by this action.</p>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeConfirm()">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="closeConfirm()">Retire plan</button>
+      </div>
+    </div>
+  </div>
+
+  <style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}</style>
+
+  <script>
+    /* Prototype-only sample data. Production renders live API data. */
+    const SAMPLE_PLANS = [
+      { id: 'p1', name: 'Enterprise', code: 'PLAN-ENT', price: 14999, currency: 'LKR', cycle: 'Monthly', cycleKey: 'monthly', activeTenants: 4, status: 'active', updated: '11 Aug 2026, 10:12' },
+      { id: 'p2', name: 'Professional', code: 'PLAN-PRO', price: 4999, currency: 'LKR', cycle: 'Monthly', cycleKey: 'monthly', activeTenants: 12, status: 'active', updated: '11 Aug 2026, 09:40' },
+      { id: 'p3', name: 'Starter', code: 'PLAN-START', price: 1999, currency: 'LKR', cycle: 'Monthly', cycleKey: 'monthly', activeTenants: 28, status: 'active', updated: '10 Aug 2026, 16:05' },
+      { id: 'p4', name: 'Annual Growth', code: 'PLAN-GROW-Y', price: 49990, currency: 'LKR', cycle: 'Yearly', cycleKey: 'yearly', activeTenants: 3, status: 'draft', updated: '09 Aug 2026, 11:22' },
+      { id: 'p5', name: 'Legacy Basic', code: 'PLAN-LEGACY', price: 999, currency: 'USD', cycle: 'Monthly', cycleKey: 'monthly', activeTenants: 2, status: 'retired', updated: '01 Jun 2026, 08:00' }
+    ];
+
+    function formatMoney(amount, currency) {
+      return amount.toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ' + currency;
+    }
+
+    function statusBadge(status) {
+      const label = status === 'draft' ? 'Draft' : status === 'active' ? 'Active' : 'Retired';
+      const cls = status === 'draft' ? 'badge-draft' : status === 'active' ? 'badge-active' : 'badge-retired';
+      return `<span class="badge ${cls}"><span class="badge-dot" aria-hidden="true"></span>${label}</span>`;
+    }
+
+    function renderRows(plans) {
+      const tbody = document.getElementById('plan-tbody');
+      tbody.innerHTML = plans.map((p) => `
+        <tr>
+          <td>
+            <div class="plan-cell">
+              <strong>${p.name}</strong>
+              <code>${p.code}</code>
+            </div>
+          </td>
+          <td>
+            <div class="price-cell">
+              <strong>${formatMoney(p.price, p.currency)}</strong>
+              <span>Catalog price · ${p.cycle.toLowerCase()}</span>
+            </div>
+          </td>
+          <td>${p.cycle}</td>
+          <td><span class="num-cell">${p.activeTenants}</span></td>
+          <td>${statusBadge(p.status)}</td>
+          <td class="meta-cell">${p.updated}</td>
+          <td>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="openPlan('${p.id}')">View</button>
+          </td>
+        </tr>
+      `).join('');
+      document.getElementById('page-info').textContent =
+        `Showing 1–${plans.length} of ${plans.length} plans · newest updates first`;
+    }
+
+    function setScreen(screen) {
+      document.getElementById('screen-list').classList.toggle('hidden', screen !== 'list');
+      document.getElementById('screen-detail').classList.toggle('hidden', screen !== 'detail');
+      document.getElementById('list-state-group').classList.toggle('hidden', screen !== 'list');
+      document.getElementById('detail-state-group').classList.toggle('hidden', screen !== 'detail');
+      document.querySelectorAll('[data-screen]').forEach((b) => b.classList.toggle('active', b.dataset.screen === screen));
+      if (screen === 'detail') setDetailState(currentDetailState);
+    }
+
+    function setWidth(w) {
+      const frame = document.getElementById('viewport');
+      frame.className = 'viewport-frame w-' + w;
+      document.querySelectorAll('[data-width]').forEach((b) => b.classList.toggle('active', b.dataset.width === String(w)));
+    }
+
+    let currentDetailState = 'active';
+
+    function setListState(state) {
+      document.querySelectorAll('[data-list-state]').forEach((b) => b.classList.toggle('active', b.dataset.listState === state));
+      const blocks = ['list-table-block', 'list-loading', 'list-empty', 'list-filtered-empty', 'list-error'];
+      blocks.forEach((id) => document.getElementById(id).classList.add('hidden'));
+
+      const chip = document.getElementById('active-filter-chip');
+      const band = document.getElementById('catalog-band-copy');
+      chip.classList.add('hidden');
+
+      if (state === 'normal') {
+        document.getElementById('list-table-block').classList.remove('hidden');
+        renderRows(SAMPLE_PLANS);
+        band.textContent = 'Define commercial plans used during tenant onboarding and assignment. Plans move from Draft to Active when published, and can be Retired when no longer offered for new assignments.';
+      } else if (state === 'filtered') {
+        document.getElementById('list-table-block').classList.remove('hidden');
+        document.getElementById('status-filter').value = 'active';
+        document.getElementById('cycle-filter').value = 'monthly';
+        renderRows(SAMPLE_PLANS.filter((p) => p.status === 'active' && p.cycleKey === 'monthly'));
+        chip.textContent = 'Filtered · Status: Active · Cycle: Monthly';
+        chip.classList.remove('hidden');
+        band.textContent = 'Showing plans that match the current status and billing cycle filters. Server order remains newest updates first.';
+      } else if (state === 'empty') {
+        document.getElementById('list-empty').classList.remove('hidden');
+      } else if (state === 'filtered-empty') {
+        document.getElementById('list-filtered-empty').classList.remove('hidden');
+        chip.textContent = 'Filtered · No matches';
+        chip.classList.remove('hidden');
+      } else if (state === 'loading') {
+        document.getElementById('list-loading').classList.remove('hidden');
+      } else if (state === 'error') {
+        document.getElementById('list-error').classList.remove('hidden');
+      }
+    }
+
+    function resetFilters() {
+      document.getElementById('plan-search').value = '';
+      document.getElementById('status-filter').value = '';
+      document.getElementById('cycle-filter').value = '';
+      document.getElementById('active-filter-chip').classList.add('hidden');
+    }
+
+    function openPlan(id) {
+      const plan = SAMPLE_PLANS.find((p) => p.id === id) || SAMPLE_PLANS[1];
+      currentDetailState = plan.status;
+      setScreen('detail');
+      applyDetailPlan(plan);
+      setDetailState(plan.status);
+    }
+
+    function applyDetailPlan(plan) {
+      document.getElementById('detail-crumb').textContent = plan.name;
+      document.getElementById('detail-title').textContent = plan.name;
+      document.getElementById('identity-heading').textContent = plan.name;
+      document.getElementById('identity-code').textContent = plan.code;
+      document.getElementById('meta-code').textContent = plan.code;
+      document.getElementById('identity-updated').textContent = 'Updated ' + plan.updated;
+      document.getElementById('meta-updated').textContent = plan.updated;
+      document.getElementById('usage-count').textContent = String(plan.activeTenants);
+      document.getElementById('commercial-dl').innerHTML = `
+        <div><dt>Price</dt><dd>${formatMoney(plan.price, plan.currency)}</dd></div>
+        <div><dt>Currency</dt><dd>${plan.currency}</dd></div>
+        <div><dt>Billing cycle</dt><dd>${plan.cycle}</dd></div>
+        <div><dt>Trial days</dt><dd>${plan.status === 'draft' ? '0' : 'Not configured'}</dd></div>
+      `;
+    }
+
+    function setDetailState(state) {
+      currentDetailState = state;
+      document.querySelectorAll('[data-detail-state]').forEach((b) => b.classList.toggle('active', b.dataset.detailState === state));
+
+      const content = document.getElementById('detail-content');
+      const loading = document.getElementById('detail-loading');
+      const notFound = document.getElementById('detail-not-found');
+      const error = document.getElementById('detail-error');
+      [content, loading, notFound, error].forEach((el) => el.classList.add('hidden'));
+
+      if (state === 'loading') {
+        loading.classList.remove('hidden');
+        loading.style.display = 'grid';
+        return;
+      }
+      loading.style.display = '';
+      if (state === 'not-found') { notFound.classList.remove('hidden'); return; }
+      if (state === 'error') { error.classList.remove('hidden'); return; }
+
+      content.classList.remove('hidden');
+      const surface = document.getElementById('identity-surface');
+      const badge = document.getElementById('identity-badge');
+      const sub = document.getElementById('identity-subcopy');
+      const lifecycle = document.getElementById('meta-lifecycle');
+      const headerActions = document.getElementById('detail-header-actions');
+      const actions = document.getElementById('detail-actions');
+      const hint = document.getElementById('actions-hint');
+
+      surface.classList.remove('tone-active', 'tone-draft', 'tone-retired');
+
+      if (state === 'draft') {
+        surface.classList.add('tone-draft');
+        badge.className = 'badge identity-badge';
+        badge.innerHTML = '<span class="badge-dot" aria-hidden="true"></span>Draft';
+        sub.textContent = 'Not yet available for normal tenant onboarding. Publish when commercial terms, limits, and features are ready.';
+        lifecycle.textContent = 'Draft — editable until published';
+        hint.textContent = 'Draft plans can be edited or published. Delete is available only while the plan remains a draft.';
+        headerActions.innerHTML = `
+          <button type="button" class="btn btn-ghost" onclick="setScreen('list')">Back to Plans</button>
+          <button type="button" class="btn btn-secondary" onclick="alert('Prototype: Edit routes to /admin/subscriptions/create in edit mode (UI-4B).')">Edit Plan</button>
+          <button type="button" class="btn btn-primary" onclick="alert('Prototype: Publish → Active')">Publish</button>
+        `;
+        actions.innerHTML = `
+          <button type="button" class="btn btn-primary" onclick="alert('Prototype: Publish → Active')">Publish</button>
+          <button type="button" class="btn btn-secondary" onclick="alert('Prototype: Duplicate creates a new draft')">Duplicate</button>
+          <button type="button" class="btn btn-danger" onclick="openConfirm('Delete draft plan?','This permanently removes the draft. This cannot be undone.','Delete draft')">Delete draft</button>
+        `;
+        applyDetailPlan(SAMPLE_PLANS[3]);
+      } else if (state === 'retired') {
+        surface.classList.add('tone-retired');
+        badge.className = 'badge badge-retired identity-badge';
+        badge.innerHTML = '<span class="badge-dot" aria-hidden="true"></span>Retired';
+        sub.textContent = 'No longer offered for new assignments. Existing tenant relationships are not removed by retirement.';
+        lifecycle.textContent = 'Retired — unavailable for new assignments';
+        hint.textContent = 'Reactivate to offer this plan again. Do not treat retirement as deletion of historical tenant usage.';
+        headerActions.innerHTML = `
+          <button type="button" class="btn btn-ghost" onclick="setScreen('list')">Back to Plans</button>
+          <button type="button" class="btn btn-primary" onclick="alert('Prototype: Reactivate → Active')">Reactivate</button>
+        `;
+        actions.innerHTML = `
+          <button type="button" class="btn btn-primary" onclick="alert('Prototype: Reactivate → Active')">Reactivate</button>
+          <button type="button" class="btn btn-secondary" onclick="alert('Prototype: Duplicate creates a new draft')">Duplicate</button>
+        `;
+        applyDetailPlan(SAMPLE_PLANS[4]);
+      } else {
+        surface.classList.add('tone-active');
+        badge.className = 'badge identity-badge';
+        badge.innerHTML = '<span class="badge-dot" aria-hidden="true"></span>Active';
+        sub.textContent = 'Available for new tenant assignments and onboarding plan selection.';
+        lifecycle.textContent = 'Active — available for new assignments';
+        hint.textContent = 'Published plans are not edited in place here. Retire when the plan should no longer be offered for new assignments. Billing remains under Billing.';
+        headerActions.innerHTML = `
+          <button type="button" class="btn btn-ghost" onclick="setScreen('list')">Back to Plans</button>
+          <button type="button" class="btn btn-secondary" onclick="alert('Prototype: Duplicate creates a new draft')">Duplicate</button>
+          <button type="button" class="btn btn-secondary" onclick="openConfirm('Retire this plan?','Archiving removes the plan from new tenant assignments. Existing tenant relationships are not deleted by this action.','Retire plan')">Retire</button>
+        `;
+        actions.innerHTML = `
+          <button type="button" class="btn btn-secondary" onclick="alert('Prototype: Duplicate creates a new draft')">Duplicate</button>
+          <button type="button" class="btn btn-danger" onclick="openConfirm('Retire this plan?','Archiving removes the plan from new tenant assignments. Existing tenant relationships are not deleted by this action.','Retire plan')">Retire plan</button>
+        `;
+        applyDetailPlan(SAMPLE_PLANS[1]);
+      }
+    }
+
+    function openConfirm(title, message, confirmLabel) {
+      document.getElementById('confirm-title').textContent = title;
+      document.getElementById('confirm-message').textContent = message;
+      const btn = document.querySelector('#confirm-dialog .btn-danger');
+      btn.textContent = confirmLabel;
+      document.getElementById('confirm-dialog').classList.remove('hidden');
+    }
+    function closeConfirm() {
+      document.getElementById('confirm-dialog').classList.add('hidden');
+    }
+
+    // init
+    renderRows(SAMPLE_PLANS);
+    setListState('normal');
+  </script>
+</body>
+</html>

@@ -89,7 +89,7 @@ Single source of wizard navigation/actions (no duplicate top-right buttons):
 - Back (step 1 â†’ `/admin/subscriptions`; other steps â†’ previous step)
 - Save Draft
 - Next (steps 1â€“5)
-- Publish Plan (Review & Publish step only; opens publish modal)
+- Publish Plan (Review & Create step only; opens publish modal)
 
 ## Create Wizard â€” Step 4 Pricing Form State
 
@@ -134,7 +134,7 @@ Guards before PATCH limits:
 Centralized save: `persistLimits({ advanceToReview })`
 
 - Save Draft â†’ PATCH limits, stay on Limits, toast on success
-- Next â†’ PATCH limits, navigate to Review & Publish
+- Next â†’ PATCH limits, navigate to Review & Create
 
 Limits summary shows `Configured` only after `limitsSaved` signal (backend PATCH success).
 
@@ -197,7 +197,7 @@ Response shape:
 
 Wizard behavior:
 
-- Step order remains Basics -> Modules -> Features -> Pricing -> Limits -> Review & Publish.
+- Step order remains Basics -> Modules -> Features -> Pricing -> Limits -> Review & Create.
 - Modules load from the backend permission catalog.
 - Module selection controls which feature groups appear.
 - Features are grouped by selected module.

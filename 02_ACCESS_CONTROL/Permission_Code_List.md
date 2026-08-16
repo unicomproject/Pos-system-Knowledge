@@ -351,8 +351,8 @@ permission rows for aliases.
 | catalog.product_channels.manage | Manage channel visibility matrices |
 | catalog.product_audit.view | View standard product audit histories |
 | catalog.product_audit_sensitive.view | View sensitive product audit details |
-| catalog.bundle_components.manage | Manage bundle kits and component rules |
-| catalog.tax_classes.view | Read tax classes |
+| catalog.combo_components.manage | Manage bundle kits and component rules |
+| catalog.tax_classes.view | **DEPRECATED** — Use canonical `pricing.tax_classes.view` and `pricing.tax_rates.view` |
 | catalog.price_lists.view | Read price list setups |
 | inventory.stock.view | View stock levels |
 | inventory.stock.adjust | Adjust stock |
@@ -534,3 +534,14 @@ Seeded / Backend constants (migration `SeedTenantAdminTillHardwarePermissions` +
 Feature entitlement for till management APIs: **`till_management`** (see platform module catalog seed). Peripheral capability may also be gated by **`device_hardware`**.
 
 Hardware-denied users must still view permitted Till list/summary; show hardware-restricted state instead of failing the whole page.
+
+### Bundle Feature Permissions
+```text
+catalog.products.view
+catalog.products.create
+catalog.products.update
+catalog.combo_components.manage
+inventory.stock.view
+catalog.product_cost.view
+```
+

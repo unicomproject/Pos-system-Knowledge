@@ -101,6 +101,7 @@ Contract: [[../05_BACKEND_ARCHITECTURE/Platform_Selected_Tenant_API_Contract]]
 | Role/permission management | Tenant active, entitlement, permission |
 | Permission catalog read | Tenant active, `roles.permissions.view`; catalog filtered by tenant entitlements |
 | Role permission update | Tenant active, `roles.permissions.update`; assigned codes must stay within entitlements |
+| Tax Management | Catalog entitlement, `pricing.tax_classes.*` and `pricing.tax_rates.*` permissions |
 | Product management | Catalog entitlement and permission `catalog.products.view`, `catalog.products.create`, `catalog.products.update`, `catalog.products.delete`, `catalog.products.publish`, `catalog.products.restore`, or `catalog.products.duplicate` (Note: `catalog.products.import` remains in schema but is deferred and excluded from the active Tenant Admin UI scope). Legacy permission codes starting with `tenant.products.*` must be mapped to their canonical `catalog.products.*` equivalents in the Flutter client per ADR 007. |
 | Catalog master data | Catalog entitlement and respective department, category, brand, collection, or return-policy permission |
 | Inventory management | Inventory entitlement and inventory permission |
@@ -321,3 +322,13 @@ completion, cash movement, and report export where required.
 - [[Feature_Entitlement_Matrix]]
 - [[../05_BACKEND_ARCHITECTURE/API_Standards]]
 - [[../05_BACKEND_ARCHITECTURE/Error_Response_Standards]]
+
+### Exact Permission Matrix for Bundles
+Candidate search endpoint (`GET /api/v1/tenant-admin/products/{productId}/bundle-component-candidates`) and Step 4 endpoints have exact authorization:
+- `catalog.combo_components.manage` is required for modifications.
+- `catalog.products.update` (or `create`) is required depending on the draft state.
+- Cost must NOT leak without `catalog.product_cost.view`.
+- Stock must NOT leak without `inventory.stock.view`.
+
+Entitlement code mapping between `product_catalog` and `product_management` must be explicitly resolved according to the runtime feature entitlement code.
+
