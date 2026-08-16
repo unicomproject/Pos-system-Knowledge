@@ -23,7 +23,7 @@ The Add Product experience is structured into exactly 7 sequential steps:
 3. **Step 3 — Units & Pack Conversion** (Base UOM, purchase/sales UOM, and conversion factors)
 4. **Step 4 — Product Configuration** (Simple: Not Applicable auto-skip; Variant: Variant Matrix & Options; Bundle: Component search & assembly)
 5. **Step 5 — Barcode & SKU** (SKU, barcode type, UOM mapping, uniqueness rules)
-6. **Step 6 — Pricing & Tax** (Cost price, standard selling price, tax classes, price lists, outlet overrides)
+6. **Step 6 — Pricing & Tax** (Cost Price, Standard Selling Price, Discount Price, Tax Name, Tax Rate, Tax Exclusive)
 7. **Step 7 — Review & Create** (Verification summary across all sections, inline edit links, final atomic publish)
 
 ### Step 4 Canonical Naming Rule
@@ -89,7 +89,7 @@ The `Track Inventory` toggle has been removed from Step 1 and exists ONLY in Ste
   - `products.current_setup_step` updated according to the rules below
   - `products.draft_saved_at` updated
   - `products.row_version` incremented
-- **Nullable Constraints for DRAFT**: Database permits NULL for `product_type`, `product_code`, `product_slug` while `status = 'DRAFT'`. Mandatory checks are enforced only on **Publish** (Step 8).
+- **Nullable Constraints for DRAFT**: Database permits NULL for `product_type`, `product_code`, `product_slug` while `status = 'DRAFT'`. Mandatory checks are enforced only on **Publish** (Step 7).
 
 ### 6.1 `current_setup_step` Canonical Rules
 
@@ -555,7 +555,7 @@ Event logged on material Step 2 update: `PRODUCT_DRAFT_STEP2_UPDATED`.
 
 ---
 
-## 9. Cross-Step Business Rules (Steps 3 - 8)
+## 9. Cross-Step Business Rules (Steps 3 - 7)
 
 ### Step 3 — Units & Pack Conversion Contract
 - **Detailed Specification**: Refer to canonical specification [[Tenant_Admin_Product_Units_Pack_Conversion_Specification]].
@@ -587,6 +587,11 @@ Event logged on material Step 2 update: `PRODUCT_DRAFT_STEP2_UPDATED`.
 - **Exclusions**: No Margin calculation, no Tax Inclusive toggle, no Price List selector, no Outlet-specific overrides.
 - **Cost Price**: Standard/Reference acquisition cost.
 - **Selling Price**: `Standard Selling Price` maps to `selling_price` (no discount) or `compare_at_price` (when discounted). `Discount Price` maps to `selling_price` when active.
+- **Discount Calculation Rule**: 
+  Where `StandardSellingPrice > 0`, `DiscountPrice exists`, and `DiscountPrice < StandardSellingPrice`, calculate:
+  `DiscountAmount = StandardSellingPrice - DiscountPrice`
+  `DiscountPercentage = (DiscountAmount / StandardSellingPrice) * 100`
+  If Discount Price is absent, there is no active Product Setup discount price.
 - **Tax Integration**: `Tax Name` saves as `TaxClassId` via `product_tax_assignments`. Default Price List is resolved entirely by the backend.
 - **Atomic Navigation**: Navigates directly to Step 7 on successful `Save & Continue`.
 

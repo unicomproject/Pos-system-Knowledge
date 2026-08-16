@@ -166,7 +166,3 @@ tables, screens, or flows.
 - [[Developer_Reading_Guide]]
 - [[Project_Glossary]]
 - [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Review_Create_Specification.md]]
-
-## Wizard Step Rule
-The Tenant Admin Add Product workflow is strictly a 7-step wizard. Step 7 is Review & Create. Legacy 8-step documentation and standalone Channel Visibility steps are obsolete.

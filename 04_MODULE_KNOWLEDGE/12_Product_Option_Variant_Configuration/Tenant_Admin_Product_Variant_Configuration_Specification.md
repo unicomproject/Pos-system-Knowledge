@@ -10,7 +10,7 @@
 This document defines the final canonical Second Brain specification for **Step 4: Variant Configuration** within the Tenant Admin **Add Product Wizard**.
 
 ### 1.1 Core Business Purpose
-Step 4 allows Tenant Admin users to configure multi-variant products (e.g. apparel with Size, Colour, Material combinations) by defining options, selecting option values, generating a Cartesian variant matrix, customising individual variant labels and images, and toggling variant inclusion before configuring pricing, inventory, and sales channel visibility in downstream steps.
+Step 4 allows Tenant Admin users to configure multi-variant products (e.g. apparel with Size, Colour, Material combinations) by defining options, selecting option values, generating a Cartesian variant matrix, customising individual variant labels and images, and toggling variant inclusion before configuring downstream steps.
 
 ### 1.2 Polymorphic Step 4 Behavior
 Step 4 is polymorphic based on `product_structure` selected in Step 2:
@@ -19,7 +19,7 @@ Step 4 is polymorphic based on `product_structure` selected in Step 2:
 3. **BUNDLE / Kit Product (`product_structure = BUNDLE`)**: Step 4 renders **Bundle/Kit Component Configuration** (assembly of component products/variants).
 
 > [!IMPORTANT]
-> Step 4 for VARIANT mode defines options, option values, combination matrix generation, display labels, variant inclusion toggles, and variant image overrides. It MUST NOT include SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility controls. Those belong strictly to Step 5 (`Barcode & SKU`), Step 6 (`Pricing & Tax`), and Step 7 (`Channel & Store Visibility`).
+> Step 4 for VARIANT mode defines options, option values, combination matrix generation, display labels, variant inclusion toggles, and variant image overrides. It MUST NOT include SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility controls. Those belong strictly to Step 5 (`Barcode & SKU`), Step 6 (`Pricing & Tax`), and Step 1 (`Basic Details`).
 
 ---
 
@@ -223,7 +223,7 @@ Example: `VAR-PRD001-A4F89C12`. Immutable after creation. Reused on repeated rec
 ## 7. "Include Variant" Semantics & Persistence Lifecycle
 
 ### 7.1 "Include Variant" vs. Channel Visibility
-"Include Variant" is a **global catalog configuration flag** (`is_sellable`). It is NOT outlet availability or channel visibility (which belong to Step 7). Include OFF is independent and does NOT create a tombstone/delete.
+"Include Variant" is a **global catalog configuration flag** (`is_sellable`). It is NOT outlet availability or channel visibility (which belong to Step 1). Include OFF is independent and does NOT create a tombstone/delete.
 
 ### 7.2 Inclusion Lifecycle & Draft State
 New included Step 4 Variants remain in a wizard **DRAFT** lifecycle status. Step 4 NEVER publishes/activates variants.
@@ -235,7 +235,7 @@ New included Step 4 Variants remain in a wizard **DRAFT** lifecycle status. Step
 | Included state changed OFF | `DRAFT` | `false` |
 | Included state changed ON | `DRAFT` | `true` |
 | Explicitly deleted | `ARCHIVED` | no longer active |
-| Final Step 8 successful create | final lifecycle status | preserve approved inclusion |
+| Final Step 7 successful create | final lifecycle status | preserve approved inclusion |
 
 ---
 
@@ -389,7 +389,7 @@ Test specification must prove the following:
 1. **ProductOption/ProductOptionValue Identity**: First selection creates one logical active entity. Repeated save reuses same ID. Remove/re-add reuses same ID (no duplicates).
 2. **Variant Identity**: Unsaved Variant has `clientCombinationKey`. First save returns real `productVariantId`. Repeated save reuses Variant ID. Attribute/Value remove/re-add preserves identical semantic matrix hash.
 3. **Tombstone Stability**: Generate Red/M -> Delete Red/M -> Generate unchanged -> Red/M is absent. Modify matrix and return to original -> Red/M still absent. Save Draft and reopen -> Red/M absent. No silent resurrection.
-4. **Variant Lifecycle**: New Included Step 4 Variant is DRAFT+is_sellable=true. Include OFF is DRAFT+is_sellable=false. Deleted is ARCHIVED. Final Step 8 saves final status. Step 4 NEVER publishes variants.
+4. **Variant Lifecycle**: New Included Step 4 Variant is DRAFT+is_sellable=true. Include OFF is DRAFT+is_sellable=false. Deleted is ARCHIVED. Final Step 7 saves final status. Step 4 NEVER publishes variants.
 5. **UOM Resolution**: Track Inventory ON correctly inherits from Step 3. Track Inventory OFF correctly resolves via canonical Product Wizard default UOM resolver. No manual Step 4 UOM field.
 6. **Permission**: Create+Variant Manage works for new product. Missing Product entitlement is Denied.
 7. **Idempotency**: Same request repeated -> no duplicates. Concurrent stale rowVersion request rejected.

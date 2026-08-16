@@ -16,13 +16,15 @@ It enforces strict alignment with **Reference UI 2** and replaces legacy 4-step 
 ## 2. Global Stepper Header & Layout Structure
 
 ### 2.1 Fixed 7-Step Horizontal Stepper Header
+The top bar renders a persistent, responsive 7-Step progress stepper:
 1. **Basic Details**
 2. **Product Type & Tracking**
 3. **Units & Pack Conversion**
 4. **Product Configuration** (VARIANT mode: Variant Configuration)
 5. **Barcode & SKU**
 6. **Pricing & Tax**
-7. **Review & Create**
+7. **Channel Visibility**
+8. **Review & Create**
 
 ---
 
@@ -58,7 +60,7 @@ Step 4 renders three primary UI regions:
 2. **Configuration Summary Card** (Middle info bar):
    - `6 Variants Generated` | `2 Attributes Defined` | `6 Included`.
 3. **Generated Variants Table & Actions** (Bottom section):
-    - Columns: `Variant` (`combinationLabel` e.g. `Red / S`), `Actions` (`Edit` icon, `Delete` icon).
+   - Columns: `Variant` (`combinationLabel` e.g. `Red / S`), `Image` (thumbnail preview), `Actions` (`Edit` icon, `Delete` icon).
    - `Edit` action opens right-side drawer (`Edit Variant`).
    - `Delete` action opens centered confirmation modal (`Delete Variant`).
 
@@ -115,7 +117,7 @@ Appears on the top right area after the first Save Draft or when Resuming a Draf
 - **Category & Brand**: Displayed as subtle metadata badges
 - **Inventory Tracking Badge**: `Tracked` / `Not Tracked`
 - **Status Badge**: Amber `DRAFT` badge during wizard completion
-- **Step Progress Bar**: e.g., "Step 4 of 7 Completed"
+- **Step Progress Bar**: e.g., "Step 4 of 8 Completed (50%)"
 
 ---
 

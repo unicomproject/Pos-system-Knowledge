@@ -61,18 +61,6 @@ The canonical Step 5 payload structure:
       "sku": "VAR-SKU-01",
       "barcode": "8901234567891"
     }
-  ],
-  "additionalBarcodes": [
-    {
-      "barcodeId": "guid...", 
-      "barcode": "8901234567892",
-      "barcodeType": "EAN-13",
-      "productVariantId": null,
-      "uomId": "guid...",
-      "quantityPerScan": 6,
-      "isPrimary": false,
-      "status": "ACTIVE"
-    }
   ]
 }
 ```
