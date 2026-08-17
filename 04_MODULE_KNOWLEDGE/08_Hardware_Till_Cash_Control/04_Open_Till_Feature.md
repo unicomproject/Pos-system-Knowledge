@@ -5,6 +5,12 @@
 
 # Open Till Feature
 
+> **2026-08-15 sync verification:** Open Till required no implementation change
+> for the Close Till financial-authority remediation. Opening float persistence,
+> negative-value rejection, trusted device/till assignment, tenant isolation,
+> single-open-session enforcement and online-only success remain intact and the
+> full backend/Flutter regression suites pass.
+
 ## Purpose
 
 Authoritative contract for Cashier **Open Till** before POS sale operations.

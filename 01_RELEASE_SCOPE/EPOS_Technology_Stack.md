@@ -138,16 +138,20 @@ Azure Cache for Redis = later scaling option only
 
 ## Hardware Stack
 
-| Hardware | Integration Direction |
-|---|---|
-| Receipt printer | Flutter/local device service |
-| Barcode scanner | Keyboard wedge/scanner input |
-| Cash drawer | Printer command or supported drawer integration |
-| Card reader | Provider/device handoff |
-| Customer display | Future / optional |
+| Hardware | Integration Direction | Current status (2026-08-16) |
+|---|---|---|
+| Receipt printer | `E_POS.LocalPrintAgent` → Windows RAW / ESC/POS | PARTIAL — physical acceptance incomplete |
+| Barcode scanner | HID keyboard wedge + camera | PARTIAL — physical acceptance incomplete |
+| Cash drawer | Printer ESC/POS pulse via Local Print Agent | PARTIAL — physical acceptance incomplete |
+| Card reader | Provider/device handoff | NOT IMPLEMENTED — out of current hardware release |
+| Customer display | Future / optional | NOT IMPLEMENTED / deferred |
+| Scale / Kitchen printer | Future | NOT IMPLEMENTED / deferred |
 
 Backend stores hardware configuration, test logs, transaction references, and
 business outcomes. Backend does not directly control every physical device.
+Overall hardware production: **BLOCKED**. Canonical:
+[[../12_INTEGRATIONS/Local_Print_Agent]] ·
+[[../12_INTEGRATIONS/POS_Hardware_Integration]].
 
 ## Payment Stack
 

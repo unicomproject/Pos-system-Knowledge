@@ -26,6 +26,21 @@ Always read source-of-truth and scope rules first.
 | 6 | [[../02_ACCESS_CONTROL/Access_Control_Overview]] | Understand entitlement and permission checks |
 | 7 | [[Markdown_Writing_Rules]] | Follow Second Brain writing rules |
 
+## POS Hardware (before any hardware code)
+
+Overall status is **BLOCKED — HARDWARE NOT PRODUCTION READY**. Read in order:
+
+1. [[Current_Source_Of_Truth]] (Hardware Production Status section)
+2. [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]]
+3. [[../12_INTEGRATIONS/POS_Hardware_Integration]]
+4. [[../12_INTEGRATIONS/Local_Print_Agent]]
+5. Device-specific integration (Receipt / Cash Drawer / Barcode / Card)
+6. [[../10_TESTING_QA/POS_Hardware_Production_Acceptance_Matrix]]
+
+Do **not** confuse financial Cash In/Drop software acceptance with physical
+drawer/printer production readiness. Next code chunk is **Local Print Agent
+production packaging / Windows service autostart**.
+
 ## Backend Developer Reading Path
 
 1. Read [[../05_BACKEND_ARCHITECTURE/Backend_Overview]].

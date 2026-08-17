@@ -177,12 +177,21 @@ real card provider and real split-payment completion are pending.
 After confirmed backend payment success, the cashier is navigated to the Payment Success screen:
 - Backend-authoritative values are displayed (Receipt Number, Payment Method, Total Paid, Cash Received, Change Due).
 - Receipt preview uses the immutable `receipt_data_json` snapshot resolved at checkout; never reconstructed from the current cart or catalogue.
-- **Print Receipt** sends the original snapshot to the Local Print Agent. Print failure does not roll back the sale or affect Payment Status.
+- **Print Receipt** / **Print Again** uses the configured receipt printer service (Android USB/BT or optional Local Print Agent). Print failure does not roll back the sale or affect Payment Status.
+- Checkout **auto-prints** the original receipt once after authoritative Cash payment
+  success (non-blocking; sale is never rolled back on print failure). Payment Success
+  **Print Receipt** reuses the same exactly-once original identity; Print Again uses a
+  reprint identity.
+- Preview and physical receipts share one `CanonicalReceiptPresentation` contract (semantic parity; pixel parity not required).
 - **Start New Sale** clears cart, customer, discount, amount received, quick amount, and payment intent. It does not delete the completed sale, payment, receipt, or stock movements.
 - **Email Receipt** and **SMS Receipt** are excluded from the current release.
 - Receipt-detail recovery uses `GET /api/v1/pos/receipts/{receiptId}` when in-memory state is unavailable.
 - Multi-tenant receipt preview uses resolved versioned template snapshots. See [[../../04_MODULE_KNOWLEDGE/21_POS_Operations/04_Multi_Tenant_Receipt_Template_Resolution]].
 - Authoritative feature specification: [[../../04_MODULE_KNOWLEDGE/24_Payment_Refund/05_Payment_Success_Receipt_Preview_Feature]].
+
+## Checkout Print Receipt first-print fix (2026-08-16)
+
+Manual policy preserved. Defect: after checkout, Print Receipt showed idle and never started the original print because only `retryPrint` was wired. Fixed by mapping the retained authoritative checkout payload and invoking exactly-once `printAutomatically`. Physical paper verification for this path remains open.
 
 ## Chunk 3 Runtime Continuation (2026-08-06)
 

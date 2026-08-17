@@ -1,7 +1,7 @@
 <!-- title: Cashier POS Second Brain vs Code Comparison Status -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-15 -->
 
 
 # Cashier POS Second Brain vs Code Comparison
@@ -205,7 +205,7 @@ issues. No backend, database, migration or customer API contract changed.
 | Actual printing is only an audit snackbar | A local receipt-printer facade, ESC/POS generator and network transport exist; physical hardware remains unverified |
 | Scanner camera support is pending | Android/iOS camera source and automated coverage exist; physical Android verification remains pending |
 | Parked sale is backend-aware | Current Flutter park/recall is device-local secure storage; backend Holds is disconnected |
-| Cash drawer operations are a placeholder only | Cash Drawer/Cash In/Cash Drop UI exists, but cash mutation remains frontend-only |
+| Cash drawer operations are a placeholder only | UI and a legacy backend mutation exist; canonical `cash_movements` + catalog-backed Cash In remains pending |
 
 ### Remaining High-Risk Gaps
 

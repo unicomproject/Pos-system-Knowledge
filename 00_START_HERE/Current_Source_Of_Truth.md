@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-13 -->
+<!-- last_updated: 2026-08-17 -->
 
 
 # Current Source Of Truth
@@ -26,6 +26,75 @@ The 2026-08-05 documentation audit is the current traceability layer: [[../15_IM
 
 Chunk 2 security authority is the approved [[../13_DECISIONS_AND_CHANGES/FLOW_4_SECURE_TEST_HOST_TOKEN_AND_FIXTURE_CONTRACT_2026-08-05]], with threat model [[../09_SECURITY_AND_COMPLIANCE/FLOW_4_TEST_FIXTURE_TOKEN_THREAT_MODEL_2026-08-05]] and implementation contract [[../10_TESTING_QA/FLOW_4_SECURE_LIFECYCLE_FIXTURE_IMPLEMENTATION_CONTRACT_2026-08-05]]. Chunk 3 must use a separate non-HTTP test CLI/hybrid, production token/hash primitives, cumulative environment/database/credential guards, one-time process-local secret handoff and ownership-bound cleanup. No production fixture endpoint, DI registration or Swagger route is authorized. This approval does not increase the 59/64 verified P0 count; fixture runtime and security proof remain pending.
 
+## POS Hardware Production Status (2026-08-16)
+
+```text
+POS Hardware Production Status: BLOCKED
+
+Primary Android printer architecture:
+  Android Tablet → USB-C Hub / USB ESC/POS  (software implemented; physical NOT VERIFIED)
+  Android Tablet → Bluetooth Classic SPP ESC/POS (software implemented; physical NOT VERIFIED)
+
+Optional Windows printer architecture:
+  Windows POS / Windows-connected printer → E_POS.LocalPrintAgent → RAW spooler
+  (source contract v3 published; installed service this machine still reports receiptContractVersion=2 —
+   elevated upgrade required for canonical Windows physical sign-off)
+
+Production blockers:
+  Android USB/Bluetooth physical tablet acceptance (at least one certified transport)
+  Windows LocalPrintAgent v3 install + POS80 canonical paper acceptance (when Windows path used)
+  Remaining physical cash drawer scenarios beyond the accepted automatic Cash Sale path
+  Barcode scanner physical acceptance
+
+Payment Terminal: Not implemented / OUT OF CURRENT HARDWARE RELEASE
+Scale: Not implemented / deferred
+Customer Display: Not implemented / deferred
+Kitchen Printer: Not implemented / deferred
+```
+
+Financial Cash In / Cash Drop remain **software production-accepted** and are
+**not** physical hardware I/O. Do not confuse them with physical drawer pulse.
+
+Receipt Preview and Physical Receipt are two renderers of one
+`CanonicalReceiptPresentation` contract. Semantic/business parity is mandatory;
+pixel parity is not required due to thermal printer limitations. Checkout print
+policy remains **MANUAL** (Payment Success → Print Receipt). LocalPrintAgent
+preferred receipt contract version: **3** (Flutter accepts 1/2/3 with fallback).
+Chunk 2 closure attempt:
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Chunk_2_Receipt_Printer_Closure_Attempt_2026-08-16]]
+(software PASS; physical gates OPEN — Chunk 2 **not** closed).
+
+Authority:
+
+- [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]]
+- [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Android_Direct_Printer_Integration_2026-08-16]]
+- [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Receipt_Canonical_Preview_Physical_Parity_2026-08-16]]
+- [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Chunk_2_Receipt_Printer_Closure_Attempt_2026-08-16]]
+- [[../12_INTEGRATIONS/POS_Hardware_Integration]]
+- [[../12_INTEGRATIONS/Local_Print_Agent]]
+- [[../12_INTEGRATIONS/Receipt_Printer_Integration]]
+- [[../10_TESTING_QA/POS_Hardware_Production_Acceptance_Matrix]]
+
+Next code sequence after this Second Brain canonicalization:
+
+```text
+Android Direct USB/Bluetooth receipt printer software
+           (IMPLEMENTED 2026-08-16; physical tablet acceptance NOT VERIFIED —
+            [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Android_Direct_Printer_Integration_2026-08-16]])
+Chunk 1 — Local Print Agent (optional Windows path; SOFTWARE PASS; elevated ops may remain)
+Chunk 2 — Receipt Printer physical acceptance (OPEN — closure attempt 2026-08-16 PARTIAL)
+Chunk 3 — Physical Cash Drawer (SOFTWARE/runtime path hardened 2026-08-16;
+            automatic Cash Sale physical PASS 2026-08-17 on POS80 / Cashbox #1 / drawerPin2;
+            other scenarios remain open —
+            [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Runtime_Integration_Issue_Resolution_2026-08-17]])
+Chunk 4 — Barcode Scanner (SOFTWARE hardened 2026-08-16; PHYSICAL acceptance PENDING —
+            [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Chunk_4_Barcode_Scanner_2026-08-16]])
+```
+
+Overall hardware production readiness remains **BLOCKED** until mandatory physical gates close.
+
+Overall POS Hardware remains **BLOCKED** until physical PR/DR/SC gates pass.
+
 ## Highest Priority Decision
 
 Cashier **Open Till** requirements are governed by
@@ -43,28 +112,42 @@ Cashier **Close Till / End Shift** requirements are governed by
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]] and
 [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Close_Till_Screen_Implementation_Specification]].
 The existing screen, `POST /api/v1/tills/close`, `pos.till.close`, tables and
-CLOSED event are reusable. Production status is **BLOCKED**: current backend
-trusts caller `ExpectedCash` (fallback opening float) and does not insert
-`cash_reconciliations`. Target uses backend-authoritative Expected Cash and one
-atomic session + reconciliation + CLOSED-event transaction. No new table,
-attribute, migration or permission is required.
+CLOSED event are reused. The financial synchronization blockers are resolved:
+the backend ignores caller `ExpectedCash`, calculates Expected Cash from the
+canonical persisted session activity, and atomically commits the closed session,
+one `cash_reconciliations` row and one CLOSED event. Flutter no longer sends
+`expectedCash`. No new table, attribute, migration or permission was required.
+The combined End Shift feature remains release-blocked only on its outstanding
+authenticated runtime matrix, not on financial authority or persistence.
 
 Cashier **Cash Drawer** requirements are governed by
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]] and
-[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]].
 Physical Open Drawer reuses `/api/v1/pos/hardware/drawer/*` and
-[[../12_INTEGRATIONS/Cash_Drawer_Integration]]. Close Till is reused, not
-duplicated. Financial summary/movements APIs
-(`GET/POST /api/v1/pos/cash-drawer/...`) are **APPROVED_TARGET_NOT_IMPLEMENTED**.
-No new Cash Drawer table or UI-only summary columns are approved. Current
-runtime cash ledger is `till_cash_movements` (+ cash sales from
-`sales_payments`); long-term ERD target remains `cash_movements` +
-`cash_movement_types` — dual-write is forbidden. Cash In/Out/Drop are online
-backend-authoritative. Permissions reuse `cash_drawer.view`,
-`cash_drawer.manage`, `cash_drawer.movement.create`, `pos.till.close`.
-Alignment evidence:
-[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Second_Brain_Alignment_2026-08-13]].
-Do not mark Cash Drawer Complete from documentation alone.
+[[../12_INTEGRATIONS/Cash_Drawer_Integration]] (`cash_drawer_operations`) — this
+is **not** a financial Cash Drop.
+Financial summary/movements APIs (`GET/POST /api/v1/pos/cash-drawer/...`) and
+`GET /api/v1/pos/cash-movement-types` are the only approved financial routes.
+No Cash Drop-specific table or `POST /cash-drop` is approved.
+Canonical manual ledger is `cash_movements` + `cash_movement_types`;
+`till_cash_movements` is legacy/compatibility only with **no dual-write** for
+POS Cash In/Drop. Cash In (`Direction=IN`) is **production-acceptance verified**.
+Cash Drop (`Direction=OUT`) is **software production-acceptance verified**
+(live Flutter↔API↔PostgreSQL on Pixel Tablet; Chunk 1 concurrency closed).
+Optional cash-movement slip print remains **not implemented** and is not a
+finance blocker. Authority:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/07_Cash_Drop_Feature]],
+journey [[../03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow]], tables
+[[../06_DATABASE_KNOWLEDGE/Tables/09_Hardware_Operations_Till_Session_And_Cash_Control_UPDATED]],
+APIs [[../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]], permissions
+[[../02_ACCESS_CONTROL/Permission_Code_List]], evidence
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_In_Chunk_3_Final_Production_Acceptance]],
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drop_Chunk_1_Core_Implementation_Status]]
+and
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Cash_Drop_Chunk_2_Production_Acceptance_2026-08-16]].
+Permissions reuse `cash_drawer.view`, `cash_drawer.manage`,
+`cash_drawer.movement.create`, and `pos.till.close`.
+Do not mark Cash Drop Complete from documentation alone.
 
 Tenant-configurable pre-authentication POS Login Branding is governed by
 [[../04_MODULE_KNOWLEDGE/02_Tenant_Foundation/04_POS_Login_Branding_Functional_Rules]]

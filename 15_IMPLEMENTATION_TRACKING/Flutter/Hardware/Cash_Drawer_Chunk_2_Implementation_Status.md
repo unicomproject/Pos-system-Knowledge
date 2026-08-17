@@ -1,6 +1,16 @@
+<!-- title: Cash Drawer Chunk 2 Implementation Status -->
+<!-- status: Active -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-15 -->
+
 # Cash Drawer Chunk 2 Implementation Status
 
-**Status:** CASH DRAWER CHUNK 2 COMPLETE — PRODUCTION READY
+> Historical UI acceptance evidence only. It does not certify the canonical
+> Cash In architecture. Current authority is
+> [[../../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]]
+> and [[../../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_In_Screen_Implementation_Specification]].
+
+**Status:** UI CHUNK COMPLETE — CANONICAL CASH IN DATA ALIGNMENT PENDING
 
 | Item | Value |
 |---|---|
@@ -115,4 +125,7 @@ Physical cash-drawer hardware pulse confirmation was not available in the develo
 
 ## Production gate
 
-All Chunk 2 production acceptance items for UI, responsive, permissions, theme tokens, tests, and backend regression are satisfied. Cash Drawer feature is production ready pending normal environment hardware smoke where drawer devices are installed.
+Historical Cash Drawer UI Chunk 2 evidence remains valid for layout and
+permissions. Cash In Flutter canonical API integration is tracked in
+[[Cash_In_Chunk_2_Flutter_Backend_Integration_Status]]. Final responsive and
+authenticated runtime acceptance remains pending.

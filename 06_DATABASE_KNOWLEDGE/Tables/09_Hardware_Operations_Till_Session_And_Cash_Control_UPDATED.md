@@ -1,8 +1,9 @@
 <!-- title: Hardware Operations, Till Session & Cash Control -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-13 -->
+<!-- last_updated: 2026-08-16 -->
 <!-- source: Updated from uploaded ERD image: 09_Hardware Operations, Till Session & Cash Control.png -->
+<!-- code_audit: Backend Tharmi_CashDrawer_012 Cash In canonicalization 2026-08-15/16 -->
 
 # 09. Hardware Operations, Till Session & Cash Control
 
@@ -10,28 +11,35 @@
 
 This file documents the database tables, attributes, keys, nullability, indexes, constraints, and external reference entities for this module. It is aligned to the uploaded ERD image.
 
-These tables are defined in schema/migration source. No complete Cashier
-cash-movement mutation API under `/api/v1/pos/cash-drawer/*` was verified.
-Schema presence therefore does not make Cash In/Out operational. Live applied
-database state was not re-verified in the 2026-08-13 documentation pass; code
-evidence shows both `till_cash_movements` and `cash_movements` tables exist in
-EF/migrations.
-
-## Cash movement source-of-truth (2026-08-13)
+## Cash movement source-of-truth (2026-08-16)
 
 | Role | Decision |
 |---|---|
-| Canonical long-term ERD target | `cash_movement_types` + `cash_movements` |
-| Current runtime financial ledger | `till_cash_movements` (partial writers: returns/exchange; Expected Cash also uses `sales_payments` for CASH) |
-| Type catalog / affects_expected_cash | `cash_movement_types` (read by Expected Cash calculator) |
-| `cash_movements` entity | SCHEMA_ONLY — no application write path found |
+| Canonical manual ledger | `cash_movements`; `sales_payments` remains payment/refund authority |
+| Type catalog / affects_expected_cash | `cash_movement_types` |
+| POS Cash In writer | **`cash_movements` VERIFIED** (`movement_type_id` + `request_id`) |
+| POS Cash Drop / OUT writer | **PENDING** — create path rejects non-IN types |
+| Legacy table | `till_cash_movements` — compatibility / non-POS paths (e.g. some returns); **no dual-write** for POS Cash In/Drop |
 | Physical drawer audit | `cash_drawer_operations` |
-| New Cash Drawer UI tables/columns | **NOT APPROVED** |
-| Dual-write both ledgers | **FORBIDDEN** |
+| New Cash Drop tables/columns | **NOT APPROVED** |
+| Dual-write both ledgers for one movement | **FORBIDDEN** |
 
-Implementation of Cash Drawer financial APIs should write the **current runtime**
-ledger (`till_cash_movements`) unless a dedicated migration chunk first unifies
-onto `cash_movements`. Record that migration as an explicit gap if deferred.
+Idempotency on canonical ledger:
+
+```text
+cash_movements.request_id uuid NULL
+UNIQUE(tenant_id, request_id) WHERE request_id IS NOT NULL
+Migration: 20260815133611_CanonicalizeCashInMovements
+```
+
+Verified seeded **IN** system types: `FLOAT_ADDED`, `PETTY_CASH_ADDED`,
+`CASH_CORRECTION`, `OTHER`. **OUT / `CASH_DROP` seeds: REQUIRED GAP.**
+Summary calculation already groups `Direction=OUT` and code `CASH_DROP` when
+such rows exist.
+
+Do not persist UI-derived columns such as `current_expected_cash`,
+`available_cash`, `remaining_expected_cash`, or `manager_pin` on
+`cash_movements`.
 
 ## ERD Update Rule
 
@@ -46,8 +54,8 @@ This markdown version follows the uploaded ERD image as the source of truth. Tab
 | `hardware_test_logs` | Stores append-only hardware test logs and result payloads. |
 | `till_sessions` | Stores till opening/closing session lifecycle, operator, device, currency and float data. |
 | `cash_movement_types` | Stores tenant/system cash movement type catalog and whether the type affects expected cash. |
-| `till_cash_movements` | **Current runtime** EF-backed till cash movement ledger. |
-| `cash_movements` | Richer ERD ledger (schema present); not the active writer path today. |
+| `till_cash_movements` | Legacy/compatibility ledger; not the POS Cash In writer. |
+| `cash_movements` | Canonical POS Cash In (verified) / Cash Drop (pending OUT) ledger. |
 | `cash_drawer_operations` | Physical cash-drawer open operations and audit. |
 | `cash_reconciliations` | Stores cash reconciliation summary per till session. |
 | `cash_count_denominations` | Stores counted cash denominations for a reconciliation. |
@@ -239,17 +247,19 @@ CHECK(status <> '')
 
 ## `till_cash_movements`
 
-Purpose: Stores typed cash movements linked to a till session. This is the
-**current runtime** entity/mapping used by Expected Cash and return/exchange
-side-effects. The richer ERD table `cash_movements` also exists in schema but
-has **no application write path** today (SCHEMA_ONLY). Do not dual-write.
+Purpose: Legacy typed till movements still used by some non-POS paths (for
+example return/exchange side-effects) and dual-**read** during expected-cash
+history. **POS Cash In** no longer writes this table. Do not dual-write POS
+Cash In/Drop into both ledgers.
 
 | Attribute | Type | Key / Constraint | Null | Reference / Note |
 | --- | --- | --- | --- | --- |
 | `id` | uuid | PK | NOT NULL | Primary key. |
 | `tenant_id` | uuid | FK | NOT NULL | References tenants(id). |
 | `till_session_id` | uuid | FK | NOT NULL | References till_sessions(id). |
-| `movement_type` | varchar | CHECK | NOT NULL | `CASH_IN`, `CASH_OUT`, `OPENING_FLOAT` or `CLOSING_REMOVE`. |
+| `pos_device_id` | uuid | FK | NULL | Trusted activated POS device associated with the movement. |
+| `request_id` | uuid | Tenant-unique | NULL | Stable idempotency key for API-created movement. |
+| `movement_type` | varchar | CHECK | NOT NULL | `CASH_IN`, `CASH_OUT`, `CASH_DROP`, `OPENING_FLOAT` or `CLOSING_REMOVE`. |
 | `amount` | numeric(18,4) | CHECK | NOT NULL | Cash movement amount. |
 | `currency_code` | char(3) | FK | NOT NULL | References currencies(currency_code). |
 | `reason` | text |  | NULL | Movement reason. |
@@ -264,11 +274,61 @@ Indexes / Constraints / Notes:
 PK(id)
 FK(tenant_id) REFERENCES tenants(id)
 FK(till_session_id) REFERENCES till_sessions(id)
+FK(pos_device_id) REFERENCES pos_devices(id)
 FK(currency_code) REFERENCES currencies(currency_code)
 FK(performed_by_tenant_user_id) REFERENCES tenant_users(id)
+UNIQUE(tenant_id, request_id) WHERE request_id IS NOT NULL
 CHECK(amount > 0)
-CHECK(movement_type IN ('CASH_IN','CASH_OUT','OPENING_FLOAT','CLOSING_REMOVE'))
+CHECK(movement_type IN ('CASH_IN','CASH_OUT','CASH_DROP','OPENING_FLOAT','CLOSING_REMOVE'))
 ```
+
+## `cash_movements`
+
+Purpose: Canonical manual financial ledger for POS Cash In (verified) and Cash
+Drop/Out (**pending** OUT API acceptance). Linked to `cash_movement_types` and
+`till_sessions`. Entity:
+`E_POS.Domain.Modules.Tenant.HardwareCash.Entities.CashMovement`.
+
+| Attribute | Type | Key / Constraint | Null | Reference / Note |
+| --- | --- | --- | --- | --- |
+| `id` | uuid | PK | NOT NULL | Primary key. |
+| `tenant_id` | uuid | FK | NOT NULL | References tenants(id). |
+| `outlet_id` | uuid | FK | NOT NULL | References outlets(id). |
+| `till_id` | uuid | FK | NOT NULL | References tills(id). |
+| `till_session_id` | uuid | FK | NOT NULL | References till_sessions(id). |
+| `pos_device_id` | uuid | FK | NULL | References pos_devices(id). |
+| `request_id` | uuid | Tenant-unique | NULL | Idempotency key; required for retry-safe POS mutations. |
+| `movement_type_id` | uuid | FK | NOT NULL | References cash_movement_types(id). |
+| `movement_number` | varchar |  | NOT NULL | Server-assigned movement number. |
+| `amount` | numeric(18,4) | CHECK | NOT NULL | Movement amount; must be `> 0`. |
+| `currency_code` | char(3) | FK | NOT NULL | From till session; not client authority. |
+| `reason` | text |  | NULL | Optional note / explanation (API `note`, max 500 enforced in service). |
+| `order_id` | uuid | FK | NULL | Optional order reference. |
+| `payment_id` | uuid | FK | NULL | Optional payment reference. |
+| `refund_id` | uuid | FK | NULL | Optional refund reference. |
+| `performed_by_tenant_user_id` | uuid | FK | NOT NULL | References tenant_users(id). |
+| `performed_at` | timestamptz |  | NOT NULL | Performed timestamp. |
+| `created_at` | timestamptz |  | NOT NULL | Creation timestamp. |
+| `updated_at` | timestamptz |  | NOT NULL | Last update timestamp. |
+
+Indexes / Constraints / Notes:
+
+```text
+PK(id)
+FK(tenant_id) REFERENCES tenants(id)
+FK(outlet_id) REFERENCES outlets(id)
+FK(till_id) REFERENCES tills(id)
+FK(till_session_id) REFERENCES till_sessions(id)
+FK(pos_device_id) REFERENCES pos_devices(id)
+FK(movement_type_id) REFERENCES cash_movement_types(id)
+FK(currency_code) REFERENCES currencies(currency_code)
+FK(performed_by_tenant_user_id) REFERENCES tenant_users(id)
+UNIQUE(tenant_id, request_id) WHERE request_id IS NOT NULL
+  -- index name: uq_cash_movements_tenant_id_request_id
+CHECK(amount > 0)
+```
+
+Do **not** add columns for UI preview fields or Manager PIN.
 
 ## `cash_reconciliations`
 
@@ -364,28 +424,30 @@ CHECK(line_total >= 0)
 ```text
 hardware_devices 1 -> many hardware_device_assignments
 hardware_devices 1 -> many hardware_test_logs
-till_sessions 1 -> many till_cash_movements   (current runtime ledger)
+till_sessions 1 -> many cash_movements        (canonical manual ledger; Cash In verified)
 till_sessions 1 -> 0..1 cash_reconciliations
-cash_movements exists in schema as ERD target / SCHEMA_ONLY (no app writer)
-cash_movement_types configures expected-cash effects; current till movement rows store a movement code
+till_cash_movements exists as legacy/compatibility; no POS Cash In/Drop dual-write
+cash_movement_types 1 -> many cash_movements
 cash_reconciliations 1 -> many cash_count_denominations
+cash_drawer_operations is physical drawer audit only
 ```
 
 ## Module Notes
 
-- Close Till currently updates `till_sessions` and inserts one CLOSED
-  `till_session_events` record, but does not insert `cash_reconciliations`.
-- Current close trusts request `ExpectedCash`, falling back to opening float;
-  production must calculate Expected Cash server-side and persist reconciliation
-  atomically. Existing schema is sufficient; no new table/attribute/migration is
-  required. See [[../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]].
+- Close Till calculates Expected Cash server-side and persists reconciliation
+  atomically under the Close Till contract
+  ([[../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]]).
+  Combined End Shift runtime acceptance may still be blocked on matrix items.
 
 - Show only core operational relationships in the ERD; tenant/audit FK arrows may be omitted in diagrams for readability.
 - `hardware_test_logs` is append-only.
-- `till_cash_movements` uses one optional `reference_number`; legacy
-  `cash_movements` order/payment/refund columns are not the active EF mapping.
+- `cash_movements.reason` stores optional note text; catalog selection is
+  `movement_type_id`. Legacy `till_cash_movements.reference_number` is not the
+  POS Cash In note field.
 - A hardware assignment must target exactly one of `till_id` or `pos_device_id`.
 - One active/open till session is allowed per till by `UNIQUE(till_id) WHERE closed_at IS NULL`.
+- Cash Drop feature contract:
+  [[../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/07_Cash_Drop_Feature]].
 
 ## Till Monitoring UI Data Mapping
 

@@ -1,7 +1,7 @@
 <!-- title: Design System -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-13 -->
+<!-- last_updated: 2026-08-14 -->
 
 # Design System
 
@@ -147,7 +147,7 @@ White content surface; semantic green/red/(info)blue for movement styling.
 Touch-friendly enterprise layout. **Do not** globally overwrite Tenant Admin or
 Platform Admin themes. Feature code must not use direct `Color(0x...)`, `#hex`,
 or a feature-local `CashDrawerColors` file. Canonical:
-[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]].
 
 ## Form Rules
 

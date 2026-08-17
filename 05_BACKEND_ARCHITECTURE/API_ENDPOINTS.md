@@ -1,7 +1,7 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-14 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -266,9 +266,10 @@ and commits all close records atomically. Existing route is implemented but
 production-blocked. Canonical:
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]].
 
-### Cash Drawer contract clarification — 2026-08-13
+### Cash Drawer contract clarification — 2026-08-16
 
-Physical Open Drawer reuses existing HardwareCash endpoints (IMPLEMENTED):
+Physical Open Drawer reuses existing HardwareCash endpoints (IMPLEMENTED) —
+**separate from financial Cash In/Drop**:
 
 | Method | Route | Role |
 |---|---|---|
@@ -279,20 +280,33 @@ Physical Open Drawer reuses existing HardwareCash endpoints (IMPLEMENTED):
 | GET | `/api/v1/pos/hardware/drawer/operations/{operationId}` | Status by id |
 | GET | `/api/v1/pos/hardware/drawer/operations/by-request/{requestId}` | Idempotent lookup |
 
-Financial Cash Drawer APIs are **APPROVED_TARGET_NOT_IMPLEMENTED** (no current
-controller under `/api/v1/pos/cash-drawer`):
+Financial Cash Drawer APIs (`PosCashDrawerController` /
+`PosCashMovementTypesController` in `PosDrawerController.cs`):
 
-| Method | Route | Status | Role |
-|---|---|---|---|
-| GET | `/api/v1/pos/cash-drawer/summary?deviceId=` | APPROVED_TARGET_NOT_IMPLEMENTED | Backend-authoritative till cash summary |
-| GET | `/api/v1/pos/cash-drawer/movements` | APPROVED_TARGET_NOT_IMPLEMENTED | Recent movements (paginated) |
-| POST | `/api/v1/pos/cash-drawer/movements` | APPROVED_TARGET_NOT_IMPLEMENTED | Create `CASH_IN` / `CASH_OUT` / `CASH_DROP` |
+| Method | Route | Auth | Permission | Purpose | Status | Flutter |
+|---|---|---|---|---|---|---|
+| GET | `/api/v1/pos/cash-drawer/summary?deviceId=` | Tenant staff | `cash_drawer.view` | Authoritative expected cash | IMPLEMENTED | Wired |
+| GET | `/api/v1/pos/cash-drawer/movements?deviceId=&page=&pageSize=` | Tenant staff | `cash_drawer.view` | Movement history | IMPLEMENTED | Wired |
+| GET | `/api/v1/pos/cash-movement-types?direction=` | Tenant staff | `cash_drawer.view` | Type catalog | **IN and OUT** (invalid direction rejected) | Cash In + Drop wired |
+| POST | `/api/v1/pos/cash-drawer/movements` | Tenant staff | `cash_drawer.movement.create` | Create financial movement | **IN VERIFIED; OUT IMPLEMENTED** (Chunk 1 automated; E2E pending) | Cash In + Drop canonical |
 
-Do not invent duplicate till/open/close endpoints for Cash Drawer. Permissions:
-`cash_drawer.view`, `cash_drawer.manage`, `cash_drawer.movement.create`,
-`pos.till.close`. Canonical:
+**Do not invent** `POST /cash-drop`, `POST /cash-out`, or `POST /safe-drop`.
+
+Canonical POST body (Cash In verified; Cash Drop target): `requestId`,
+`deviceId`, `movementTypeId`, `amount`, optional `note` (≤500). Currency and
+session context are server-owned. Idempotency: same `requestId` + same logical
+request → safe replay; conflicting payload → conflict.
+
+Cash Drop OUT support, OUT type seeds, and server available-cash checks are
+**implemented in Chunk 1** (automated). Authenticated production E2E and
+printing remain Chunk 2. Canonical feature:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/07_Cash_Drop_Feature]],
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drop_Chunk_1_Core_Implementation_Status]].
+
+Permissions: `cash_drawer.view`, `cash_drawer.manage` (physical only),
+`cash_drawer.movement.create`, `pos.till.close`. Also:
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]],
-[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]].
 
 ### Device activation contract clarification — 2026-08-10
 

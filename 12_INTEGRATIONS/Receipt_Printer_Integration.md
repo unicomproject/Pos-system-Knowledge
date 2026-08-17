@@ -1,35 +1,104 @@
 <!-- title: Receipt Printer Integration -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-16 -->
 # Receipt Printer Integration
+
+## Canonical status (2026-08-16)
+
+```text
+RECEIPT PRINTER: PARTIAL
+Overall hardware module: BLOCKED — HARDWARE NOT PRODUCTION READY
+Android USB/Bluetooth: SOFTWARE IMPLEMENTED; physical tablet acceptance NOT VERIFIED
+Windows LocalPrintAgent: SUPPORTED OPTIONAL PATH (source v3 published; installed agent may still be v2 until elevated upgrade; spooler/visual PARTIAL)
+Chunk 2: OPEN — [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Chunk_2_Receipt_Printer_Closure_Attempt_2026-08-16]]
+Evidence: [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Android_Direct_Printer_Integration_2026-08-16]]
+```
+
 ## Purpose
-Define the verified receipt data, Flutter orchestration, Windows Local Print
-Agent, ESC/POS, audit, recovery, security, and physical-verification boundary.
+Define the verified receipt data, Flutter orchestration, Android direct USB/Bluetooth
+transports, optional Windows Local Print Agent, ESC/POS, audit, recovery, security,
+and physical-verification boundary.
+
 ## Scope
 Cash completed-sale receipts, Receipt History reprints, manual non-sale tests,
-58/80 mm formatting, barcode, feed/cut, Local Agent health, and print audit.
+58/80 mm formatting, barcode, feed/cut, Android USB/BT, Local Agent health, and print audit.
 
 ## Current Architecture
-Physical Android POS → private LAN → Windows Local Print Agent → Windows RAW
-spooler → laptop USB `POSPrinter POS80`. `E_POS.Api` remains authoritative for
-sale/receipt data and audit; it does not communicate with the USB printer.
+
+**Primary (Android tablet production)**
+
+```text
+Flutter POS → EscPosReceiptGenerator → USB Host or Bluetooth Classic SPP → ESC/POS printer
+```
+
+USB-C hub is physical host transport only (not a printer protocol).
+
+**Optional (Windows-connected printer)**
+
+```text
+Flutter / Windows POS → LocalPrintAgentClient → E_POS.LocalPrintAgent → Windows RAW → printer
+```
+
+`E_POS.Api` remains authoritative for sale/receipt data and audit; it does not
+communicate with USB/Bluetooth printers.
 
 ## Component Responsibilities
 Backend commits the snapshot and audit. Flutter maps, persists, and orchestrates.
-The Agent authenticates, validates, de-duplicates, builds ESC/POS, and writes RAW
-bytes to the configured Windows printer.
+Direct Android adapters open the device transport and write ESC/POS bytes.
+The optional Local Agent authenticates, validates, de-duplicates, builds ESC/POS,
+and writes RAW bytes to a configured Windows printer.
 
 ## Runtime Flow
-Completed payment → backend receipt → Flutter mapper → durable print controller
-→ printer service → Local Agent adapter/client → `POST /api/print/receipt` →
-validation/idempotency → ESC/POS builder → RAW spooler → result → backend audit.
-Receipt History reprint reuses the immutable snapshot and same transport.
+Completed payment → backend receipt → Flutter success state retains authoritative
+payload → cashier taps **Print Receipt** (manual; exactly-once original) →
+`CanonicalReceiptPresentationMapper` → shared presentation contract →
+printer service → selected adapter:
+- Android USB/BT: Dart `EscPosReceiptGenerator.generateCanonical` → native bridge
+- LocalPrintAgent: structured contract **v3** → C# `EscPosReceiptBuilder` → spooler
+Payment Success preview renders the same `CanonicalReceiptPresentation`.
+Reprint uses the same presentation with a separate reprint request identity.
+
+### Checkout receipt print policy
+
+```text
+Checkout receipt print policy: MANUAL
+Original print: Payment Success "Print Receipt" (exactly-once per sale)
+Print again: separate reprint request identity after success
+Printer failure: sale and payment remain complete; retry/print-again available
+```
+
+### Preview ↔ physical parity
+
+```text
+Receipt Preview and Physical Receipt are two renderers
+of one canonical receipt presentation contract.
+Semantic/business parity is mandatory.
+Pixel parity is not required due to thermal printer limitations.
+Evidence: [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Receipt_Canonical_Preview_Physical_Parity_2026-08-16]]
+```
+
+### Receipt customer authority
+
+```text
+Receipt customer is derived from the completed-sale customer snapshot.
+Walk-in Customer is used only for genuinely anonymous sales.
+Preview, original print, and reprint must use the same customer value.
+```
+
+Checkout payment response returns `customerId` / `customerName` / `customerPhone`
+from the persisted sale snapshot. Flutter enriches `authoritativePayment` at
+checkout record time so cart clear cannot drop the customer before print.
+
+## HTTPS scope
+Android direct USB/Bluetooth does **not** require LocalPrintAgent HTTPS.
+Android → LAN → LocalPrintAgent deployments still require trusted HTTPS
+(no trust-all / no ASP.NET development certificate as production acceptance).
 
 ## Configuration
 | Owner | Verified settings |
 |---|---|
-| Flutter device | transport, Agent URL, timeout, printer name; API key secure |
+| Flutter device | transport (USB/BT/agent), Agent URL when used, timeout, printer identity; API key secure |
 | Local Agent | listen URL, printer, width, auto-cut, feed lines, API key |
 | Security/operations | CIDR allow-list, body limit, operation/log paths, retention |
 
@@ -47,8 +116,9 @@ Never store a real API key in this knowledge base.
 | `POST /api/print/receipt` | Local key | Validate and print one receipt |
 | `POST /api/v1/pos/receipts/{saleId}/print` | POS auth/permission | Audit result |
 
-Agent API version is `1`; active receipt contract is `2`. Receipt contract v1
-is accepted for backward compatibility. Unsupported explicit versions fail.
+Agent API version is `1`; active receipt contract is `3` (canonical presentation).
+Receipt contracts `1` and `2` remain accepted for backward compatibility.
+Unsupported explicit versions fail.
 
 ## Receipt Data Ownership
 Backend `receipt_data_json` owns historical lines, safe tender allocations,
@@ -63,17 +133,19 @@ The two manual generators are a drift risk and must never both transform one
 Local Agent request.
 
 ## Supported Transports
-| Transport | Code state | Physical state |
+| Transport | Code state | Physical / production state |
 |---|---|---|
-| Local Agent → Windows RAW → USB | Implemented | POS80 output observed; release matrix incomplete |
-| Direct TCP | Separate adapter | Physically unverified |
-| Direct USB/Bluetooth | Fail-safe adapter boundaries | Unsupported/unverified |
+| Android USB Host (USB-C / USB) | Implemented | Physical tablet acceptance **NOT VERIFIED** |
+| Android Bluetooth Classic SPP | Implemented | Physical tablet acceptance **NOT VERIFIED** |
+| Local Agent → Windows RAW → USB | Implemented | Optional Windows path; POS80 spooler PARTIAL |
+| Direct TCP (network ESC/POS) | Separate adapter | Physically unverified — not production-accepted |
 
 ## Security Rules
-Use explicit private CIDRs plus constant-time `X-Local-Print-Key` validation.
+LocalPrintAgent deployments: explicit private CIDRs + constant-time `X-Local-Print-Key`.
 Do not log the key, access tokens, PAN/CVV, raw card data, or provider secrets.
-No CORS/Swagger/public exposure. Release Android clear-text remains disabled;
-production requires trusted HTTPS or an explicitly approved security decision.
+No CORS/Swagger/public exposure for the agent.
+Android direct USB/Bluetooth does not use LocalPrintAgent HTTPS.
+Android → LAN → LocalPrintAgent still requires trusted HTTPS (no trust-all).
 
 ## Idempotency And Duplicate Prevention
 Each physical attempt has stable `printRequestId`. Agent operation files survive
@@ -109,9 +181,23 @@ Implemented and physically unverified.
 
 ## Physical Verification Status
 Observed development evidence confirms Local Agent health readiness, Windows
-spooler availability, and real POS80 receipt output. It does not confirm current
-release acceptance for barcode scanning, corrected cutter margin, 58 mm,
-paper-out/cover/jam, timeout unknown outcome, reprint, or multi-copy behavior.
+spooler availability, and real POS80 receipt output. It does **not** complete
+release acceptance.
+
+### Production acceptance requirement (PR-*)
+
+Physical acceptance must include where claimed supported:
+
+- print receipt
+- reprint
+- printer offline
+- paper/failure path where supported
+- restart/reconnect
+- configured printer
+- 58mm/80mm only if actually supported
+- real physical hardware evidence
+
+No production PASS without physical evidence.
 
 ## Known Limitations
 Real card provider, split tender execution, tax registration/invoice label,
@@ -182,11 +268,13 @@ unrelated New Sale failures. No physical test was performed. Status:
 
 ## Related Files
 - [[POS_Hardware_Integration]]
+- [[Local_Print_Agent]]
 - [[../03_USER_JOURNEYS/Cashier/07_Payment_Flow]]
 - [[../03_USER_JOURNEYS/Cashier/13_Hardware_Testing_Flow]]
 - [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Hardware_Payment_Receipt]]
 - [[../15_IMPLEMENTATION_TRACKING/Backend/POSOperations/Receipt_Printer_Local_Agent_Implementation_Status]]
 - [[../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Payment_Receipt_Contract_Implementation_Status]]
+- [[../10_TESTING_QA/POS_Hardware_Production_Acceptance_Matrix]]
 
 
 ## Tenant Admin Monitoring Boundary (2026-08-01)
