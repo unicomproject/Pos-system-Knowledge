@@ -1,9 +1,34 @@
 <!-- title: Barcode Scanner Integration -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-16 -->
 
 # Barcode Scanner Integration
+
+## Canonical status (2026-08-16)
+
+```text
+BARCODE SCANNER: PARTIAL — software hardened 2026-08-16 (HID + bluetoothHid + camera path);
+physical SC-* acceptance incomplete
+Overall hardware module: BLOCKED — HARDWARE NOT PRODUCTION READY
+```
+
+Supported software modes:
+
+```text
+USB HID / keyboard wedge (usbHid, hid)
+Bluetooth HID (bluetoothHid — same wedge pipeline; OS keyboard emulation)
+Camera scanning (mobile_scanner on Android/iOS)
+```
+
+Physical acceptance remains open — see
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Chunk_4_Barcode_Scanner_2026-08-16]].
+
+Scanner capture may be local; product lookup remains part of the POS/catalogue
+backend flow.
+
+Authority:
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]]
 
 ## Purpose
 
@@ -119,8 +144,22 @@ New Sale consumes each event once and replaces the current scanner snackbar, so
 the FIFO queue is never blocked and visual notifications cannot accumulate.
 
 Physical TURBOGEAR TB-00D verification and physical Android camera validation
-remain pending. Full scanner E2E status is partial until hardware validation
+remain pending. Full scanner E2E status is **PARTIAL** until hardware validation
 completes.
+
+### Production acceptance requirements (SC-*)
+
+- Real USB/HID scanner
+- Camera scan
+- Rapid scanning
+- Duplicate handling
+- CR/LF suffix handling if applicable
+- Focus lifecycle
+- Unknown barcode
+- Product disabled/unavailable
+- Reconnect/restart
+
+No production PASS without physical evidence.
 
 ## Camera scanner
 

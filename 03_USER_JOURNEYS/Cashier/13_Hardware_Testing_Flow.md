@@ -166,9 +166,10 @@ Current hardware capability must be read per device type:
 | USB HID scanner | Keyboard framing and shared exact barcode-to-cart pipeline implemented | TURBOGEAR TB-00D physical and repeated-scan acceptance not verified |
 | Camera scanner | Android/iOS camera source and automated coverage implemented | Physical Android/iOS camera permission, lifecycle and barcode recognition not verified |
 | Receipt printer | Local Agent UI/client/adapter, health, test print and RAW spooler path implemented | POS80 printed in observed development use; current release acceptance, failure matrix and final cutter/barcode fixes remain unverified |
-| Cash drawer | UI entry exists | No verified drawer-kick/printer-pulse command or physical result |
-| Card reader | Payment route exists as placeholder | No provider terminal capture or physical terminal evidence |
-| Hardware test log | Backend operation create/result APIs and `hardware_test_logs` persistence are wired for current printer health/test-print flow | Physical evidence capture and full peripheral matrix remain pending |
+| Cash drawer | Local Agent `POST /api/drawer/open` + Flutter transport + backend drawer ops path implemented | Physical RJ11/RJ12 DR-* acceptance Not Run / Blocked |
+| Card reader | Provider-neutral unavailable safety; **NOT IMPLEMENTED** production provider | No terminal; **OUT OF CURRENT HARDWARE RELEASE** |
+| Hardware test log | Backend operation create/result APIs and `hardware_test_logs` persistence wired for supported tests | Physical evidence capture and full peripheral matrix remain pending |
+| Local Print Agent deployment | Software process + install scripts exist | Production Windows service reboot→autostart acceptance **not signed**; `dotnet run` is not production |
 
 Therefore this journey is `RUNTIME_VERIFICATION_REQUIRED`, not end-to-end
 complete. Package/plugin registration and adapter classes are not physical-test
@@ -212,4 +213,8 @@ inventory data. Physical acceptance remains pending.
 
 ## Tenant Admin Monitoring Link (2026-08-01)
 
-Cashier hardware testing remains the physical execution path. Results must eventually land in `hardware_test_logs` for Tenant Admin Till monitoring. End-to-end logging chain remains incomplete; physical verification pending. See [[../../12_INTEGRATIONS/POS_Hardware_Integration]].
+Cashier hardware testing remains the physical execution path. Results land in
+`hardware_test_logs` for Tenant Admin Till monitoring where the software path
+is wired. Physical verification remains pending. Overall hardware:
+**BLOCKED**. See [[../../12_INTEGRATIONS/POS_Hardware_Integration]] and
+[[../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]].

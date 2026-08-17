@@ -1,7 +1,7 @@
 <!-- title: Flutter Hardware Payment Receipt -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-17 -->
 # Flutter Hardware Payment Receipt
 
 ## Purpose
@@ -144,6 +144,14 @@ pending, so the status is `IMPLEMENTED — PHYSICAL ACCEPTANCE PENDING`.
 ## Cash Drawer Rule
 
 Cash drawer actions require permission, till context, and audit where supported.
+
+The automatic Cash Sale path was physically accepted on 2026-08-17 using the
+Windows Local Print Agent, POSPrinter POS80, Cashbox #1 / `drawerPin2`, and a
+100/200 ms pulse. Flutter generates drawer `requestedAt` from device UTC. The
+Agent's 120-second stale-request validation remains mandatory, so POS device
+system time must be synchronized. Do not bypass validation or blindly retry a
+stale/unknown drawer pulse. Detailed evidence:
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Runtime_Integration_Issue_Resolution_2026-08-17]].
 
 ## Hardware Config Cache
 

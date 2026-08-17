@@ -1,7 +1,7 @@
 <!-- title: POS App UI Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-13 -->
+<!-- last_updated: 2026-08-14 -->
 
 # POS App UI Rules
 
@@ -177,7 +177,7 @@ Cash in/out must require type, amount, and reason.
 
 Canonical:
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]],
-[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]].
 
 ## Device UI Rules
 

@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-15 -->
 
 # Permission Code List
 
@@ -446,7 +446,7 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `refunds.create` / `exchanges.create` | Branch processing after resolution is selected |
 | `cash_drawer.view` | View Cash Drawer screen / nav |
 | `cash_drawer.manage` | Physical/manual Open Drawer management |
-| `cash_drawer.movement.create` | Create authorized Cash In / Cash Out / Cash Drop (canonical; seed + API enforce required) |
+| `cash_drawer.movement.create` | Create Cash In / Cash Out / Cash Drop; Cash In + Cash Drop → `cash_movements` **software production-accepted** |
 | `notifications.view` | Notification bell |
 | `pos.till.open` | Till open flow (`canOpenPosTill`); backend Open Till authority |
 | `pos.till.close` | End Shift / close currently assigned open till session / Close Till action |
@@ -484,17 +484,20 @@ Receipt printing and hardware configuration are separate:
 `receipts.print` protects printing, while `pos.hardware.settings` protects the
 activated-device Local Print Agent settings/testing surface.
 
-Permission visibility does not prove implementation. In particular,
-`cash_drawer.manage` gates physical Open Drawer (hardware path exists).
-`cash_drawer.movement.create` is defined in constants but was **not seeded /
-not API-enforced** as of 2026-08-13 code evidence; Flutter currently gates Cash
-In/Drop with `cash_drawer.manage` — align to the canonical mapping before
-production. `pos.hardware.settings` exists, but backend hardware-test-log
+Permission visibility does not prove physical acceptance. `cash_drawer.manage`
+gates physical Open Drawer. `cash_drawer.movement.create` is the sole mutation
+permission for Cash In/Out/Drop; it does not replace trusted-device, open-till,
+tenant, or type validation. Cash In canonical `cash_movements` persistence and
+idempotency are verified; Cash Drop OUT create remains pending
+([[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/07_Cash_Drop_Feature]]).
+`pos.hardware.settings` exists, but backend hardware-test-log
 persistence is not fully wired. No distinct merchant-copy or sensitive-reprint
 permission is approved; do not invent one.
 
 Cash Drawer feature contract:
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]].
+Cash Drop feature contract:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/07_Cash_Drop_Feature]].
 
 ## Seed Data Rule
 

@@ -1,7 +1,7 @@
 <!-- title: Till Close Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-15 -->
 
 # Till Close Flow
 
@@ -76,7 +76,7 @@ flowchart TD
 | Read | Extend/reuse `GET /api/v1/tills/current-session?deviceId=` for authoritative close summary |
 | Write | Modify/reuse `POST /api/v1/tills/close` |
 | Core tables | `till_sessions`, `cash_reconciliations`, `till_session_events` |
-| Expected-cash input | Cash activity plus canonical `till_cash_movements`; `cash_movement_types` controls effect |
+| Expected-cash input | Cash activity plus canonical `cash_movements`; `cash_movement_types` controls effect |
 
 Current code trusts optional request `ExpectedCash` (or falls back to opening
 float) and does not persist `cash_reconciliations`. Those are release blockers,

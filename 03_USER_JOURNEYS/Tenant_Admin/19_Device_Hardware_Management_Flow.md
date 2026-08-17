@@ -112,8 +112,15 @@ Tenant Admin may request/queue tests; native POS executes; Backend append-only `
 
 Derived alerts only — no dedicated `hardware_alerts` table required for MVP. View Alerts only when real count &gt; 0. Acknowledge/resolve workflow is post-MVP.
 
-### Status
+### Status (updated 2026-08-16)
 
-Registration/assignment management APIs: **NOT IMPLEMENTED**. Readiness read: **PARTIALLY COMPLETED**. Physical verification: **PHYSICAL VERIFICATION PENDING**. Do not mark COMPLETED from reference images.
+Registration/assignment management APIs: **COMPLETED** (software) — see
+[[../../15_IMPLEMENTATION_TRACKING/Backend/HardwareCash/Tenant_Admin_Hardware_Read_Assignment_Status_Implementation]].
+Readiness merge (Till + POS-device): **COMPLETED** (software).
+Physical peripheral verification: **PENDING**.
+Overall POS hardware production: **BLOCKED**.
 
-Canonical architecture: [[../../12_INTEGRATIONS/POS_Hardware_Integration]].
+Do not mark physical hardware COMPLETED from reference images or API HTTP 200 alone.
+
+Canonical architecture: [[../../12_INTEGRATIONS/POS_Hardware_Integration]] ·
+[[../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]].

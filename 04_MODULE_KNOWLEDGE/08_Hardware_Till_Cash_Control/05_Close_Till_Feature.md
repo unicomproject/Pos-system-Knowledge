@@ -1,7 +1,7 @@
 <!-- title: Close Till Feature -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-15 -->
 
 # Close Till Feature
 
@@ -18,12 +18,13 @@ the canonical Close Till contract; current-code gaps are stated explicitly.
 | Flutter screen and route | Implemented |
 | Close API and permission | Implemented |
 | CLOSED session/event write | Implemented |
-| Backend-authoritative expected cash | **Missing — release blocker** |
-| `cash_reconciliations` persistence | **Missing — release blocker** |
-| Authenticated production E2E | Not accepted after required backend changes |
+| Backend-authoritative expected cash | Implemented and automated-test verified |
+| `cash_reconciliations` persistence | Implemented and automated-test verified |
+| Authenticated production E2E | Balanced real close accepted in Cash Drawer Chunk 2; full End Shift matrix remains pending |
 
-The existing implementation is reusable but is **not production complete**.
-Documentation is ready for implementation; this status is not runtime acceptance.
+The Close Till financial synchronization implementation is complete. The wider
+End Shift release remains blocked until its remaining authenticated runtime
+matrix is accepted.
 
 ## Entry Paths And Modes
 
@@ -97,25 +98,26 @@ the dashboard top bar.
 
 ## Expected Cash Contract
 
-Target Expected Cash is calculated server-side from the opening float plus
+Expected Cash is calculated server-side from the opening float plus
 canonical cash-affecting activity for that till session, including accepted cash
-payments/refunds and `till_cash_movements` according to configured movement
+payments/refunds and canonical `cash_movements` according to configured movement
 effect. The read summary and close command must use the same calculator and
 transactional snapshot.
 
-Current repository behavior is unsafe: it uses request `ExpectedCash` when
-provided and otherwise uses only `OpeningFloatAmount`. This is a release blocker.
+The repository ignores compatibility-only request `ExpectedCash`; the Flutter
+caller omits that field. The close response's expected/count/difference values
+are the final financial result.
 
 ## API Contract
 
 | Method | Route | Decision |
 |---|---|---|
 | GET | `/api/v1/tills/current-session?deviceId=` | Reuse and extend/add close-summary fields; no separate route required unless response compatibility requires it |
-| POST | `/api/v1/tills/close` | Reuse but modify implementation for authoritative calculation and atomic reconciliation |
+| POST | `/api/v1/tills/close` | Reused; authoritative calculation and atomic reconciliation implemented |
 
-Current request fields are `deviceId`, `tillId`, `countedCash`, optional
-`expectedCash`, `mismatchReason` and `closingNote`. Target callers must omit
-`expectedCash`; it remains transition-only until removed or ignored server-side.
+The Flutter request fields are `deviceId`, `tillId`, `countedCash`, optional
+`mismatchReason` and `closingNote`. The backend DTO temporarily accepts optional
+`expectedCash` for compatibility, but repository calculation ignores it.
 
 The success response keeps the closed session: identifiers, opening float,
 expected cash, counted cash, difference, `CLOSED`, opened/closed timestamps and
@@ -145,17 +147,20 @@ migration is required for this contract.
 | `till_sessions` | Set status, closer, closing device/note and closed timestamp; cash amounts belong in reconciliation |
 | `cash_reconciliations` | Persist expected, counted, difference, currency, status/reason and calculation evidence |
 | `till_session_events` | Append one CLOSED audit event |
-| `till_cash_movements` | Canonical session cash-movement input; do not rename to `cash_movements` |
+| `cash_movements` | Canonical session cash-movement input linked to `cash_movement_types` |
+| `till_cash_movements` | Legacy implementation input pending canonical cut-over; no dual-write |
 | `cash_movement_types` | Defines whether a movement affects expected cash |
 | `till_session_payment_summaries` | Optional derived summary input/output; not a substitute for reconciliation |
 
-## Current Audit Finding
+## Verified Implementation Finding — 2026-08-15
 
-The current close repository updates `till_sessions` and calls
-`TillSessionEvent.RecordClosed`, so a CLOSED event is written in the same
-`SaveChanges` operation. It does **not** insert `cash_reconciliations`. The event
-records actor, device, counted amount, currency, timestamp and note; richer
-calculation evidence belongs in reconciliation data.
+`PosTillSessionRepository.CloseTillAsync` revalidates the tenant-scoped trusted
+device assignment and open session, calculates Expected Cash from persisted
+cash payments/refunds and configured cash movements, creates and submits one
+`CashReconciliation`, closes the session and records one CLOSED event. The three
+writes share one `SaveChanges` and one serializable relational transaction.
+Repeated/concurrent close maps to `till_session.already_closed` and the unique
+session reconciliation constraint prevents duplicates.
 
 ## Save Draft Contract
 
@@ -184,10 +189,12 @@ approved Release 1 requirement; do not imply persistence.
 
 ## Verification Gate
 
-Production completion requires focused backend tests, Flutter widget/provider
-tests and one authenticated real E2E for balanced and variance close. Verify one
-session, one reconciliation and one CLOSED event, no duplicate close, correct
-normal-close bootstrap and End Shift logout. Until then status remains blocked.
+Automated financial synchronization gates passed on 2026-08-15, including
+authoritative calculation/client manipulation, reconciliation, forced
+persistence failure, tenant isolation, variance validation and repeated close.
+Flutter analyze and the full Flutter suite also passed. A real balanced close
+was accepted in Cash Drawer Chunk 2. Variance and End Shift authenticated runtime
+acceptance remain release gates for the combined End Shift feature.
 
 ## Related Files
 

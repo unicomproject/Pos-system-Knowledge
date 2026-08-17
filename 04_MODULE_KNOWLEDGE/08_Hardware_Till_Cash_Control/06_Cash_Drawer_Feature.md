@@ -1,97 +1,137 @@
 <!-- title: Cash Drawer Feature -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-13 -->
+<!-- last_updated: 2026-08-16 -->
 
 # Cash Drawer Feature
 
 ## Purpose
 
-Authoritative product/backend contract for Cashier **Cash Drawer** management:
-till cash position monitoring, physical Open Drawer, Cash In / Cash Out·Drop,
-recent movements, and entry to Close Till.
+Canonical Cashier contract for backend-authoritative drawer position, physical
+Open Drawer, Cash In/Out/Drop, recent movements, and Close Till reuse.
 
-Flutter presentation authority:
-[[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
-Journey: [[../../03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow]].
-Physical pulse: [[../../12_INTEGRATIONS/Cash_Drawer_Integration]].
+## Domain separation
 
-## Implementation Readiness
+| Concern | API / table | Notes |
+|---|---|---|
+| Physical Open Drawer | `/api/v1/pos/hardware/drawer/*` → `cash_drawer_operations` | Hardware audit only |
+| Financial Cash In | `POST /api/v1/pos/cash-drawer/movements` + `Direction=IN` | Canonical `cash_movements` |
+| Financial Cash Drop | Same movements API + `Direction=OUT` | **SOFTWARE PRODUCTION ACCEPTED** (Chunk 2) |
+| Summary / history | `GET .../summary`, `GET .../movements` | Backend-authoritative |
 
-| Layer | Status |
+## Current implementation classification
+
+| Capability | Status |
 |---|---|
-| Requirements / Second Brain | **DOCUMENTED / READY FOR IMPLEMENTATION PLANNING** (2026-08-13) |
-| Backend Till session APIs | **EXISTING / REUSE** |
-| Backend physical drawer APIs | **EXISTING / REUSE** (`/api/v1/pos/hardware/drawer/*`) |
-| Backend Cash Drawer financial APIs | **APPROVED_TARGET_NOT_IMPLEMENTED** |
-| New DB table for Cash Drawer screen | **NOT REQUIRED / NOT APPROVED** |
-| New summary DB columns for UI | **NOT REQUIRED / NOT APPROVED** |
-| New permission codes | **NOT REQUIRED** (reuse catalog; seed/enforce `cash_drawer.movement.create`) |
-| Flutter Cash In/Out | **FRONTEND_ONLY** today |
-| Feature Completed | **Not claimed** |
+| Cash Drawer Management Flutter UI | IMPLEMENTED |
+| Physical drawer APIs | SOFTWARE hardened 2026-08-16 ([[../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Chunk_3_Physical_Cash_Drawer_2026-08-16]]); physical DR-* PENDING |
+| Summary / movement list APIs | IMPLEMENTED |
+| Cash movement type read API (`direction=IN`) | **VERIFIED** |
+| Cash movement type read API (`direction=OUT`) | **IMPLEMENTED** (Chunk 1) |
+| Canonical Cash In mutation → `cash_movements` | **VERIFIED** |
+| Canonical Cash Drop / OUT mutation | **IMPLEMENTED** + **SOFTWARE PRODUCTION ACCEPTED** (Chunk 2) |
+| `cash_movements.request_id` + tenant unique index | **IMPLEMENTED** |
+| Dual-write POS Cash In/Drop to `till_cash_movements` | **FORBIDDEN / not used** |
+| Cash In Phone/Tablet/Desktop acceptance | **VERIFIED** (Chunk 3) |
+| Cash Drop UI | IMPLEMENTED |
+| Cash Drop available-cash server validation | **IMPLEMENTED** (Chunk 1) |
+| Cash Drop E2E / production acceptance | **VERIFIED** — [[../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Cash_Drop_Chunk_2_Production_Acceptance_2026-08-16]] |
 
-## Screen Contract (summary)
-
-- Title **Cash Drawer** and subtitle inside the main **white** content card,
-  below the standard POS top bar.
-- No back-arrow; no “Continue to Dashboard”.
-- Normal POS bottom navigation remains available.
-- Simplified Till Summary: Till, Status, Opening Cash, Cash Sales, Current
-  Expected Cash.
-- Actions: Open Drawer, Cash In, Cash Out/Drop, Close Till.
-- Recent cash movements newest first with typed semantics.
-
-## Permissions
-
-| Code | Purpose |
-|---|---|
-| `cash_drawer.view` | View Cash Drawer |
-| `cash_drawer.manage` | Physical/manual Open Drawer management |
-| `cash_drawer.movement.create` | Create Cash In / Cash Out / Cash Drop |
-| `pos.till.close` | Close Till |
-
-## Approved Target Financial APIs
-
-| API | Status |
-|---|---|
-| `GET /api/v1/pos/cash-drawer/summary` | APPROVED_TARGET_NOT_IMPLEMENTED |
-| `GET /api/v1/pos/cash-drawer/movements` | APPROVED_TARGET_NOT_IMPLEMENTED |
-| `POST /api/v1/pos/cash-drawer/movements` | APPROVED_TARGET_NOT_IMPLEMENTED |
-
-## Database Decision
-
-One financial cash-movement source of truth is mandatory.
-
-| Role | Table / source |
-|---|---|
-| Canonical long-term ERD target | `cash_movement_types` + `cash_movements` |
-| Current runtime ledger | `till_cash_movements` |
-| Cash sale contribution today | `sales_payments` (CASH, paid statuses) |
-| Physical drawer audit | `cash_drawer_operations` |
-
-Do not create `cash_drawer_summary` / `cash_drawer_history`.
-Do not dual-write both movement tables.
-
-## Expected Cash
-
-Backend-authoritative. Conceptual:
+## Canonical financial authority
 
 ```text
-Opening Cash + Cash Sales + Cash In − Cash Refunds − Cash Out − Cash Drops
+cash_movement_types -> cash_movements -> till_sessions
 ```
 
-No double counting of the same payment as both payment row and movement row.
+- `sales_payments` remains payment/refund truth.
+- `cash_movements` is the only approved manual movement ledger for POS Cash In/Drop.
+- `cash_movement_types` is the reason/type catalog authority.
+- `till_cash_movements` is legacy/compatibility (e.g. some return flows), not a
+  second POS Cash In/Drop ledger.
+- Never dual-write one financial Cash In/Drop.
+- Never add a screen-specific summary table.
 
-## Offline
+Expected Cash is calculated by the backend from opening float, successful cash
+payments/refunds, and canonical movements whose type affects expected cash.
+Flutter displays the returned value and must not recalculate final authority.
 
-Cash In / Out / Drop: **ONLINE / BACKEND AUTHORITATIVE** until an approved
-offline contract exists.
+Available Cash in Drawer is currently the same backend figure as Current
+Expected Cash unless a future separate authority is approved.
 
-## Related Files
+## Cash In reason model
+
+System IN types: `FLOAT_ADDED`, `PETTY_CASH_ADDED`, `CASH_CORRECTION`, `OTHER`.
+They are global (`tenant_id = NULL`), system-owned, active, direction `IN`, and
+affect expected cash. Active tenant-owned IN types may also be returned.
+
+UI **Reason \*** selects `cash_movement_types.id` as `movementTypeId`.
+`cash_movements.reason` is optional explanatory note text.
+
+## Cash Drop reason model
+
+**TARGET:** OUT catalog via `GET .../cash-movement-types?direction=OUT`.
+Summary formula already anticipates system code `CASH_DROP` for drop totals.
+OUT seeds and API acceptance are **REQUIRED gaps**. Hardcoded Flutter Drop
+labels are interim only. A "Bank Deposit" label does not authorize a banking
+module. Full contract: [[07_Cash_Drop_Feature]].
+
+## Permissions and preconditions
+
+- `cash_drawer.view`: read summary, history, movement types.
+- `cash_drawer.manage`: physical/manual Open Drawer only.
+- `cash_drawer.movement.create`: create Cash In/Out/Drop.
+- `pos.till.close`: Close Till.
+- Authentication, active tenant, trusted active device, resolved outlet/till,
+  and an OPEN till session are mandatory.
+- Backend authorization is permission-based; role-name bypasses are forbidden.
+- No new permission codes for Cash Drop.
+
+## API direction
+
+| Method | Route | Status |
+|---|---|---|
+| GET | `/api/v1/pos/cash-drawer/summary` | IMPLEMENTED |
+| GET | `/api/v1/pos/cash-drawer/movements` | IMPLEMENTED |
+| GET | `/api/v1/pos/cash-movement-types?direction=IN` | VERIFIED |
+| GET | `/api/v1/pos/cash-movement-types?direction=OUT` | **PENDING** (currently rejected) |
+| POST | `/api/v1/pos/cash-drawer/movements` | **IN VERIFIED; OUT REJECTED** |
+
+Do **not** create `POST /cash-drop` or `POST /cash-out`.
+
+Canonical body uses `requestId`, `deviceId`, `movementTypeId`, `amount`,
+optional `note`. Currency/session/user/tenant are server-owned.
+
+Idempotency uses `cash_movements.request_id` with
+`UNIQUE(tenant_id, request_id) WHERE request_id IS NOT NULL`.
+
+## Screen contracts
+
+- Cash Drawer Management: [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]]
+- Cash In: [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_In_Screen_Implementation_Specification]]
+- Cash Drop: [[07_Cash_Drop_Feature]]
+
+Manager PIN remains UI-only future placeholder on In/Drop forms.
+
+## No-new-schema decision for Cash Drop
+
+```text
+New Cash Drop table        → NO
+New Cash Drop-specific API → NO
+New Cash Drop DB columns   → NO
+New permission             → NO
+New backend module         → NO
+Duplicate Flutter feature  → NO
+Existing generic movement  → REUSE / EXTEND
+OUT movement support       → IMPLEMENT / VERIFY
+```
+
+## Related files
 
 - [[01_Module_Overview]]
 - [[02_Functional_Rules]]
 - [[03_Technical_Contract]]
-- [[04_Open_Till_Feature]]
-- [[05_Close_Till_Feature]]
-- [[../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Second_Brain_Alignment_2026-08-13]]
+- [[07_Cash_Drop_Feature]]
+- [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_In_Screen_Implementation_Specification]]
+- [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]]
+- [[../../03_USER_JOURNEYS/Cashier/10_Cash_In_Out_Flow]]
+- [[../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Cash_Drop_Second_Brain_Canonicalization_2026-08-16]]

@@ -1,7 +1,7 @@
 <!-- title: Receipt Printer Local Agent Implementation Status -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-16 -->
 
 # Receipt Printer Local Agent Implementation Status
 
@@ -11,152 +11,67 @@
 |---|---|
 | Platform | Backend / Windows Local Service |
 | Module | POS Operations / Hardware |
-| Feature | Windows Local Print Agent |
-| Status | Testing |
-| Completed Date | - |
-| PR / Commit | Current working tree; no commit created |
-| Tests | Automated pass; physical acceptance incomplete |
+| Feature | Windows Local Print Agent (`E_POS.LocalPrintAgent`) |
+| Status | **Chunk 1 software foundation PASS** — Windows service/reboot runtime **NOT VERIFIED** |
+| Completed Date | 2026-08-16 (software) |
+| PR / Commit | Current working tree |
+| Tests | LocalPrintAgent **60** Release passed; published artifact health verified |
+
+## Canonical production note (2026-08-16)
+
+```text
+Overall hardware: STILL BLOCKED — HARDWARE NOT PRODUCTION READY
+Customer must NOT rely on daily `dotnet run` for production POS
+Windows Service scripts + packaging: IMPLEMENTED
+Production install → reboot → auto-start acceptance: NOT VERIFIED in this environment
+```
+
+Chunk 1 evidence:
+
+[[../../Flutter/Hardware/POS_Hardware_Chunk_1_Local_Print_Agent_Production_Foundation_2026-08-16]]
+
+Authority: [[../../../12_INTEGRATIONS/Local_Print_Agent]] ·
+[[../../Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]]
 
 ## Feature Summary
 
-A separate Windows service exposes a laptop USB receipt printer to an activated
-Flutter POS over a restricted private LAN. It validates source network, local
-API key, contract, receipt data, and request identity before generating ESC/POS
-and sending RAW bytes to the Windows spooler.
+A separate Windows process/service exposes a laptop USB receipt printer (and
+drawer kick) to an activated Flutter POS over a restricted private LAN. It
+validates source network, local API key, contract, receipt/drawer data, and
+request identity before generating ESC/POS and sending RAW bytes to the Windows
+spooler.
 
-## Related Second Brain Files
+## Production packaging
 
-| Area | File |
+| Item | Value |
 |---|---|
-| Module | [[../../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/01_Module_Overview]] |
-| POS contract | [[../../../04_MODULE_KNOWLEDGE/21_POS_Operations/03_Technical_Contract]] |
-| Journey | [[../../../03_USER_JOURNEYS/Cashier/13_Hardware_Testing_Flow]] |
-| Database | [[../../../06_DATABASE_KNOWLEDGE/Tables/21_POS_Operations_UPDATED]] |
-| Integration | [[../../../12_INTEGRATIONS/Receipt_Printer_Integration]] |
+| Publish model | `dotnet publish -c Release -r win-x64 --self-contained` |
+| Runtime | win-x64 |
+| Output | `artifacts/local-print-agent/publish` |
+| Self-contained | YES |
+| Single file | NO (dependency-friendly) |
+| Install | `scripts/local-print-agent/install-print-agent.ps1` |
+| Update | `update-print-agent.ps1` (preserves config + env key) |
+| Uninstall | `uninstall-print-agent.ps1` (preserves ProgramData unless `-DeleteOperationalData`) |
 
-## Files Changed
+## Security (Chunk 1)
 
-`tools/E_POS.LocalPrintAgent/` contains Program, options, validation, security,
-idempotency, observability, ESC/POS builder, and Windows RAW printer service.
-`tests/E_POS.LocalPrintAgent.Tests/` contains the focused test project.
+- `X-Local-Print-Key` via service environment (not appsettings JSON)
+- Empty / placeholder / low-entropy keys fail closed at startup
+- CIDR allow-list required; invalid CIDR fails validation
+- Loopback-only → bind `127.0.0.1`, skip inbound firewall
+- LAN → bind `0.0.0.0`, Private-profile firewall scoped to CIDR + program
+- Logs sanitize; key never logged
+- HTTPS optional via `-UseHttps` (Android release requires HTTPS)
 
-## Access Checks Implemented
+## Drawer safety
 
-| Check | Status | Notes |
-|---|---|---|
-| Explicit private CIDR | Done | Request rejected outside allow-list |
-| Local API key | Done | Fixed-time header comparison |
-| Request validation | Done | Tender/tax/discount/copy checks |
-| Contract compatibility | Done | Agent v1; receipt v1/v2 |
-| Tenant POS permission | N/A | Enforced by Flutter/backend audit boundary |
-
-## Database Tables Used
-
-| Table/store | Usage |
-|---|---|
-| Local operation JSON files | Durable idempotency/restart recovery |
-| `receipts` | Backend authoritative snapshot; not written by Agent |
-| `receipt_print_logs` | Backend audit; not written by Agent |
-
-## Implemented Scope
-
-- Console/Windows Service hosting and configurable listen URL.
-- Live, ready, authenticated detail, diagnostics, operation, and receipt routes.
-- Windows printer existence/readiness and RAW spooler submission.
-- 58/80 mm text, alignment, wrapping, bold/size, CODE128, feed and full cut.
-- Auto-cut false omits cut; copy/tender/discount/tax formatting exists.
-- Durable duplicate prevention and structured failure/unknown outcome.
-- Request limits, allow-list, API-key authentication, safe logging, retention.
-
-## Known Gaps
-
-- QR, raster/image, partial cut, drawer pulse, and Tamil/Unicode rendering.
-- Driver/spooler cannot reliably prove paper completion or every hardware fault.
-- Direct USB/Bluetooth support is not provided by this service.
-- Production HTTPS certificate deployment and full physical failure matrix.
-
-## Tests Written
-
-| Test type | Evidence | Result |
-|---|---|---|
-| Unit | ESC/POS byte order/width/barcode/cut/discount | Passed |
-| Unit | Request validation and compatibility | Passed |
-| Unit | File idempotency and hardening | Passed |
-| Physical | POS80 development receipt output | Observed; incomplete acceptance |
-
-## Test Commands Run
-
-```text
-dotnet test tests/E_POS.LocalPrintAgent.Tests/E_POS.LocalPrintAgent.Tests.csproj
-dotnet build E_POS.sln --configuration Release
-```
-
-## Test Result Summary
-
-Local Agent focused tests passed 30/30. Full backend solution tests passed 1,363
-across Unit, Integration, API, and Local Agent projects. This proves automated
-behavior only.
-
-## Physical Verification
-
-Health reported configured POS80 present/ready and real paper output was observed.
-Current barcode scan, corrected cutter edge, reprint, 58 mm, paper-out,
-cover/jam, timeout-unknown and service-restart acceptance remain unverified.
-
-## Second Brain Updates
-
-Owning Hardware/POS modules, hardware journey, Flutter knowledge, integrations,
-feature index, and payment-receipt status were aligned on 2026-07-29.
-
-## Final Completion Checklist
-
-| Check | Status |
-|---|---|
-| Active Local Agent path | Yes |
-| Automated tests | Yes |
-| Security/idempotency documented | Yes |
-| Full physical matrix | No |
-| Production deployment acceptance | No |
-| Status may be Completed | No |
-
-## Hardware Chunk 2 update (2026-07-29)
-
-- Structured receipt contract extended for sale original/reprint,
-  return/exchange/refund, references, item grouping and settlements.
-- Windows RAW status returns typed paper/door/jam/offline/spooler categories
-  where the driver exposes them.
-- Receipt validation caps safe collection sizes and validates purpose/config
-  identity.
-- Device config owns purpose routing and customer/merchant copy policy.
-- Backend audit persists receipt purpose/copy/configuration/route/device/session,
-  typed outcome and linked unknown-outcome recovery identity.
-- Purpose-aware receipt selection prevents sale-original audit association with
-  a newer refund/exchange receipt.
-- Focused Local Agent suite: 35 passed.
-- Physical purpose/copy/failure acceptance remains pending; status is
-  `PARTIALLY IMPLEMENTED / RUNTIME VERIFICATION REQUIRED`.
-
-## Hardware Chunk 2C update (2026-07-29)
-
-- Refund/Return and Exchange historical snapshots are exposed by receipt detail
-  and used for controlled reprint.
-- One authorization may now own multiple immutable customer/merchant copy logs.
-- Reprint-operation index is non-unique; print-request identity remains unique
-  per tenant/receipt.
-- Duplicate reprint copy types are explicit and migration rollback safely
-  normalizes them before restoring the legacy constraint.
-- Agent produces clear non-sale reprint labels and validates required original
-  references/copy limits.
-- Migration applied; backend Release and 1,386 tests passed.
-
-Code status: `IMPLEMENTED`. Physical status: `PENDING`.
+Drawer requests require fresh `requestedAt` (default max age 120s). Duplicate
+request IDs are idempotent. Stale delayed pulses are rejected.
 
 ## Related Files
 
+- [[../../../12_INTEGRATIONS/Local_Print_Agent]]
 - [[../../../12_INTEGRATIONS/POS_Hardware_Integration]]
-- [[../../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Hardware_Payment_Receipt]]
-- [[../../../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Payment_Receipt_Contract_Implementation_Status]]
-
-## Chunk 3 Runtime Continuation (2026-08-06)
-
-Agent process and POS80 host printer were available, but backend receipt routing returned `PRINTER_NOT_CONFIGURED` for `RCP-000091`. Two failed audit rows exist: one unwanted automatic checkout attempt and one explicit Print Receipt tap. Flutter automatic printing has been removed. No physical receipt was produced and no retry occurred. Hardware assignment/routing must be corrected before acceptance; status remains `IMPLEMENTED / PHYSICAL PENDING`.
+- [[../../Flutter/Hardware/POS_Hardware_Chunk_1_Local_Print_Agent_Production_Foundation_2026-08-16]]
+- [[../../Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]]
