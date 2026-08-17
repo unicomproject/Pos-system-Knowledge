@@ -1,61 +1,33 @@
-<!-- title: Tenant Admin Brand Management Canonical UI Contract -->
-<!-- status: Active canonical target; implementation not verified -->
-<!-- last_updated: 2026-08-12 -->
-# Tenant Admin Brand Management — Canonical UI Contract
+<!-- status: Active canonical target; Add/Edit not implemented -->
+<!-- last_updated: 2026-08-15 -->
+# Tenant Admin Brand Management and Add/Edit Content Contract
 
-## Truth labels
+## Preserve implemented list/details
 
-- **CURRENT SOURCE:** Flutter is NOT READY. The list is mounted in `TenantAdminPageScaffold`; Add/Edit opens a desktop `showGeneralDialog` with dark barrier or a responsive bottom sheet. There is no `selectedBrandId`, permanent details region, no-selection state, row selection, or pagination UI. Edit receives incomplete list-summary data. The black/orange sidebar exists, but the footer marks Brand as Settings-active.
-- **TARGET CONTRACT:** Rules below are mandatory future behavior.
-- **IMPLEMENTATION STATUS:** TARGET — TO BE IMPLEMENTED. Flutter must align with a verified Backend/DB contract.
+Brand Management keeps the implemented list and read-only detail behavior. The detail panel must remain read-only and must not become the Add/Edit form.
 
-## Final workspace and shell
+## Common-layout ownership
 
-Use one continuous white workspace with two internal regions separated only by a subtle 1px divider. Do not use two Cards, a detachable panel, modal, dialog, drawer, floating surface, separate right Scaffold, shadow, large gutter, or dark barrier on desktop/laptop.
+Future Add/Edit implementation creates only route content. It must reuse the actual shared `TenantAdminLayout`, `TenantAdminPageScaffold`, header, sidebar/drawer, footer, navigation, theme, spacing, responsive outer layout and breadcrumb components. It must not create another Scaffold/shell/sidebar/header/footer.
 
-The shared shell is black with white text/icons and orange active state. Product and Brand are active; Settings is not active. Product children are exactly: Add Product; Categories & Subcategories; Brand.
+## One form
 
-### First region ownership
+Use one reusable form content implementation with ADD and EDIT modes. Exact class name is not locked. Independent duplicated Add and Edit forms are forbidden.
 
-1. Breadcrumb: `Product / Brand / Brand Management`.
-2. Header: `Brands Management` at left and orange `+ Add Brand` at right, wholly before the divider.
-3. `Search brands...`.
-4. Brand table.
-5. Pagination.
+ADD: heading `Add Brand`; breadcrumb `Product / Brand / Brand Management / Add Brand`; empty/default state.
 
-### Second region ownership
+EDIT: heading `Edit Brand`; breadcrumb `Product / Brand / Brand Management / Edit Brand`; receive `brandId`; show loading before editable fields; GET detail; guard prefill so async completion cannot overwrite user edits.
 
-Permanent heading: `Brand Details`. Initial state is `selectedBrandId = null`; list load must not select a row or call detail automatically. Center a Brand-specific neutral icon, `No brand selected`, and `Select a brand from the list to view its details.` without an extra Card.
+Fields: Brand Name*, Code*, Sort Order, Brand Logo, Description, Status*. Actions: Back to List, Cancel, Save Brand. Brand Preview is excluded. Status options are Active/Inactive only. BrandSlug is hidden/server-managed.
 
-Row click sets the ID, highlights only that row with a restrained orange tint, calls `GET /api/v1/brands/{id}`, and shows loading/error only in the second region while retaining the list. No navigation or modal.
+## State and behavior target
 
-## Add, edit, cancel and delete
+State must cover identity, visible fields, existing/new logo, mode, loading, dirty, submitting, field errors and global error. Reset between Add/Edit and Brand IDs. Suppress double save. On failure retain values. Dirty Back/Cancel requires confirmation. Refresh affected list/detail after success.
 
-- Add switches the existing second region to Create mode with empty Name/Code, null/empty Description, SortOrder 0, no image, ACTIVE. Cancel returns to no selection.
-- Edit must use full detail, never list summary. Field order is Name*, Code*, Description, Sort Order, Brand Image, Status, Cancel/Save Brand. The permanent desktop region has no X.
-- Cancel Edit restores persisted detail and retains selection.
-- After deleting the selected Brand: clear selection, refresh list, do not select another row, and restore no-selection wording.
-- Delete dialog: Cancel orange outlined; Delete orange filled; include Brand name, loading state and duplicate-submit prevention.
+Initial logo belongs to Create; later replacement belongs to Update. If Brand creation succeeds and logo fails, show recoverable partial success and retry logo without re-creating. Exact mechanism awaits backend closure.
 
-## Table contract
+## Responsive/accessibility target
 
-Exactly: Brand Logo; Brand Name; Code; Product Count; Status; Updated On; Actions. Exclude Sort Order, Description, Slug, Created On and ID. All desktop/tablet headers and cell contents are centered. Widths are proportional: Logo small; Name/Code medium; Product Count/Status/Actions medium-small; Updated On wider. Mobile cards are exempt.
+Tablet-first: verify 1024×768, 1280×800, common Android tablet portrait/landscape and desktop. Content must scroll with keyboard, avoid breadcrumb/action overflow, retain usable logo sizing/alignment, and meet shared touch target, focus, label, semantics and error-announcement standards.
 
-## Form contracts
-
-| Field | Target |
-|---|---|
-| Brand Name | required, trimmed, max 150 |
-| Code | required, trimmed, max 80, canonical uppercase, tenant-unique; allowed characters, deleted-code reuse and restore semantics unresolved |
-| Description | optional, max 255, `0/255` counter, returned by detail and preserved on unrelated edit |
-| Sort Order | integer, default 0, >=0, helper `Lower numbers appear first`; form only |
-| Image | JPEG/JPG or PNG, max 2 MB, recommended 400×200px; preview/change; explicit partial-success error |
-| Status | ACTIVE or INACTIVE only; DELETED internal |
-
-## Search and pagination
-
-Server search Name+Code with 300–500ms/shared debounce, stale-response protection, clear behavior and reset to page 1. Initial size 10. Footer: `Showing X to Y of Z brands` left; `[10 ▼] [‹] [1] [›]` right, orange current page. Size/search reset page 1; deletion from an invalid final page moves to the previous valid page.
-
-## Responsive and accessibility
-
-Verify 1920×1080, 1600×900, 1440×900, 1366×768, 1280×720, 1180×820 and 1024×768. Desktop/laptop shows both regions. Tablet may use the approved responsive sheet pattern when necessary. Provide row-selection semantics, accessible Add/Change Image/pagination labels, Edit/Delete tooltips, keyboard/focus behavior, text scaling, non-color-only status and approximately 44×44 targets.
+Implementation status: **NOT IMPLEMENTED**. Do not begin until the canonical backend P0 gate passes.

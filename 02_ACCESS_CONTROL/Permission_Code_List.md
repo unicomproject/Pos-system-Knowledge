@@ -326,7 +326,7 @@ permission rows for aliases.
 | catalog.brands.delete | Delete/deactivate brands |
 | catalog.brands.manage | Manage all brand actions |
 
-Brand permission reconciliation: CURRENT CRUD operations use their matching permission or `catalog.brands.manage`. Logo mutation uses update/manage, but the current response reload can require view/manage; this is a P1 current defect. TARGET: internal post-mutation reload succeeds for update/manage without weakening the public detail endpoint. Flutter aliases are UX controls only; backend authorization remains authoritative.
+Brand permission contract (canonical 2026-08-15): list/detail use `catalog.brands.view` or manage; create uses create or manage; edit uses update or manage; delete uses delete or manage. Later logo replacement is update/manage. **P0 current gap:** initial logo upload also requires update/manage, so a create-only user can create the Brand and then receive 403. LOCKED TARGET: initial logo belongs to the Create journey and must be completable by a create-authorized user without granting broad update authority. Exact technical mechanism is open. Backend authorization remains authoritative.
 | catalog.collections.view | View collections |
 | catalog.collections.create | Create collections |
 | catalog.collections.update | Update collections |

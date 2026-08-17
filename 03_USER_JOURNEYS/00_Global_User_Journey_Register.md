@@ -171,9 +171,9 @@ One row per journey. Implementation status reflects **production code**, not doc
 | TA-UJ-038 | - | TA | Tenant Admin | - | Edit Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
 | TA-UJ-039 | - | TA | Tenant Admin | - | Delete Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
 | TA-UJ-040 | - | TA | Tenant Admin | - | Browse Brands | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
-| TA-UJ-041 | - | TA | Tenant Admin | - | Create Brand | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
+| TA-UJ-041 | - | TA | Tenant Admin | - | Create Brand | - | - | Y | NOT_STARTED | 20 | Backend P0 gate required | - | - | - | - |
 | TA-UJ-042 | - | TA | Tenant Admin | - | View Brand Details | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
-| TA-UJ-043 | - | TA | Tenant Admin | - | Edit Brand | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
+| TA-UJ-043 | - | TA | Tenant Admin | - | Edit Brand | - | - | Y | NOT_STARTED | 20 | Shared Add/Edit content missing | - | - | - | - |
 | TA-UJ-044 | - | TA | Tenant Admin | - | Delete Brand | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | TA-UJ-045 | - | TA | Tenant Admin | - | View Inventory / Current Stock | - | - | Y | NOT_STARTED | 20 | - | - | - | - | - |
 | TA-UJ-046 | - | TA | Tenant Admin | - | Stock In | - | - | Y | NOT_STARTED | 25 | - | - | - | - | - |

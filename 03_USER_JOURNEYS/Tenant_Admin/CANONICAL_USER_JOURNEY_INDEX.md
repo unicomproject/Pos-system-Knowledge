@@ -50,9 +50,9 @@
 | TA-UJ-038 | Edit Category | NOT_STARTED | 10 |
 | TA-UJ-039 | Delete Category | NOT_STARTED | 10 |
 | TA-UJ-040 | Browse Brands | COMPLETE | 90 |
-| TA-UJ-041 | Create Brand | COMPLETE | 90 |
+| TA-UJ-041 | Create Brand | NOT_STARTED | 20 |
 | TA-UJ-042 | View Brand Details | COMPLETE | 90 |
-| TA-UJ-043 | Edit Brand | COMPLETE | 90 |
+| TA-UJ-043 | Edit Brand | NOT_STARTED | 20 |
 | TA-UJ-044 | Delete Brand | COMPLETE | 90 |
 | TA-UJ-045 | View Inventory / Current Stock | NOT_STARTED | 20 |
 | TA-UJ-046 | Stock In | NOT_STARTED | 25 |

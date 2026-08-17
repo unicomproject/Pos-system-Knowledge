@@ -1,20 +1,18 @@
-<!-- status: Active canonical target; to be implemented/verified -->
-# Tenant Admin Brand Management — NFR Contract
+<!-- status: Active canonical target; implementation partial -->
+<!-- last_updated: 2026-08-15 -->
+# Tenant Admin Add/Edit Brand — NFR Contract
 
-| ID | Category | Canonical requirement | Current status |
-|---|---|---|---|
-| NFR-01 | Performance | Server paging/search, 300–500ms debounce, set-based ProductCount/no N+1, no automatic detail call. | PARTIAL |
-| NFR-02 | Scalability | Support 10/100/1,000/10,000 Brands without loading the catalog into Flutter. | TO VERIFY |
-| NFR-03 | Security | Authentication, backend authorization, tenant-scoped queries, IDOR-safe 404, DB tenant integrity. | PARTIAL; Product FK unsafe |
-| NFR-04 | File security | Brand-only JPEG/PNG, 2 MB, MIME/extension/signature validation, tenant ownership, replace/orphan cleanup. | PARTIAL; shared policy differs |
-| NFR-05 | Data integrity | Preserve Description/SortOrder; max contracts; code uniqueness; tenant-safe Product FK. | FAIL/P0 |
-| NFR-06 | Concurrency | CURRENT last-write-wins/no token. TARGET adopt platform-wide standard. | ARCHITECTURAL DECISION REQUIRED |
-| NFR-07 | Reliability | Guard duplicate save/delete; explicit profile-saved/image-failed partial success; safe retries. | PARTIAL |
-| NFR-08 | Errors | Deliberate UI/API mapping for 400,401,403,404,409,413,415,429,500,503. | PARTIAL |
-| NFR-09 | Accessibility | Semantics, tooltips, focus/keyboard, text scale, status text, required indicators, ~44×44 targets. | TO IMPLEMENT |
-| NFR-10 | Maintainability | UI/domain/data separation, one authoritative state path, shared constants without weakening Brand policy. | PARTIAL |
-| NFR-11 | Observability | Structured create/update/delete/image events with tenant/user/Brand/trace and no sensitive payloads. | NOT VERIFIED |
-| NFR-12 | Localization/timezone | Localizable strings and tenant-aware Updated On formatting. | PARTIAL |
-| NFR-13 | Rate limiting | Verify inherited platform policy and document 429 handling. | NOT VERIFIED |
-| NFR-14 | Responsiveness | Verify seven target viewports; simultaneous regions on usable desktop/laptop; approved tablet adaptation. | TO IMPLEMENT |
-| NFR-15 | Testability | Injectable state/data dependencies and deterministic backend/PostgreSQL tests for all contracts. | PARTIAL |
+| Category | Locked target | Current implementation |
+|---|---|---|
+| Security | Backend authority, tenant isolation, safe files; create-authorized initial logo without broad update | Tenant isolation/file security IMPLEMENTED; initial logo FAIL/P0 |
+| Reliability | Recoverable create/logo partial success; stale-write protection; submit guard | P0 recovery MISSING; concurrency MISSING; form MISSING |
+| Idempotency | UI submit lock; duplicate transport remains distinct; server strategy shared/open | Server MISSING |
+| Accessibility | Labels, focus/tab order, semantics, announced errors, contrast, shared touch sizes | Add/Edit MISSING |
+| Performance | One detail fetch, no unchanged-logo upload, targeted list/detail invalidation, indexed ordering | Backend PARTIAL/IMPLEMENTED; form MISSING |
+| Maintainability | Common shell reuse, content-only ownership, one shared form, existing data layers reused | LOCKED TARGET; form MISSING |
+| Observability | Structured safe create/update/status/logo/delete failure and success events | Explicit Brand events/logging MISSING |
+| Responsiveness | Tablet-first scrolling/keyboard/action/breadcrumb/logo behavior | Add/Edit MISSING |
+| Errors | Stable field identifiers; 400/401/403/404/409/413/415/500 handling | Field errors MISSING; unsupported media currently 400 |
+| Audit | Explicit audit event trail, distinct from created_by/updated_by columns | MISSING |
+
+Last-write-wins is not acceptable target behavior. The technical concurrency mechanism is an OPEN DECISION. Brand creation and optional logo upload must never be documented as one transaction while they are separate requests.

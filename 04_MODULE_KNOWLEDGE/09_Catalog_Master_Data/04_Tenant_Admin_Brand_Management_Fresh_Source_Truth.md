@@ -1,69 +1,133 @@
-<!-- status: Active canonical source truth -->
-<!-- last_updated: 2026-08-12 -->
-# Tenant Admin Brand Management — Fresh Source Truth
+<!-- status: Active canonical contract and current-source ledger -->
+<!-- last_updated: 2026-08-15 -->
+# Tenant Admin Add/Edit Brand — Canonical Contract and Source Truth
 
-## Baseline and verdict
+## Authority and truth labels
 
-Second Brain `main@4d8918d`; Flutter `main@5d9eb91`; Backend `suganya/Category@808b73e`. Previous Second Brain reliability: LOW.
+This file separates **LOCKED TARGET** from **CURRENT IMPLEMENTATION**. A locked target is not evidence that source exists. Executable source, migrations and tests remain authoritative for implementation status.
 
-| Area | Current status |
-|---|---|
-| Frontend | NOT READY |
-| Backend | PARTIALLY READY |
-| Database | NOT READY |
-| API | NOT READY |
-| Permissions | PARTIALLY READY |
-| Responsive | NOT READY |
-| NFR | PARTIALLY READY |
-| Tests | NOT READY |
-| Overall | NOT READY |
+## Canonical architecture
 
-## Verified existing source
+- **BRAND-FE-LAYOUT-001 — LOCKED TARGET:** Add/Edit must render Brand-specific content inside the existing Tenant Admin common layout. Reuse `TenantAdminLayout`, shell scaffold, sidebar, header, footer, navigation, theme, spacing, responsive outer layout and breadcrumb pattern. Do not create a second shell.
+- **BRAND-FE-LAYOUT-002 — LOCKED TARGET:** Add and Edit use one reusable Brand form/content implementation. Add initializes empty/default state; Edit loads by `brandId`, shows loading, then performs guarded one-time prefill.
+- Brand Management remains full-width list when nothing is selected and list plus **read-only** Brand Details when selected. Do not convert that detail region into an editor.
+- Add/Edit are separate route-content flows inside the common shell. No modal, drawer, editable side panel or Brand Preview.
 
-- Tenant-protected CRUD at `/api/v1/brands`; tenant-filtered list/detail/update/delete, Name+Code server search, bounded paging, uppercase code normalization, tenant code uniqueness, ACTIVE/INACTIVE writes and DELETED soft delete.
-- Composite tenant-safe Brand-to-media FK and Brand logo upload with MIME/extension/signature checking and replacement cleanup.
-- Flutter data/domain layers, search request, form field order, Description counter, SortOrder UI validation, image preview and CRUD permission visibility.
-- Black/white/orange sidebar and approved Product submenu.
+## Locked Add/Edit UX
 
-## Gap register
-
-| ID | Priority | Current source | Target/status |
+| Mode | Heading | Breadcrumb | Initialization |
 |---|---|---|---|
-| BRAND-P0-001 | P0 | Edit uses list summary; detail response omits Description; save can overwrite it with null. | Full detail before edit; preserve Description/SortOrder. TO BE IMPLEMENTED. |
-| BRAND-P0-002 | P0 | Backend Name validator max 200; DB `varchar(150)`. | Required/trim/max 150 everywhere. TO BE IMPLEMENTED. |
-| BRAND-P0-003 | P0 | nullable `Product.BrandId`; service tenant check only; no DB FK/index. | `(tenant_id,brand_id)` FK to Brands, Restrict, index, safe preflight. TO BE IMPLEMENTED. |
-| BRAND-P1-001 | P1 | Desktop modal/dark overlay. | Continuous two-region workspace. |
-| BRAND-P1-002 | P1 | SortOrder only in Flutter concept; backend/DB/migration absent. | End-to-end integer default 0/check >=0/order. |
-| BRAND-P1-003 | P1 | ProductCount absent; Flutter defaults missing data to zero. | Set-based server projection; never stored. |
-| BRAND-P1-004 | P1 | selection/detail/no-selection state absent. | `selectedBrandId` journey and regional loading. |
-| BRAND-P1-005 | P1 | Flutter fixed page 1/50; no pagination UI. | initial size 10 and target footer. |
-| BRAND-P1-006 | P1 | mutation invalidates provider not watched by screen. | one authoritative list state/refetch. |
-| BRAND-P1-007 | P1 | upload Update/Manage then response reload View/Manage. | internal reload without unrelated View requirement. |
-| BRAND-P1-008 | P1 | shared media accepts JPEG/PNG/WebP up to 5 MB. | Brand boundary JPEG/PNG max 2 MB. |
-| BRAND-P1-009 | P1 | footer treats Brand as Settings-active. | Settings inactive; Product/Brand active. |
-| BRAND-P1-010 | P1 | profile update then image upload is non-atomic. | explicit partial-success UX/recovery. |
-| BRAND-P2-001 | P2 | table has Sort Order; default alignment/intrinsic sizing. | exact seven centered proportional columns. |
-| BRAND-P2-002 | P2 | search has no debounce/stale protection. | canonical debounce/page reset/cancellation. |
-| BRAND-P2-003 | P2 | semantics/focus/touch/text-scale coverage incomplete. | accessibility contract and tests. |
-| BRAND-P2-004 | P2 | active documentation contained false implementation claims. | this reconciled contract. |
-| BRAND-P2-005 | P2 | Brand observability/rate limiting not verified. | verify/document platform behavior. |
+| Add | `Add Brand` | `Product / Brand / Brand Management / Add Brand` | Empty/default fields |
+| Edit | `Edit Brand` | `Product / Brand / Brand Management / Edit Brand` | Loading, GET by `brandId`, guarded one-time prefill |
 
-## Current and target API
+Fields: Brand Name*, Code*, Sort Order, Brand Logo, Description, Status*. Actions: Back to List, Cancel, Save Brand. Brand Preview is **NOT REQUIRED**.
 
-CURRENT: list summaries contain ID/code/name/logo/media/status/timestamps; detail is the same shape. Description, SortOrder and ProductCount are absent. Create/update accept Description but not SortOrder. Backend paging returns items/pageNumber/pageSize/totalCount.
+Edit must prefill Name, Code, Sort Order, existing logo, Description and Status. It must not show an editable empty form and later overwrite user-entered values.
 
-TARGET list: `GET /api/v1/brands?pageNumber&pageSize&search`, returning items/pageNumber/pageSize/totalCount/totalPages. Summary: id, brandCode, brandName, resolved logo/media, productCount, status, updatedAt.
+## Business rules
 
-TARGET detail: id, brandCode, brandName, description, sortOrder, logoMediaAssetId/resolved media, status, createdAt, updatedAt. Create/update editable profile: brandCode, name, description, sortOrder, status. BrandSlug remains **UNRESOLVED — KEEP CURRENT BEHAVIOR UNTIL DECISION**.
+| ID | Canonical rule | Current implementation |
+|---|---|---|
+| BR-Brand-001 | Brand belongs to authenticated Tenant; UI TenantId is never authoritative | IMPLEMENTED |
+| BR-Brand-002 | Name required, trimmed, max 150 | IMPLEMENTED backend/DB; Flutter form MISSING |
+| BR-Brand-003 | Code required, trimmed, uppercase, max 80 | IMPLEMENTED backend/DB; Flutter form MISSING |
+| BR-Brand-004 | Normalized code unique within Tenant | IMPLEMENTED |
+| BR-Brand-005 | Edit may retain its own code; another Brand's code conflicts | IMPLEMENTED repository logic; targeted tests incomplete |
+| BR-Brand-006 | Description optional, trimmed, max 255 | IMPLEMENTED backend; DB text has no 255 check |
+| BR-Brand-007 | Sort Order integer and >= 0 | IMPLEMENTED backend/DB |
+| BR-Brand-008 | Editable statuses are ACTIVE and INACTIVE | IMPLEMENTED backend; Flutter form MISSING |
+| BR-Brand-009 | DELETED is internal and absent from Add/Edit | IMPLEMENTED backend lifecycle; Flutter form MISSING |
+| BR-Brand-010 | BrandSlug is server-managed and hidden | IMPLEMENTED derivation; max/conflict gaps remain |
+| BR-Brand-011 | Logo optional | IMPLEMENTED backend capability |
+| BR-Brand-012 | Logo JPG/JPEG/PNG, <= 2 MB | IMPLEMENTED backend; Flutter picker MISSING |
+| BR-Brand-013 | Initial logo belongs to authorized Create journey without broad update authority | FAIL/P0 |
+| BR-Brand-014 | Later logo replacement is an Update action | IMPLEMENTED |
+| BR-Brand-015 | Created Brand remains created if optional logo fails; expose retryable partial success | MISSING/P0 |
+| BR-Brand-016 | Cross-tenant GET/update/logo/delete prohibited | IMPLEMENTED |
+| BR-Brand-017 | Unchanged Edit logo is not uploaded | LOCKED TARGET; form MISSING |
+| BR-Brand-018 | Stale Edit must not overwrite newer update | MISSING/P1; mechanism OPEN DECISION |
+| BR-Brand-019 | Repeated submit must be guarded | Flutter MISSING; server idempotency MISSING |
+| BR-Brand-020 | Backend is authoritative for permissions/validation | IMPLEMENTED principle |
+| BR-Brand-021 | Brand owns content only and reuses common shell | LOCKED TARGET |
+| BR-Brand-022 | Add/Edit share one reusable form/content implementation | LOCKED TARGET; MISSING |
 
-## Current and target database
+Brand Code allowed-character rule is **OPEN/GAP**; no regex is currently defined. Deleted-code reuse and restore semantics are also open.
 
-CURRENT Brand fields: id, tenant_id, brand_code(80), brand_name(150), brand_slug(180), nullable text description, nullable logo_media_asset_id, status, audit users and timestamps. Tenant/code and tenant/slug are unique; status check permits ACTIVE/INACTIVE/DELETED. No SortOrder exists.
+## Field and validation contract
 
-TARGET adds `sort_order integer NOT NULL DEFAULT 0`, check `sort_order >= 0`, and—subject to query-plan approval—index `(tenant_id,sort_order,brand_code)`. The claimed `20260728103522_AddBrandSortOrder` migration does not exist.
+| Field | Frontend target | Backend current | Database current |
+|---|---|---|---|
+| Name | required, trim, max 150 | required/max 150 | varchar(150), non-null |
+| Code | required, trim, uppercase, max 80 | required/max 80/normalized | tenant-unique varchar(80) |
+| Description | optional, trim, max 255 | max 255 | nullable text; no 255 check |
+| Sort Order | integer >=0; initial value OPEN | integer >=0; fallback 0 | integer default 0; check >=0 |
+| Status | Active/Inactive only | ACTIVE/INACTIVE writes | lifecycle also permits DELETED |
+| Logo | JPG/JPEG/PNG <=2 MB | size/MIME/extension/signature/dimensions checked | tenant-safe media FK |
+| BrandSlug | hidden | derived from normalized code if omitted | required, max 180, tenant-unique |
 
-Product lifecycle verified from `ProductConfiguration`: DRAFT, ACTIVE, INACTIVE, ARCHIVED. Target ProductCount includes same-tenant DRAFT/ACTIVE/INACTIVE rows for BrandId and excludes ARCHIVED; use a set-based projection/no N+1 and do not persist the count on Brand.
+Frontend Add/Edit validation is **NOT IMPLEMENTED**. BrandSlug explicit max validation and duplicate-slug domain translation are **GAPS**. Backend validation is PARTIAL because the Brand API does not expose stable field-addressable errors; Flutter must not parse messages.
 
-## Implementation status
+## API and permissions
 
-Backend/DB work must precede dependent Flutter integration. Targets are not implemented until source, migrations and tests prove them.
+| Method | Route | Current permission | Status |
+|---|---|---|---|
+| GET | `/api/v1/brands` | view or manage | IMPLEMENTED |
+| GET | `/api/v1/brands/{id}` | view or manage | IMPLEMENTED; sufficient Edit prefill |
+| POST | `/api/v1/brands` | create or manage | IMPLEMENTED |
+| PUT | `/api/v1/brands/{id}` | update or manage | IMPLEMENTED |
+| DELETE | `/api/v1/brands/{id}` | delete or manage | IMPLEMENTED soft delete |
+| POST | `/api/v1/brands/{brandId}/logo` | update or manage | IMPLEMENTED; initial-create authorization FAIL/P0 |
+
+Dedicated logo removal endpoint: **MISSING / DOES NOT EXIST**. Unsupported Brand media currently maps to HTTP 400; target is 415 (**P1 GAP**).
+
+Initial logo authorization outcome is LOCKED: a create-authorized user must complete initial logo attachment without receiving broad update authority. Atomic create-with-logo, narrowly scoped initial authorization, or another reviewed design remain implementation options.
+
+Create then logo upload is not atomic. If logo fails after POST success, report Brand **CREATED**, logo **FAILED/NOT ATTACHED**, retain Brand ID, and allow logo-only retry without another create. Exact API/result mechanism is OPEN.
+
+## Database contract
+
+`brands`: `id`, `tenant_id`, `brand_code varchar(80)`, `brand_name varchar(150)`, `brand_slug varchar(180)`, nullable `description text`, `sort_order integer NOT NULL DEFAULT 0`, nullable `logo_media_asset_id`, `status varchar(40)`, `created_at`, `updated_at`, `created_by_tenant_user_id`, `updated_by_tenant_user_id`.
+
+Implemented in source: unique `(tenant_id, brand_code)`, unique `(tenant_id, brand_slug)`, check `sort_order >= 0`, status ACTIVE/INACTIVE/DELETED, tenant-safe logo FK, and `products(tenant_id, brand_id) -> brands(tenant_id, id) ON DELETE RESTRICT`.
+
+Migration `20260812163014_ImplementTenantAdminBrandContract` is **PRESENT IN SOURCE**. Database contract is **IMPLEMENTED IN SOURCE**. Application/deployment to a target PostgreSQL environment is **NOT VERIFIED BY THIS AUDIT**.
+
+## Current implementation tracking
+
+| Capability | Status | Priority |
+|---|---|---|
+| Brand List | IMPLEMENTED | — |
+| Read-only Brand Details | IMPLEMENTED | — |
+| Common Tenant Admin Layout | IMPLEMENTED / REUSE | — |
+| Add route | MISSING | P0/Frontend phase |
+| Edit route | MISSING | P0/Frontend phase |
+| Shared Add/Edit content | MISSING/BLOCKED | P0/Frontend phase |
+| CRUD/detail APIs | IMPLEMENTED | — |
+| Database contract | IMPLEMENTED IN SOURCE | deployment unverified |
+| Tenant isolation | IMPLEMENTED | — |
+| BrandSlug derivation | IMPLEMENTED | — |
+| Initial-logo authorization | FAIL/GAP | P0 |
+| Create→logo recovery | MISSING | P0 |
+| Field-addressable errors | MISSING | P1 |
+| HTTP 415 mapping | GAP | P1 |
+| Edit concurrency | MISSING | P1 |
+| Explicit Brand audit events/logging | MISSING | P1 |
+| Server idempotency | MISSING | P2/shared decision |
+| Flutter Add/Edit QA | MISSING | P1 |
+| PostgreSQL Brand constraint QA | MISSING/PARTIAL | P1 |
+
+## Open decisions
+
+- Exact UI initial Sort Order; persisted/backend fallback remains 0.
+- Optimistic concurrency mechanism.
+- Initial-logo authorization implementation mechanism.
+- Partial-success API/result and retry mechanism.
+- Brand soft-delete behavior when products reference it.
+- Server idempotency priority/mechanism.
+- Code character rule and deleted-code reuse/restore semantics.
+
+## Locked implementation sequence and backend gate
+
+Phase 0 canonicalization → Phase 1 backend/API/RBAC P0 closure → Phase 2 backend/API/permission/PostgreSQL tests → Phase 3 backend gate → Phase 4 Flutter Brand **content only** inside common layout → Phase 5 validation/loading/dirty/responsive behavior → Phase 6 end-to-end QA → Phase 7 final documentation sync.
+
+Before Flutter integration: Create, Update, Detail, server slug, SortOrder and tenant isolation must remain acceptable; initial-logo authorization and create/logo recovery must PASS; validation contract must be approved; required RBAC and PostgreSQL tests must PASS.

@@ -1,21 +1,19 @@
-<!-- status: Active implementation handoff; no implementation performed -->
-# Tenant Admin Brand — Backend/Database Handoff
+<!-- status: Active next-phase handoff -->
+<!-- last_updated: 2026-08-15 -->
+# Tenant Admin Add/Edit Brand — Backend/API/RBAC P0 Handoff
 
-Use `04_Tenant_Admin_Brand_Management_Fresh_Source_Truth.md` as canonical baseline. Execute later in this order:
+Next phase is **Backend / API / RBAC P0 Gap Closure**, not Flutter implementation.
 
-1. Return full Description in detail and prove safe edit preservation.
-2. Align Name required/trim/max 150; add Description max 255.
-3. Preflight orphan/cross-tenant Product BrandIds, then add nullable composite FK `products(tenant_id,brand_id) -> brands(tenant_id,id)`, `ON DELETE RESTRICT`, and index `(tenant_id,brand_id)`. Fail migration safely; never silently delete/reassign data.
-4. Add Brand `sort_order integer NOT NULL DEFAULT 0`, check >=0, DTO/entity/config/snapshot/migration, and list ordering SortOrder then code. Optional list index requires query-plan approval.
-5. Add set-based ProductCount: same tenant/Brand; include DRAFT, ACTIVE, INACTIVE; exclude ARCHIVED; do not persist.
-6. Complete paging with totalPages and validate query behavior.
-7. Fix logo post-mutation internal reload for Update/Manage users without weakening public detail View authorization.
-8. Enforce Brand-only JPEG/PNG max 2 MB while retaining signature/MIME/extension/tenant ownership/cleanup.
-9. Resolve platform-wide concurrency standard; do not invent a Brand-only token.
-10. Add backend and database tests from the canonical test contract.
-11. Verify model snapshot/pending changes/migration ordering and false historical SortOrder claim removal.
-12. Run migrations and integrity tests against real PostgreSQL.
+1. Close initial-logo authorization outcome: create-authorized user completes initial attachment without broad update authority.
+2. Define and implement recoverable create-success/logo-failure semantics and logo-only retry.
+3. Add permission/API tests for create-only+logo, manage, denied, replacement and cross-tenant IDs.
+4. Return stable field-addressable Brand validation using the shared error envelope.
+5. Map unsupported Brand media to HTTP 415.
+6. Select the shared optimistic-concurrency mechanism and prevent silent stale overwrite.
+7. Translate code/slug database uniqueness races safely.
+8. Add explicit structured Brand mutation/audit events.
+9. Add real PostgreSQL tests for tenant code/slug uniqueness, sort check, tenant-safe Product FK, RESTRICT behavior, migration and uniqueness races.
 
-BrandSlug is **UNRESOLVED — KEEP CURRENT BEHAVIOR UNTIL DECISION**. Code allowed characters, deleted-code reuse and restore semantics also require decisions.
+Preserve existing CRUD, detail response, tenant filters, same-code exclusion, BrandSlug derivation, media validation, Brand configuration, migration and list/read-only details.
 
-Handoff readiness: **READY FOR BACKEND/DB IMPLEMENTATION** as a documentation contract; implementation remains NOT STARTED.
+Backend gate must pass before Flutter integration: Create, Update, Detail, server slug, SortOrder, tenant isolation, initial-logo authorization, partial-success recovery, approved validation contract, RBAC tests and PostgreSQL tests.

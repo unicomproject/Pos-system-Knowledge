@@ -1629,14 +1629,10 @@ Response structure (Proposed):
 ```
 
 *Note*: `stockValue` reuses the canonical Inventory valuation logic (Sum of `remaining_quantity * unit_cost`). Open orders rely on canonical `SalesOrder` statuses (Not `COMPLETED` and not `CANCELLED`).
-## Tenant Admin Brand API reconciliation (2026-08-12)
+## Tenant Admin Brand API reconciliation (2026-08-15)
 
-CURRENT SOURCE: `/api/v1/brands` supports GET list, GET detail, POST, PUT and DELETE; `POST /api/v1/brands/{id}/logo` uploads media. List/detail responses currently omit Description, SortOrder and ProductCount; paging omits totalPages. SortOrder is not accepted or persisted. Brand remains NOT READY.
+CURRENT SOURCE: `GET /api/v1/brands`, `GET /api/v1/brands/{id}`, `POST /api/v1/brands`, `PUT /api/v1/brands/{id}`, `DELETE /api/v1/brands/{id}`, and `POST /api/v1/brands/{brandId}/logo` exist. Detail contains Description, SortOrder and resolved logo and is sufficient for Edit. POST/PUT accept SortOrder. BrandSlug is derived server-side when omitted. Dedicated logo removal does not exist.
 
-TARGET — TO BE IMPLEMENTED:
+CURRENT GAPS: initial logo upload requires update/manage while create requires create/manage (P0); separate create+logo calls have no recoverable partial-success contract (P0); Brand validation errors are not stably field-addressable (P1); unsupported Brand media maps to 400 rather than target 415 (P1); Brand Edit concurrency and server idempotency are missing.
 
-- `GET /api/v1/brands?pageNumber&pageSize&search` returns summaries plus pageNumber/pageSize/totalCount/totalPages. Summary includes ID, code, name, resolved logo/media, server-derived ProductCount, status and updatedAt.
-- `GET /api/v1/brands/{id}` returns complete editable Description, SortOrder and media in addition to current canonical fields.
-- POST/PUT accept code, name, Description, SortOrder and status. BrandSlug is unresolved; keep current behavior pending decision.
-- Logo upload remains Update/Manage-authorized. Its internal post-mutation reload must not demand unrelated View permission; public detail GET remains View/Manage protected.
-- Brand boundary accepts JPEG/PNG up to 2 MB. Shared Product/Category media capability is not globally changed.
+LOCKED TARGET: initial logo is part of the authorized Create journey without broad update authority; later replacement remains Update. A created Brand stays created when optional logo upload fails, and the client receives a Brand ID/result enabling logo-only retry.

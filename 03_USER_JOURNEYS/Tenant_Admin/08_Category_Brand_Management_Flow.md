@@ -1,29 +1,23 @@
 <!-- status: Active canonical target; implementation partial -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-15 -->
 # Tenant Admin Category and Brand Management Flow
 
-Category behavior remains governed by its own current contracts. This document locks the reconciled Brand journey.
+Category remains governed by its own contracts. Brand source truth is [[../../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/04_Tenant_Admin_Brand_Management_Fresh_Source_Truth]].
 
-## Current Brand source
+## Current Brand Management
 
-Brand CRUD is tenant-protected, but Flutter currently opens Add/Edit in a modal/right overlay, has no selection state, and edits from an incomplete list summary. **P0 CURRENT DATA INTEGRITY DEFECT:** because list/detail responses omit Description, changing only Name can submit null and erase an existing Description.
+- No selection: full-width Brand list.
+- Selection: Brand list plus read-only Brand Details.
+- List and read-only details are IMPLEMENTED. Add/Edit actions are deferred.
 
-## Target Brand journey
+## Locked Add journey
 
-1. Open `/tenant-admin/brands`; load list only.
-2. Keep `selectedBrandId = null`; do not request detail because list data arrived.
-3. Show `No brand selected` and `Select a brand from the list to view its details.` in the permanent right region.
-4. Row click sets Brand ID, highlights only that row, calls `GET /api/v1/brands/{id}`, and loads full detail in the right region while list stays mounted.
-5. Edit uses full Name, Code, Description, SortOrder, image/media and Status. Regression: with Description `Original description` and SortOrder 5, changing only Name preserves both values after save.
-6. `+ Add Brand` switches the same right region to Create with empty Name/Code, null Description, SortOrder 0, no image and ACTIVE. Cancel returns to no selection.
-7. Delete confirmation names the Brand. If the selected Brand is deleted, clear selection, refresh list, select no replacement, and restore no-selection state.
+`Brand Management → Add Brand` opens Add Brand content inside the existing Tenant Admin common layout. Heading: `Add Brand`. Breadcrumb: `Product / Brand / Brand Management / Add Brand`. Use one shared Add/Edit form with empty/default values, fields Name*, Code*, Sort Order, optional Logo, Description and Status*, and actions Back to List, Cancel and Save Brand. No Brand Preview.
 
-## Rules
+## Locked Edit journey
 
-- Authentication and operation-specific Brand permission/Manage override are mandatory; tenant context is server-resolved.
-- Code is trimmed, max 80, uppercase canonical and tenant-unique. Allowed characters, deleted-code reuse and restore semantics remain unresolved.
-- Name is required/trimmed/max 150; Description optional/max 255; SortOrder integer/default 0/nonnegative; editable status ACTIVE/INACTIVE.
-- Product mapping accepts nullable BrandId but target DB integrity requires a same-tenant composite FK.
-- Image partial failure must state: `Brand details were saved, but the image upload failed.`
+`Brand Management → Edit → route with brandId → loading → GET /api/v1/brands/{id} → guarded one-time prefill of the same form`. Heading: `Edit Brand`. Breadcrumb: `Product / Brand / Brand Management / Edit Brand`. Existing logo is shown; unchanged logo is not uploaded.
 
-Implementation status: **TARGET — TO BE IMPLEMENTED** except verified existing CRUD/security elements documented in `04_Tenant_Admin_Brand_Management_Fresh_Source_Truth.md`.
+Back/Cancel with dirty data requires confirmation using an existing shared pattern if available. During save, disable Save, show progress, prevent a second request and retain the form on failure.
+
+Current Add/Edit implementation: **MISSING / BLOCKED BY BACKEND P0 CONTRACT CLOSURE**.
