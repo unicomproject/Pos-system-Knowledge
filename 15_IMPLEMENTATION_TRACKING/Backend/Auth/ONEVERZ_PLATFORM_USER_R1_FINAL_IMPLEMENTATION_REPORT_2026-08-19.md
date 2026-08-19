@@ -78,18 +78,22 @@ Super Admin / Authorized Platform Admin
 ## 5. Email Infrastructure & ACS Completion Semantics
 
 - **Shared Gateway**: Platform User Invitations and Admin Password Resets share the exact same `IApplicationEmailSender` (`AzureCommunicationEmailSender`).
-- **ACS Blocking Wait**: `EmailClientAcsEmailSendGateway` calls `operation.WaitForCompletionAsync()` to ensure the message is accepted and submitted by ACS before returning success. `WaitUntil.Started` is NOT treated as final send success.
-- **Invitation Status Transition**: `platform_user_invitations.status` updates from `PENDING` to `SENT` ONLY when ACS operation returns `Succeeded`.
+- **ACS Send Operation Wait**: `EmailClientAcsEmailSendGateway` calls `operation.WaitForCompletionAsync()` to ensure the message is accepted and successfully submitted through the ACS email transport. `WaitUntil.Started` is NOT treated as final send success.
+- **ACS Succeeded Definition**: ACS `EmailSendStatus.Succeeded` means the send operation successfully completed and the message was submitted through the ACS transport. It does NOT by itself prove recipient mailbox delivery.
+- **Outbox Status Definition**: `integration_outbox_messages = DELIVERED` represents successful processing and submission of the integration outbox message through the configured transport workflow.
+- **Invitation Status Transition**: `platform_user_invitations.status` updates from `PENDING` to `SENT` (meaning successfully submitted through ACS transport) ONLY when the ACS send operation returns `Succeeded`.
 
 ---
 
 ## 6. Runtime Verification Evidence
 
-| Flow | Mailbox Recipient | Subject | Status | Email Arrived |
-|------|-------------------|---------|--------|---------------|
-| Admin Password Reset | `mathur1test@mailnesia.com` | **Reset your OneVerz password** | `DELIVERED` | ✅ Yes |
-| Platform User Invite | `mathur1test@mailnesia.com` | **Set up your OneVerz Platform Admin account** | `SENT` / `DELIVERED` | ✅ Yes |
-| Platform User Invite | `r1compare_*@mailnesia.com` | **Set up your OneVerz Platform Admin account** | `SENT` / `DELIVERED` | ✅ Yes |
+Recipient mailbox delivery was independently verified during R1 runtime acceptance using an accessible DEV/test mailbox.
+
+| Flow | Recipient Mailbox | Subject | Outbox Status | Invitation Status | Mailbox Delivery Verified |
+|------|-------------------|---------|---------------|-------------------|---------------------------|
+| Admin Password Reset | `mathur1test@mailnesia.com` | **Reset your OneVerz password** | N/A (direct) | — | ✅ Yes |
+| Platform User Invite | `mathur1test@mailnesia.com` | **Set up your OneVerz Platform Admin account** | `DELIVERED` | `SENT` | ✅ Yes |
+| Platform User Invite | `r1compare_*@mailnesia.com` | **Set up your OneVerz Platform Admin account** | `DELIVERED` | `SENT` | ✅ Yes |
 
 ---
 
@@ -99,7 +103,7 @@ Super Admin / Authorized Platform Admin
 > **R1 ENDS AT INVITATION EMAIL DELIVERY.**
 > The following capabilities are explicitly OUT OF R1 (Next Phase):
 > - Recipient clicking `/setup-account?token=` link
-> - Setup Account Angular page & token validation API (`POST /api/v1/platform-auth/invitation/validate`)
-> - Setting first password API (`POST /api/v1/platform-auth/invitation/complete`)
-> - Status transition from `INVITED` to `ACTIVE`
-> - Invited user sign-in & session establishment
+> - Setup Account Angular page & token validation API — TBD (Next Phase API Contract)
+> - Setting first password API — TBD (Next Phase API Contract)
+> - Status transition from `INVITED` to `ACTIVE` — Next Phase
+> - Invited user sign-in & session establishment — Next Phase

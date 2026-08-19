@@ -39,9 +39,9 @@ Platform Admin opens **Platform Users** (`/admin/platform-users`).
 | 6 | Atomic DB persistence | Backend creates `platform_users` (`status = INVITED`, `password_hash = NULL`), inserts `platform_user_roles`, generates in-memory invitation token, inserts `platform_user_invitations` (`status = PENDING`, `token_hash`), encrypts token via AES-GCM, inserts `integration_outbox_messages` (`event = platform.user_invited`, `status = PENDING`), and commits transaction. |
 | 7 | Immediate HTTP response | Backend returns HTTP 200 with created `PlatformUserDetailResponse`. UI displays toast: `"Platform user <name> created. Invitation queued."` and cancels inline form. |
 | 8 | Asynchronous Outbox Worker | `TenantOnboardingOutboxWorker` polls `integration_outbox_messages` for `platform.user_invited`, decrypts protected token in memory using `AesGcmInvitationDeliverySecretProtector`, composes HTML invitation email using `PlatformUserInvitationEmailComposer`, and calls `IApplicationEmailSender.SendAsync`. |
-| 9 | ACS Delivery & Wait | `AzureCommunicationEmailSender` sends email via Azure Communication Services. Sender awaits `operation.WaitForCompletionAsync()` until ACS operation reaches terminal `EmailSendStatus.Succeeded`. |
-| 10 | Invitation State Update | Upon ACS `Succeeded`, outbox message updates to `DELIVERED`, invitation updates to `SENT` (`sent_at` timestamp recorded), and audit log `platform_user.invitation_sent` is created. |
-| 11 | Recipient receives email | Recipient receives email titled `"Set up your OneVerz Platform Admin account"` containing secure link `/setup-account?token=<rawToken>`. (R1 Ends Here). |
+| 9 | ACS Transport Processing | `AzureCommunicationEmailSender` sends email via Azure Communication Services. Sender awaits `operation.WaitForCompletionAsync()` until ACS send operation reaches terminal status `Succeeded` (indicating successful message submission through the ACS email transport). |
+| 10 | Invitation State Update | Upon ACS final send operation = `Succeeded`, outbox message updates to `DELIVERED` (transport message processing completed), invitation updates to `SENT` (`sent_at` timestamp recorded), and audit log `platform_user.invitation_sent` is created. |
+| 11 | Recipient receives email | Recipient mailbox receipt was independently verified during R1 runtime acceptance using an accessible DEV/test mailbox, receiving `"Set up your OneVerz Platform Admin account"` containing secure link `/setup-account?token=<rawToken>`. (R1 Ends Here). |
 
 ## R1 Form vs Edit Drawer Scope
 
@@ -84,8 +84,9 @@ Role options for create/edit come from `GET /api/v1/platform-admin/roles` (`plat
 
 - **Transaction Isolation**: ACS network calls occur strictly AFTER database transaction commit.
 - **Shared Infrastructure**: Both Platform User Invitations and Admin Password Resets use the same singleton `IApplicationEmailSender` (`AzureCommunicationEmailSender`).
-- **ACS Operation Wait**: ACS `WaitUntil.Started` is NOT treated as success. The gateway invokes `WaitForCompletionAsync()` and checks for `EmailSendStatus.Succeeded`.
-- **Status Transition**: `platform_user_invitations.status` transitions from `PENDING` to `SENT` ONLY after ACS `Succeeded`. Failed or canceled ACS operations keep the invitation `PENDING` for retry and preserve user status `INVITED`.
+- **ACS Operation Wait**: ACS `WaitUntil.Started` is NOT treated as success. The gateway invokes `WaitForCompletionAsync()` and validates ACS final send operation = `Succeeded` (message successfully submitted to transport).
+- **Outbox Status**: `integration_outbox_messages = DELIVERED` represents successful transport workflow processing of the integration message.
+- **Invitation Status**: `platform_user_invitations.status` transitions from `PENDING` to `SENT` (meaning successfully submitted through ACS transport) ONLY after ACS send operation = `Succeeded`. Failed or canceled ACS operations keep the invitation `PENDING` for retry and preserve user status `INVITED`.
 
 ## R1 Boundary (Scope Termination)
 
@@ -93,10 +94,10 @@ Role options for create/edit come from `GET /api/v1/platform-admin/roles` (`plat
 > **R1 ENDS AT INVITATION EMAIL DELIVERY.**
 > The following capabilities are explicitly OUT OF R1 (Next Phase):
 > - Recipient clicking `/setup-account?token=` link
-> - Setup Account Angular page & token validation API (`POST /api/v1/platform-auth/invitation/validate`)
-> - Setting first password API (`POST /api/v1/platform-auth/invitation/complete`)
-> - Status transition from `INVITED` to `ACTIVE`
-> - Invited user sign-in & session establishment
+> - Setup Account Angular page & token validation API — TBD (Next Phase API Contract)
+> - Setting first password API — TBD (Next Phase API Contract)
+> - Status transition from `INVITED` to `ACTIVE` — Next Phase
+> - Invited user sign-in & session establishment — Next Phase
 
 ## Validation & Error Cases
 
