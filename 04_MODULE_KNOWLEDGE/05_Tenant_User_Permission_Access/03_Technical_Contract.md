@@ -1,125 +1,131 @@
-<!-- title: Tenant Users, Roles, Permissions & Outlet Access Technical Contract -->
+﻿<!-- title: Tenant Users, Roles, Permissions & Outlet Access Technical Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-15 -->
 
 # Tenant Users, Roles, Permissions & Outlet Access Technical Contract
 
 ## Purpose
 
-Defines the implementation contract for `Tenant_User_Permission_Access`. This contract is based on
-new OneVerz POS MVP scope images and the uploaded Unified Commerce database design.
+Defines the implementation contract for tenant users, tenant roles, direct permissions, outlet roles, outlet permissions, role templates, and permission catalog integration.
 
-## API Contract
+## Verification Status
 
-| Area | Contract |
-|---|---|
-| API groups | `/api/v1/tenant-admin/users`, `/api/v1/tenant-admin/roles`, `/api/v1/tenant-admin/permission-catalog`, `/api/v1/tenant-admin/outlet-access` |
-| Request format | Typed request DTOs; no raw map payloads in application layer |
-| Response format | Typed response DTOs with safe fields only |
-| Error format | Standard API error response |
-| Tenant context | Resolved server-side for tenant-owned records |
-| Auth | Staff/customer/platform auth boundary must match module surface |
-
-## API Groups
-
-| API Group | Purpose |
-|---|---|
-| `/api/v1/tenant-admin/users` | Module API group |
-| `/api/v1/tenant-admin/roles` | Module API group |
-| `/api/v1/tenant-admin/permission-catalog` | Module API group |
-| `/api/v1/tenant-admin/outlet-access` | Module API group |
+This document was corrected on 2026-08-15 after source inspection. Items marked `MISSING` or `PARTIAL` must not be treated as implemented.
 
 ## Database Contract
 
-| Table | Contract |
-|---|---|
-| `tenant_users` | Used by this module |
-| `role_templates` | Used by this module |
-| `role_template_versions` | Used by this module |
-| `role_template_version_permissions` | Used by this module |
-| `tenant_roles` | Used by this module |
-| `tenant_role_permissions` | Used by this module |
-| `permission_definitions` | Used by this module |
-| `tenant_user_roles` | Used by this module |
-| `tenant_user_permissions` | Used by this module |
-| `outlet_user_roles` | Used by this module |
-| `outlet_user_permissions` | Used by this module |
+| Table | Verified Purpose | Status |
+|---|---|---|
+| `tenant_users` | Tenant staff account. | Implemented |
+| `tenant_roles` | Tenant-scoped role, optionally sourced from a role template/version. | Implemented |
+| `tenant_role_permissions` | Additive tenant role permission grant with revocation timestamp. | Implemented |
+| `tenant_user_roles` | Tenant user role assignment with revocation timestamp. | Implemented |
+| `tenant_user_permissions` | Direct tenant user permission grant with revocation timestamp. | Implemented |
+| `outlet_user_roles` | Outlet-scoped role assignment with revocation timestamp and primary manager flag. | Implemented |
+| `outlet_user_permissions` | Direct outlet-scoped permission grant with revocation timestamp. | Implemented |
+| `permission_definitions` | Backend-owned permission code catalog. | Implemented |
+| `role_templates` | Reusable role template definition. | Implemented |
+| `role_template_versions` | Versioned role template snapshot. | Implemented |
+| `role_template_version_permissions` | Template version permission membership. | Implemented |
+| `audit_logs` | Persistent audit trail. | Implemented table; role mutation event coverage missing until APIs exist. |
 
-Entity mappings must preserve exact table names, column names, tenant foreign keys,
-unique constraints, CHECK constraints, hash-only token rules, and append-only
-history/ledger behavior where applicable.
+## Effective Permission Contract
+
+The canonical resolver is documented in `02_ACCESS_CONTROL/Tenant_Effective_Permission_Resolution.md`.
+
+Effective permissions are additive:
+
+```text
+tenant direct permissions
+UNION tenant role permissions
+UNION outlet direct permissions where outlet context applies
+UNION outlet role permissions where outlet context applies
+```
+
+Every resolver must filter inactive and revoked rows.
+
+## Required Runtime Filters
+
+- Tenant ID must match authenticated tenant context.
+- User must belong to tenant.
+- Role must belong to tenant and be active.
+- Permission definition must be active.
+- User-role assignment must have `revoked_at IS NULL`.
+- Direct permission assignment must have `revoked_at IS NULL`.
+- Role-permission grant must have `revoked_at IS NULL`.
+- Outlet grants must match the target outlet context and active outlet status.
+- Feature entitlement must allow plan-controlled features.
+
+## Backend API Contract
+
+### Verified Implemented
+
+| Endpoint Group | Status |
+|---|---|
+| `/api/v1/tenant-admin/users` | Implemented for Tenant Admin user management. |
+
+### Canonical Target - Missing Until Implemented
+
+| Endpoint | Status |
+|---|---|
+| `GET /api/v1/tenant-admin/permission-catalog` | MISSING |
+| `GET /api/v1/tenant-admin/roles` | MISSING |
+| `POST /api/v1/tenant-admin/roles` | MISSING |
+| `GET /api/v1/tenant-admin/roles/{roleId}` | MISSING |
+| `PUT /api/v1/tenant-admin/roles/{roleId}` | MISSING |
+| `GET /api/v1/tenant-admin/roles/{roleId}/permissions` | MISSING |
+| `PUT /api/v1/tenant-admin/roles/{roleId}/permissions` | MISSING |
+| `GET /api/v1/tenant-admin/roles/{roleId}/users` | MISSING |
+| `PUT /api/v1/tenant-admin/roles/{roleId}/users` | MISSING |
+| `POST /api/v1/tenant-admin/roles/{roleId}/activate` | MISSING |
+| `POST /api/v1/tenant-admin/roles/{roleId}/disable` | MISSING |
 
 ## Frontend Contract
 
-- Use feature-owned folders and typed services/providers.
-- Widgets/components must not call HTTP APIs directly.
-- Use DTOs in data layer, domain/view models in UI layer.
-- Permission and entitlement checks are UX helpers only; backend remains final authority.
-- Browser online store and Flutter business app must share backend rules but keep separate user/auth surfaces.
+- Canonical Flutter route: `/tenant-admin/roles-permissions`.
+- Compatibility routes may redirect from `/tenant-admin/roles-access` and `/tenant-admin/roles`.
+- Flutter must consume typed DTOs/repositories/providers and must not expose raw JSON directly to widgets.
+- Flutter permission checks are visibility helpers only.
+- Flutter currently calls missing backend role/permission-catalog endpoints; this is a backend contract gap, not proof that those APIs exist.
 
-## Backend Contract
+## Canonical Role Setup Flow
 
-- Controllers stay thin.
-- Application services own use cases.
-- Domain entities/value objects hold stable business invariants.
-- Repository interfaces stay in application layer; EF implementations stay in infrastructure layer.
-- Audit/event rows are written for sensitive state changes.
-- Idempotency keys are required for retryable commands that can create duplicates.
+| Step | Name |
+|---:|---|
+| 1 | Role Details & Template |
+| 2 | Select Modules |
+| 3 | Configure Permissions |
+| 4 | Assign Users & Access Scope |
+| 5 | Review & Create |
 
-## Permission And Entitlement Contract
+No sixth wizard step is canonical.
 
-- Permission codes must be database-seeded and module-scoped.
-- Do not create one giant global enum as the source of truth.
-- Tenant feature entitlement must be checked before tenant staff permission where the feature is plan-controlled.
-- Customer-facing actions use customer account/session rules, not tenant staff role permissions.
+## Open Implementation Gaps
+
+- Tenant role management API controllers/services/repositories.
+- Permission catalog API filtered by tenant entitlements.
+- Effective permission resolver hardening for revoked rows.
+- Outlet-scoped permission inclusion in runtime authorization.
+- Last-admin/super-admin safety guard.
+- Explicit role mutation audit events persisted in `audit_logs`.
+- Concurrency/idempotency policy for role permission replacement.
+- Tests for multiple role union, direct grants, outlet scope, template snapshot, revocation, audit, and authorization denial.
 
 ## Test Contract
 
 Test coverage must include:
 
-- Happy path for each primary API group.
-- Missing authentication.
-- Permission denied or customer access denied.
-- Feature disabled / entitlement missing.
-- Tenant isolation failure.
-- Validation failure.
-- Duplicate/conflict behavior.
-- Safe error display.
-- Audit/event/history creation where required.
-- Offline/cache behavior where this module touches POS, checkout, order, inventory, payment, or sync.
-
-## Implementation Sequence
-
-1. Confirm scope and table coverage from this module file.
-2. Create DTOs, validators, and application service methods.
-3. Create repository interface and EF repository/mapping if missing.
-4. Add entitlement, permission, tenant, outlet, till, device, customer, or offline checks as relevant.
-5. Build frontend route/screen/component/provider/service.
-6. Add loading, empty, error, denied, feature-disabled, offline, and conflict states.
-7. Add unit/integration/API/widget tests.
-8. Review against new OneVerz POS MVP module boundaries.
-
-## Out Of Scope
-
-- Platform role management
-- Customer website accounts
-- Payment provider credentials
-- Offline conflict resolution
-
-## Related Files
-
-- [[04_MODULE_KNOWLEDGE/05_Tenant_User_Permission_Access/01_Module_Overview]]
-- [[04_MODULE_KNOWLEDGE/05_Tenant_User_Permission_Access/02_Functional_Rules]]
-
-## Flutter Implementation Update — 2026-07-22
-
-- Tenant Admin Roles & Access frontend now uses `/tenant-admin/roles-permissions` as the canonical root route.
-- Compatibility redirects remain from `/tenant-admin/roles-access` and `/tenant-admin/roles` to the canonical route.
-- Implemented six-step frontend flow: Role Details, Select Modules, Configure Permissions, Assign Users, Review & Save, Confirmation.
-- Role list, details, create, edit, status, duplicate, delete, permission catalog, permission replacement and assigned-user APIs are wired through the existing Flutter `role_permissions` feature.
-- Role list no longer depends on Tenant Admin context roles as the primary data source.
-- Permission matrix rows/actions are derived from backend permission catalog data.
-- Assigned user summaries come from the backend role-user API; user selection reuses the existing Tenant Admin users API.
-- Validation/result: `flutter analyze` passed and full `flutter test` passed with 554 tests.
-- Remaining gap: manual browser/API verification was not performed; Advanced Rules are intentionally not implemented until a backend contract exists.
+- Tenant isolation for every endpoint.
+- Permission denied for missing role management permission.
+- Feature entitlement disabled.
+- Duplicate role name/code conflicts.
+- Multiple roles union and duplicate collapse.
+- Direct permission additive behaviour.
+- Revoked tenant role/user/direct/role-permission rows excluded.
+- Outlet role/direct permissions included only in correct outlet context.
+- Role template version snapshot behaviour.
+- Disable does not delete.
+- Last-admin protection.
+- Audit log persistence.
+- Friendly problem details and no internal data leaks.

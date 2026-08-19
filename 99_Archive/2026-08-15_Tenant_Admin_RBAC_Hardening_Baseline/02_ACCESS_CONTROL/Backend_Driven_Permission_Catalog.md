@@ -1,4 +1,4 @@
-﻿<!-- title: Backend Driven Permission Catalog -->
+<!-- title: Backend Driven Permission Catalog -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-29 -->
@@ -107,14 +107,3 @@ business-critical or security-sensitive.
 - [[Permission_Code_List]]
 - [[Feature_Entitlement_Matrix]]
 - [[API_Authorization_Rules]]
-
-<!-- RBAC_HARDENING_2026_08_15_START -->
-## Tenant Admin Permission Catalog Gap - 2026-08-15
-
-Flutter expects `GET /api/v1/tenant-admin/permission-catalog`.
-
-Backend source inspection found Platform Admin permission catalog endpoints, but did not verify a Tenant Admin permission catalog endpoint. Platform Admin endpoints must not be used as a substitute because Tenant Admin catalog responses must be tenant-isolated and entitlement-filtered.
-
-Status: `MISSING BACKEND CONTRACT`.
-<!-- RBAC_HARDENING_2026_08_15_END -->
-

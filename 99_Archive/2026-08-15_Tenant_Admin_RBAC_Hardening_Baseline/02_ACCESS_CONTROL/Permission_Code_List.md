@@ -1,7 +1,7 @@
-﻿<!-- title: Permission Code List -->
+<!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-15 -->
+<!-- last_updated: 2026-08-12 -->
 
 # Permission Code List
 
@@ -12,7 +12,7 @@ This file defines the Release 1 permission-code strategy.
 The database `permissions` and `platform_permissions` tables are the source of
 truth.
 
-The catalog hierarchy (module â†’ feature â†’ permission) is seeded in
+The catalog hierarchy (module → feature → permission) is seeded in
 `platform_modules`, `platform_features`, and the permission tables, then
 exposed through backend catalog APIs. Frontends must not duplicate this tree in
 code. See [[Backend_Driven_Permission_Catalog]].
@@ -51,7 +51,7 @@ code references.
 
 ### Platform selected-tenant bootstrap (added 2026-08-12)
 
-Selected-Tenant Mode uses **platform bootstrap permissions** â€” distinct from tenant permission codes used by Tenant Admin.
+Selected-Tenant Mode uses **platform bootstrap permissions** — distinct from tenant permission codes used by Tenant Admin.
 
 | Code | Meaning | Journey / Screen |
 |---|---|---|
@@ -66,7 +66,7 @@ Selected-Tenant Mode uses **platform bootstrap permissions** â€” distinct f
 
 **Entry also requires** `platform.tenants.view`.
 
-Default assignment (target seed â€” **NOT IMPLEMENTED**):
+Default assignment (target seed — **NOT IMPLEMENTED**):
 
 | Platform Role | bootstrap.access | outlets | tills | roles | users | products | import | online_store |
 |---|---|---|---|---|---|---|---|---|
@@ -74,7 +74,7 @@ Default assignment (target seed â€” **NOT IMPLEMENTED**):
 | Support Admin | Explicit only | Explicit | Explicit | Explicit | Explicit | Explicit | Explicit | Explicit |
 | Billing Admin | Deny | Deny | Deny | Deny | Deny | Deny | Deny | Deny |
 
-Contract: [[../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Mode_Contract]] Â· Online Store: [[../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Online_Store_Bootstrap_Contract]]
+Contract: [[../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Mode_Contract]] · Online Store: [[../03_USER_JOURNEYS/Platform_Admin/Selected_Tenant_Online_Store_Bootstrap_Contract]]
 
 #### Platform Dashboard page vs widget permissions
 
@@ -86,9 +86,9 @@ Page access and widget data/destination access are separate.
 | Tenant metrics / attention / Recent Tenants data and navigation | `platform.tenants.view` | Without it: non-sensitive summary only if allowed; **disable** navigation (no dead-end 403). |
 | MRR, Pending Billing, Past Due commercial values; open Billing | `platform.billing.view` | Without it: **hide** sensitive commercial widgets/values and links. |
 | Platform Users footprint count / nav | `platform.users.view` | Distinct from tenant-user count (`totalUsers`). |
-| Tenant subscription metric widgets (Active Paid / Trial / Past Due / trend / subscription navigation) | `platform.tenant_subscriptions.view` | Subscription lifecycle + subscription summary widgets and subscription-aware navigation are protected by this permission. MRR additionally requires `platform.billing.view` (Â§14). |
+| Tenant subscription metric widgets (Active Paid / Trial / Past Due / trend / subscription navigation) | `platform.tenant_subscriptions.view` | Subscription lifecycle + subscription summary widgets and subscription-aware navigation are protected by this permission. MRR additionally requires `platform.billing.view` (§14). |
 
-Default role assignment for `platform.tenant_subscriptions.view` (approved; **Partially Implemented** â€” Super Administrator seed/migration present; FE gating incomplete):
+Default role assignment for `platform.tenant_subscriptions.view` (approved; **Partially Implemented** — Super Administrator seed/migration present; FE gating incomplete):
 
 | Platform Role | Default Assignment |
 |---|---|
@@ -99,9 +99,9 @@ Default role assignment for `platform.tenant_subscriptions.view` (approved; **Pa
 
 Runtime authorization remains permission-based, not role-name-based. Do not mark SA-DASH-GAP-13 Completed and Verified until Frontend gating, omit/hide semantics, and E2E tests pass.
 
-Full matrix and gaps: [[03_USER_JOURNEYS/Platform_Admin/02_Platform_Dashboard_Flow]] Â§14 / SA-DASH-GAP-13. Audit: [[15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-07-29-platform-dashboard/Platform_Dashboard_Second_Brain_Gap_Completion_Audit]].
+Full matrix and gaps: [[03_USER_JOURNEYS/Platform_Admin/02_Platform_Dashboard_Flow]] §14 / SA-DASH-GAP-13. Audit: [[15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-07-29-platform-dashboard/Platform_Dashboard_Second_Brain_Gap_Completion_Audit]].
 
-### Platform subscription plans (granular â€” implemented)
+### Platform subscription plans (granular — implemented)
 
 | Code | Meaning |
 |---|---|
@@ -127,7 +127,7 @@ reactivate permission code.
 | platform.return_policy_templates.delete | Delete platform return policy templates |
 | platform.return_policy_templates.manage | Manage all platform return policy template actions |
 
-### Platform catalog (granular â€” implemented)
+### Platform catalog (granular — implemented)
 
 | Code | Meaning |
 |---|---|
@@ -135,7 +135,7 @@ reactivate permission code.
 | platform.modules.view | View modules catalog |
 | platform.features.view | View features catalog |
 
-### Platform roles (granular â€” implemented)
+### Platform roles (granular — implemented)
 
 | Code | Meaning |
 |---|---|
@@ -351,8 +351,8 @@ permission rows for aliases.
 | catalog.product_channels.manage | Manage channel visibility matrices |
 | catalog.product_audit.view | View standard product audit histories |
 | catalog.product_audit_sensitive.view | View sensitive product audit details |
-| catalog.combo_components.manage | Manage bundle kits and component rules |
-| catalog.tax_classes.view | **DEPRECATED** — Use canonical `pricing.tax_classes.view` and `pricing.tax_rates.view` |
+| catalog.bundle_components.manage | Manage bundle kits and component rules |
+| catalog.tax_classes.view | Read tax classes |
 | catalog.price_lists.view | Read price list setups |
 | inventory.stock.view | View stock levels |
 | inventory.stock.adjust | Adjust stock |
@@ -396,8 +396,8 @@ Verified through real backend APIs, not mock data:
 |---|---|
 | `pos.sale.create` | Start sale |
 | `pos.sale.complete` | Complete sale |
-| `pos.sale.park` | Legacy / demoted â€” use `sales.park.create` |
-| `pos.sale.recall` | Legacy / demoted â€” use `sales.park.recall` |
+| `pos.sale.park` | Legacy / demoted — use `sales.park.create` |
+| `pos.sale.recall` | Legacy / demoted — use `sales.park.recall` |
 | `pos.sale.discount.apply` | Apply POS discount |
 | `pos.payment.capture` | Take payment |
 | `pos.receipt.print` | Print receipt |
@@ -423,7 +423,7 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `sales.cart.remove_item` | Remove cart line |
 | `sales.cart.clear` | Clear cart |
 | `customers.view` | Customers nav / action visibility |
-| `customers.create` | Create customer from POS/Customer Management. Approved for the normal Cashier New Sale flow, but the current definition/role seed was removed and must be restored before checkout Add Customer can be enabled. **APPROVED REQUIREMENT â€” IMPLEMENTATION/PERMISSION SEED FIX PENDING.** |
+| `customers.create` | Create customer from POS/Customer Management. Approved for the normal Cashier New Sale flow, but the current definition/role seed was removed and must be restored before checkout Add Customer can be enabled. **APPROVED REQUIREMENT — IMPLEMENTATION/PERMISSION SEED FIX PENDING.** |
 | `customers.update` | Edit customer on POS Customer Management (`77777777-0338-4000-8000-000000000001`; Cashier seed assignment) |
 | `sales.discount.apply` | Current Release MANUAL list/context, validate, apply and cancel; offline snapshot is provisional |
 | `sales.discount.approve` | Existing/deferred approval capability; not used by current Cashier Discount flow |
@@ -446,7 +446,7 @@ in `lib/core/access/pos_access_codes.dart` for cashier New Sale UI.
 | `refunds.create` / `exchanges.create` | Branch processing after resolution is selected |
 | `cash_drawer.view` | View Cash Drawer screen / nav |
 | `cash_drawer.manage` | Physical/manual Open Drawer management |
-| `cash_drawer.movement.create` | Create Cash In / Cash Out / Cash Drop; Cash In + Cash Drop → `cash_movements` **software production-accepted** |
+| `cash_drawer.movement.create` | Create authorized Cash In / Cash Out / Cash Drop (canonical; seed + API enforce required) |
 | `notifications.view` | Notification bell |
 | `pos.till.open` | Till open flow (`canOpenPosTill`); backend Open Till authority |
 | `pos.till.close` | End Shift / close currently assigned open till session / Close Till action |
@@ -484,26 +484,17 @@ Receipt printing and hardware configuration are separate:
 `receipts.print` protects printing, while `pos.hardware.settings` protects the
 activated-device Local Print Agent settings/testing surface.
 
-Permission visibility does not prove physical acceptance. `cash_drawer.manage`
-gates physical Open Drawer. `cash_drawer.movement.create` is the sole mutation
-permission for Cash In/Out/Drop; it does not replace trusted-device, open-till,
-tenant, or type validation. Cash In canonical `cash_movements` persistence and
-idempotency are verified; Cash Drop OUT create remains pending
-([[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/07_Cash_Drop_Feature]]).
-`pos.hardware.settings` exists, but backend hardware-test-log
 Permission visibility does not prove implementation. In particular,
 `cash_drawer.manage` gates physical Open Drawer (hardware path exists).
 `cash_drawer.movement.create` is defined in constants but was **not seeded /
 not API-enforced** as of 2026-08-13 code evidence; Flutter currently gates Cash
-In/Drop with `cash_drawer.manage` â€” align to the canonical mapping before
+In/Drop with `cash_drawer.manage` — align to the canonical mapping before
 production. `pos.hardware.settings` exists, but backend hardware-test-log
 persistence is not fully wired. No distinct merchant-copy or sensitive-reprint
 permission is approved; do not invent one.
 
 Cash Drawer feature contract:
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]].
-Cash Drop feature contract:
-[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/07_Cash_Drop_Feature]].
 
 ## Seed Data Rule
 
@@ -543,21 +534,3 @@ Seeded / Backend constants (migration `SeedTenantAdminTillHardwarePermissions` +
 Feature entitlement for till management APIs: **`till_management`** (see platform module catalog seed). Peripheral capability may also be gated by **`device_hardware`**.
 
 Hardware-denied users must still view permitted Till list/summary; show hardware-restricted state instead of failing the whole page.
-
-### Bundle Feature Permissions
-```text
-catalog.products.view
-catalog.products.create
-catalog.products.update
-catalog.combo_components.manage
-inventory.stock.view
-catalog.product_cost.view
-```
-<!-- RBAC_HARDENING_2026_08_15_START -->
-## Role Permission Mutation Note - 2026-08-15
-
-`PUT /api/v1/tenant-admin/roles/{roleId}/permissions` is a canonical target endpoint for Tenant Admin role permission replacement, but backend source inspection did not verify this endpoint.
-
-Any historical example mentioning this endpoint must be read as target contract until backend implementation and tests exist.
-<!-- RBAC_HARDENING_2026_08_15_END -->
-
