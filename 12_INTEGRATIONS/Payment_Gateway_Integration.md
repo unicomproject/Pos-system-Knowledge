@@ -59,6 +59,10 @@ last4 only. Provider/card secrets and raw responses are prohibited.
 
 ## Permission And Business Rules
 
+> [!IMPORTANT]
+> **SUPERSEDED BY OWNER-APPROVED R1 SCOPE LOCK**  
+> Integrated Card and Split payments are deferred to Release 2. The permissions `payments.card.accept` and `payments.split.accept` are reclassified as **R2_DEFERRED** under [ONEVERZ_RELEASE_1_SCOPE_LOCK.md](file:///c:/Users/User/Desktop/Nytroz__POS/Nytroz%20POS%20-%20Second%20Brain/Pos-system-Knowledge/01_RELEASE_SCOPE/ONEVERZ_RELEASE_1_SCOPE_LOCK.md).
+
 Verified permissions include `payments.card.accept` and
 `payments.split.accept`. Authentication, activated device, tenant/outlet/till,
 enabled method and backend authorization are required.

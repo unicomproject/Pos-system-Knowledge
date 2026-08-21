@@ -1,16 +1,19 @@
 <!-- title: OneVerz POS MVP Scope -->
-<!-- status: Active -->
+<!-- status: SUPERSEDED BY OWNER-APPROVED R1 SCOPE LOCK -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
-
+<!-- last_updated: 2026-08-21 -->
 
 # OneVerz POS MVP Scope
 
+> [!WARNING]
+> **SUPERSEDED BY OWNER-APPROVED R1 SCOPE LOCK**  
+> This document has been superseded by the canonical business-owner approved scope lock document: [ONEVERZ_RELEASE_1_SCOPE_LOCK.md](file:///c:/Users/User/Desktop/Nytroz__POS/Nytroz%20POS%20-%20Second%20Brain/Pos-system-Knowledge/01_RELEASE_SCOPE/ONEVERZ_RELEASE_1_SCOPE_LOCK.md).  
+> Do not use this file as the active source of truth. Refer to the lock document instead.
+
 ## Purpose
 
-This file locks the current OneVerz POS MVP scope.
-Use it before creating journeys, backend modules, database migrations, UI tasks,
-test cases, or AI development prompts.
+This file historically locked the early drafts of the OneVerz POS MVP scope.
+
 
 This file replaces older POS-first scope statements where they conflict with the
 updated OneVerz POS scope images and Unified Commerce database design.
