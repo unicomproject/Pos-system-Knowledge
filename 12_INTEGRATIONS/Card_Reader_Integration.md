@@ -1,9 +1,24 @@
 <!-- title: Card Reader Integration -->
-<!-- status: Draft -->
+<!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-16 -->
 
 # Card Reader Integration
+
+## Canonical status (2026-08-16)
+
+```text
+PAYMENT TERMINAL / CARD READER: NOT IMPLEMENTED
+Release scope: OUT OF CURRENT HARDWARE RELEASE (unless product reopens)
+Overall hardware module: BLOCKED — HARDWARE NOT PRODUCTION READY
+```
+
+Do **not** confuse hardware registry type, card-terminal setting slot, mock, or
+provider-neutral unavailable safety with a real payment-terminal integration.
+
+Authority:
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]]
+[[POS_Hardware_Integration]]
 
 ## Purpose
 
@@ -102,7 +117,15 @@ receipts/slips, automated tests and physical certification must pass.
 
 ## Current Implementation Status
 
-Partially Implemented — Blocked By External Dependency.
+```text
+NOT IMPLEMENTED — production provider / terminal adapter absent
+```
+
+Provider-neutral safety boundary and unavailable-by-default UI exist. That is
+**not** implementation of a payment terminal.
+
+If reopened for release, Hardware Code Chunk 5 applies only after Chunks 1–4
+physical gates for required peripherals.
 
 ## Known Gaps
 

@@ -1,4 +1,4 @@
-<!-- title: API Authorization Rules -->
+﻿<!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-08-12 -->
@@ -49,10 +49,10 @@ Frontend route guards and menu filtering are UX only. Backend service checks are
 | API Area | Required permission(s) |
 |---|---|
 | Platform dashboard page / aggregate API / R1 basic System Health | `platform.dashboard.view` |
-| Dashboard → tenant metrics / attention navigation | `platform.tenants.view` (destination/data; page may still load without it) |
+| Dashboard â†’ tenant metrics / attention navigation | `platform.tenants.view` (destination/data; page may still load without it) |
 | Dashboard commercial widgets (MRR, pending billing, past-due values) | `platform.billing.view` (MRR additionally requires `platform.tenant_subscriptions.view`; hide when absent) |
 | Dashboard Platform Users count | `platform.users.view` |
-| Dashboard tenant-subscription metric widgets | `platform.tenant_subscriptions.view` (approved; **Partially Implemented** — catalogue/seed/Super Administrator grant + Backend Dashboard filtering present; Frontend widget/nav gating incomplete). Default grant: `super_administrator` only; Billing Admin, Support Admin, custom roles require explicit assignment. Permission-hidden sections must be omitted/hidden — not returned as authentic-looking zeros. |
+| Dashboard tenant-subscription metric widgets | `platform.tenant_subscriptions.view` (approved; **Partially Implemented** â€” catalogue/seed/Super Administrator grant + Backend Dashboard filtering present; Frontend widget/nav gating incomplete). Default grant: `super_administrator` only; Billing Admin, Support Admin, custom roles require explicit assignment. Permission-hidden sections must be omitted/hidden â€” not returned as authentic-looking zeros. |
 | Tenant list/summary/filter | `platform.tenants.view` |
 | Tenant create | `platform.tenants.create` |
 | Tenant update | `platform.tenants.update` |
@@ -68,7 +68,7 @@ Frontend route guards and menu filtering are UX only. Backend service checks are
 | Platform users | `platform.users.view`, `platform.users.create`, `platform.users.update`, `platform.users.roles.assign` |
 | Platform settings | `platform.settings.view`, `platform.settings.update` |
 | Platform billing | `platform.billing.view`, `platform.billing.manage` |
-| Platform audit logs (R1 login/security) | `platform.audit.view` → `GET /api/v1/platform-admin/audit-logs` |
+| Platform audit logs (R1 login/security) | `platform.audit.view` â†’ `GET /api/v1/platform-admin/audit-logs` |
 | Platform integrations | `platform.integrations.manage` |
 | Return policy templates | Respective `platform.return_policy_templates.*` action code |
 | Selected-Tenant bootstrap summary | `platform.tenants.bootstrap.access` + `platform.tenants.view` |
@@ -101,6 +101,7 @@ Contract: [[../05_BACKEND_ARCHITECTURE/Platform_Selected_Tenant_API_Contract]]
 | Role/permission management | Tenant active, entitlement, permission |
 | Permission catalog read | Tenant active, `roles.permissions.view`; catalog filtered by tenant entitlements |
 | Role permission update | Tenant active, `roles.permissions.update`; assigned codes must stay within entitlements |
+| Tax Management | Catalog entitlement, `pricing.tax_classes.*` and `pricing.tax_rates.*` permissions |
 | Product management | Catalog entitlement and permission `catalog.products.view`, `catalog.products.create`, `catalog.products.update`, `catalog.products.delete`, `catalog.products.publish`, `catalog.products.restore`, or `catalog.products.duplicate` (Note: `catalog.products.import` remains in schema but is deferred and excluded from the active Tenant Admin UI scope). Legacy permission codes starting with `tenant.products.*` must be mapped to their canonical `catalog.products.*` equivalents in the Flutter client per ADR 007. |
 | Catalog master data | Catalog entitlement and respective department, category, brand, collection, or return-policy permission |
 | Inventory management | Inventory entitlement and inventory permission |
@@ -126,6 +127,24 @@ Activation must never accept client tenant identity as authority, log/store the
 raw activation code, or persist partial trusted state after failure. Existing
 same-device trusted resolution may be idempotent; a `USED` code must not re-pair
 a changed fingerprint.
+
+### POS Open Till authorization
+
+| Endpoint | Canonical authorization |
+|---|---|
+| `GET /api/v1/devices/current` | Authenticated `TenantOnly`; trusted ACTIVE device + active assignment within tenant |
+| `GET /api/v1/tills/current-session` | `TenantOnly` + any of `pos.till.open`, `pos.till.close`, `till.session.view`; trusted device context |
+| `POST /api/v1/tills/open` | `TenantOnly` + **`pos.till.open`**; trusted ACTIVE device; active till assignment; requested till match; ACTIVE till; opening float >= 0; reject duplicate OPEN (`till_session.already_open`) |
+| `POST /api/v1/tills/close` | `TenantOnly` + **`pos.till.close`**; trusted ACTIVE device; active assignment and requested-till match; ACTIVE till; one open session; non-negative Counted Cash; approved reason for non-zero variance; backend-authoritative Expected Cash |
+
+No new permission is required. Flutter open-till visibility is UX only; backend
+authorization remains final. Open Till is not offline-authoritative. Canonical:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]].
+
+No new Close Till permission is required. Flutter visibility is UX only. Current
+backend route enforces `pos.till.close`, but expected-cash authority, approved
+reason validation and reconciliation persistence remain production blockers.
+Canonical: [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]].
 
 ### POS Customer API authorization
 
@@ -178,6 +197,7 @@ cashier input is directly rejected, not routed to manager approval. See
 | Exchange | POS entitlement, permission, exchange validation |
 | Cash in/out | Cash drawer entitlement, permission, open till |
 | Close till | Till permission, open till, cash count validation |
+| Open till | `pos.till.open`, trusted ACTIVE device, active assignment, ACTIVE till, opening float >= 0, no duplicate OPEN session |
 
 ## Storefront Customer Authentication Rules
 
@@ -302,3 +322,26 @@ completion, cash movement, and report export where required.
 - [[Feature_Entitlement_Matrix]]
 - [[../05_BACKEND_ARCHITECTURE/API_Standards]]
 - [[../05_BACKEND_ARCHITECTURE/Error_Response_Standards]]
+
+### Exact Permission Matrix for Bundles
+Candidate search endpoint (`GET /api/v1/tenant-admin/products/{productId}/bundle-component-candidates`) and Step 4 endpoints have exact authorization:
+- `catalog.combo_components.manage` is required for modifications.
+- `catalog.products.update` (or `create`) is required depending on the draft state.
+- Cost must NOT leak without `catalog.product_cost.view`.
+- Stock must NOT leak without `inventory.stock.view`.
+
+Entitlement code mapping between `product_catalog` and `product_management` must be explicitly resolved according to the runtime feature entitlement code.
+<!-- RBAC_HARDENING_2026_08_15_START -->
+## Tenant RBAC Authorization Addendum - 2026-08-15
+
+Every Tenant Admin authorization check must evaluate tenant context, user status, feature entitlement, active permission definitions, active roles, and non-revoked assignment/grant rows.
+
+Runtime gap found during source inspection:
+
+- Tenant auth/context resolvers currently union tenant role/direct permissions but do not consistently filter all revoked RBAC rows.
+- Outlet role/direct permission sources are not included in the session effective permission list.
+- Tenant Admin role management endpoints are not verified in backend source.
+
+Backend implementation must be fixed before Roles & Access is marked complete.
+<!-- RBAC_HARDENING_2026_08_15_END -->
+

@@ -155,13 +155,22 @@ The updated database design contains dedicated modules for these areas.
 
 ## Hardware, Reporting, And Analytics
 
-Included hardware and reporting scope:
+Included hardware and reporting scope (product intent):
 
 - Android phones, iPhones, Android tablets, iPads, Windows laptops, and Windows desktops.
-- Bluetooth, USB, and network receipt printers where supported.
-- Barcode scanners, cash drawers, and card payment machines.
+- Receipt printers where a supported production path exists (current: Local Print Agent → Windows RAW USB; network TCP optional/unverified).
+- Barcode scanners and physical cash drawers (required gates once software paths exist).
+- Card payment machines only when a real provider is approved for the release.
 - Sales, product, inventory, and order reports.
 - Dashboard and basic operational analytics required for the MVP.
+
+**Current production-readiness clarification (2026-08-16):** overall POS hardware
+is **BLOCKED — HARDWARE NOT PRODUCTION READY**. Direct Bluetooth/USB Flutter
+printer adapters are **NOT** production-verified stubs. Payment terminal is
+**NOT IMPLEMENTED** / out of current hardware release until product reopens
+provider scope. Customer Display / Scale / Kitchen Printer are deferred.
+See [[../12_INTEGRATIONS/POS_Hardware_Integration]] and
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]].
 
 ## Related Files
 

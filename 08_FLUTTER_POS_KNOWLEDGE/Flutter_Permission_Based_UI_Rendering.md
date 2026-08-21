@@ -1,4 +1,4 @@
-<!-- title: Flutter Permission Based UI Rendering -->
+﻿<!-- title: Flutter Permission Based UI Rendering -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-08-09 -->
@@ -69,3 +69,20 @@ Flutter must load:
 - [[Flutter_Routing_Guards]]
 - [[Flutter_API_Integration]]
 - [[Flutter_Offline_Operation_Sync]]
+
+<!-- RBAC_HARDENING_2026_08_15_START -->
+## Tenant Admin Roles & Access UI Correction - 2026-08-15
+
+Flutter permission rendering is a UX helper only. Backend authorization remains final authority.
+
+Role setup must use the approved five-step flow:
+
+1. Role Details & Template
+2. Select Modules
+3. Configure Permissions
+4. Assign Users & Access Scope
+5. Review & Create
+
+Do not expose or imply a sixth wizard step. Confirmation is a post-save result state.
+<!-- RBAC_HARDENING_2026_08_15_END -->
+

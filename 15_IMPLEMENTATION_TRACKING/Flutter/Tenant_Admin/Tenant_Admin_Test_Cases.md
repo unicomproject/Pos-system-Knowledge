@@ -22,14 +22,14 @@
 
 ```powershell
 # Backend — all Tenant Admin unit tests
-Set-Location "c:\Users\User\Desktop\pos final wep\Back end\Nytroz-POS-Backend"
+Set-Location "<Backend-Repo-Root>"
 dotnet test tests/SCS.UnitTests/SCS.UnitTests.csproj --filter "FullyQualifiedName~TenantAdmin"
 
 # Backend — all Tenant Admin API tests
 dotnet test tests/SCS.ApiTests/SCS.ApiTests.csproj --filter "FullyQualifiedName~TenantAdmin"
 
 # Flutter — Tenant Admin feature tests
-Set-Location "c:\Users\User\Desktop\pos final wep\Tenantadmin\Nytroz-POS-App"
+Set-Location "<Flutter-Repo-Root>"
 flutter test test/features/tenant_admin/
 ```
 

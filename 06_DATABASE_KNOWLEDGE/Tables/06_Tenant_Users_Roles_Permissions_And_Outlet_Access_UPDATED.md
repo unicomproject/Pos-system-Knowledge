@@ -1,4 +1,4 @@
-<!-- title: Tenant Users, Roles, Permissions & Outlet Access -->
+﻿<!-- title: Tenant Users, Roles, Permissions & Outlet Access -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-07-06 -->
@@ -399,3 +399,31 @@ UNIQUE(tenant_id, outlet_id, user_id, permission_id)
 - [[03_Catalog_Plans_Addons_Entitlements]]
 - [[07_Invitations_Authentication_Tokens_And_Security_Audit]]
 - [[08_Outlet_Till_POS_Device_Foundation]]
+
+<!-- RBAC_HARDENING_2026_08_15_START -->
+## RBAC Runtime Verification Addendum - 2026-08-15
+
+Verified tables:
+
+- `tenant_roles`
+- `tenant_role_permissions`
+- `tenant_user_roles`
+- `tenant_user_permissions`
+- `outlet_user_roles`
+- `outlet_user_permissions`
+- `permission_definitions`
+- `role_templates`
+- `role_template_versions`
+- `role_template_version_permissions`
+- `audit_logs`
+
+Canonical resolver requirement:
+
+- Include all active tenant and outlet role/direct grant sources where context applies.
+- Exclude rows with `revoked_at IS NOT NULL`.
+- Exclude inactive roles and inactive permission definitions.
+- Respect tenant isolation and feature entitlement.
+
+Schema support exists, but auth/context resolvers and Tenant Admin role APIs remain implementation gaps.
+<!-- RBAC_HARDENING_2026_08_15_END -->
+

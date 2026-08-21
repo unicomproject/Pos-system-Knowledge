@@ -1,7 +1,7 @@
 <!-- title: Flutter Cashier POS Implementation Map -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-15 -->
 
 
 # Flutter Cashier POS Implementation Map
@@ -10,6 +10,22 @@
 > dedicated Flutter implementation, `customers.create` permission seed
 > restoration, and authenticated E2E verification remain pending. Normative
 > contract: [[Flutter_Checkout_Customer_Selection_Implementation_Specification]].
+
+> Open Till (2026-08-11): API wiring is integrated; approved UI contract
+> (Dashboard Top Bar, orange, white parent, Phone+Tablet+Desktop) is
+> **PENDING**. Canonical:
+> [[Flutter_Open_Till_Screen_Implementation_Specification]],
+> [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]].
+
+> Cash Drawer / Cash In (2026-08-15): UI, summary, and a legacy movement route
+> exist. Canonical Cash In remains pending: Flutter reasons are hardcoded and
+> the backend writes `till_cash_movements` instead of `cash_movements` with a
+> `cash_movement_types` identifier. Physical Open Drawer reuses
+> `/api/v1/pos/hardware/drawer/*`. Canonical:
+> [[Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]],
+> [[Flutter_Cash_In_Screen_Implementation_Specification]],
+> [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]],
+> [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Management_Screen_Second_Brain_Alignment_2026-08-14]].
 
 ## Purpose
 
@@ -24,12 +40,12 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 | Login | `/tenant-login` | `POST /api/v1/tenant-auth/login` | Integrated |
 | Device bootstrap | session bootstrap | `GET /api/v1/devices/current` | Integrated |
 | Till session check | bootstrap | `GET /api/v1/tills/current-session` | Integrated |
-| Open till | `/pos/till/open` | `POST /api/v1/tills/open` | Integrated |
+| Open till | `/pos/till/open` | `POST /api/v1/tills/open` | API integrated; approved UI PENDING |
 | POS home | `/pos/home` | `GET /api/v1/pos/home` | Integrated |
 | New Sale catalog | `/pos/new-sale` | `GET /api/v1/pos/products` | Partially integrated |
 | Search Original Sale | `/pos/returns-refunds` | `GET /api/v1/pos/returns/sales/search` | Integrated |
-| Close till | `/pos/cash-drawer/close-till` | `POST /api/v1/tills/close` | Integrated |
-| End Shift | sidebar action | close till + session clear | Integrated |
+| Close till | `/pos/cash-drawer/close-till` | `POST /api/v1/tills/close` | Wired; production-blocked by expected-cash/reconciliation gaps |
+| End Shift | sidebar action | close till + session clear | Wired; production acceptance pending safe close E2E |
 
 ## New Sale Status
 
@@ -57,7 +73,7 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 | Returns & Exchanges | Count | `GET /api/v1/pos/returns/sales/search` | Step 1 integrated; exact `returns.view` |
 | Customer Management | Count | customers APIs | Wired (`/pos/customers`); separate approved checkout selector remains pending |
 | Parked Sales | Device-local count/dialog | Backend `/api/v1/pos/holds` exists but is not called by Flutter | Partial/disconnected |
-| Cash Drawer | Balance | drawer detail API | Partial (balance only) |
+| Cash Drawer | Balance + actions | `/api/v1/pos/cash-drawer/*`; hardware drawer reused | Implemented; runtime and installed-hardware acceptance pending |
 | Online Orders | Placeholder | none | UI only |
 
 ### Dashboard implementation update (2026-07-24)
@@ -179,12 +195,12 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 | Login | `/tenant-login` | `POST /api/v1/tenant-auth/login` | Integrated |
 | Device bootstrap | session bootstrap | `GET /api/v1/devices/current` | Integrated |
 | Till session check | bootstrap | `GET /api/v1/tills/current-session` | Integrated |
-| Open till | `/pos/till/open` | `POST /api/v1/tills/open` | Integrated |
+| Open till | `/pos/till/open` | `POST /api/v1/tills/open` | API integrated; approved UI PENDING |
 | POS home | `/pos/home` | `GET /api/v1/pos/home` | Integrated |
 | New Sale catalog | `/pos/new-sale` | `GET /api/v1/pos/products` | Partially integrated |
 | Search Original Sale | `/pos/returns-refunds` | `GET /api/v1/pos/returns/sales/search` | Integrated |
-| Close till | `/pos/cash-drawer/close-till` | `POST /api/v1/tills/close` | Integrated |
-| End Shift | sidebar action | close till + session clear | Integrated |
+| Close till | `/pos/cash-drawer/close-till` | `POST /api/v1/tills/close` | Wired; production-blocked by expected-cash/reconciliation gaps |
+| End Shift | sidebar action | close till + session clear | Wired; production acceptance pending safe close E2E |
 
 ## New Sale Status
 
@@ -212,7 +228,7 @@ Active implementation map for cashier POS in `Nytroz-POS-App` against
 | Returns & Exchanges | Count | `GET /api/v1/pos/returns/sales/search` | Step 1 integrated; exact `returns.view` |
 | Customer Management | Count | customers APIs | Wired (`/pos/customers`); not the approved full-screen checkout selector |
 | Parked Sales | Device-local count/dialog | Backend `/api/v1/pos/holds` exists but is not called by Flutter | Partial/disconnected |
-| Cash Drawer | Balance | drawer detail API | Partial (balance only) |
+| Cash Drawer | Balance + actions | `/api/v1/pos/cash-drawer/*`; hardware drawer reused | Implemented; runtime and installed-hardware acceptance pending |
 | Online Orders | Placeholder | none | UI only |
 
 ### Dashboard implementation update (2026-07-24)
@@ -279,9 +295,15 @@ The production popup adds dynamic ID-based option resolution, one image slot, qu
 | Non-sale copies | Device printer policy + deterministic copy identity | Implemented; physical pending |
 | Copy audit recovery | Per-copy pending audit, audit-only retry | Implemented |
 
-## Cash Payment Screen Target (2026-08-04)
+## Cash Payment Screen Target (2026-08-14)
 
-The new Cash Payment screen redesign is fully documented but its implementation remains pending/not completed by this task. See the dedicated specification: [[Flutter_Cash_Payment_Screen_Implementation_Specification]]. Documentation Status: Documentation Ready.
+Cash Payment redesign is **implemented** and matches the approved Order Summary | Cash Payment composition.
+
+- Route: `/pos/new-sale/payment/cash` → `PosCashPaymentScreen`
+- Fixed viewport layout (no page scroll); compact fonts/paddings; item list may scroll inside the summary card only
+- Right panel: single CASH PAYMENT card (Amount Received + Quick chips + keypad + CHANGE DUE + COMPLETE SALE)
+- Status tracking: [[../15_IMPLEMENTATION_TRACKING/Flutter/Sales/Cash_Payment_Screen_Redesign_Implementation_Status]]
+- Spec: [[Flutter_Cash_Payment_Screen_Implementation_Specification]]
 
 ## Related Files
 

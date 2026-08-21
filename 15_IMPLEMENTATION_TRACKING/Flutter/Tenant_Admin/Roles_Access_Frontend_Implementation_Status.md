@@ -1,90 +1,63 @@
-﻿## Implementation Status
+﻿<!-- title: Roles & Access Frontend Implementation Status -->
+<!-- status: Corrected - frontend partial, backend contract gap -->
+<!-- last_updated: 2026-08-15 -->
 
-| Item | Value |
+# Roles & Access Frontend Implementation Status
+
+## Current Verdict
+
+`FRONTEND PARTIAL - BACKEND CONTRACT GAP`
+
+The Flutter Roles & Access feature contains route, UI, datasource, and provider work, but the tenant role management backend endpoints it calls were not verified in the backend source.
+
+Do not treat earlier `Completed` notes as release-ready until the backend role API contract is implemented and runtime verified.
+
+## Verified Frontend State
+
+| Item | Status |
 |---|---|
-| Feature | Roles & Access |
-| Module | Tenant |
-| Platform | Flutter Frontend |
-| Status | Completed |
-| Name | Codex |
-| Completed Date | 2026-07-22 |
-| Tests | Passed |
-| PR / Commit | - |
+| Canonical frontend route `/tenant-admin/roles-permissions` | Present |
+| Compatibility redirects from `/tenant-admin/roles-access` and `/tenant-admin/roles` | Present / expected |
+| Role permission datasource | Present |
+| Datasource catalog URL | `/api/v1/tenant-admin/permission-catalog` |
+| Datasource role URL | `/api/v1/tenant-admin/roles` |
+| Permission visibility provider model | Present |
 
-## Implementation Summary
+## Backend Contract Gap
 
-- Canonical route is `/tenant-admin/roles-permissions`.
-- Compatibility redirects retained: `/tenant-admin/roles-access` and `/tenant-admin/roles` redirect to `/tenant-admin/roles-permissions`.
-- Implemented backend-driven role list, role details, create/edit role wizard, permission matrix, assigned users summary and save confirmation.
-- Six-step flow implemented: Role Details, Select Modules, Configure Permissions, Assign Users, Review & Save, Confirmation.
-- Role list uses `GET /api/v1/tenant-admin/roles` as primary source instead of Tenant Admin context role fallback.
-- Permission catalog is loaded from `GET /api/v1/tenant-admin/permission-catalog` and modules/actions are derived from backend data.
-- Assigned users are loaded from `GET /api/v1/tenant-admin/roles/{roleId}/users`; create/edit assignment selection uses the existing tenant user list API.
-- Create, update, status update, duplicate and delete APIs are wired through the existing `role_permissions` feature architecture.
+The Flutter feature calls these backend endpoints:
 
-## Validation
+- `GET /api/v1/tenant-admin/permission-catalog`
+- `GET /api/v1/tenant-admin/roles`
+- `GET /api/v1/tenant-admin/roles/{roleId}/permissions`
+- `PUT /api/v1/tenant-admin/roles/{roleId}/permissions`
 
-- `flutter analyze` passed with no issues.
-- Focused role/permission tests passed.
-- Full `flutter test` passed: 554 tests.
+Backend source inspection did not find Tenant Admin controllers for these endpoints. Platform Admin permission catalog/role controllers are not substitutes for Tenant Admin role management.
 
-## Remaining Notes
+## Correct Canonical Wizard Flow
 
-- Browser DevTools/manual API verification was not performed in this Codex run.
-- Advanced Rules were not implemented because no confirmed backend contract exists.
-- `dart format` timed out in the local environment, but analyzer and tests passed.
+The approved Create Role flow is five steps:
 
-## Integration Stabilization Update — 2026-07-22
+1. Role Details & Template
+2. Select Modules
+3. Configure Permissions
+4. Assign Users & Access Scope
+5. Review & Create
 
-- Added centralized Flutter route constants for Tenant Admin Roles & Access.
-- Preserved canonical root `/tenant-admin/roles-permissions` and compatibility redirects from `/tenant-admin/roles-access` and `/tenant-admin/roles`.
-- Save Draft behavior now saves through the real backend as `DRAFT`, clears active user assignments for draft saves, and moves newly-created drafts to the returned edit route so later saves use update semantics instead of duplicate create semantics.
-- Added role-specific frontend API error mapper for known backend role error codes, avoiding raw Dio/SQL/stack messages in UI.
-- Added centralized `RolePageVisibility` provider model for role page/action visibility derived from effective permissions.
-- Verification: Flutter analyze passed, focused role tests passed, backend build passed, backend tests passed, and EF pending-model check reported no pending model changes.
+Confirmation is a post-save result, not a sixth wizard step.
 
-## UI Alignment Update — 2026-07-22
+## Required Before Marking Complete
 
-| Item | Value |
-|---|---|
-| Feature | Roles & Access frontend UI alignment |
-| Module | Tenant User Permission Access |
-| Platform | Flutter |
-| Status | Completed |
-| Source App | Tenantadmin/Nytroz-POS-App |
-| Backend/API Changes | None |
-| Folder Structure Changes | None |
-| Validation | flutter analyze passed; focused role tests passed |
+- Implement backend Tenant Admin role and permission catalog endpoints.
+- Add backend tests for the role APIs.
+- Verify Flutter can load real backend catalog/role data.
+- Verify create/edit/save/disable/user assignment flows against backend.
+- Verify no revoked permission/role assignment appears effective.
+- Verify audit logs persist role mutations.
+- Re-run Flutter analyzer/tests and browser runtime verification.
 
-### Completed Scope
-- Updated the active Roles & Access screen to match the approved master-detail Tenant Admin design more closely.
-- Kept the implementation backend-driven: role list, permission catalog, assigned users, status, scope, and actions continue to come from the API/provider layer.
-- Combined role details and module permissions into the primary right-side card, with assigned users and bottom actions below.
-- Added responsive permission rendering: table layout on tablet/desktop and expandable module cards on narrow screens.
-- Preserved existing permission gating, unsaved-change protection, provider refresh, auth handling, and route structure.
+## Related Docs
 
-### Validation
-- `flutter analyze` — Passed, no issues found.
-- `flutter test test/features/tenant_admin/role_permissions_screen_test.dart test/features/tenant_admin/tenant_admin_navigation_guard_test.dart` — Passed, 6 tests.
-
-## Create Role Details Drawer Update — 2026-07-22
-
-| Item | Value |
-|---|---|
-| Feature | Create New Role Step 1 frontend |
-| Route | `/tenant-admin/roles-permissions/create/details` |
-| Status | Verified |
-| Backend/API Changes | None |
-| Folder Structure Changes | None |
-| Validation | `flutter analyze` passed; focused role/navigation tests passed |
-
-### Implemented Behaviour
-- Create Role route is guarded by role create visibility derived from the centralized tenant access checker.
-- Desktop renders the create flow as a right-side drawer-style panel; tablet/mobile use a constrained/full-width responsive panel.
-- Step label is corrected to `Step 1 of 6` for Role Details.
-- Role Name maps to `roleName`, trims before request serialization, validates required/length, and does not expose editable `roleCode`.
-- Description maps to `description`, remains optional, and uses the current frontend contract length limit.
-- Role Type uses backend create-options role templates plus the supported Custom Role/null-template path.
-- Status uses the typed `RoleLifecycleStatus` Active/Inactive toggle; Save Draft still submits `DRAFT`.
-- Footer actions remain stable: Cancel/Back, Save Draft, Continue.
-- No mock role data, backend URL, tenant ID, role ID, or permission data was added.
+- `02_ACCESS_CONTROL/Tenant_Effective_Permission_Resolution.md`
+- `03_USER_JOURNEYS/Tenant_Admin/06_Role_Permission_Management_Flow.md`
+- `04_MODULE_KNOWLEDGE/05_Tenant_User_Permission_Access/03_Technical_Contract.md`

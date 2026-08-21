@@ -320,3 +320,6 @@ CHECK(max_stock_quantity IS NULL OR min_stock_quantity IS NULL OR max_stock_quan
 CHECK(lead_time_days IS NULL OR lead_time_days >= 0)
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 ```
+
+## Traceability of Inventory
+- **UI**: Available Stock -> **Flutter State**: `BundleAvailabilitySummary` -> **API**: Draft Resume / Candidate -> **App Logic**: `SupportsBundles` formula -> **Domain**: Component based tracking -> **DB**: `inventory_balances` mapped by `component_product_id` and `inventory_locations`.

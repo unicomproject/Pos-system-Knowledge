@@ -1,109 +1,136 @@
 <!-- title: Cash In Out Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-08-16 -->
 
 # Cash In Out Flow
 
 ## Purpose
 
-Defines cashier cash drawer movement flow.
-
-## Source Basis
-
-This journey is based on the uploaded SCS-TIX Release 1 user journey files, UI
-screens, backend architecture, database design, and confirmed project decisions.
-
-It must not be expanded into e-commerce, offline sync, supplier, delivery, kiosk,
-coupon, AI, or accounting scope.
-
-## Actors
-
-| Actor | Responsibility |
-|---|---|
-| Cashier | Records cash in/out |
-| Manager | Approves where business policy requires |
-| Backend | Stores cash movement under till session |
+Defines the canonical online Cash In and Cash Out/Drop journey.
 
 ## Preconditions
 
-- Cashier is logged in.
-- Till session is open.
-- Cash drawer/cash movement permission exists.
+- Authenticated user with `cash_drawer.view` and, for mutation,
+  `cash_drawer.movement.create`.
+- Active tenant and trusted ACTIVE device with resolved outlet/till.
+- OPEN till session.
+- Backend and database reachable; offline financial completion is forbidden.
 
-## Main Flow
+## Domain separation
 
-| Step | User/System Action | Expected Result |
-|---:|---|---|
-| 1 | Open cash drawer/cash movement | Cash movement form appears |
-| 2 | Select movement type and reason | Cash in/out category is chosen |
-| 3 | Enter amount and note | Amount is validated |
-| 4 | Submit movement | Target behavior is backend validation and persistence |
-| 5 | Refresh drawer summary | Target behavior is authoritative expected-cash update |
+| Domain | Meaning | Persistence |
+|---|---|---|
+| Financial Cash In | Movement `Direction = IN` | `cash_movements` |
+| Financial Cash Drop / Out | Movement `Direction = OUT` | `cash_movements` |
+| Physical drawer open | Hardware pulse / manual open | `cash_drawer_operations` |
 
-## Journey Diagram
+Physical drawer open is **not** a Cash Drop.
+
+## Status matrix (verified 2026-08-16)
+
+| Capability | Status |
+|---|---|
+| Cash In UI | **IMPLEMENTED** |
+| Cash In backend mutation (`POST .../movements` + `movementTypeId`) | **VERIFIED** |
+| Cash In persistence (`cash_movements`) | **VERIFIED** |
+| Cash In permission enforcement | **VERIFIED** |
+| Cash In idempotency (`request_id`) | **VERIFIED** |
+| Cash In expected-cash effect | **VERIFIED** |
+| Cash In E2E / production acceptance | **VERIFIED** — [[../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_In_Chunk_3_Final_Production_Acceptance]] |
+| Cash Drop UI | **IMPLEMENTED** |
+| Cash Drop OUT backend support | **VERIFIED** (automated + PG concurrency) |
+| Cash Drop persistence | **VERIFIED** (`cash_movements`) |
+| Cash Drop available-cash server validation | **VERIFIED** |
+| Cash Drop expected-cash subtraction | **VERIFIED** |
+| Cash Drop concurrent over-drop | **VERIFIED** |
+| Cash Drop UI / tablet layout (widget) | **VERIFIED** (automated layout tests) |
+| Cash Drop printing | **NOT IMPLEMENTED** (optional) |
+| Cash Drop live authenticated E2E / production acceptance | **VERIFIED** — [[../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Cash_Drop_Chunk_2_Production_Acceptance_2026-08-16]] |
+
+## Cash In flow
+
+1. Open Cash Drawer and choose **Cash In**.
+2. Load current till session/summary from the backend.
+3. Load active visible movement types for direction `IN`: global system types
+   plus current-tenant custom types only.
+4. Enter a positive decimal amount, select **Reason \*** (the movement type),
+   and optionally enter a note.
+5. Confirm once with a stable idempotency request identifier.
+6. Backend validates permission, device, till, session, type eligibility,
+   amount, and server-owned currency.
+7. Backend atomically inserts one `cash_movements` row linked to
+   `cash_movement_types` and `till_sessions`.
+8. Backend returns authoritative movement and refreshed expected-cash values.
+9. Flutter shows success only after that response, then refreshes summary and
+   recent movements.
+
+## Cash Drop flow (Chunk 1 closed; live E2E pending)
+
+1. Open Cash Drop.
+2. Permission + trusted device + OPEN till + summary load.
+3. Load valid **OUT** movement types.
+4. Enter amount + reason + optional note; live remaining-cash preview.
+5. Confirm with stable `requestId`; prevent double submit.
+6. Backend revalidates including amount ≤ available cash.
+7. Atomic OUT `cash_movements` insert; expected cash decreases.
+8. Refresh summary; success UI only after confirmation.
+9. Physical slip print is optional/separate and must not reverse finance.
+
+## Canonical data flow
 
 ```mermaid
-flowchart TD
-    S1[Open cash drawer/cash movement]
-    S1 --> S2[Select movement type and reason]
-    S2 --> S3[Enter amount and note]
-    S3 --> S4[Submit movement]
-    S4 --> S5[Receipt/audit is saved where required]
-    S5 --> Done[Journey completed]
+flowchart LR
+  UI[Cash In / Cash Drop UI] --> TYPES[GET movement types by direction]
+  UI --> POST[POST /api/v1/pos/cash-drawer/movements]
+  POST --> VALIDATE[Permission + trusted device + open till + type validation]
+  VALIDATE --> TX[Atomic transaction + idempotency]
+  TX --> CMT[cash_movement_types]
+  TX --> CM[cash_movements]
+  CM --> TS[till_sessions]
+  TX --> RESULT[Authoritative movement + expected cash]
+  RESULT --> UI
 ```
 
-## Business Rules
+## Reason semantics
 
-- Cash movement must attach to open till session.
-- Amount must be positive.
-- Reason is required.
-- Cash movement must be auditable.
-
-## Access-Control Rules
-
-| Control | Required Rule |
+| UI/data | Meaning |
 |---|---|
-| Authentication | Required |
-| Feature entitlement | POS cash drawer enabled |
-| Permission | Cash movement permission |
-| Open till session | Required |
+| Reason selector | `movement_type_id` from `cash_movement_types` |
+| Note | Optional `cash_movements.reason` explanation |
+| Currency | `till_sessions.currency_code`, never caller authority |
+| Manager PIN | UI-only future placeholder; not authorization/persistence/logging |
 
-## Data and API References
+### Verified system IN defaults
 
-| Area | References |
-|---|---|
-| Current Flutter | Cash Drawer, Cash In and Cash Drop screens/forms/providers exist |
-| Current API | No cashier cash-movement mutation endpoint was verified |
-| Schema | `till_cash_movements` and related till-session schema are defined in source |
+`FLOAT_ADDED`, `PETTY_CASH_ADDED`, `CASH_CORRECTION`, `OTHER`.
 
-Current classification is `FRONTEND_ONLY`. Form state is not proof of a stored
-movement, audit record or expected-cash update. The schema is approved data
-foundation, but operational controller/service/repository wiring remains absent.
-Defined in migration source; live applied state not verified.
+### OUT / Cash Drop types
 
-## Edge Cases
+Seeded system OUT types (Chunk 1): `CASH_DROP` (Safe Drop), `BANK_DEPOSIT`,
+`CASH_PICKUP`, `SECURITY_TRANSFER`, `OUT_CASH_CORRECTION`, `OUT_OTHER`.
+A "Bank Deposit" label does not authorize a banking module.
 
-- No open till blocks action.
-- Invalid amount is blocked by current Flutter form validation.
-- No permission returns 403.
+## Failure and duplicate handling
 
-## Out of Scope
+- Missing/closed till, invalid type, invalid amount, forbidden permission, or
+  stale context returns a typed error and creates no movement.
+- Timeout/unknown outcome must be resolved by the same request identifier; do
+  not create a fresh automatic retry.
+- No optimistic balance or local-only success.
+- No dual write to `till_cash_movements` for POS Cash In/Drop.
 
-- Accounting ledger is excluded.
-- Bank deposit workflow is excluded.
-- Cash movement must not be treated as completed until backend mutation and
-  persistence are wired and tested.
+## Legacy rule
 
-## Completion Criteria
+```text
+cash_movements = canonical financial ledger for POS Cash In (verified)
+till_cash_movements = legacy/compatibility (e.g. some return paths); not POS Cash In writer
+No dual-write for one Cash In or Cash Drop.
+```
 
-- The user reaches the expected final state without bypassing access control.
-- Tenant-owned data remains inside the resolved tenant context.
-- Sensitive actions write audit records where required.
-- UI state and backend state stay consistent after completion.
+## Related files
 
-## Related Files
-
-- [[../../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../../02_ACCESS_CONTROL/Access_Control_Overview]]
-- [[../../05_BACKEND_ARCHITECTURE/API_Standards]]
+- [[../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]]
+- [[../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/07_Cash_Drop_Feature]]
+- [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_In_Screen_Implementation_Specification]]
+- [[11_Till_Close_Flow]]

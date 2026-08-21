@@ -545,3 +545,8 @@ The following active canonical documents have been fully synchronized with this 
 7. [[02_Functional_Rules]]
 8. [[03_Technical_Contract]]
 9. [[Full_Feature_Status_Index]]
+
+## Step 3 SKIP Rule
+For `productStructure = BUNDLE`:
+`Step 3 = NOT_APPLICABLE`.
+A Bundle parent does NOT own physical inventory, thus Step 3 conversions are not supported. Component UOM is derived directly from the selected components during Step 4.

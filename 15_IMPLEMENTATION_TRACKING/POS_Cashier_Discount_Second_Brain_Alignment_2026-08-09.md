@@ -599,3 +599,43 @@ lib/
 - **Full Flutter test suite (`flutter test`)**: **473 passed**
 - **Whole-project analyzer (`flutter analyze`)**: Exit code 1 due to **3 info-level lint issues in unrelated Tenant Admin files** (`add_outlet_screen.dart`, `business_hours_editor.dart`, `outlet_form.dart` with `curly_braces_in_flow_control_structures`). **0 errors and 0 warnings in the discount feature.**
 
+## 2026-08-12 — Catalog Manual-Offer Classification Remediation
+
+### Status
+
+**IMPLEMENTED AND AUTOMATED-VERIFIED; AUTHENTICATED FLUTTER UI ACCEPTANCE BLOCKED BY UNAVAILABLE INTERACTIVE BROWSER SESSION.**
+
+### Root Cause and Fix
+
+- The POS catalog offer resolver considered every eligible active discount policy,
+  including the four internal manual cashier authority envelopes.
+- This allowed `POS_MANUAL_FIXED_LINE` (LKR 10,000) to appear as a customer-facing
+  automatic catalog offer and reduce display prices to zero, even though cart and
+  checkout correctly require a manual Discount Application.
+- A shared domain constant set now provides the exact canonical identities of the
+  four existing manual authority envelopes. Both the manual Discount repository and
+  Catalog repository use that shared classification.
+- Catalog offer resolution excludes those exact manual policies before automatic
+  offer eligibility/calculation. No Flutter hiding logic, schema change, seed removal,
+  or checkout pricing bypass was introduced.
+
+### Verification Evidence
+
+- Catalog repository integration tests: **28 passed**.
+- Discount repository integration tests: **6 passed**.
+- POS Discount service unit tests: **11 passed**.
+- POS Checkout integration tests: **15 passed**.
+- Backend Release build: **PASS**, zero errors (one unrelated nullable warning in
+  `InventoryController.cs`).
+- Flutter offer tests: **4 passed**.
+- Flutter cart tests: **25 passed**.
+- Flutter analyzer: **PASS — No issues found**.
+- Real Local Development API health/database connectivity: **PASS**.
+- Authenticated catalog runtime for Development Main Store / Front Till 01:
+  manual fixed/percentage policy hits **0**, zero-price manual offer hits **0**;
+  genuine `Dev Promo 25% Off` automatic offers remained present.
+- Authenticated Flutter card/cart/manual-discount interaction was not completed in
+  this execution environment because no controllable browser session was available.
+  Production completion must remain blocked until that UI acceptance evidence is
+  captured; the manual transaction must not be inferred from automated tests alone.
+

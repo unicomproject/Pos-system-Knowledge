@@ -27,12 +27,12 @@ Layout:
 - Page breadcrumb: `Subscriptions / Create Plan`
 - Title: **Create Subscription Plan**
 - Subtitle: Build a subscription package for your tenants.
-- Six-step stepper: Basics → Modules → Features → Pricing → Limits → Review & Publish
+- Six-step stepper: Basics → Modules → Features → Pricing → Limits → Review & Create
 - Left card: Plan Basics
 - Right sticky card: Draft Summary
 - Bottom sticky action bar (single source of wizard actions):
   - Left: **Back** (step 1 returns to list)
-  - Right: **Save Draft** and **Next** (steps 1–5) or **Publish Plan** (Review & Publish)
+  - Right: **Save Draft** and **Next** (steps 1–5) or **Publish Plan** (Review & Create)
 - No duplicate top-right wizard action buttons
 
 ### Allowed Step 1 fields (Release 1 DB-backed)
@@ -191,7 +191,7 @@ Limits must not show **Configured** on Pricing step unless user completed Limits
 3. Validate maxOutlets, maxTills, maxUsers (required integers ≥ 1)
 4. `PATCH /api/v1/platform/subscription-plans/{id}/limits` with `{ maxOutlets, maxTills, maxUsers }`
 5. Success toast only after backend success; Draft Summary Limits = **Configured** only after PATCH success
-6. **Next** on Limits → PATCH limits then navigate to Review & Publish
+6. **Next** on Limits → PATCH limits then navigate to Review & Create
 
 ### Allowed Limits fields (Release 1 DB-backed)
 

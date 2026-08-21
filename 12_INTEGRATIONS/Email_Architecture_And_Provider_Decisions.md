@@ -1,4 +1,4 @@
-﻿<!-- title: Email Architecture and Provider Decisions -->
+<!-- title: Email Architecture and Provider Decisions -->
 <!-- status: APPROVED -->
 <!-- system: OneVerz POS MVP -->
 <!-- owner: Platform Architecture / Product (OneVerz) -->

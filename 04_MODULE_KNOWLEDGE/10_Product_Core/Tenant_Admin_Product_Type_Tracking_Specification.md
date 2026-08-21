@@ -179,8 +179,8 @@ Status (`DRAFT`/`ACTIVE`), Primary Image Thumbnail, Product Name, Internal Code 
 ### Database Core Schema Alignment
 - `products`: `id`, `tenant_id`, `product_name`, `product_code`, `product_type` (default `'STANDARD'`), `product_structure` (`SIMPLE`/`VARIANT`/`BUNDLE`), `status`, `current_setup_step`, `row_version`, `created_at`, `updated_at`.
 - `product_inventory_settings`: `id`, `tenant_id`, `product_id`, `product_variant_id` (NULL for parent policy/simple), `is_stock_tracked`, `requires_batch_tracking`, `requires_expiry_tracking`, `requires_serial_tracking`, `inventory_uom_id`.
-- `product_variants`: `id`, `tenant_id`, `product_id`, `variant_sku`, `variant_barcode`, `selling_price`, `status`, `row_version`.
-- `combo_definitions`: `id`, `tenant_id`, `product_id` (bundle parent), `combo_type`, `status`.
+- `product_variants`: `id`, `tenant_id`, `product_id`, `variant_code`, `sku`, `status`, `row_version`.
+- `combo_definitions`: `id`, `tenant_id`, `product_id` (bundle parent), `combo_definitions.pricing_mode / combo_definitions.inventory_deduction_mode`, `status`.
 - `combo_components`: `id`, `tenant_id`, `combo_definition_id`, `component_product_id`, `component_variant_id`, `quantity`, `uom_id`.
 
 ---
@@ -192,7 +192,7 @@ Status (`DRAFT`/`ACTIVE`), Primary Image Thumbnail, Product Name, Internal Code 
 - Edit Mode Active Product: `catalog.products.update`
 - Resume / View Draft: `catalog.products.view`
 - Stage 4 Variant Configuration: `catalog.variants.manage`
-- Stage 4 Bundle Configuration: `catalog.bundle_components.manage`
+- Stage 4 Bundle Configuration: `catalog.combo_components.manage`
 
 ### 8.2 Feature Entitlements
 - Runtime Feature Entitlement Code: `product_catalog` (Module Code: `product_management`).
@@ -270,3 +270,18 @@ Single Unified Wizard Pipeline (`SaveProductWizardAsync`) with semantic stage he
 - `ValidateProductTypeTracking(SaveProductDraftCommand command)`
 - `ApplyProductTypeTracking(Product product, SaveProductDraftCommand command)`
 - `ResolveNextApplicableStage(ProductStructure structure, int currentStage)`
+
+## Step 2 Bundle UI Contract
+For `Product Structure = Bundle / Kit`, the following UI is displayed:
+```text
+Product Structure: Bundle / Kit
+Inventory Method: Component-based
+```
+Helper texts:
+- `Bundle availability is calculated from component stock.`
+- `Selling this bundle deducts the configured component quantities.`
+- `Batch, expiry and serial tracking follow component settings.`
+- `Add and manage bundle components in Step 4 — Product Configuration.`
+
+Do NOT expose Bundle parent controls for: Track Inventory, Batch Tracking, Expiry Tracking, Serial Tracking, Unit & Pack Conversion, Bundle Pricing, SKU Prefix, Barcode, Component substitution, Sell when component unavailable.
+

@@ -195,7 +195,7 @@ payment recovery · tenant cancel/renew/suspend · MRR/ARR analytics
 | Create route | `/admin/subscriptions/create` |
 | Edit | Same route; `history.state { planId, mode?: 'view' \| 'edit' }` |
 | State usage today | **Only `planId` used** (`mode` present in type; not driving UX) |
-| Steps | Basics → Modules → Features → Pricing → Limits → Review & Publish |
+| Steps | Basics → Modules → Features → Pricing → Limits → Review & Create |
 | Catalog | GET modules/features catalog |
 | Persist features | PATCH `featureIds` (**included only**) |
 | Persist pricing | PATCH `basePrice` |
@@ -237,7 +237,7 @@ Exact order (do not rename, reorder, add, or remove):
 | 3 | `features` | Features |
 | 4 | `pricing` | Pricing |
 | 5 | `limits` | Limits |
-| 6 | `review` | Review & Publish |
+| 6 | `review` | Review & Create |
 
 ---
 
@@ -254,7 +254,7 @@ Exact order (do not rename, reorder, add, or remove):
 | Active geometry | **No size/position shift** vs idle |
 | Completed geometry | **No size/position shift** vs idle (check replaces number in-place) |
 | Modules alignment | **Frozen** — Modules indicator must align with other five |
-| Review & Publish label | May wrap **in-column**; must not break equal-width rail |
+| Review & Create label | May wrap **in-column**; must not break equal-width rail |
 | First/last connectors | Outer stubs hidden (no dangling connector beyond rail) |
 
 Quality target for stepper: **≥ 9.5/10** geometry fidelity to approved corrected prototype.
@@ -529,7 +529,7 @@ Do not invent additional limit keys in UI-4B.
 
 ---
 
-## 34. Review & Publish
+## 34. Review & Create
 
 Review step shows a truthful summary of:
 
@@ -1033,7 +1033,7 @@ Same composition; tighten gaps if needed. Stepper remains equal-width horizontal
 | Features | feature `included`/`not_available` | PATCH `featureIds` included only | Respect module inclusion/locks |
 | Pricing | `basePrice` (+ echoes) | PATCH pricing | `basePrice` ≥ 0 |
 | Limits | `maxOutlets`, `maxTills`, `maxUsers` | PATCH limits | Each ≥ 1 |
-| Review & Publish | Summary + confirm | pricing/limits then POST publish | All publish prerequisites |
+| Review & Create | Summary + confirm | pricing/limits then POST publish | All publish prerequisites |
 
 ---
 
@@ -1232,7 +1232,7 @@ Modules alignment
 1440/1280 horizontal
 1024 tightened horizontal
 768 contained horizontal scroll without page overflow
-Review & Publish in-column wrap
+Review & Create in-column wrap
 ```
 
 ### Create Mode
@@ -1427,7 +1427,7 @@ Future UI-4B implementation must satisfy at minimum:
 
 ```text
 Premium Stepped Form Workspace preserved
-Exact six steps: Basics → Modules → Features → Pricing → Limits → Review & Publish
+Exact six steps: Basics → Modules → Features → Pricing → Limits → Review & Create
 Corrected stepper alignment preserved (978c587)
 Modules indicator alignment exact
 No active-state geometry shift
@@ -1547,7 +1547,7 @@ Merge the approved UI-4B Premium Blue Visual Direction Specification through the
 
 After the specification is integrated, implement only the existing UI-4B Create/Edit Subscription Plan workflow on a dedicated Platform Admin feature branch.
 
-Preserve the exact six-step flow, corrected stepper alignment (978c587), Create + Draft Edit semantics (including Edit heading/identity and module/feature hydration), current billing-cycle options (no one_time), Save Draft / Review & Publish behavior, real modules/features/limits, UI-4A lifecycle boundary, and UI-5 Billing boundary.
+Preserve the exact six-step flow, corrected stepper alignment (978c587), Create + Draft Edit semantics (including Edit heading/identity and module/feature hydration), current billing-cycle options (no one_time), Save Draft / Review & Create behavior, real modules/features/limits, UI-4A lifecycle boundary, and UI-5 Billing boundary.
 
 Do not add one_time, trialDays, a new edit route, tenant subscription CRM, billing operations, new lifecycle states, backend changes, API changes, or DB changes.
 

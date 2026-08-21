@@ -38,7 +38,7 @@ This module is part of the OneVerz POS MVP scope: mobile and desktop EPOS, respo
 - Option templates standardize common values such as size, color, portion, or type.
 - Variant option combinations identify sellable variants via deterministic `option_combination_hash` (SHA-256).
 - Add Product Step 4 uses **`Include Variant`** (never "Availability") to toggle global variant inclusion.
-- Step 4 does NOT configure SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, or Channel Visibility (belonging to Steps 5, 6, and 7).
+- Step 4 does NOT configure SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, or Channel Visibility (belonging to Step 1).
 - Option values shown online must match sellable variant configuration.
 - Do not use option templates for combo choice groups; combos have their own module.
 

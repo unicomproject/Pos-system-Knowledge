@@ -41,6 +41,17 @@ merchandising, attractions, and temporary retail locations.
 - Inactive products cannot be sold through POS or online store.
 - POS may cache product reference data, but backend remains final authority.
 
+### Bundle / Kit Core Domain Rules
+- Bundle / Kit is defined as one sellable parent Product, one parent SKU, one parent Barcode, one Bundle selling price, and multiple existing Product / exact Variant components.
+- Inventory is component-based; there is NO Bundle parent physical stock.
+- The Bundle parent MUST have:
+  - `products.product_structure = 'BUNDLE'`
+  - `product_inventory_settings.is_stock_tracked = false`
+  - `product_inventory_settings.requires_batch_tracking = false`
+  - `product_inventory_settings.requires_expiry_tracking = false`
+  - `product_inventory_settings.requires_serial_tracking = false`
+- A Bundle parent MUST NOT have a physical stock ledger (`inventory_balances` directly for the bundle parent is non-existent). Inventory tracking at the parent level is strictly disabled. Component stock deduction does NOT imply parent stock tracking is enabled.
+
 ## Access Summary
 
 | Control | Rule |

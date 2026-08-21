@@ -285,6 +285,7 @@ Purpose: Stores tenant product master records.
 | `is_sellable`               | boolean      |     | NOT NULL DEFAULT true | Sellable flag                  |
 | `is_taxable`                | boolean      |     | NOT NULL DEFAULT true | Taxable flag                   |
 | `status`                    | varchar(40)  |     | NOT NULL              | Product status                 |
+| `reference_cost_price`      | numeric(18,4)|     | NULL                  | Reference cost price           |
 | `current_setup_step`        | int          |     | NOT NULL DEFAULT 1    | Wizard setup step progress     |
 | `draft_saved_at`            | timestamptz  |     | NULL                  | Draft creation timestamp       |
 | `published_at`              | timestamptz  |     | NULL                  | Timestamp of publication       |
@@ -418,7 +419,7 @@ Indexes / Constraints / Notes:
 
 ## Module Notes
 
-- Every sellable product must have at least one `product_variants` row.
+- Every sellable product must have at least one `product_variants` row. Therefore, for `SIMPLE` and `BUNDLE` products, their Base SKU is stored in `product_variants.sku` on their single default variant row.
 - Only entity tables visible in the uploaded ERD image are included.
 - Tenant-owned tables include `tenant_id` for data isolation.
 

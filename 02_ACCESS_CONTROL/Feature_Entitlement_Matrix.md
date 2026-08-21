@@ -27,7 +27,7 @@ A permission cannot activate a disabled feature.
 | tenant_admin           | Included   | Business operations setup                               |
 | mobile_pos             | Included   | Phone/tablet POS selling                                |
 | desktop_epos           | Included   | Laptop/desktop EPOS/admin use                           |
-| product_management     | Included   | Products, variants, attributes, barcodes                |
+| product_catalog        | Included   | Products, variants, attributes, barcodes                |
 | inventory_management   | Included   | Stock, adjustments, alerts, movement history            |
 | online_store           | Included   | Customer website and catalogue                          |
 | cart_checkout          | Included   | Shopping cart and checkout sessions                     |
@@ -68,7 +68,7 @@ A permission cannot activate a disabled feature.
 | Feature | Required For |
 |---|---|
 | tenant_admin | Tenant business admin layout |
-| product_management | Product setup and catalogue |
+| product_catalog | Product setup and catalogue |
 | inventory_management | Stock setup and visibility |
 | users_permissions | User, role, permission management |
 | reporting_analytics | Dashboard and report screens |

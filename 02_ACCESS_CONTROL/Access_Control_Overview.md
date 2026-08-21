@@ -1,4 +1,4 @@
-<!-- title: Access Control Overview -->
+﻿<!-- title: Access Control Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-08-08 -->
@@ -113,3 +113,19 @@ permission, tenant isolation, and audit.
 - [[Permission_Code_List]]
 - [[API_Authorization_Rules]]
 - [[../01_RELEASE_SCOPE/Release_1_Scope]]
+
+<!-- RBAC_HARDENING_2026_08_15_START -->
+## Tenant RBAC Runtime Addendum - 2026-08-15
+
+Canonical effective permission resolution is now documented in `02_ACCESS_CONTROL/Tenant_Effective_Permission_Resolution.md`.
+
+Key rules:
+
+- Effective permissions are additive allow grants.
+- Sources are tenant direct permissions, tenant role permissions, outlet direct permissions, and outlet role permissions where outlet context applies.
+- Revoked assignments/grants must never contribute to effective permissions.
+- Feature entitlement must be checked before plan-controlled permissions are usable.
+- Explicit deny is not implemented in Release 1.
+- Tenant Admin role APIs remain an implementation gap until `/api/v1/tenant-admin/roles` and `/api/v1/tenant-admin/permission-catalog` exist in backend source.
+<!-- RBAC_HARDENING_2026_08_15_END -->
+
