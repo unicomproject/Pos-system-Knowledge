@@ -73,6 +73,10 @@ track/EMV data, reusable token, credentials or raw response.
 
 ## Permission And Business Rules
 
+> [!IMPORTANT]
+> **SUPERSEDED BY OWNER-APPROVED R1 SCOPE LOCK**  
+> Integrated Card checkout is deferred to Release 2. The permission `payments.card.accept` is reclassified as **R2_DEFERRED** under [ONEVERZ_RELEASE_1_SCOPE_LOCK.md](file:///c:/Users/User/Desktop/Nytroz__POS/Nytroz%20POS%20-%20Second%20Brain/Pos-system-Knowledge/01_RELEASE_SCOPE/ONEVERZ_RELEASE_1_SCOPE_LOCK.md).
+
 Existing permission is `payments.card.accept`. Backend authorization, activated
 device, assigned/open till and enabled method are required. Card must never be
 stored as Cash and no fake fallback is allowed.

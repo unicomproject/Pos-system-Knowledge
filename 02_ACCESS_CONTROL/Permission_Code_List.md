@@ -1,9 +1,14 @@
-﻿<!-- title: Permission Code List -->
+<!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-08-24 -->
 
 # Permission Code List
+
+> **Permission & Entitlement Contract Reconciled: 2026-08-21 — SUPERSEDED BY OWNER-APPROVED R1 SCOPE LOCK**  
+> The authoritative Release 1 scope is locked in [ONEVERZ_RELEASE_1_SCOPE_LOCK.md](file:///c:/Users/User/Desktop/Nytroz__POS/Nytroz%20POS%20-%20Second%20Brain/Pos-system-Knowledge/01_RELEASE_SCOPE/ONEVERZ_RELEASE_1_SCOPE_LOCK.md).  
+> The reconciled Release 1 permission catalog is locked in [CANONICAL_MODULE_FEATURE_PERMISSION_CATALOG_R1.md](file:///c:/Users/User/Desktop/Nytroz__POS/Nytroz%20POS%20-%20Second%20Brain/Pos-system-Knowledge/02_ACCESS_CONTROL/CANONICAL_MODULE_FEATURE_PERMISSION_CATALOG_R1.md).  
+> Where this working list conflicts with the Canonical Scope and Catalog, **the Canonical Scope and Catalog win**.
 
 ## Purpose
 
@@ -15,7 +20,19 @@ truth.
 The catalog hierarchy (module â†’ feature â†’ permission) is seeded in
 `platform_modules`, `platform_features`, and the permission tables, then
 exposed through backend catalog APIs. Frontends must not duplicate this tree in
-code. See [[Backend_Driven_Permission_Catalog]].
+code. See [[Backend_Driven_Permission_Catalog]] and [[CANONICAL_PERMISSION_AND_FEATURE_ENTITLEMENT_CONTRACT_R1]].
+
+```text
+NO production frontend-owned permission list as Source of Truth.
+```
+
+### Invalid tokens (never seed / never bootstrap)
+
+The following are **not** permission codes and **not** commercial entitlements. Reject if presented during bootstrap:
+
+`pos.cash_drawer`, `pos.customers`, `pos.exchanges`, `pos.home`, `pos.notifications`, `pos.orders`, `pos.payments`, `pos.products`, `pos.receipts`, `pos.returns`, `pos.sales`, `pos.till`, `product_barcodes`, `product_brands`, `product_categories`, `product_images`, `product_variants`, `tenant.till_ops`.
+
+See Canonical Contract §6.
 
 Code constants are only safe references for API attributes, services, seed data,
 and tests.
@@ -245,8 +262,8 @@ must be seeded and stored in the database.
 | Area | Permission Code | Usage |
 |---|---|---|
 | Platform | `platform.tenants.create` | Create tenant |
-| Catalog | `catalog.product.create` | Create product |
-| Catalog | `catalog.product.update` | Update product |
+| Catalog | `catalog.products.create` | Create product |
+| Catalog | `catalog.products.update` | Update product |
 | Inventory | `inventory.adjust` | Adjust stock |
 | Sales | `pos.sale.create` | Create POS sale |
 | Sales | `pos.sale.discount.apply` | Apply discount |
@@ -374,19 +391,27 @@ permission rows for aliases.
 | inventory.stock.adjust | Adjust stock |
 | inventory.movements.view | View movement history |
 | inventory.alerts.view | View low/expiry stock alerts |
+| inventory.opening_stock.manage | Post opening stock |
+| inventory.receiving.manage | Receive stock |
+| inventory.serials.view | View serial registry |
+| inventory.channel_allocation.view | View channel allocations |
+| inventory.channel_allocation.manage | Confirm channel allocations |
 
 Only confirmed platform actions should be seeded.
 
 ## Tenant Examples
 
-| Code Pattern | Meaning |
-|---|---|
-| `tenant.outlet.manage` | Manage outlets |
-| `tenant.till.manage` | Manage tills |
-| `tenant.user.manage` | Manage users |
-| `tenant.role.manage` | Manage roles |
-| `tenant.permission.manage` | Manage permissions |
-| `tenant.product.import` | Import products |
+> **SUPERSEDED as current seed examples: 2026-08-13** — prefer plural canonical forms in [[CANONICAL_PERMISSION_AND_FEATURE_ENTITLEMENT_CONTRACT_R1]] §10 / §17.  
+> Singular forms below are **legacy alias / historical examples** only.
+
+| Code Pattern | Meaning | Canonical |
+|---|---|---|
+| `tenant.outlet.manage` | Manage outlets | Prefer `tenant.outlets.manage` |
+| `tenant.till.manage` | Manage tills / device activation gate | Prefer `tenant.tills.*`; alias retained for activation gate |
+| `tenant.user.manage` | Manage users | Prefer `tenant.users.manage` |
+| `tenant.role.manage` | Manage roles | Prefer `tenant.roles.manage` |
+| `tenant.permission.manage` | Manage permissions | Prefer `roles.permissions.*` / `tenant.roles.manage` |
+| `tenant.product.import` | Import products | Prefer `catalog.products.import` |
 
 Exact seed list must be reviewed against UI journeys before production seeding.
 
@@ -530,6 +555,7 @@ Never rename a permission code casually after development starts.
 
 ## Related Files
 
+- [[CANONICAL_PERMISSION_AND_FEATURE_ENTITLEMENT_CONTRACT_R1]]
 - [[Backend_Driven_Permission_Catalog]]
 - [[Access_Control_Overview]]
 - [[Feature_Entitlement_Matrix]]

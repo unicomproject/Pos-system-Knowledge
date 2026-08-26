@@ -14,6 +14,7 @@ This file documents the entity tables, attributes, keys, nullability, constraint
 | Table | Purpose |
 |---|---|
 | `platform_users` | Stores platform administrator users. |
+| `platform_user_invitations` | Stores platform user invitation records and hashed setup tokens (Migration `20260817113600_AddPlatformUserInvitation`). |
 | `platform_roles` | Stores platform-level roles. |
 | `platform_permissions` | Stores platform permission catalog. |
 | `platform_user_roles` | Assigns platform roles to platform users. |
@@ -34,13 +35,13 @@ Purpose: Stores platform administrator users.
 | `id` | uuid | PK | NOT NULL | Primary key |
 | `email` | varchar(255) |  | NOT NULL | Login email |
 | `normalized_email` | varchar(255) |  | NOT NULL | Normalized login email |
-| `password_hash` | varchar(255) |  | NOT NULL | Password hash only; raw password is never stored |
+| `password_hash` | varchar(255) |  | NULL | Nullable for initial `INVITED` users before password setup |
 | `first_name` | varchar(100) |  | NULL |  |
 | `last_name` | varchar(100) |  | NULL |  |
-| `display_name` | varchar(150) |  | NULL |  |
-| `phone` | varchar(40) |  | NULL |  |
+| `display_name` | varchar(150) |  | NULL | Set to Full Name during creation |
+| `phone` | varchar(40) |  | NULL | Optional phone number |
 | `job_title` | varchar(120) |  | NULL |  |
-| `status` | varchar(40) |  | NOT NULL | Original ERD domain: platform_user_status |
+| `status` | varchar(40) |  | NOT NULL | Status values: `INVITED`, `ACTIVE`, `INACTIVE`, `LOCKED` |
 | `email_verified_at` | timestamptz |  | NULL |  |
 | `failed_login_count` | int |  | NOT NULL |  |
 | `locked_until` | timestamptz |  | NULL |  |
@@ -50,6 +51,20 @@ Purpose: Stores platform administrator users.
 | `updated_at` | timestamptz |  | NOT NULL |  |
 | `created_by_platform_user_id` | uuid | FK | NULL | Self reference to platform_users(id) |
 | `updated_by_platform_user_id` | uuid | FK | NULL | Self reference to platform_users(id) |
+
+## `platform_user_invitations`
+
+Purpose: Stores invitation state and deterministic token hashes for platform user onboarding (added in Migration `20260817113600_AddPlatformUserInvitation`).
+
+| Attribute | Type | Key | Null | Reference / Note |
+|---|---|---|---|---|
+| `id` | uuid | PK | NOT NULL | Primary key |
+| `platform_user_id` | uuid | FK | NOT NULL | References `platform_users(id)` |
+| `token_hash` | varchar(256) |  | NOT NULL | SHA-256 hash of the invitation token; raw token is NEVER stored |
+| `status` | varchar(50) |  | NOT NULL | Status values: `PENDING`, `SENT`, `ACCEPTED`, `EXPIRED`, `REVOKED` |
+| `expires_at` | timestamptz |  | NOT NULL | Invitation token expiry timestamp |
+| `sent_at` | timestamptz |  | NULL | Timestamp recorded when ACS delivery Succeeded |
+| `created_at` | timestamptz |  | NOT NULL |  |
 
 Constraints / Notes:
 
