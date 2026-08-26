@@ -1,3 +1,8 @@
+<!-- title: Tenant Admin Add Product Draft And Auto-Save Lifecycle Specification -->
+<!-- status: Active -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-24 -->
+
 # Tenant Admin Add Product — Draft & Auto-Save Lifecycle Specification
 
 ## 1. Core Concept & Separation of States
@@ -25,8 +30,13 @@ The Add Product Wizard operates on a persistent backend draft system, specifical
 ## 3. Resume & Restoration
 Whenever an In-Progress or Explicit Draft is resumed, the wizard MUST restore:
 *   The exact `CurrentSetupStep` the user was on.
-*   All previously entered data, including generated variants, taxes, and image ordering.
+*   All previously entered data, including generated variants, taxes, image ordering, and TARGET Initial Tracking Details (`initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`, plus VARIANT `initialTrackingAssignedVariantId` when set).
+*   If Step 2 already cleared incompatible tracking values after explicit confirmation, restore the **normalized** values. Do not resurrect discarded identities.
 *   Tenant isolation is enforced strictly on all reads and writes.
+
+CURRENT: Step 1 draft persists on `products` master columns. There is **no CURRENT store** for provisional Batch/Expiry/Serial.
+
+TARGET / GAP: persist those three fields on dedicated `product_setup_initial_tracking` via the existing `PUT .../draft` pipeline. Do not write `product_batches` / `serial_numbers` until Step 7 Publish. See [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
 
 ## 4. Concurrency & Idempotency
 *   The system uses `ExpectedRowVersion` for optimistic concurrency. If a draft is updated in two different tabs simultaneously, the older tab will gracefully reject the save to prevent silent data corruption.

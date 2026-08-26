@@ -1,7 +1,7 @@
 <!-- title: Product Core Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-11 -->
+<!-- last_updated: 2026-08-24 -->
 
 # Product Core Functional Rules
 
@@ -23,13 +23,39 @@ These rules must be applied before creating backend APIs, Flutter screens, respo
 - Step 4 for VARIANT mode defines options, values, Cartesian matrix, display labels, variant inclusion toggles (`Include Variant`), and variant image overrides. It does NOT configure SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility (belonging to Step 1).
 - Inactive products cannot be sold through POS or online store.
 - POS may cache product reference data, but backend remains final authority.
+- Optional Step 1 Initial Tracking Details (Batch / Expiry / Serial) do not enable tracking policy. See BR-TRACK-001 to BR-TRACK-020 in [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Permission matrix: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
+
+| ID | Rule |
+|---|---|
+| BR-TRACK-001 | Step 1 may collect optional initial Batch Number. |
+| BR-TRACK-002 | Step 1 may collect optional initial Expiry Date. |
+| BR-TRACK-003 | Step 1 may collect optional initial Serial Number. |
+| BR-TRACK-004 | Step 1 tracking values do not determine tracking policy. |
+| BR-TRACK-005 | Step 2 is authoritative for tracking enable/disable state. |
+| BR-TRACK-006 | Expiry Tracking requires Batch Tracking. |
+| BR-TRACK-007 | Serial Tracking is mutually exclusive with Batch/Expiry in Release 1. |
+| BR-TRACK-008 | Incompatible Step 1 values must never be silently discarded. |
+| BR-TRACK-009 | Expiry remains batch-owned domain data. |
+| BR-TRACK-010 | Serial remains physical-unit identity data. |
+| BR-TRACK-011 | Step 1 serial is an INITIAL serial, not a Product-wide reusable serial. |
+| BR-TRACK-012 | Step 1 batch is an INITIAL batch; later batches may be added. |
+| BR-TRACK-013 | No positive inventory quantity may be invented from Batch/Expiry/Serial input alone. |
+| BR-TRACK-014 | Variant tracking identity must resolve to an exact Variant before final physical ownership. |
+| BR-TRACK-015 | Bundle parent cannot receive direct physical tracking identities while Bundle inventory remains component-based. |
+| BR-TRACK-016 | Initial Tracking mutation uses Product Setup authorization and does not imply Stock Adjustment permission. |
+| BR-TRACK-017 | Unauthorized specialized fields must never be persisted merely because they were included in a generic draft payload. |
+| BR-TRACK-018 | Publish revalidates all permissions required for mutations performed during publish. |
+| BR-TRACK-019 | Cost data must not be returned to callers without `catalog.product_cost.view`. |
+| BR-TRACK-020 | Permission denial must not cause silent destructive normalization of draft data. |
 
 ## Related Specifications
 
 - [[../12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification]]
 - [[Tenant_Admin_Product_Type_Tracking_Specification]]
 - [[Tenant_Admin_Product_Units_Pack_Conversion_Specification]]
-- [[05_Tenant_Admin_Add_Product_8_Step_Contract]]
+- [[05_Tenant_Admin_Add_Product_7_Step_Contract]]
+- [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
+- [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
 
 ## Bundle / Kit Functional Rules
 

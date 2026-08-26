@@ -1,7 +1,7 @@
 <!-- title: Developer Reading Guide -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-24 -->
 
 
 # Developer Reading Guide
@@ -108,11 +108,17 @@ production packaging / Windows service autostart**.
 ## Admin / Operations Developer Reading Path
 
 1. Read Platform Admin and Tenant Admin journeys.
-2. Read product, variant, inventory, order, reports, users, and permissions modules.
-3. Read entitlement and feature flag rules.
-4. Read database tables for product, inventory, user, outlet, till, order, and
+2. For Tenant Admin Add Product, read the 7-step contract, then
+   [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]],
+   [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]],
+   and
+   [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
+   before changing Step 1, inventory identity, or Product Setup authorization.
+3. Read product, variant, inventory, order, reports, users, and permissions modules.
+4. Read entitlement and feature flag rules.
+5. Read database tables for product, inventory, user, outlet, till, order, and
    reporting areas.
-5. Do not hardcode roles or access decisions.
+6. Do not hardcode roles or access decisions.
 
 ## QA Engineer Reading Path
 

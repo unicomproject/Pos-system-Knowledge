@@ -1,7 +1,7 @@
 ﻿<!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-15 -->
+<!-- last_updated: 2026-08-24 -->
 
 # Permission Code List
 
@@ -352,6 +352,22 @@ permission rows for aliases.
 | catalog.product_audit.view | View standard product audit histories |
 | catalog.product_audit_sensitive.view | View sensitive product audit details |
 | catalog.combo_components.manage | Manage bundle kits and component rules |
+| pricing.tax_classes.view | TARGET Product Setup Tax Name lookup; also Tax Admin view |
+| pricing.tax_classes.create | Create tax classes (Tax Admin; not required to assign a class on a Product) |
+| pricing.tax_classes.update | Update tax classes |
+| pricing.tax_classes.delete | Delete tax classes |
+| pricing.tax_rates.view | TARGET Product Setup tax-rate display lookup |
+| pricing.tax_rates.create | Create tax rates (Tax Admin) |
+| pricing.tax_rates.update | Update tax rates |
+| pricing.tax_rates.delete | Delete tax rates |
+| tax.classes.view | CURRENT runtime alias (`PricingTaxPermissions.TaxClasses.View`) — one-way map to `pricing.tax_classes.view` |
+| tax.classes.create | CURRENT runtime alias → `pricing.tax_classes.create` |
+| tax.classes.update | CURRENT runtime alias → `pricing.tax_classes.update` |
+| tax.classes.delete | CURRENT runtime alias → `pricing.tax_classes.delete` |
+| tax.rates.view | CURRENT runtime alias (`PricingTaxPermissions.TaxRates.View`) — one-way map to `pricing.tax_rates.view` |
+| tax.rates.create | CURRENT runtime alias → `pricing.tax_rates.create` |
+| tax.rates.update | CURRENT runtime alias → `pricing.tax_rates.update` |
+| tax.rates.delete | CURRENT runtime alias → `pricing.tax_rates.delete` |
 | catalog.tax_classes.view | **DEPRECATED** — Use canonical `pricing.tax_classes.view` and `pricing.tax_rates.view` |
 | catalog.price_lists.view | Read price list setups |
 | inventory.stock.view | View stock levels |
@@ -553,6 +569,29 @@ catalog.combo_components.manage
 inventory.stock.view
 catalog.product_cost.view
 ```
+
+## Product Wizard permission namespace (LOCKED 2026-08-24)
+
+Canonical Product Setup authority is **`catalog.*` only**. Backend TARGET checks
+must not `OR` `catalog.products.*` with `tenant.products.*` as two first-class
+permissions.
+
+| Code | Status |
+|---|---|
+| `catalog.products.view/create/update/delete/publish/restore/duplicate` | Canonical |
+| `catalog.variants.manage` | Canonical specialized |
+| `catalog.combo_components.manage` | Canonical specialized |
+| `catalog.barcodes.manage` | Canonical specialized |
+| `catalog.product_media.manage` | Canonical specialized |
+| `catalog.product_channels.manage` | Canonical specialized |
+| `catalog.product_pricing.manage` | Canonical specialized |
+| `catalog.product_cost.view` | Canonical cost read |
+| `tenant.products.view/create/update/delete` | CURRENT `TenantAdminProductPermissions` — **compatibility only**. Effective-permission resolver MAY one-way map these to `catalog.products.*`. Remove after grant seed and Flutter guards switch. |
+| `catalog.product_tracking.manage` | **Not a permission.** Do not invent. Initial Tracking uses create/update + `inventory_tracking`. |
+
+Full wizard matrix:
+[[Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
+
 <!-- RBAC_HARDENING_2026_08_15_START -->
 ## Role Permission Mutation Note - 2026-08-15
 

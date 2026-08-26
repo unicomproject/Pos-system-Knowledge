@@ -1,7 +1,7 @@
 ﻿<!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-24 -->
 
 # API Authorization Rules
 
@@ -102,7 +102,7 @@ Contract: [[../05_BACKEND_ARCHITECTURE/Platform_Selected_Tenant_API_Contract]]
 | Permission catalog read | Tenant active, `roles.permissions.view`; catalog filtered by tenant entitlements |
 | Role permission update | Tenant active, `roles.permissions.update`; assigned codes must stay within entitlements |
 | Tax Management | Catalog entitlement, `pricing.tax_classes.*` and `pricing.tax_rates.*` permissions |
-| Product management | Catalog entitlement and permission `catalog.products.view`, `catalog.products.create`, `catalog.products.update`, `catalog.products.delete`, `catalog.products.publish`, `catalog.products.restore`, or `catalog.products.duplicate` (Note: `catalog.products.import` remains in schema but is deferred and excluded from the active Tenant Admin UI scope). Legacy permission codes starting with `tenant.products.*` must be mapped to their canonical `catalog.products.*` equivalents in the Flutter client per ADR 007. |
+| Product management | Catalog entitlement **`product_catalog`** (not `product_management`) and permission `catalog.products.view`, `catalog.products.create`, `catalog.products.update`, `catalog.products.delete`, `catalog.products.publish`, `catalog.products.restore`, or `catalog.products.duplicate` (Note: `catalog.products.import` remains in schema but is deferred and excluded from the active Tenant Admin UI scope). Specialized Product Wizard subgraphs additionally require `catalog.variants.manage`, `catalog.combo_components.manage`, `catalog.barcodes.manage`, `catalog.product_media.manage`, `catalog.product_channels.manage`, `catalog.product_pricing.manage`, `catalog.product_cost.view`. Tax lookup TARGET `pricing.tax_classes.view` / `pricing.tax_rates.view` (CURRENT runtime `tax.classes.*` / `tax.rates.*` one-way map). Legacy `tenant.products.*` may one-way map to `catalog.products.*` during the compatibility window only — backend TARGET checks catalog codes, not a dual OR. Full matrix: [[Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]. |
 | Catalog master data | Catalog entitlement and respective department, category, brand, collection, or return-policy permission |
 | Inventory management | Inventory entitlement and inventory permission |
 | Loyalty setup | Future/deferred; not active Release 1 Cashier Customer Management |
@@ -330,7 +330,12 @@ Candidate search endpoint (`GET /api/v1/tenant-admin/products/{productId}/bundle
 - Cost must NOT leak without `catalog.product_cost.view`.
 - Stock must NOT leak without `inventory.stock.view`.
 
-Entitlement code mapping between `product_catalog` and `product_management` must be explicitly resolved according to the runtime feature entitlement code.
+**Entitlement resolution (LOCKED):** Product Setup runtime entitlement is
+`product_catalog`. `product_management` is the platform **module_code** only.
+Advanced Batch/Expiry/Serial and non-empty Initial Tracking require
+`inventory_tracking`. `inventory_management` is not a Product Setup runtime
+check. See [[Feature_Entitlement_Matrix]] and
+[[Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
 <!-- RBAC_HARDENING_2026_08_15_START -->
 ## Tenant RBAC Authorization Addendum - 2026-08-15
 
