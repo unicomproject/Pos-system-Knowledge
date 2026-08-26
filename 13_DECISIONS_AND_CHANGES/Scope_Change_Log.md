@@ -1,9 +1,20 @@
 ﻿<!-- title: Scope Change Log -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-24 -->
 
 # Scope Change Log
+
+## 2026-08-24 — Product Setup Initial Tracking Details
+
+- Step 1 Basic Details now targets optional initial Batch Number, Expiry Date, and Serial Number capture during Tenant Admin Add Product.
+- Step 2 remains tracking-policy authority (`product_inventory_settings`).
+- Wizard stays 7 steps. No extra tracking step. No Channel Visibility step.
+- Actual identity persists at Step 7 Publish into `product_batches` / `serial_numbers`. Product master identity columns are forbidden.
+- Draft storage TARGET is dedicated `product_setup_initial_tracking`. VARIANT uses Option 2 assignment at Review. Bundle parent cannot receive physical identities.
+- Documentation-only decision; Flutter/backend/database production implementation was not performed.
+
+Decision: [[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]].
 
 ## 2026-08-09 â€” Current Release cashier Discount scope lock
 

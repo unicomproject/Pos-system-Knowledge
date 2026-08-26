@@ -1,13 +1,27 @@
 <!-- title: Tenant Admin Add Product — 7-Step Wizard Flutter Implementation Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS Flutter Client Scope -->
-<!-- last_updated: 2026-08-11 -->
+<!-- last_updated: 2026-08-24 -->
 
 # Tenant Admin Add Product — 7-Step Wizard Flutter Implementation Specification
 
 ## 1. Executive Overview
 
 This document specifies the canonical Flutter architecture, Riverpod state management, widget hierarchy, DTO mapping, and business rule enforcement for the **Tenant Admin Add Product Wizard** (7-Step layout).
+
+TARGET Step 1 Initial Tracking Details must live on shared wizard state/controller:
+
+```text
+initialBatchNumber
+initialExpiryDate
+initialSerialNumber
+```
+
+Plus Step 7 VARIANT assignment: `initialTrackingAssignedVariantId`.
+
+Step 1 controller/state must preserve these through Save Draft, Save & Continue, Back, Resume, and Review. Step 2 reconciliation must not be duplicated inside individual widgets.
+
+CURRENT `AddProductWizardState` and Step 1 widgets do **not** contain these fields (GAP). Do not implement in this documentation phase.
 
 ---
 
@@ -35,8 +49,9 @@ lib/features/tenant_admin/products/
     │   ├── add_product_wizard_state.dart
     │   └── step4_variant_configuration_state.dart
     ├── widgets/
-    │   ├── step_1_basic_details_form.dart
-    │   ├── step_2_product_type_tracking_form.dart
+│   ├── step_1_basic_details_form.dart
+│   ├── step_1_initial_tracking_details_card.dart   // TARGET / GAP
+│   ├── step_2_product_type_tracking_form.dart
     │   ├── step_3_units_pack_conversion_form.dart
     │   ├── step_4_variant_configuration_form.dart
     │   ├── step_6_pricing_tax_form.dart
@@ -104,7 +119,32 @@ class Step4VariantConfigurationState {
 - **Route Path**: `/tenant-admin/products/add`
 - **Resume Route Path**: `/tenant-admin/products/draft/:productId`
 - **Edit Route Path**: `/tenant-admin/products/edit/:productId`
-- **GoRouter Guard**: Checks permissions `catalog.products.create` / `catalog.products.update` and `catalog.variants.manage`.
+- **GoRouter Guard**: UX only. Checks `catalog.products.create` / `catalog.products.update`. **Not** a security boundary. Backend remains authoritative.
+
+### Wizard Capability Model (UX only)
+
+Derive **before** Add Product starts from the authenticated permission catalog:
+
+```text
+canCreateProduct
+canUpdateProduct
+canPublishProduct
+canManageProductMedia
+canManageProductChannels
+canManageVariants
+canManageBundleComponents
+canManageBarcodes
+canManagePricing
+canViewProductCost
+canLookupTaxClasses
+canViewStock
+canUseAdvancedInventoryTracking
+```
+
+Start only if `canCreateProduct` + `canManageBarcodes` + `canManagePricing` + `canLookupTaxClasses`.
+Disable VARIANT without `canManageVariants`. Disable BUNDLE without `canManageBundleComponents`.
+Hide/disable media, channels, cost, and advanced tracking according to the matrix.
+Canonical: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
 
 ---
 
@@ -118,6 +158,8 @@ class Step4VariantConfigurationState {
 ## 7. Related Specifications
 - [[../04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification]]
 - [[../07_UI_UX_KNOWLEDGE/Tenant_Admin_Add_Product_7_Step_UI_UX_Specification]]
+- [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
+- [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
 
 ## Implementation-Grade Flutter File
 

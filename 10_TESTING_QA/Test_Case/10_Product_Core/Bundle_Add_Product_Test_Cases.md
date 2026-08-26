@@ -1,3 +1,13 @@
+<!-- title: Bundle Add Product Test Cases -->
+<!-- status: Active -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-24 -->
+
+<!-- title: Bundle / Kit QA Test Cases -->
+<!-- status: Active -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-24 -->
+
 # Bundle / Kit QA Test Cases
 
 1. select BUNDLE structure
@@ -75,4 +85,10 @@
 68. POS Bundle sale uses quantity multiplier
 69. insufficient component stock blocks sale
 70. component deductions remain atomic
+71. Step 1 Batch/Expiry/Serial on a later BUNDLE selection shows the parent-identity warning
+72. confirmed BUNDLE conflict clears initial tracking values and creates no Bundle-parent `product_batches` / `serial_numbers`
+73. Product Setup identity persist does not invent Bundle parent stock quantity
+71. Step 1 Initial Tracking values with BUNDLE selected show the parent-identity warning
+72. Confirming BUNDLE conflict clears provisional Batch/Expiry/Serial and does not create Bundle-parent `product_batches` / `serial_numbers`
+73. Cancelling the BUNDLE conflict warning retains Step 1 values and does not advance/save the incompatible structure change silently
 

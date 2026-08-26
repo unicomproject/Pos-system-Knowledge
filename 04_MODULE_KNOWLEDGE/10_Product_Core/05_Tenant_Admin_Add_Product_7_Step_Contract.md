@@ -2,7 +2,7 @@
 <!-- title: Tenant Admin Add Product 7-Step Implementation Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-14 -->
+<!-- last_updated: 2026-08-24 -->
 
 # Tenant Admin Add Product 7-Step Implementation Contract
 
@@ -18,7 +18,7 @@ This document serves as the single source of truth for Frontend (Flutter), Backe
 
 The Add Product experience is structured into exactly 7 sequential steps:
 
-1. **Step 1 — Basic Details** (General info, mandatory Category, optional Brand, Product Image upload, Channel Availability toggles)
+1. **Step 1 — Basic Details** (General info, mandatory Category, optional Brand, Product Image upload, Channel Availability toggles, optional Initial Tracking Details)
 2. **Step 2 — Product Type & Tracking** (`SIMPLE`, `VARIANT`, `BUNDLE` selection and tracking combinations)
 3. **Step 3 — Units & Pack Conversion** (Base UOM, purchase/sales UOM, and conversion factors)
 4. **Step 4 — Product Configuration** (Simple: Not Applicable auto-skip; Variant: Variant Matrix & Options; Bundle: Component search & assembly)
@@ -50,9 +50,14 @@ The Add Product experience is structured into exactly 7 sequential steps:
 | Product Image | NO | File/URL | Max 10 images, ≤5MB each, PNG/JPG | Compact Card / Overlay | `mediaAssetId` / `stagedMediaAssets` | `ProductImage.MediaAssetId` | `product_images.media_asset_id` | Compact upload card opens Product Images Manager panel |
 | In-Store POS | NO | Boolean | - | True | `posSellable` | `Product.IsSellable` | `products.is_sellable` | Channel Availability toggle |
 | Online Store | NO | Boolean | - | False | `allowOnlineSale` | `Product.AllowOnlineSale` | - | Channel Availability toggle |
+| Batch Number | NO | String | Max 100 chars; trim; optional | NULL | `initialBatchNumber` | Draft only — not Product master | TARGET `product_setup_initial_tracking.initial_batch_number` | INITIAL TRACKING INPUT. Does not enable Step 2 Batch Tracking. Final owner `product_batches.batch_number` at publish. |
+| Expiry Date | NO | Date | Valid date picker value; optional | NULL | `initialExpiryDate` | Draft only — not Product master | TARGET `product_setup_initial_tracking.initial_expiry_date` | INITIAL TRACKING INPUT. Domain owner remains `product_batches.expiry_date`. |
+| Serial Number | NO | String | Max 150 chars; trim; optional | NULL | `initialSerialNumber` | Draft only — not Product master | TARGET `product_setup_initial_tracking.initial_serial_number` | INITIAL TRACKING INPUT. Does not enable Step 2 Serial Tracking. Final owner `serial_numbers.serial_number` at publish. |
 
 > [!IMPORTANT]
 > SKU, Barcode, Unit Type, and Variant Templates DO NOT belong to Step 1. They are collected in Steps 3 and 5.
+> Do **not** persist Initial Tracking Details as `products.batch_number`, `products.expiry_date`, or `products.serial_number`.
+> Canonical TARGET contract: [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
 
 ---
 
@@ -118,6 +123,7 @@ When Product Name is empty during **Save Draft**:
 | Category | Optional (validate if supplied) | Required |
 | Brand | Optional | Optional |
 | Descriptions / Internal Code | Optional (+ length limits) | Optional (+ length limits) |
+| Batch Number / Expiry Date / Serial Number | Optional (syntax only) | Optional (syntax only; not required) |
 
 ### 6.4 Strict DRY Shared Action & Save Pipeline Architecture
 
@@ -131,7 +137,7 @@ Both Backend (.NET) and Frontend (Flutter) MUST follow a single, unified reusabl
 - **Business Processors**: Step-specific rules are executed by dedicated step processors (`IProductWizardStepProcessor` implementations like `Step1WizardProcessor`, `Step2WizardProcessor`) selected dynamically based on `CurrentSetupStep`.
 
 #### B. FRONTEND (FLUTTER) — ONE SHARED ACTION FOOTER & CONTROLLER
-- **Single Actions Footer Widget**: `ProductWizardActionsFooter` is shared across all 8 wizard steps. Creating independent button widgets per step (`Step1ContinueButton`, `Step2ContinueButton`, etc.) is strictly FORBIDDEN.
+- **Single Actions Footer Widget**: `ProductWizardActionsFooter` is shared across all 7 wizard steps. Creating independent button widgets per step (`Step1ContinueButton`, `Step2ContinueButton`, etc.) is strictly FORBIDDEN.
 - **Single Controller Action**: `ProductWizardController.saveDraft()` handles saving for every step. The controller inspects `currentStep` and constructs the payload.
 - **Save Draft vs Save & Continue**: `saveDraft()` sends `advanceStep: false` (persists state without step increment), while `saveAndContinue()` sends `advanceStep: true` (validates completion and advances `currentSetupStep` to `N + 1`).
 
@@ -220,6 +226,9 @@ The 3 UI options ("Simple Product", "Variant Product", "Bundle / Kit") map canon
 **Synchronization with Step 1**:
 - The `Track Inventory` toggle has been completely removed from Step 1.
 - Step 2 is now the sole source of truth for the inventory tracking toggle during setup.
+- Step 1 optional Initial Tracking Details are **not** policy. Entering Batch/Expiry/Serial in Step 1 must not auto-enable Step 2 toggles.
+- When Step 2 is saved, reconcile Step 1 values using the matrix in [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Incompatible values require confirmation before clearing (`confirmClearIncompatibleInitialTracking`).
+- Step 2 UI SHOULD show found Step 1 values and the destructive-clear warning when the selected policy cannot keep them.
 
 ---
 
@@ -478,10 +487,24 @@ Appears in the right-side rail (Desktop) for persisted drafts and edit mode:
 
 ### 8.17 Permission & Entitlement Model
 
-- **Initial Wizard Creation (Steps 1–7)**: Authorized by `catalog.products.create`. A user with `catalog.products.create` can create drafts and execute `PUT /draft` calls on their own tenant drafts without requiring `catalog.products.update`.
-- **Product List Edit Mode**: Authorized by `catalog.products.update`.
-- **Tenant Entitlement**: Requires active feature entitlement `product_management`.
-- **Missing Permission / Entitlement Failure**: Returns `403 Forbidden` with standard error body.
+- **Initial Wizard Creation (Steps 1–7)**: Authorized by `catalog.products.create`. A user with `catalog.products.create` can create drafts and execute `PUT /draft` calls on their own tenant **initial wizard drafts** without requiring `catalog.products.update`.
+- **Product List Edit Mode / published product**: Authorized by `catalog.products.update`.
+- **Resume GET `/setup`**: `catalog.products.view` **OR** `catalog.products.create` **OR** `catalog.products.update`.
+- **Tenant Entitlement (Product Setup)**: Requires active feature entitlement **`product_catalog`**. `product_management` is the platform **module_code** only — it is not a runtime entitlement check.
+- **Advanced Inventory Tracking Entitlement**: Non-empty Initial Tracking, Batch/Expiry/Serial policy ON, and publish identity rows require **`inventory_tracking`**. Quantity Track Inventory ON/OFF remains `product_catalog`. `inventory_management` is a documentation group name for stock operations — not a Product Setup runtime key.
+- **Canonical permission authority**: `catalog.*` only. See [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
+- **Specialized permissions (required in addition to create/update where the subgraph is mutated):**
+  - Images: `catalog.product_media.manage`
+  - Channels: `catalog.product_channels.manage` (unauthorized channel fields ignored; defaults preserved)
+  - VARIANT: `catalog.variants.manage`
+  - BUNDLE: `catalog.combo_components.manage`
+  - Barcode/SKU: `catalog.barcodes.manage`
+  - Pricing/tax assignment: `catalog.product_pricing.manage`
+  - Cost view/mutate: `catalog.product_cost.view`
+  - Tax lookup TARGET: `pricing.tax_classes.view` / `pricing.tax_rates.view` (CURRENT runtime `tax.classes.view` / `tax.rates.view`, one-way map)
+- **Publish**: `catalog.products.publish` **plus subgraph recheck** (BR-TRACK-018). Initial identity does **not** require `inventory.stock.adjust`.
+- **Start eligibility**: wizard opens only with create + barcodes.manage + product_pricing.manage + tax-class view. VARIANT/BUNDLE cards disabled without variants.manage / combo_components.manage.
+- **Missing Permission / Entitlement Failure**: Returns `403 Forbidden` (`product.permission_denied` / `product.entitlement_denied` / envelope `auth.forbidden`). Draft is not silently destroyed (BR-TRACK-020).
 
 ---
 
@@ -489,6 +512,8 @@ Appears in the right-side rail (Desktop) for persisted drafts and edit mode:
 
 Event logged on material Step 2 update: `PRODUCT_DRAFT_STEP2_UPDATED`.
 - **Logged Properties**: `tenantId`, `productId`, `actorUserId`, `timestamp`, `oldProductStructure`, `newProductStructure`, `oldTrackInventory`, `newTrackInventory`, `oldBatchTracking`, `newBatchTracking`, `oldExpiryTracking`, `newExpiryTracking`, `oldSerialTracking`, `newSerialTracking`, `rowVersion`.
+
+Initial Tracking TARGET events (existing `audit_logs` family; GAP until implemented): `PRODUCT_DRAFT_INITIAL_TRACKING_UPDATED`, `PRODUCT_DRAFT_INITIAL_TRACKING_CLEARED`, `PRODUCT_DRAFT_INITIAL_TRACKING_VARIANT_ASSIGNED`, `PRODUCT_PUBLISH_INITIAL_BATCH_CREATED`, `PRODUCT_PUBLISH_INITIAL_SERIAL_CREATED`. See Initial Tracking spec Audit Contract.
 
 ---
 
@@ -504,9 +529,19 @@ Event logged on material Step 2 update: `PRODUCT_DRAFT_STEP2_UPDATED`.
 | **400** | `SERIAL_AND_EXPIRY_MUTUALLY_EXCLUSIVE` | Serial tracking cannot be combined with Expiry tracking. | Release 1 restriction. |
 | **400** | `INVALID_PRODUCT_STRUCTURE` | Selected product structure is invalid. | Enum validation failure. |
 | **400** | `STRUCTURE_CHANGE_PROHIBITED_HAS_HISTORY` | Cannot change product structure because historical stock movements exist. | Edit safety failure. |
-| **403** | `auth.forbidden` | Missing required permission or entitlement. | Permission/entitlement failure. |
+| **403** | `auth.forbidden` | Missing required permission or entitlement. | Envelope when specialized mapping is not used. |
+| **403** | `product.permission_denied` | Missing required Product Setup permission. | Canonical Product Wizard 403. |
+| **403** | `product.entitlement_denied` | Missing `product_catalog` or `inventory_tracking`. | Entitlement failure. |
 | **404** | `product.not_found` | Product was not found or inaccessible. | Tenant isolation / invalid ID. |
 | **409** | `product.concurrency_conflict` | Product was modified by another user. Refresh and try again. | Concurrency check failure. |
+| **400** | `product.initial_tracking.incompatible_values_require_confirmation` | Incompatible Step 1 values and confirm flag false. | Initial Tracking reconciliation. |
+| **400** | `product.initial_tracking.batch_required_for_expiry` | Identity finalization with expiry and no Batch. | Distinct from toggle `BATCH_REQUIRED_FOR_EXPIRY`. |
+| **400** | `product.initial_tracking.invalid_expiry_date` | Malformed expiry. | Initial Tracking. |
+| **400** | `product.initial_tracking.variant_assignment_required` | VARIANT identity without assigned variant. | Option 2. |
+| **400** | `product.initial_tracking.invalid_variant_assignment` | Variant not included/sellable/wrong product. | Option 2. |
+| **400** | `product.initial_tracking.bundle_parent_not_supported` | Identity on BUNDLE parent. | BR-TRACK-015. |
+| **409** | `product.initial_tracking.duplicate_batch` | Batch uniqueness vs `product_batches`. | Publish identity. |
+| **409** | `product.initial_tracking.duplicate_serial` | Serial uniqueness vs `serial_numbers`. | Publish identity. |
 
 ---
 
@@ -523,7 +558,7 @@ Event logged on material Step 2 update: `PRODUCT_DRAFT_STEP2_UPDATED`.
 - **Atomicity**: Step 2 structure and tracking flags save in a single PostgreSQL transaction.
 - **Consistency**: UI, API, Domain entity, and Database columns must remain strictly synchronized.
 - **Tenant Isolation**: All queries filter by authenticated `tenant_id`.
-- **Performance**: Save Step 2 operation executes under 100ms (no N+1 queries).
+- **Performance**: Save Step 2 operation executes under 100ms (no N+1 queries). Wizard-wide NFRs including Initial Tracking: see Initial Tracking spec NFR-SEC/CON/TXN/IDEM/PERF/AUD/OBS/UX/ACC.
 - **Idempotency**: Submitting the same Step 2 state repeatedly produces identical results without corrupting data.
 
 ---
@@ -598,6 +633,9 @@ Event logged on material Step 2 update: `PRODUCT_DRAFT_STEP2_UPDATED`.
 ### Step 7 — Review & Create
 - Performs full server-side validation graph. Atomically updates `status` to `ACTIVE` or `INACTIVE`, sets `published_at`, and returns final Product DTO.
 - Includes Channel Availability summary from Step 1.
+- TARGET: display applicable **Initial Tracking Details** from remaining draft values (Batch + Expiry, or Serial) according to Step 2 policy. Do not display cleared/incompatible fields.
+- VARIANT + remaining identities: require `initialTrackingAssignedVariantId` before publish (Option 2). SIMPLE identities use `product_variant_id` NULL. BUNDLE parent identities must already have been cleared.
+- Publish MAY create identity-only `product_batches` / `serial_numbers` rows. It MUST NOT invent on-hand quantity, `stock_movements`, or cost layers. Opening Stock remains quantity owner.
 
 ---
 
@@ -605,14 +643,14 @@ Event logged on material Step 2 update: `PRODUCT_DRAFT_STEP2_UPDATED`.
 
 | Operation | Endpoint | Method | Permission | DTO / Contract |
 |---|---|---|---|---|
-| Create Options | `/api/v1/tenant-admin/products/create-options` | GET | `catalog.products.create` | `TenantProductCreateOptionsDto` |
-| Save Draft (create) | `/api/v1/tenant-admin/products/draft` | POST | `catalog.products.create` | `SaveProductDraftRequestDto` -> `ProductDraftResponseDto` |
-| Resume Draft | `/api/v1/tenant-admin/products/{id}/setup` | GET | `catalog.products.view` | `ProductSetupWizardDto` |
-| Update Draft Step | `/api/v1/tenant-admin/products/{id}/draft` | PUT | `catalog.products.update` | `UpdateProductDraftStepRequestDto` |
+| Create Options | `/api/v1/tenant-admin/products/create-options` | GET | `catalog.products.create` + `product_catalog` | `TenantProductCreateOptionsDto` |
+| Save Draft (create) | `/api/v1/tenant-admin/products/draft` | POST | `catalog.products.create` + `product_catalog` | `SaveProductDraftRequestDto` -> `ProductDraftResponseDto` |
+| Resume Draft | `/api/v1/tenant-admin/products/{id}/setup` | GET | view **OR** create **OR** update + `product_catalog` | `ProductSetupWizardDto` (redact cost/stock) |
+| Update Draft Step | `/api/v1/tenant-admin/products/{id}/draft` | PUT | create (initial draft) **or** update + step specialized perms | `UpdateProductDraftStepRequestDto` |
 | Stage Image | `/api/v1/tenant-admin/products/images/stage` | POST | `catalog.product_media.manage` | Multipart -> `StagedImageResponseDto` |
-| Final Publish | `/api/v1/tenant-admin/products/{id}/publish` | POST | `catalog.products.publish` | `PublishProductRequestDto` -> `TenantProductDetailDto` |
+| Final Publish | `/api/v1/tenant-admin/products/{id}/publish` | POST | `catalog.products.publish` + subgraph recheck + `product_catalog` | `PublishProductRequestDto` -> `TenantProductDetailDto` |
 
-Canonical Product permissions for this wizard (no `tenant.products.*` fallback):
+Canonical Product Wizard permissions (`catalog.*` only — no dual `tenant.products.*` authority):
 
 - `catalog.products.view`
 - `catalog.products.create`
@@ -620,12 +658,21 @@ Canonical Product permissions for this wizard (no `tenant.products.*` fallback):
 - `catalog.products.publish`
 - `catalog.product_media.manage`
 - `catalog.product_channels.manage`
+- `catalog.variants.manage`
+- `catalog.combo_components.manage`
+- `catalog.barcodes.manage`
+- `catalog.product_pricing.manage`
+- `catalog.product_cost.view`
+- Tax lookup TARGET: `pricing.tax_classes.view`, `pricing.tax_rates.view`
+- Bundle stock leak: `inventory.stock.view`
+
+Full matrix: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
 
 **Superseded (not canonical for Tenant Admin Add Product):**
 
 - `POST /api/v1/tenant/catalog/media/stage`
 - `POST /api/v1/media/stage`
-- `tenant.products.create` / `tenant.products.update` as wizard authorization
+- `tenant.products.create` / `tenant.products.update` as first-class wizard authorization (compatibility map only; see permission matrix)
 
 ---
 
@@ -637,6 +684,7 @@ Canonical Product permissions for this wizard (no `tenant.products.*` fallback):
 - `media_assets` + `product_images`: Canonical normalized Product media model (`STAGED` → `ACTIVE` on link)
 - `product_channel_visibility`: POS and Online visibility flags
 - `product_inventory_settings`: Track stock (`is_stock_tracked`), batch (`requires_batch_tracking`), expiry (`requires_expiry_tracking`), serial (`requires_serial_tracking`) flags
+- TARGET GAP `product_setup_initial_tracking`: provisional Step 1 Batch/Expiry/Serial draft values (not Product master identity)
 
 ---
 
@@ -644,11 +692,11 @@ Canonical Product permissions for this wizard (no `tenant.products.*` fallback):
 
 | Trigger | Rules Enforced | Failure Result |
 |---|---|---|
-| **Save Draft (Step 1)** | Category optional; Brand optional; blank Product Name $\rightarrow$ persist `Untitled Product` | HTTP 400 with field errors |
-| **Save & Continue (Step 1)** | Real Product Name required; Category required; Brand optional; then `current_setup_step = 2` | UI stays on Step 1; step not advanced |
-| **Save Draft (Step 2)** | Structure valid enum; Tracking combination valid according to truth table; `advanceStep = false` | Keeps on Step 2; returns updated `rowVersion` |
-| **Save & Continue (Step 2)** | Structure valid enum; Tracking matrix valid according to truth table; `advanceStep = true` | Advances to next applicable Step upon HTTP 200 OK |
-| **Publish (Step 7)** | All 7 steps valid; SKU/Barcode unique; Price >= 0; Channels configured | HTTP 400/409 error envelope, transaction rolls back |
+| **Save Draft (Step 1)** | Category optional; Brand optional; blank Product Name $\rightarrow$ persist `Untitled Product`; Batch/Expiry/Serial optional (syntax only) | HTTP 400 with field errors |
+| **Save & Continue (Step 1)** | Real Product Name required; Category required; Brand optional; Batch/Expiry/Serial optional; then `current_setup_step = 2` | UI stays on Step 1; step not advanced |
+| **Save Draft (Step 2)** | Structure valid enum; Tracking combination valid according to truth table; incompatible Step 1 identities require confirmation; `advanceStep = false` | Keeps on Step 2; returns updated `rowVersion` |
+| **Save & Continue (Step 2)** | Structure valid enum; Tracking matrix valid according to truth table; Step 1 reconciliation complete; `advanceStep = true` | Advances to next applicable Step upon HTTP 200 OK |
+| **Publish (Step 7)** | All 7 steps valid; SKU/Barcode unique; Price >= 0; Channels configured; initial tracking ownership/uniqueness/variant assignment/Bundle restriction | HTTP 400/409 error envelope, transaction rolls back |
 
 ---
 
@@ -658,6 +706,10 @@ Canonical Product permissions for this wizard (no `tenant.products.*` fallback):
 - [[../../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Add_Product_7_Step_Flutter_Implementation_Specification]]
 - [[../../06_DATABASE_KNOWLEDGE/Tables/10_Catalog_Master_Data_And_Product_Core_UPDATED]]
 - [[../../06_DATABASE_KNOWLEDGE/Tables/16_Inventory_Foundation_Product_Tracking_And_Stock_Availability]]
+- [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
+- [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
+- [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
+- [[../../15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-08-24_Tenant_Admin_Product_Setup_Permission_NFR_API_DB_Contract_Closure_Audit]]
 
 ## Step 3 — Units & Pack Conversion (NOT_APPLICABLE for BUNDLE)
 For `BUNDLE`: `Step 3 = NOT_APPLICABLE`.

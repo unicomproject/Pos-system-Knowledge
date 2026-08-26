@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin Inventory Stock Management Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-08-24 -->
 
 # Tenant Admin Inventory Stock Management Flow
 
@@ -59,6 +59,7 @@ Tenant Admin opens inventory module.
 - All create/update/status actions should be audit logged.
 - Stock transfer is not active MVP scope unless separately approved.
 - Stock updates must be audit-ready.
+- Product Setup may persist **identity-only** Batch/Serial rows at publish. Quantity, balances, and movements remain this Inventory journey (Opening Stock, stock in, adjustment). Do not treat Step 1 Batch/Expiry/Serial as stock quantity.
 
 ## Validation And Error Cases
 

@@ -1,7 +1,7 @@
 ﻿<!-- title: Tenant Effective Permission Resolution -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-15 -->
+<!-- last_updated: 2026-08-24 -->
 <!-- verification: Backend and Flutter source inspected; documentation-only update -->
 
 # Tenant Effective Permission Resolution
@@ -152,3 +152,13 @@ The following endpoints are canonical target contracts and must not be treated a
 `PRODUCT DECISION RESOLVED - IMPLEMENTATION GAPS OPEN`
 
 The data model is capable of the target RBAC model, but backend tenant role management endpoints and the runtime resolver hardening are not yet complete.
+
+## Product Wizard permission aliasing (LOCKED 2026-08-24)
+
+Effective-permission resolution MAY one-way map `tenant.products.view|create|update|delete` → `catalog.products.*` so historical grants satisfy the canonical check.
+
+Backend TARGET authorization for Product Setup evaluates **only** `catalog.products.*`. Do not keep two first-class authorities (`catalog` OR `tenant`) on the same decision.
+
+Tax lookup MAY one-way map `tax.classes.view` / `tax.rates.view` → `pricing.tax_classes.view` / `pricing.tax_rates.view`.
+
+See [[Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].

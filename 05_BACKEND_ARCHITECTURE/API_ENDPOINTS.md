@@ -1,7 +1,7 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-14 -->
+<!-- last_updated: 2026-08-24 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -354,9 +354,9 @@ Base route: `/api/v1/tenant-admin/products` · Controller: `TenantAdminProductsC
 | GET | `/api/v1/tenant-admin/products/filter-options` | `catalog.products.view` | Dropdown values for category, brand, and status filters | PARTIAL |
 | POST | `/api/v1/tenant-admin/products` | `catalog.products.create` | Create a product wizard graph (DRAFT or published) | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/{id}` | `catalog.products.view` | Get complete details of a specific product | PARTIAL |
-| GET | `/api/v1/tenant-admin/products/{id}/setup` | `catalog.products.view` | Get ProductSetupWizardDto Review snapshot and validation checklist | DOCUMENTED CONTRACT |
+| GET | `/api/v1/tenant-admin/products/{id}/setup` | view **OR** create **OR** update | Get ProductSetupWizardDto Review snapshot and validation checklist | DOCUMENTED CONTRACT |
 | PUT | `/api/v1/tenant-admin/products/{id}` | `catalog.products.update` | Update product details | PARTIAL |
-| POST | `/api/v1/tenant-admin/products/{id}/publish` | `catalog.products.publish` | Finalize and publish the draft (transactional) | DOCUMENTED CONTRACT |
+| POST | `/api/v1/tenant-admin/products/{id}/publish` | `catalog.products.publish` + subgraph recheck | Finalize and publish the draft (transactional) | DOCUMENTED CONTRACT |
 | DELETE | `/api/v1/tenant-admin/products/{id}` | `catalog.products.delete` | Perform soft delete (ARCHIVE status mutation) | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/imports/template` | `catalog.products.import` | Download UTF-8 CSV import template | PARTIAL |
 | POST | `/api/v1/tenant-admin/products/imports` | `catalog.products.import` | Upload CSV and create batch row logs | PARTIAL |
@@ -364,6 +364,10 @@ Base route: `/api/v1/tenant-admin/products` · Controller: `TenantAdminProductsC
 | GET | `/api/v1/tenant-admin/products/imports/{importId}/rows` | `catalog.products.import` | Read paginated valid or invalid row validation errors | PARTIAL |
 | POST | `/api/v1/tenant-admin/products/imports/{importId}/commit` | `catalog.products.import` | Commit valid rows in batch to database | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/imports/{importId}/errors.csv` | `catalog.products.import` | Export validation failures CSV log | PARTIAL |
+
+### Step 1 Initial Tracking Details (TARGET / GAP)
+
+`PUT /api/v1/tenant-admin/products/{productId}/draft` and `GET .../setup` remain the only Product Setup draft routes. TARGET Step 1 fields: `initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`. Step 2 remains tracking policy (`productStructure`, `trackInventory`, `batchTracking`, `expiryTracking`, `serialTracking`) plus `confirmClearIncompatibleInitialTracking` when clearing incompatible Step 1 values. Step 7 VARIANT assignment: `initialTrackingAssignedVariantId`. CURRENT DTOs do not contain these fields. Authority: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Permission authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]. Entitlement: `product_catalog`; advanced tracking / non-empty identity: `inventory_tracking`.
 
 ### Step 5 Barcode & SKU Payload & Duplicate Projection
 `PUT /api/v1/tenant-admin/products/{productId}/draft` accepts `UpdateProductDraftStep5RequestDto`.
