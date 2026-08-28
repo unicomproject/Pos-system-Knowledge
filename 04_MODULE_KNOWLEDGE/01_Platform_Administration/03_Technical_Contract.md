@@ -294,7 +294,10 @@ Implementation notes:
 
 - `PlatformUserApiService` owns HTTP calls; the page component does not call APIs directly except through services.
 - Role pickers load from the roles API and filter to non-inactive roles; no hardcoded Super Admin / Support Admin lists in UI code.
-- Create requires email plus at least one `roleId`; edit splits status update and role assignment into separate save actions matching backend endpoints.
+- Create DTO accepts `{ fullName, email, phone?, roleIds }`. Prohibits password and status fields. Initial user status is always `INVITED`.
+- Create flow inserts `platform_users`, `platform_user_roles`, `platform_user_invitations` (`PENDING`), and `integration_outbox_messages` (`platform.user_invited`).
+- `TenantOnboardingOutboxWorker` asynchronously decrypts protected token and dispatches invitation via shared `AzureCommunicationEmailSender` (ACS `WaitForCompletionAsync()` required for `Succeeded` status).
+- Edit splits status update (`PUT /users/{userId}`) and role assignment (`PUT /users/{userId}/roles`) into separate save actions matching backend endpoints.
 - UI exposes loading, empty, error-with-retry, and editor error states.
 
 See [[03_USER_JOURNEYS/Platform_Admin/13_Platform_User_Management_Flow]] and [[05_BACKEND_ARCHITECTURE/API_ENDPOINTS]] for DTO shapes and error codes.

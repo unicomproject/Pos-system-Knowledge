@@ -1,7 +1,7 @@
 <!-- title: Inventory Foundation, Product Tracking & Stock Availability Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-08-24 -->
 
 # Inventory Foundation, Product Tracking & Stock Availability Functional Rules
 
@@ -16,6 +16,7 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Availability is computed from on-hand, reserved, damaged/quarantine, and channel allocation rules.
 - Batches support expiry tracking and expiry discounts.
 - Serial numbers apply only when product tracking requires them.
+- Product Setup may capture optional initial Batch/Expiry/Serial as wizard draft input. Final identity still belongs to `product_batches` / `serial_numbers`. Product Setup must not invent on-hand quantity, stock movements, or cost layers. Opening Stock / stock receiving remain quantity owners. Expiry remains batch-owned (`product_batches.expiry_date`).
 - Channel allocation can reserve stock for POS, online store, or click and collect.
 - Final stock authority is backend, not device cache.
 - POS product and variant availability is scoped to the outlet assigned to the requesting POS device and to active, sellable inventory locations only.

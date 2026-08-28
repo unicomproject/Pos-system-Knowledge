@@ -1,4 +1,4 @@
-<!-- title: Backend Driven Permission Catalog -->
+﻿<!-- title: Backend Driven Permission Catalog -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-08-27 -->

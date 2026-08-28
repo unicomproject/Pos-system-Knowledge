@@ -1,7 +1,7 @@
 <!-- title: Product Core Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-24 -->
 
 # Product Core Module Overview
 
@@ -31,7 +31,7 @@ merchandising, attractions, and temporary retail locations.
 | `products` | Stores parent product records, setup steps, status, and audit parameters. |
 | `product_variants` | Stores sellable variant details, SKU, and barcode links. |
 | `product_import_batches` | Stores metadata for CSV product import runs. |
-| `product_import_rows` | Stores row-level parsed and validated import records. |
+| `product_setup_initial_tracking` | TARGET 1:1 draft for Initial Tracking Details (GAP). |
 
 ## Core Business Rules
 
@@ -40,6 +40,7 @@ merchandising, attractions, and temporary retail locations.
 - Variants carry sellable identity; price and stock remain separate modules.
 - Inactive products cannot be sold through POS or online store.
 - POS may cache product reference data, but backend remains final authority.
+- Add Product Step 1 may collect optional Initial Tracking Details (Batch Number, Expiry Date, Serial Number). Those values are provisional wizard input. Tracking policy remains Step 2 (`product_inventory_settings`). Actual identity is created at Step 7 Publish into `product_batches` / `serial_numbers`. Product Setup must not invent stock quantity.
 
 ### Bundle / Kit Core Domain Rules
 - Bundle / Kit is defined as one sellable parent Product, one parent SKU, one parent Barcode, one Bundle selling price, and multiple existing Product / exact Variant components.
@@ -81,3 +82,5 @@ merchandising, attractions, and temporary retail locations.
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/02_Functional_Rules]]
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/03_Technical_Contract]]
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/04_Tenant_Admin_Product_List_And_Import_Contract]]
+- [[04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
+- [[02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]

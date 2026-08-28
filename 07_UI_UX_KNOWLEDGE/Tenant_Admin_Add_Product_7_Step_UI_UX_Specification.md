@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin Add Product — 7-Step Wizard UI/UX Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Scope -->
-<!-- last_updated: 2026-08-11 -->
+<!-- last_updated: 2026-08-24 -->
 
 # Tenant Admin Add Product — 7-Step Wizard UI/UX Specification
 
@@ -27,12 +27,77 @@ It enforces strict alignment with **Reference UI 2** and replaces legacy 4-step 
 ---
 
 ## 3. Step 1 Form Layout — Basic Details
-(Maintains standard basic details UI layout specifications).
+
+TARGET layout for 1024×768 tablet: compact cards, professional spacing, no
+unnecessary page-length growth, avoid nested scrolling. Preserve the existing
+Add Product visual system. Do not redesign unrelated UI.
+
+```text
+STEP 1 — BASIC DETAILS
+
+┌ Product Information ────────────────────────────┐
+│ Product Name                                    │
+│ Internal Code                                   │
+│ Category             Brand                      │
+│ Short Description                               │
+│ Long Description                                │
+│ Product Images                                  │
+└─────────────────────────────────────────────────┘
+
+┌ Initial Tracking Details ───────────────────────┐
+│ Batch Number                                    │
+│ Expiry Date                                     │
+│ Serial Number                                   │
+│                                                 │
+│ Helper: Tracking behaviour will be configured   │
+│ in the next step.                               │
+└─────────────────────────────────────────────────┘
+
+┌ Channel Availability ───────────────────────────┐
+│ In-Store POS                         [ON]        │
+│ Online Store                         [OFF]       │
+└─────────────────────────────────────────────────┘
+```
+
+All three Initial Tracking fields are optional. Date uses a date picker.
+CURRENT Flutter Step 1 does not render this card (GAP).
 
 ---
 
 ## 4. Step 2 Form Layout — Product Type & Tracking
-(Maintains standard product type & tracking rules grid).
+
+```text
+STEP 2 — PRODUCT TYPE & TRACKING
+
+Select Product Type
+Simple / Variant / Bundle / Kit
+
+Inventory Tracking
+Track Inventory
+Batch Tracking
+Expiry Tracking
+Serial Tracking
+```
+
+TARGET contextual panel when Step 1 has values:
+
+```text
+Initial Tracking Details Found
+Batch: BAT-2026-0001
+Expiry: 2027-06-30
+Selected Tracking: Batch + Expiry
+```
+
+If incompatible:
+
+```text
+Initial Serial Number will be removed because
+Batch + Expiry Tracking is selected.
+```
+
+Require confirmation before destructive clearing. CURRENT Step 2 has no this
+panel (GAP). Canonical rules:
+[[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
 
 ---
 
@@ -140,6 +205,7 @@ Sticky bottom bar spanning the wizard content width:
 ## 8. Related Documents
 - [[../04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification]]
 - [[08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Add_Product_7_Step_Flutter_Implementation_Specification]]
+- [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
 
 ## Implementation-Grade UI Contract: Add Component Drawer
 
@@ -162,3 +228,11 @@ Displays: Product, exact Variant, SKU, tracking type, Unit, Required Quantity, A
 
 **Drawer vs Page State**:
 Cancel/X/Escape only clears drawer temporary state. It never clears already-added Bundle components. Changes only reflect on the page state upon clicking Add/Update, and only persist to backend upon Save Draft / Save & Continue.
+
+## Permission-aware UX
+
+Flutter permission checks are UX only. Backend authorization is authoritative.
+
+Hide Add Product when start eligibility fails (create + barcodes.manage + pricing.manage + tax lookup). Disable VARIANT/BUNDLE cards at Step 2 without specialized manage permissions. Hide/disable media, channels, cost, and advanced tracking according to the canonical matrix. Never dead-end the wizard after Step 1.
+
+Authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].

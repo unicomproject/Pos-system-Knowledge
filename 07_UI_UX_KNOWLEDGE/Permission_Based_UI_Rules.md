@@ -1,4 +1,4 @@
-<!-- title: Permission Based UI Rules -->
+﻿<!-- title: Permission Based UI Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-08-09 -->
@@ -125,3 +125,20 @@ When permissions or entitlements change:
 - [[../02_ACCESS_CONTROL/Access_Control_Overview]]
 - [[../02_ACCESS_CONTROL/Feature_Entitlement_Matrix]]
 - [[../02_ACCESS_CONTROL/API_Authorization_Rules]]
+
+<!-- RBAC_HARDENING_2026_08_15_START -->
+## Tenant Admin Roles & Access UI Correction - 2026-08-15
+
+Flutter permission rendering is a UX helper only. Backend authorization remains final authority.
+
+Role setup must use the approved five-step flow:
+
+1. Role Details & Template
+2. Select Modules
+3. Configure Permissions
+4. Assign Users & Access Scope
+5. Review & Create
+
+Do not expose or imply a sixth wizard step. Confirmation is a post-save result state.
+<!-- RBAC_HARDENING_2026_08_15_END -->
+

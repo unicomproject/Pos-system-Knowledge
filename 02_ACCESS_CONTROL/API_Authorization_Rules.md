@@ -1,4 +1,4 @@
-<!-- title: API Authorization Rules -->
+﻿<!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-08-27 -->

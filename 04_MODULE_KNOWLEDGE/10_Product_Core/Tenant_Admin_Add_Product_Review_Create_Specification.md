@@ -1,3 +1,8 @@
+<!-- title: Tenant Admin Add Product Review And Create Specification -->
+<!-- status: Active -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-24 -->
+
 # Tenant Admin Add Product Review & Create Specification
 
 ## 1. Overview
@@ -17,6 +22,11 @@ Displays fields from Step 1:
 - Descriptions
 - Product Images
 - Channel Visibility (POS, Online Store)
+- **Initial Tracking Details** (TARGET): only remaining applicable values after Step 2 reconciliation.
+  - Batch + Expiry example: Tracking Method, Initial Batch Number, Initial Expiry Date.
+  - Serial example: Tracking Method, Initial Serial Number.
+  - VARIANT: also show the assigned variant (`initialTrackingAssignedVariantId`) or block Create until selected.
+  - Do not display cleared/incompatible fields.
 
 ### B. Product Type & Tracking
 Displays fields from Step 2:
@@ -87,6 +97,8 @@ Each Review section can trigger an `Edit` action:
 - **BR-RC-012:** Product List is rebuilt/read from persisted backend state.
 - **BR-RC-013:** No hardcoded Review value is allowed.
 - **BR-RC-014:** 7-step workflow is authoritative.
+- **BR-RC-015:** Review/Create must revalidate Initial Tracking Details against structure, tracking policy, ownership, uniqueness, variant assignment, Bundle restriction, and expiry validity.
+- **BR-RC-016:** Publish may persist identity-only Batch/Serial rows. It must not invent inventory quantity, balances, or stock movements.
 
 ## 7. Non-Functional Requirements (NFRs)
 - **Transaction Integrity:** Final publication is atomic.
@@ -108,8 +120,9 @@ UI -> Controller/Notifier -> Repository -> API Service -> Backend
 ## 9. API Contract
 - **Review Snapshot API:** `GET /api/v1/tenant-admin/products/{productId}/setup` (Returns `ProductSetupWizardDto` with validation checklist)
 - **Publish API:** `POST /api/v1/tenant-admin/products/{productId}/publish`
-  - Payload: `{ "expectedRowVersion": <number> }`
-  - Permission: `catalog.products.publish`
+  - Payload: `{ "expectedRowVersion": <number>, "initialTrackingAssignedVariantId": "<guid optional VARIANT>" }`
+  - Permission: `catalog.products.publish` **plus subgraph recheck** (media, channels, variants, bundle, barcodes, pricing, cost if non-null, `inventory_tracking` if identity rows). See [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
+  - Initial identity does **not** require `inventory.stock.adjust`.
 
 ## 10. Database Graph
 - Master: `products`
@@ -122,6 +135,8 @@ UI -> Controller/Notifier -> Repository -> API Service -> Backend
 - Channel: `product_channel_visibility`
 - Pricing: `price_lists`, `price_list_items`
 - Tax: `product_tax_assignments`, `tax_classes`, `tax_class_rates`, `tax_rates`
+- TARGET identity at publish: `product_batches`, `serial_numbers` (no quantity)
+- TARGET draft until consume: `product_setup_initial_tracking`
 - **Rule:** No Review-specific persistence table.
 
 ## 11. Field-to-Table Matrix
@@ -145,6 +160,9 @@ UI -> Controller/Notifier -> Repository -> API Service -> Backend
 | Tax Rate | 6 | PricingTax.TaxClassId | SaveProductDraftRequest | TaxRate | tax_rates.rate_percent | PricingTax.TaxRatePercentage | Tax Calc |
 | Tax Exclusive | 6 | PricingTax.TaxExclusive | SaveProductDraftRequest | N/A | Calculated | PricingTax.TaxExclusive | Price Type |
 | Desired Product Status | 2 | DesiredPublishActive | SaveProductDraftRequest | Product | products.desired_publish_status | DesiredPublishStatus | Publish State |
+| Initial Batch Number | 1 | InitialBatchNumber | SaveProductDraftRequest | Draft tracking | TARGET product_setup_initial_tracking.initial_batch_number | InitialBatchNumber | None (identity, not list qty) |
+| Initial Expiry Date | 1 | InitialExpiryDate | SaveProductDraftRequest | Draft tracking | TARGET product_setup_initial_tracking.initial_expiry_date | InitialExpiryDate | None |
+| Initial Serial Number | 1 | InitialSerialNumber | SaveProductDraftRequest | Draft tracking | TARGET product_setup_initial_tracking.initial_serial_number | InitialSerialNumber | None |
 
 ## 12. Test Contract
 - **Review Rendering:** Asserts structure-specific rendering, no sample values leak, skipped steps hide.
@@ -152,5 +170,5 @@ UI -> Controller/Notifier -> Repository -> API Service -> Backend
 - **Publish Validation:** Asserts missing fields, duplicate identifiers, invalid graphs return 400/409.
 - **Publish Transaction:** Asserts single row update, no duplicate creation, `published_at` set.
 - **Rollback:** Asserts transactional failure leaves product as DRAFT.
-- **Permission & Concurrency:** Asserts 403 and 409 responses correctly.
+- **Permission & Concurrency:** Asserts 403 and 409 responses correctly, including publish subgraph recheck and cost redaction.
 - **Product List Re-hydration:** Asserts Product List fetches updated records from DB post-publish.

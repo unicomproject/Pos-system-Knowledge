@@ -5,6 +5,11 @@
 
 # Permission Code List
 
+> **Permission & Entitlement Contract Reconciled: 2026-08-21 — SUPERSEDED BY OWNER-APPROVED R1 SCOPE LOCK**  
+> The authoritative Release 1 scope is locked in [ONEVERZ_RELEASE_1_SCOPE_LOCK.md](file:///c:/Users/User/Desktop/Nytroz__POS/Nytroz%20POS%20-%20Second%20Brain/Pos-system-Knowledge/01_RELEASE_SCOPE/ONEVERZ_RELEASE_1_SCOPE_LOCK.md).  
+> The reconciled Release 1 permission catalog is locked in [CANONICAL_MODULE_FEATURE_PERMISSION_CATALOG_R1.md](file:///c:/Users/User/Desktop/Nytroz__POS/Nytroz%20POS%20-%20Second%20Brain/Pos-system-Knowledge/02_ACCESS_CONTROL/CANONICAL_MODULE_FEATURE_PERMISSION_CATALOG_R1.md).  
+> Where this working list conflicts with the Canonical Scope and Catalog, **the Canonical Scope and Catalog win**.
+
 ## Purpose
 
 This document is the **Single Source of Truth** for permission codes across the OneVerz POS / Unified Commerce system.
@@ -273,6 +278,7 @@ $$\mathbf{domain.module.feature.action}$$
 
 ## Related Files
 
+- [[CANONICAL_PERMISSION_AND_FEATURE_ENTITLEMENT_CONTRACT_R1]]
 - [[Backend_Driven_Permission_Catalog]]
 - [[Access_Control_Overview]]
 - [[API_Authorization_Rules]]
