@@ -1,66 +1,57 @@
-<!-- title: Flutter Order Click Collect Fulfilment -->
-<!-- status: Active -->
-<!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- title: Flutter Online Order Click & Collect Fulfilment -->
+<!-- status: OO-01 target canonicalized; Chunk 3 implementation pending -->
+<!-- last_updated: 2026-08-27 -->
 
+# Flutter Online Order Click & Collect Fulfilment
 
-# Flutter Order Click Collect Fulfilment
+## Scope and authority
 
-## Purpose
+Flutter owns staff preparation, collection and collection-cash UI only; browser storefront remains customer-facing. Follow [[Frontend_Engineering_Canonical_Standard]], [[Frontend_Reusable_Component_Governance]] and POS-UJ-036. The approved OO-01 target is canonicalized but its Flutter implementation is pending Chunk 3; downstream implementation claims require their own source/runtime evidence.
 
-This file defines Flutter staff-side order, click-and-collect, fulfilment, and
-pickup workflow guidance.
+## Feature ownership
 
-Customer storefront is browser/web-facing.
-Flutter supports staff-side order handling and pickup operations.
+The canonical owner is `lib/features/fulfilment_pickup/` with `data/{datasources,dtos,repositories}`, `domain/{entities,repositories,usecases}` and `presentation/{providers,screens,widgets,utils}`. Do not create or retain a competing `lib/features/online_orders/` owner. Chunk 3 must reconcile reusable existing code into the canonical owner rather than duplicating it.
 
-## Staff Workflows
-
-| Workflow | Flutter Support |
+| Surface group | Owned screens |
 |---|---|
-| Online order list | View new/paid/pending orders |
-| Order detail | View items, options, pickup details |
-| Fulfilment preparation | Mark preparing/ready where permitted |
-| Pickup order | Verify and mark collected |
-| Cancellation | Permit only valid status/permission |
-| Status history | Show order/pickup timeline where API provides it |
+| Preparation | Online Orders, Order Detail, Start confirmation, Pick Order, Pick Item, Review & Pack, Ready confirmation |
+| Collection | Ready queue, Scan QR, QR Validated, QR Rejected, Manual Lookup, Confirm Handover, Collection Complete |
+| Payment | Payment Required, Collect Cash, Success, Failure |
 
-## Status Rule
+Dependency direction is `Screen/Widget → Provider → Use case/repository → Data source → API`. Widgets never call Dio/HTTP. Providers coordinate loading/empty/error/denied/offline/conflict states and invalidate authoritative reads after successful commands; they do not invent transitions or totals.
 
-Flutter must not invent status transitions.
+## Reuse matrix
 
-Allowed transitions must come from backend rules or API response.
+| Need | Reuse decision |
+|---|---|
+| Shell/navigation/responsive layout | Existing cashier app shell, top/bottom navigation and responsive primitives |
+| Search | Existing shared input/debounce primitives; OO-01 exposes search only |
+| Loading/error/empty/permission/feature states | Existing shared state components |
+| Confirmation | Existing canonical confirmation modal |
+| Barcode and QR input | Existing hardware abstraction/scanner components; manual input uses same use case |
+| Cash collection | Existing POS cash-payment amount, payment summary and unified payment orchestration UI where compatible |
+| Product/media | Existing product/variant image components |
+| Notification/printing | Existing services; no feature-local transport |
 
-## Permission Rule
+## State rules
 
-Staff needs order, fulfilment, or pickup permission before seeing or changing
-order/pickup state.
+Backend owns order, fulfilment, pickup, payment, reservation and final status. New/Preparing/Ready/Delayed/Collected/Cancelled are presentation projections; Delayed is computed from backend timestamps and never mutated. QR and all workflow mutations require online validation. Cash payment must not be offered for an already-paid order.
 
-## Offline Rule
+## Route/API boundary
 
-Pickup status changes should normally require online backend validation.
+All staff data sources use only `/api/v1/tenant/ecommerce/click-collect/...`. Public storefront fulfilment reads are not used as staff mutation APIs. Generic status PATCH is not a cashier use case.
 
-If queued offline later, the UI must clearly mark the action as pending and not
-show it as final collected until sync succeeds.
+Target routing must retain the established POS route convention while resolving OO-01 and OO-02 under the `fulfilment_pickup` feature owner. Queue/detail entry requires both `commerce.online_order.orders.access` and `commerce.online_order.orders.view`; picking and commands additionally enforce their action-level permissions. The `click_collect` entitlement and backend tenant/outlet/resource checks remain mandatory.
 
-## UX Rule
+The outlet sent by OO-01–OO-06 comes from the activated POS device context, not a hardcoded or user-entered identifier. Flutter maps `online_orders.outlet_access_denied` to an actionable, non-sensitive outlet-access message. Because outlet assignment is evaluated by the backend on every request, an administrator repair for the same activated outlet is picked up by Retry without logout or token refresh; device re-assignment still requires refreshed activation/device context.
 
-Show clear sections:
+OO-01 uses horizontal order cards on tablet/desktop and stacked cards on phone. It exposes one debounced server-side search, six backend aggregate summary cards and detail chevrons. Filters, tabs, sort, table headers, Open/Start actions and visible pagination are absent. The provider may retain bounded status/sort/page query state internally. The server owns Delayed derivation and all summary/page totals.
 
-- New orders.
-- Preparing.
-- Ready for pickup.
-- Collected.
-- Cancelled/failed.
-- Sync pending/conflict if applicable.
+## Validation and remaining completion gate
 
-## Data Rule
+Chunk 1 supplies documentation only. Backend implementation is pending Chunk 2; Flutter implementation and focused phone/tablet/desktop tests are pending Chunk 3; authenticated E2E remains pending. Do not treat earlier table/tab/filter screenshot evidence as acceptance of this superseding target.
 
-Order totals, payment status, refund state, and pickup completion are backend
-validated.
+## Related files
 
-## Related Files
-
-- [[Flutter_API_Integration]]
-- [[Flutter_Permission_Based_UI_Rendering]]
-- [[Flutter_Offline_Operation_Sync]]
+- [[../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]]
+- [[../04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]]

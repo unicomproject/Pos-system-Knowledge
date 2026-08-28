@@ -22,7 +22,8 @@ merchandising, attractions, and temporary retail locations.
 | Module number | 23 |
 | Primary users | Customer, Fulfilment staff, Store Manager, Cashier |
 | Frontend surfaces | Pickup slot selection, Order preparation board, Ready for collection state, Collection confirmation |
-| API groups | `/api/v1/fulfilment/methods`, `/api/v1/pickup/slots`, `/api/v1/fulfilment-orders`, `/api/v1/pickup-orders`, `/api/v1/pickup-events` |
+| Staff operational API | `/api/v1/tenant/ecommerce/click-collect/...` (canonical; implementation pending) |
+| Public storefront reads | Existing `/api/v1/ecommerce/storefront/fulfillment/...` routes remain customer-facing |
 
 ## Main Tables
 
@@ -37,6 +38,8 @@ merchandising, attractions, and temporary retail locations.
 | `fulfillment_order_events` | Used by this module |
 | `pickup_orders` | Used by this module |
 | `pickup_order_events` | Used by this module |
+| `fulfillment_packages` | Package/bag headers; canonical, implementation pending |
+| `fulfillment_package_lines` | Package contents; canonical, implementation pending |
 
 ## Core Business Rules
 
@@ -44,6 +47,8 @@ merchandising, attractions, and temporary retail locations.
 - Pickup slot reservations protect capacity until checkout/order confirmation.
 - Fulfilment and pickup events are append-only.
 - Collected status must be backend confirmed, not just UI changed.
+- Paid Online and Cash on Collection are supported; never charge an already-paid order.
+- Staff operations use command-specific APIs; generic status PATCH is not the primary cashier contract.
 - Own delivery is later phase and must not be mixed into pickup state.
 
 ## Access Summary

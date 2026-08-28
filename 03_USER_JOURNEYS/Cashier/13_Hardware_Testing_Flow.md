@@ -62,7 +62,7 @@ flowchart TD
 |---|---|
 | Authentication | Required |
 | Feature entitlement | Hardware/POS enabled |
-| Permission | Hardware test permission |
+| Permission | `pos.hardware.local_agent.settings` (legacy alias: `pos.hardware.settings`) |
 | Trusted device | Required |
 
 ## Data and API References
