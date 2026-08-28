@@ -1,0 +1,126 @@
+/* DESKTOP >= 1200 */
+@media (min-width:1200px){
+  .order-hero{grid-template-columns:minmax(0,1.7fr) minmax(230px,.72fr) minmax(300px,.92fr)}
+}
+
+/* TABLET 768–1199 */
+@media (min-width:768px) and (max-width:1199px){
+  .app-header{padding:11px 18px}
+  .brand-name{font-size:22px}
+  .header-right .context-chip:nth-child(2){display:none}
+
+  main{padding:0 10px}
+  .workspace{padding:18px 16px 14px}
+
+  .order-hero{
+    grid-template-columns:minmax(0,1.45fr) minmax(220px,.8fr);
+    gap:16px
+  }
+  .fulfilment-cta-wrap{grid-column:1 / -1}
+  .fulfilment-cta{min-height:92px}
+  .fulfilment-cta-text{font-size:22px}
+
+  .summary-grid{grid-template-columns:repeat(3,1fr);gap:12px}
+  .summary-card{grid-template-columns:58px minmax(0,1fr) 22px;padding:16px;gap:12px}
+  .summary-icon{width:54px;height:54px}
+  .summary-icon svg{width:29px;height:29px}
+  .summary-title{font-size:18px}
+
+  .item-row{
+    grid-template-columns:100px minmax(0,1.4fr) 100px 160px 24px;
+    gap:12px;padding:12px 14px
+  }
+  .product-thumb{width:92px;height:84px}
+  .product-thumb svg{width:70px;height:68px}
+  .pick-pill{padding:9px 10px;font-size:13px}
+
+  .bottom-nav{padding:0 12px}
+}
+
+/* PHONE <= 767 */
+@media (max-width:767px){
+  :root{--bottom-nav-h:76px}
+
+  .app-header{min-height:62px;padding:9px 12px}
+  .brand-name{font-size:19px}
+  .brand-mark{width:28px;height:28px;font-size:16px}
+  .session-card,.header-right .context-chip{display:none}
+  .notification-button{width:40px;height:40px}
+  .mobile-context-strip{display:flex}
+
+  main{padding:0 7px}
+  .workspace{padding:14px 11px 10px;border-radius:14px}
+  .back-row{margin-bottom:12px}
+
+  .order-hero{display:block}
+  .order-identity{grid-template-columns:58px minmax(0,1fr);gap:13px}
+  .order-icon{width:58px;height:58px;border-radius:13px}
+  .order-icon svg{width:31px;height:31px}
+  .order-title{font-size:25px}
+  .order-meta{font-size:12.5px}
+  .customer-line{margin-top:13px;font-size:15px}
+
+  .collect-by{
+    min-height:auto;
+    margin-top:15px;
+    padding:14px 0 0;
+    border-left:0;border-top:1px solid #E1E7F0
+  }
+  .collect-label{font-size:14px}
+  .collect-time{font-size:22px}
+  .collect-remaining{font-size:14px}
+
+  .fulfilment-cta-wrap{margin-top:15px}
+  .fulfilment-cta{min-height:80px;padding:15px 18px;gap:14px}
+  .fulfilment-cta svg{width:40px;height:40px}
+  .fulfilment-cta-text{font-size:20px}
+
+  .summary-grid{grid-template-columns:1fr;gap:10px;margin-top:18px}
+  .summary-card{min-height:108px;grid-template-columns:54px minmax(0,1fr) 22px;padding:15px}
+  .summary-icon{width:50px;height:50px}
+  .summary-icon svg{width:28px;height:28px}
+  .summary-title{font-size:18px}
+  .summary-main{font-size:15px}
+  .summary-sub{font-size:13px}
+
+  .items-panel-head{min-height:auto;display:block;padding:0}
+  .items-panel-title{padding:15px;font-size:19px}
+  .view-details{
+    width:100%;min-height:58px;
+    border-left:0;border-top:1px solid #E5EAF2;
+    padding:0 15px
+  }
+
+  .item-row{
+    display:grid;
+    grid-template-columns:82px minmax(0,1fr);
+    gap:12px;
+    min-height:0;
+    padding:14px
+  }
+  .product-thumb{width:78px;height:78px}
+  .product-thumb svg{width:62px;height:62px}
+  .product-name{font-size:16px}
+  .product-variant,.product-sku{font-size:12.5px}
+  .quantity-block{grid-column:1 / 2}
+  .pick-pill{grid-column:2 / 3;align-self:center;justify-self:start;padding:8px 10px;font-size:12px}
+  .item-chevron{display:none}
+
+  .bottom-nav{min-height:var(--bottom-nav-h);padding:0 4px}
+  .nav-item{gap:3px}
+  .nav-item svg{width:21px;height:21px}
+  .nav-item span{font-size:10.5px}
+  .nav-item.active::after{bottom:4px;width:55px}
+
+  .qa-toggle{right:9px;bottom:calc(var(--bottom-nav-h) + 9px)}
+  .qa-panel{right:9px;bottom:calc(var(--bottom-nav-h) + 51px);width:calc(100vw - 18px)}
+}
+
+@media (max-width:420px){
+  .order-title{font-size:22px}
+  .order-title-row{gap:8px}
+  .summary-card{grid-template-columns:48px minmax(0,1fr) 20px}
+  .summary-icon{width:45px;height:45px}
+  .item-row{grid-template-columns:70px minmax(0,1fr)}
+  .product-thumb{width:68px;height:68px}
+}

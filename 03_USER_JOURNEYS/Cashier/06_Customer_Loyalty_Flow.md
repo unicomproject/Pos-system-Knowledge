@@ -66,13 +66,13 @@ presented as working filters.
 
 ## Add, Edit, And Deactivate Rules
 
-- Create: `customers.create`; full name and phone required; email optional.
+- Create: `pos.customers.management.create` (legacy alias: `customers.create`); full name and phone required; email optional.
 - Add Customer opens a create-only orange modal with exactly Full Name, Phone
   Number, and Email inputs; it does not search or render existing customers.
 - Customer Management shows one toolbar Add Customer action when
-  `customers.create` is granted; successful creation refreshes the paginated
+  `pos.customers.management.create` is granted; successful creation refreshes the paginated
   list and selects the backend-created customer.
-- Update/deactivate: `customers.update`.
+- Update/deactivate: `pos.customers.management.update` (legacy alias: `customers.update`).
 - Name maximum: 150 characters.
 - Phone maximum: 50 characters and at least 7 normalized digits.
 - Email maximum: 150 characters and valid address syntax when supplied.
@@ -84,7 +84,7 @@ presented as working filters.
 
 ## Attach Rules
 
-Attach requires `customers.view` plus `sales.cart.manage`. Only an `ACTIVE`
+Attach requires `pos.customers.management.view` plus `pos.sales.cart.manage` (legacy: `customers.view` + `sales.cart.manage`). Only an `ACTIVE`
 customer is eligible. Current rejection codes are:
 
 - `pos_customers.customer_inactive`

@@ -1,7 +1,7 @@
 <!-- title: Tenant Users, Roles, Permissions & Outlet Access -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-06 -->
+<!-- last_updated: 2026-08-18 -->
 <!-- source: Updated from uploaded ERD image: 06_Tenant Users, Roles, Permissions & Outlet Access.png -->
 
 # 06. Tenant Users, Roles, Permissions & Outlet Access
@@ -50,7 +50,7 @@ Purpose: Stores tenant user login/profile/access base records.
 | `password_salt` | varchar(255) |  | NOT NULL | Password salt. |
 | `full_name` | varchar(255) |  | NOT NULL | User full name. |
 | `display_name` | varchar(500) |  | NULL | User display name. |
-| `profile_image_url` | uuid | FK | NULL | ERD marks this as FK uuid. |
+| `profile_image_url` | uuid | FK | NULL | Stores the tenant user's `media_assets.id` profile image reference. The legacy column name is retained; APIs resolve this media asset to nullable `profileImageUrl` for clients. |
 | `outlet_id` | uuid | FK | NULL | References `outlets(id)`. |
 | `default_outlet_id` | varchar(50) |  | NOT NULL | Default outlet identifier as shown in ERD image. |
 | `user_type` | varchar(20) |  | NOT NULL | User type. |
@@ -349,6 +349,8 @@ CHECK(revoked_at IS NULL OR revoked_at > assigned_at)
 ## `outlet_user_permissions`
 
 Purpose: Stores outlet-scoped direct permission assignments for users.
+
+Runtime scope rule: only rows with `revoked_at IS NULL` are active authorization assignments. Revoked rows remain audit history and must not grant access or be counted when deciding whether a user has active outlet-scoped assignments.
 
 | Attribute | Type | Key | Null | Reference / Note |
 | --- | --- | --- | --- | --- |

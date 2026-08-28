@@ -1,9 +1,18 @@
 <!-- title: POS Hardware Chunk 3 Physical Cash Drawer 2026-08-16 -->
-<!-- status: Active — software partial; physical acceptance pending -->
+<!-- status: Historical evidence — superseded for automatic Cash Sale physical acceptance -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-16 -->
+<!-- last_updated: 2026-08-18 -->
 
 # POS Hardware Chunk 3 — Physical Cash Drawer (2026-08-16)
+
+> **Supersession (2026-08-17 runtime acceptance):** The automatic Cash Sale path
+> on Windows Local Print Agent + POSPrinter POS80 + Cashbox #1 / `drawerPin2`
+> physically passed after resolving emulator clock drift. See
+> [[Cash_Drawer_Runtime_Integration_Issue_Resolution_2026-08-17]].
+> This 2026-08-16 file remains historical evidence for the pre-acceptance
+> software/runtime hardening session. Split Cash, refund, manual/no-sale,
+> `drawerPin5`, Android direct printer transports and alternate hardware remain
+> unverified.
 
 ## Final result (this session)
 
@@ -16,7 +25,10 @@ Overall hardware production readiness: BLOCKED
 ```
 
 Do **not** treat transport accept / spooler / USB write as physical drawer open.
-Physical RJ11/RJ12 movement was **NOT VERIFIED** on Windows, Android USB, or Android BT.
+At the time of this 2026-08-16 session, physical RJ11/RJ12 movement was **NOT
+VERIFIED** on Windows, Android USB, or Android BT. The Windows POS80 automatic
+Cash Sale path was later physically accepted on 2026-08-17; other scenarios
+remain unverified.
 
 ## Canonical release numbering
 

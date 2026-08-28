@@ -26,7 +26,7 @@ Flutter UI contract:
 - Device is ACTIVE and trusted.
 - Till is ACTIVE and assigned (assignment not released).
 - No active OPEN session exists for the till (or current-session restores it).
-- Caller has `pos.till.open`.
+- Caller has `pos.till.session.open` (legacy alias: `pos.till.open`).
 
 ## Main Flow
 

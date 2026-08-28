@@ -1,112 +1,80 @@
 <!-- title: Fulfilment & Pickup / Click & Collect Technical Contract -->
-<!-- status: Active -->
-<!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- status: Canonicalized - Implementation Pending -->
+<!-- last_updated: 2026-08-27 -->
 
 # Fulfilment & Pickup / Click & Collect Technical Contract
 
-## Purpose
+## Ownership
 
-Defines the implementation contract for `Fulfilment_Pickup_ClickCollect`. This contract is based on
-new OneVerz POS MVP scope images and the uploaded Unified Commerce database design.
+This specializes the canonical frontend/backend standards. Tenant E-commerce Click & Collect owns staff operations. Existing public storefront fulfilment reads remain separate customer-facing APIs.
 
-## API Contract
+## Canonical staff API
 
-| Area | Contract |
-|---|---|
-| API groups | `/api/v1/fulfilment/methods`, `/api/v1/pickup/slots`, `/api/v1/fulfilment-orders`, `/api/v1/pickup-orders`, `/api/v1/pickup-events` |
-| Request format | Typed request DTOs; no raw map payloads in application layer |
-| Response format | Typed response DTOs with safe fields only |
-| Error format | Standard API error response |
-| Tenant context | Resolved server-side for tenant-owned records |
-| Auth | Staff/customer/platform auth boundary must match module surface |
+Base: `/api/v1/tenant/ecommerce/click-collect`. Every operation below is **canonical / implementation pending** unless implementation tracking proves otherwise.
 
-## API Groups
+| Method | Route | Permission | Purpose |
+|---|---|---|---|
+| GET | `/orders` | `.orders.access` + `.orders.view` | Bounded staff queue read with authoritative summary aggregates; approved OO-01 exposes search only |
+| GET | `/orders/{orderId}` | `.orders.access` + `.orders.view` | Authoritative detail |
+| POST | `/orders/{orderId}/fulfilment/start` | `.fulfilment.start` | Atomic start, assignment and validation |
+| GET | `/orders/{orderId}/picking` | `.picking.view` | Picking detail |
+| POST | `/orders/{orderId}/picking/lines/{lineId}/pick` | `.picking.pick` plus scan/manual capability | Barcode/quantity pick |
+| POST | `/orders/{orderId}/picking/lines/{lineId}/issues` | `.picking.report_issue` | Cannot-find issue event only |
+| POST | `/orders/{orderId}/pack` | `.packing.pack` | Validate and create package(s) |
+| POST | `/orders/{orderId}/ready` | `.collection.mark_ready` | Validate ready and notify |
+| GET | `/collection/ready` | `.collection.view_ready` | Outlet ready queue |
+| POST | `/collection/qr/validate` | `.collection.scan_qr` + `.collection.validate_qr` | Server QR validation |
+| GET | `/collection/lookup` | `.collection.manual_lookup` | Manual fallback lookup |
+| POST | `/orders/{orderId}/collection/payment/cash` | `.payment.accept_cash` | Orchestrate existing payment/till engine |
+| POST | `/orders/{orderId}/collection/handover` | `.collection.handover` + `.collection.collect` | Idempotent finalization |
 
-| API Group | Purpose |
-|---|---|
-| `/api/v1/fulfilment/methods` | Module API group |
-| `/api/v1/pickup/slots` | Module API group |
-| `/api/v1/fulfilment-orders` | Module API group |
-| `/api/v1/pickup-orders` | Module API group |
-| `/api/v1/pickup-events` | Module API group |
+All permission suffixes use the `commerce.online_order` prefix. `PATCH /orders/{orderId}/status` is not the primary cashier contract. If retained, restrict it to safe/internal compatibility and prevent transition bypass.
 
-## Database Contract
+## Authorization and failures
 
-| Table | Contract |
-|---|---|
-| `fulfillment_methods` | Used by this module |
-| `fulfillment_method_outlets` | Used by this module |
-| `pickup_slots` | Used by this module |
-| `pickup_slot_reservations` | Used by this module |
-| `fulfillment_orders` | Used by this module |
-| `fulfillment_order_lines` | Used by this module |
-| `fulfillment_order_events` | Used by this module |
-| `pickup_orders` | Used by this module |
-| `pickup_order_events` | Used by this module |
+Effective authorization = authenticated tenant staff + active tenant + `click_collect` entitlement + capability permission + tenant ownership + outlet/resource access. Role names never authorize. Use standard 400, 401, 403, non-disclosing 404, 409 conflict and safe 500 responses.
 
-Entity mappings must preserve exact table names, column names, tenant foreign keys,
-unique constraints, CHECK constraints, hash-only token rules, and append-only
-history/ledger behavior where applicable.
+Online Orders outlet access additionally requires an `ACTIVE` tenant user and an `ACTIVE` outlet in the same tenant. Only non-revoked `outlet_user_roles` / `outlet_user_permissions` rows (`revoked_at IS NULL`) participate in scoped authorization. When any active outlet-scoped assignment exists, the requested outlet must match one of those active assignments; historical revoked rows must neither grant access nor suppress the established tenant-wide fallback. A failure returns HTTP 403 with stable code `online_orders.outlet_access_denied`.
 
-## Frontend Contract
+The tenant lifecycle comparison must use canonical `TenantStatusConstants.Active` (`active`, lowercase in `tenants.status`); outlet and tenant-user statuses retain their own canonical uppercase constants. Do not compare tenant lifecycle data to an outlet/user status literal.
 
-- Use feature-owned folders and typed services/providers.
-- Widgets/components must not call HTTP APIs directly.
-- Use DTOs in data layer, domain/view models in UI layer.
-- Permission and entitlement checks are UX helpers only; backend remains final authority.
-- Browser online store and Flutter business app must share backend rules but keep separate user/auth surfaces.
+## OO-01 staff list read contract
 
-## Backend Contract
+`GET /api/v1/tenant/ecommerce/click-collect/orders` is the implemented staff-facing bounded queue read. It accepts `outletId`, `search`, `status`, `sortBy`, `sortDirection`, `page`, and `pageSize`; the approved UI exposes only debounced search (approximately 300–500 ms). The service enforces TenantOnly context, active tenant, Click & Collect entitlement, both Online Orders access/view permissions, and outlet access. Its response owns the six full-scope aggregates, server-derived display status, authoritative `serverTime`, item/unit counts, payment projection, and up to four batched product previews plus `remainingPreviewCount`.
 
-- Controllers stay thin.
-- Application services own use cases.
-- Domain entities/value objects hold stable business invariants.
-- Repository interfaces stay in application layer; EF implementations stay in infrastructure layer.
-- Audit/event rows are written for sensitive state changes.
-- Idempotency keys are required for retryable commands that can create duplicates.
+Authenticated POS theme values are resolved independently through `GET /api/v1/pos/theme`. The cross-cutting contract reuses `setting_definitions` and `tenant_settings` with tenant-editable keys `pos.theme.primary_color` and `pos.theme.secondary_color`; defaults are `#FF6A00` and `#000000`. Resolution precedence is tenant override → setting-definition default → safe application fallback. No theme table or schema column exists. Flutter consumption remains Chunk 3 scope.
 
-## Permission And Entitlement Contract
+The response contains `items`, `summary`, `page`, `pageSize`, `totalCount`, and authoritative `serverTime`. Each list item reconciles existing naming while providing the equivalent of `orderId`, `orderNumber`, pickup/collection reference, customer name/phone, collection start/end/timezone snapshot, display and payment status, item/unit counts, product previews, and remaining preview count. A preview contains product/variant identifiers, product name, image URL and accessible alternative text.
 
-- Permission codes must be database-seeded and module-scoped.
-- Do not create one giant global enum as the source of truth.
-- Tenant feature entitlement must be checked before tenant staff permission where the feature is plan-controlled.
-- Customer-facing actions use customer account/session rules, not tenant staff role permissions.
+Summary values are tenant/outlet/query-scoped aggregate counts, never current-page counts. `Delayed` is a read projection from authoritative lifecycle + promised collection window + server time; it is not persisted and cannot incorrectly replace Ready, Collected, Cancelled or terminal states. Payment comes from existing payment/order authority. List projections must use efficient joined/batched reads and avoid N+1 database or image API access.
 
-## Test Contract
+The queue chevron navigates to `GET /api/v1/tenant/ecommerce/click-collect/orders/{orderId}` only. No queue mutation command is exposed.
 
-Test coverage must include:
+## Database contract
 
-- Happy path for each primary API group.
-- Missing authentication.
-- Permission denied or customer access denied.
-- Feature disabled / entitlement missing.
-- Tenant isolation failure.
-- Validation failure.
-- Duplicate/conflict behavior.
-- Safe error display.
-- Audit/event/history creation where required.
-- Offline/cache behavior where this module touches POS, checkout, order, inventory, payment, or sync.
+Reuse fulfilment methods/outlets, slots/reservations, sales orders/lines/payments, inventory reservations/lines, inventory locations/balances/movements, fulfilment orders/lines/events, pickup orders/events, customers, outlets, tenant users and audit infrastructure. Add only `fulfillment_packages`, `fulfillment_package_lines`, `fulfillment_order_lines.inventory_reservation_line_id`, and repository-standard concurrency fields on fulfilment/pickup headers (canonical target `row_version`).
 
-## Implementation Sequence
+For OO-01 specifically: **New API = YES; New table = NO; New database column/attribute = NO.** Display status, delayed state, counts and previews are read projections. No `online_orders`, `delayed_orders`, `ready_orders`, priority column or summary-count column is introduced.
 
-1. Confirm scope and table coverage from this module file.
-2. Create DTOs, validators, and application service methods.
-3. Create repository interface and EF repository/mapping if missing.
-4. Add entitlement, permission, tenant, outlet, till, device, customer, or offline checks as relevant.
-5. Build frontend route/screen/component/provider/service.
-6. Add loading, empty, error, denied, feature-disabled, offline, and conflict states.
-7. Add unit/integration/API/widget tests.
-8. Review against new OneVerz POS MVP module boundaries.
+## Backend ownership and reuse
 
-## Out Of Scope
+| Layer | Responsibility | Reuse |
+|---|---|---|
+| API | Thin Tenant E-commerce Click & Collect controller family | Auth/error conventions |
+| Application | Fulfilment/Pickup orchestration | Tenant/outlet authorization, inventory reservation, payments, notification, audit, idempotency, time |
+| Domain | Fulfilment/pickup/package invariants and transitions | Sales Order, Inventory and Payment authorities |
+| Infrastructure | Existing module repositories and EF mappings | Transactions, concurrency and append-only event patterns |
 
-- Driver assignment
-- Delivery fee calculation
-- Third-party courier integration
-- Kitchen display automation
+Do not create duplicate OnlineOrderPaymentService, OnlineOrderInventoryService, payment records, stock ledgers, notification outboxes or audit tables.
 
-## Related Files
+OO-01 remains under E-commerce / Customer Orders / Click & Collect ownership. Prefer extending the canonical Click Collect controller. The smallest pending backend addition is a list-read service, repository query and typed request/list-item/summary/response DTOs; do not create a parallel module or controller family.
 
-- [[04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/01_Module_Overview]]
-- [[04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/02_Functional_Rules]]
+## Guarantees
+
+Start, pick, pack, ready, QR validation, cash payment and handover use optimistic concurrency. Retryable mutations use idempotency. Handover revalidates state/package/items/payment in one transaction; replay returns the original result without duplicate payment, stock or events.
+
+## Related files
+
+- [[../../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]]
+- [[../../06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup_UPDATED]]
+- [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Order_ClickCollect_Fulfilment]]

@@ -29,6 +29,8 @@ This markdown version follows the uploaded ERD image as the source of truth. Tab
 | `fulfillment_order_events` | Stores append-only fulfillment event history. |
 | `pickup_orders` | Stores customer pickup execution headers. |
 | `pickup_order_events` | Stores append-only pickup event history. |
+| `fulfillment_packages` | Canonical package/bag headers (implementation pending). |
+| `fulfillment_package_lines` | Canonical package contents (implementation pending). |
 
 ## `fulfillment_methods`
 
@@ -373,9 +375,30 @@ Append-only pickup event history.
 
 ## Module Notes
 
+## Canonical Click & Collect schema delta (implementation pending)
+
+### `fulfillment_packages`
+
+One fulfilment may produce multiple packages. Required conceptual columns: `id`, `tenant_id`, `fulfillment_order_id`, tenant-scoped `package_number`, optional `staging_inventory_location_id`, `package_status`, `packed_by_tenant_user_id`, `packed_at`, optional `ready_at`, audit timestamps and repository-standard concurrency. Foreign keys must enforce same-tenant ownership. Package number is unique per tenant/fulfilment. Status values are constrained strings such as `OPEN`, `PACKED`, `READY`, `HANDED_OVER`, `CANCELLED` and must align with the final implementation migration.
+
+### `fulfillment_package_lines`
+
+Required conceptual columns: `id`, `tenant_id`, `fulfillment_package_id`, `fulfillment_order_line_id`, `quantity`, audit timestamps. Quantity is positive; a line/package pair is unique; both parent records must belong to the same fulfilment and tenant.
+
+### Relationship and concurrency additions
+
+- Add nullable `fulfillment_order_lines.inventory_reservation_line_id` → canonical inventory reservation line. It provides exact allocation/pick traceability; it does not create another reservation table.
+- Add repository-standard optimistic concurrency to `fulfillment_orders` and `pickup_orders`; canonical target name/type is `row_version bigint NOT NULL` unless implementation confirms the repository standard differs.
+- Keep QR material on `pickup_orders` as hash/version/expiry. Raw QR token, separate QR table and client-authoritative used flag are rejected. Successful collection and append-only pickup events provide single-use finality.
+
+### Explicitly rejected duplicate concepts
+
+No single `bag_number` on `fulfillment_orders`; no online-order-specific inventory balance/movement/reservation tables; no duplicate payment, receipt, notification, audit, customer, outlet or staff tables; no persisted UI `Delayed` status; no generic package JSON blob.
+
 - This file follows the uploaded image, which contains 9 main tables.
 - All event tables are append-only histories.
 - All type/status fields are written as `varchar(...)` plus CHECK constraints instead of database enum datatypes.
+- These schema deltas are canonical documentation only; migration/runtime verification is pending.
 
 ## Related Files
 

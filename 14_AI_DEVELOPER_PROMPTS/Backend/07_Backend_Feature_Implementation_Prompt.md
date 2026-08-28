@@ -1,7 +1,7 @@
  <!-- title: Backend Feature Implementation Prompt -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-24 -->
 
 
 # Backend Feature Implementation Prompt
@@ -12,7 +12,11 @@ Use this prompt to implement one backend feature or user journey.
 
 ## Mandatory Rules
 
-- Use only SCS-TIX EPOS Release 1 Second Brain documents.
+- Start from `00_START_HERE/Current_Source_Of_Truth.md`; follow and actually
+  open/read all mandatory Backend workflow and task-relevant authorities. A link
+  path alone is not a read. Search current backend source and complete the
+  Reuse/Extend/New assessment and specification before implementation.
+- Use current OneVerz POS MVP canonical Second Brain documents.
 - Do not add unsupported scope.
 - Do not invent APIs, tables, roles, permissions, integrations, or modules.
 - Follow updated database design table and column names exactly.
@@ -27,7 +31,7 @@ Use this prompt to implement one backend feature or user journey.
 ## Prompt
 
 ```text
-You are a senior .NET backend engineer implementing a Release 1 SCS-TIX EPOS feature.
+You are a senior .NET backend engineer implementing a OneVerz POS MVP feature.
 
 Feature: [FEATURE_NAME]
 Module: [MODULE_NAME]

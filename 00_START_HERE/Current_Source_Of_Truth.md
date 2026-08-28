@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-17 -->
+<!-- last_updated: 2026-08-24 -->
 
 
 # Current Source Of Truth
@@ -13,6 +13,100 @@ It prevents developers and AI assistants from mixing old POS-first scope, future
 ideas, and current MVP delivery work.
 Use this file before writing, implementing, reviewing, or generating any module
 documentation.
+
+## Canonical Engineering Entry Points
+
+All feature development must read Second Brain, search the current source, and
+reuse approved implementations before adding code.
+
+## AI / Developer Canonical Read Contract
+
+This file is the single mandatory starting point for frontend or backend feature
+analysis, specification, implementation, review, bug fixing, gap audits, and
+canonicalization.
+
+1. **Start here.** Open and read this file before using a lower-level workflow,
+   prompt, feature document, or source file as the task authority.
+2. **A link is a reading instruction, not read content.** Every document marked
+   `Required Read`, `Mandatory`, `Canonical authority`, or required for the
+   current feature by a canonical workflow must be opened and read. Merely
+   seeing its title or path in another Markdown file does not satisfy the read.
+3. **Use controlled recursive traversal.** If a mandatory authority explicitly
+   requires another authority for the current task, open and read it too.
+   Continue until the task's required authority set is resolved. Do not traverse
+   informational, optional, historical, evidence-only, or unrelated links unless
+   a canonical rule makes them mandatory.
+4. **Resolve task-relevant authorities only.** After the frontend or backend core
+   reads, load the applicable journey, module, screen/feature specification, API,
+   permission/RBAC, database, state/workflow, offline/sync, integration/hardware,
+   design/reuse, testing/readiness, and decision/change authorities. Do not load
+   unrelated modules merely because they exist.
+5. **Inspect current source.** Second Brain does not replace repository search.
+   Where the applicable canonical workflow requires it, inspect the current
+   implementation before deciding `Reuse`, `Extend`, or `New`.
+6. **Resolve conflicts by authority.** The order is: this Current Source of Truth
+   → canonical engineering standard → canonical reusable governance → canonical
+   development workflow → task-specific canonical authority. If an active AI
+   prompt or lower-level file conflicts, the higher/current authority wins; do
+   not silently follow the older instruction.
+7. **Preserve history.** Archives, superseded implementation evidence, old
+   prompts, and historical notes are context/evidence only unless a current
+   canonical authority explicitly promotes them.
+
+This contract is a router. Detailed engineering rules remain owned by the
+linked canonical standards and workflows below.
+
+### Frontend feature development
+
+```text
+Read Frontend Canonical Standard
+→ Reusable Component Governance
+→ relevant design/module/journey/API/permission documents
+→ search current Flutter code
+→ reuse first
+→ specification
+→ implementation
+→ tests
+→ update Second Brain
+```
+
+Authorities:
+
+- [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Engineering_Canonical_Standard]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Reusable_Component_Governance]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Screen_Development_Second_Brain_Workflow]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Screen_Implementation_Specification_Template]]
+
+### Backend feature development
+
+```text
+Read Backend Canonical Standard
+→ Reusable Service Logic Governance
+→ architecture/module/journey/API/permission/database documents
+→ search current backend code
+→ reuse first
+→ specification
+→ implementation
+→ tests
+→ update Second Brain
+```
+
+Authorities:
+
+- [[../05_BACKEND_ARCHITECTURE/Backend_Engineering_Canonical_Standard]]
+- [[../05_BACKEND_ARCHITECTURE/Backend_Reusable_Service_Logic_Governance]]
+- [[../05_BACKEND_ARCHITECTURE/Backend_Feature_Development_Second_Brain_Workflow]]
+- [[../05_BACKEND_ARCHITECTURE/Backend_Feature_Implementation_Specification_Template]]
+
+### Global Second Brain update rule
+
+Update the relevant canonical knowledge when implementation introduces a new
+reusable UI component, reusable backend service, domain/business rule, API
+contract, permission, state/workflow, database rule, integration contract,
+design token, architecture decision, or important operational rule.
+
+When an existing reusable component, service, or rule is simply reused,
+reference its canonical entry. Do not duplicate its full documentation.
 
 ## Flow 4 Tenant Onboarding Authority
 
@@ -96,6 +190,12 @@ Overall hardware production readiness remains **BLOCKED** until mandatory physic
 Overall POS Hardware remains **BLOCKED** until physical PR/DR/SC gates pass.
 
 ## Highest Priority Decision
+
+## Online Order Fulfilment / Click & Collect authority (updated 2026-08-27)
+
+Cashier/store operational Click & Collect is governed by [[../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]], module contract [[../04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]], database contract [[../06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup_UPDATED]], and Flutter ownership [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Order_ClickCollect_Fulfilment]]. The approved 2026-08-27 OO-01 target supersedes the earlier table/tab/filter queue: its contract is canonicalized, the new staff list API is pending Chunk 2, Flutter under `lib/features/fulfilment_pickup/` is pending Chunk 3, and authenticated E2E remains pending. The 2026-08-24 implementation audit is historical evidence for the superseded implementation and is not target-screen completion proof. Public storefront fulfilment reads do not prove staff operational completion.
+
+The approved prototype/UI layer is governed by [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Prototype_Flow]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Visual_Direction]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Component_Inventory]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_UI_API_Mapping]], and [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_UI_DB_Mapping]]. Prototype values remain display-only. Production Flutter composes the approved structure from staff API/provider data; the prototype never overrides journey, module, permission, API, or database authorities.
 
 Cashier **Open Till** requirements are governed by
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]] and
@@ -182,6 +282,16 @@ The current scope is OneVerz POS MVP.
 The MVP includes mobile and desktop EPOS, online store, click and collect,
 offline operation, product and variant management, inventory management, order
 management, reporting, users and permissions, and device/peripheral integration.
+
+Tenant Admin Users List profile image support is implemented in backend and
+Flutter code as of 2026-08-18. The Users List API returns nullable resolved
+`profileImageUrl` from the tenant user's media asset reference; Flutter renders
+that image when available and retains initials fallback for missing or invalid
+values. Evidence:
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin/Tenant_Admin_Users_Profile_Image_List_Resolution_2026-08-18]].
+Status remains `IMPLEMENTED — RUNTIME VERIFICATION PENDING` until an
+authenticated Flutter Users screen visual run confirms the seeded cashier image
+is visible in-app.
 
 Older Second Brain files that say online store, click and collect, or offline
 sync are excluded must be updated or treated as superseded.

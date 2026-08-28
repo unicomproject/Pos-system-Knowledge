@@ -57,7 +57,7 @@ coupon, AI, or accounting scope.
 
 `GET /api/v1/pos/returns/sales/search`
 
-Required permission: exact `returns.view`
+Required permission: exact `pos.returns.search_sale.view` (legacy alias: `returns.view`)
 
 Required context:
 
