@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-13 -->
+<!-- last_updated: 2026-08-28 -->
 <!-- decision: Permission & Entitlement Contract Reconciled: 2026-08-13 -->
 
 # Permission Code List

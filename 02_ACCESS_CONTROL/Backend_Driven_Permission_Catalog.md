@@ -1,10 +1,13 @@
 <!-- title: Backend Driven Permission Catalog -->
-<!-- status: Active -->
+<!-- status: CANONICAL — LOCKED & MERGED -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-28 -->
 
 
 # Backend Driven Permission Catalog
+
+> **Permission & Entitlement Contract Reconciled: 2026-08-28 — CANONICAL / LOCKED FOR RELEASE 1**  
+> Full Release-1 catalog: [CANONICAL_MODULE_FEATURE_PERMISSION_CATALOG_R1.md](file:///c:/Users/User/Desktop/Nytroz__POS/Nytroz%20POS%20-%20Second%20Brain/Pos-system-Knowledge/02_ACCESS_CONTROL/CANONICAL_MODULE_FEATURE_PERMISSION_CATALOG_R1.md).
 
 ## Purpose
 
@@ -12,6 +15,20 @@ This file defines the backend-driven permission catalog rule for OneVerz POS MVP
 
 The frontend must not own the permission catalog.
 The backend and database seed/catalog are the source of truth.
+
+```text
+NO production frontend-owned permission list as Source of Truth.
+```
+
+```text
+Canonical Permission Definitions
+        ↓
+Database / Backend Seed
+        ↓
+Backend Permission Catalog API
+        ↓
+Frontend Rendering
+```
 
 ## Catalog Principle
 
@@ -80,7 +97,13 @@ Do not hardcode role-based menu access.
 
 ## Entitlement + Permission Rule
 
+```text
+Entitlement ≠ Permission
+```
+
 A permission is not enough if the feature is disabled.
+
+A permission cannot activate a feature that the tenant is not entitled to use.
 
 Example: `pickup.orders.manage` is valid only if the tenant has click collect /
 fulfilment feature enabled.
@@ -104,6 +127,7 @@ business-critical or security-sensitive.
 
 ## Related Files
 
+- [[CANONICAL_PERMISSION_AND_FEATURE_ENTITLEMENT_CONTRACT_R1]]
 - [[Permission_Code_List]]
 - [[Feature_Entitlement_Matrix]]
 - [[API_Authorization_Rules]]

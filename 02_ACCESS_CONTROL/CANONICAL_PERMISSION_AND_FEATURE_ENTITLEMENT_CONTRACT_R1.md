@@ -1,13 +1,13 @@
-﻿# OneVerz Canonical Module â†’ Feature â†’ Permission Catalog (Release 1)
+# OneVerz Canonical Permission and Feature Entitlement Contract (Release 1)
 
-<!-- title: Canonical Module, Feature and Permission Catalog (Release 1) -->
-<!-- status: LOCK CANDIDATE — OWNER DECISIONS COMPLETE -->
+<!-- title: Canonical Permission and Feature Entitlement Contract (Release 1) -->
+<!-- status: CANONICAL — LOCKED & MERGED -->
 <!-- system: OneVerz POS MVP / Unified Commerce -->
-<!-- last_updated: 2026-08-20 -->
+<!-- last_updated: 2026-08-28 -->
 
 > [!NOTE]
-> **Authoritative Single Source of Truth Candidate**  
-> This catalog provides a mathematically reconciled and itemized master audit of all Modules, Features, Permission Definitions, Commercial Subscription Entitlements, Scoping Rules, and default Role Template Mappings across Backend (.NET), Database (PostgreSQL/EF Core), Platform Admin (Angular), Tenant Admin & POS (Flutter), and Second Brain Documentation.
+> **Authoritative Single Source of Truth for Entitlements**  
+> Reconciled capability catalog is locked in [CANONICAL_MODULE_FEATURE_PERMISSION_CATALOG_R1.md](file:///c:/Users/User/Desktop/Nytroz__POS/Nytroz%20POS%20-%20Second%20Brain/Pos-system-Knowledge/02_ACCESS_CONTROL/CANONICAL_MODULE_FEATURE_PERMISSION_CATALOG_R1.md).
 
 ---
 
