@@ -1,7 +1,7 @@
 <!-- title: Project Glossary -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-08-27 -->
 
 
 # Project Glossary
@@ -76,6 +76,18 @@ them.
 | Held Sale | POS order temporarily parked and later recalled |
 | Fulfilment Order | Operational record for preparing/fulfilling an order |
 | Pickup Order | Click and collect pickup execution record |
+
+## Catalog and Category Terms
+
+| Term | Meaning |
+|---|---|
+| Category | A classification for products. Part of a recursive hierarchy. There is no separate SubCategory domain entity, table, API resource, or Flutter model. |
+| Root Category | A category with no parent (`parent_category_id = NULL`). Equivalent to level 1. |
+| Child Category | A category that has a parent. A category can simultaneously be a child and a parent. |
+| Subcategory | A business/UI label for a child Category (for example the sidebar label “Categories & Subcategories”). Not a separate domain entity, table, API resource, or Flutter domain model. |
+| Leaf Category | A category with zero children. |
+| Category Path / Hierarchy | The full tree path from a root category down to the current category. Derived; not a stored column. |
+| Department | A Catalog Master Data entity for **unrelated** modules. **Not** part of Tenant Admin Category Management (ADR 010). Category has **no** `department_id` — migration `20260827140000_DecoupleCategoryFromDepartment` applied. |
 
 ## Product And Inventory Terms
 

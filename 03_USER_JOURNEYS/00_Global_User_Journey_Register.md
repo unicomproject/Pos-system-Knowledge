@@ -165,11 +165,11 @@ One row per journey. Implementation status reflects **production code**, not doc
 | TA-UJ-032 | - | TA | Tenant Admin | - | Activate / Deactivate Product | - | - | Y | PARTIAL | 60 | - | - | - | - | - |
 | TA-UJ-033 | - | TA | Tenant Admin | - | View Product Dashboard | - | - | Y | COMPLETE | 80 | - | - | - | - | - |
 | TA-UJ-034 | - | TA | Tenant Admin | - | Curate Popular Products | - | - | Y | PARTIAL | 60 | - | - | - | - | - |
-| TA-UJ-035 | - | TA | Tenant Admin | - | Browse Categories | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
-| TA-UJ-036 | - | TA | Tenant Admin | - | Create Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
-| TA-UJ-037 | - | TA | Tenant Admin | - | View Category Details | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
-| TA-UJ-038 | - | TA | Tenant Admin | - | Edit Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
-| TA-UJ-039 | - | TA | Tenant Admin | - | Delete Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
+| TA-UJ-035 | - | TA | Tenant Admin | - | Browse Categories | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend contract + implementation complete. Flutter pending. E2E NOT COMPLETE. |
+| TA-UJ-036 | - | TA | Tenant Admin | - | Create Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend complete. Flutter pending. E2E NOT COMPLETE. |
+| TA-UJ-037 | - | TA | Tenant Admin | - | View Category Details | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend complete. Flutter pending. E2E NOT COMPLETE. |
+| TA-UJ-038 | - | TA | Tenant Admin | - | Edit Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend complete. Flutter pending. E2E NOT COMPLETE. |
+| TA-UJ-039 | - | TA | Tenant Admin | - | Delete Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend complete. Flutter pending. E2E NOT COMPLETE. |
 | TA-UJ-040 | - | TA | Tenant Admin | - | Browse Brands | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | TA-UJ-041 | - | TA | Tenant Admin | - | Create Brand | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | TA-UJ-042 | - | TA | Tenant Admin | - | View Brand Details | - | - | Y | COMPLETE | 90 | - | - | - | - | - |

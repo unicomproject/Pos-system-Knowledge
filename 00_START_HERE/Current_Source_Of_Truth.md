@@ -403,6 +403,7 @@ tables, screens, or flows.
 - [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
 - [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
 - [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
+- [[../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_PRODUCT_TAX_INCLUSIVE_EXCLUSIVE_DECISION_2026-08-27]]
 
 ## Wizard Step Rule
 The Tenant Admin Add Product workflow is strictly a 7-step wizard. Step 7 is Review & Create. Legacy 8-step documentation and standalone Channel Visibility steps are obsolete.
@@ -411,4 +412,48 @@ Step 1 Basic Details may collect optional **Initial Tracking Details** (Batch Nu
 
 Product Setup authorization authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]. Canonical permission namespace is `catalog.*`. Runtime Product Setup entitlement is `product_catalog`. Advanced tracking entitlement is `inventory_tracking`. Closure audit: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-08-24_Tenant_Admin_Product_Setup_Permission_NFR_API_DB_Contract_Closure_Audit]].
 
-Implementation status (2026-08-24): permission-first + Initial Tracking code is in Unified Commerce and Nytroz POS App, including `product_setup_initial_tracking` migration `20260824095742_AddProductSetupInitialTracking`. Live 7-scenario E2E, persona permission E2E, PostgreSQL integration, and 1024×768 tablet verification are not complete. Authority for remaining gaps: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/TENANT_ADMIN_PRODUCT_SETUP_INITIAL_TRACKING_PERMISSION_FIRST_IMPLEMENTATION_CLOSURE_2026-08-24]].
+Implementation status (2026-08-24): permission-first + Initial Tracking code is in Unified Commerce and Nytroz POS App, including `product_setup_initial_tracking` migration `20260824095742_AddProductSetupInitialTracking`. Live 7-scenario E2E, persona permission E2E, PostgreSQL integration, and 1024x768 tablet verification are not complete. Authority for remaining gaps: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/TENANT_ADMIN_PRODUCT_SETUP_INITIAL_TRACKING_PERMISSION_FIRST_IMPLEMENTATION_CLOSURE_2026-08-24]].
+
+## Category Management Rule
+
+**Tenant Admin Category Management**
+
+| Aspect | Status |
+|---|---|
+| Canonical contract | READY |
+| Backend | **IMPLEMENTED / VERIFIED** |
+| Flutter | **PENDING** |
+| E2E | **PENDING** |
+
+Category Management is a tenant-owned recursive hierarchy (max depth 5). There is no separate SubCategory entity. “Subcategory” is a UI label for a child Category.
+
+**Department:** decoupled from Category (ADR 010, migration `20260827140000_DecoupleCategoryFromDepartment` applied). No `department_id` on Category.
+
+**Hierarchy:** recursive Category, depth 5.
+
+**Permissions:** `catalog.categories.view|create|update|delete|manage`
+
+**Entitlement:** `product_catalog`
+
+**API:**
+
+```http
+GET    /api/v1/categories
+GET    /api/v1/categories/tree
+GET    /api/v1/categories/{id}
+POST   /api/v1/categories
+PUT    /api/v1/categories/{id}
+DELETE /api/v1/categories/{id}
+POST   /api/v1/tenant-admin/categories/{categoryId}/image
+DELETE /api/v1/tenant-admin/categories/{categoryId}/image
+```
+
+**Media:** upload/replace/remove via tenant-admin category image endpoints (not write `imageUrl` on Create/Update).
+
+**Product Setup:** recursive effectively-ACTIVE category hierarchy via `GET /api/v1/tenant-admin/products/create-options` (backend enforces **BR-CAT-PRODUCT-SELECT-001**); persist `CategoryId` only.
+
+**Management tree:** `GET /api/v1/categories/tree` — ACTIVE+INACTIVE, DELETED excluded, no `status` query parameter.
+
+Journeys **TA-UJ-035 … TA-UJ-039 remain NOT COMPLETE** (Flutter pending). Do not mark full journey COMPLETE.
+
+Authority: [[../13_DECISIONS_AND_CHANGES/ADR/ADR_010_Category_Decoupled_From_Department]], [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_PERMISSION_FIRST_BACKEND_IMPLEMENTATION_CLOSURE_2026-08-27]], [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_BACKEND_GAP_FIX_CLOSURE_2026-08-27]].
