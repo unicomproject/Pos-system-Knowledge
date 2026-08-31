@@ -1,7 +1,7 @@
 <!-- title: Fulfilment & Pickup / Click & Collect Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-27 -->
 
 # Fulfilment & Pickup / Click & Collect Functional Rules
 
@@ -18,6 +18,12 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Fulfilment and pickup events are append-only.
 - Collected status must be backend confirmed, not just UI changed.
 - Own delivery is later phase and must not be mixed into pickup state.
+- `Delayed` is derived, never persisted as another lifecycle.
+- One fulfilment may have multiple packages and package lines.
+- Ready requires resolved picking, valid package contents and backend validation.
+- QR is READY-only, opaque, hash-stored, expiring, tenant/outlet/order bound and single-use on collection.
+- Paid Online and Cash on Collection are valid; payment must complete before handover and duplicate charging is forbidden.
+- Handover is idempotent and atomically finalizes pickup, fulfilment, sales-order projection and events/audit.
 
 ## User Rules
 
@@ -36,6 +42,18 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Do not hardcode role names such as cashier, manager, or administrator as authorization logic.
 - Do not show fake data, fake counts, fake success states, or hardcoded module rows.
 - Mobile, tablet, iPad, laptop, and desktop layouts must keep the same business rules.
+
+### OO-01 Online Orders queue
+
+- Authenticated access requires `commerce.online_order.orders.access` and `commerce.online_order.orders.view`; frontend gating is UX only and backend enforcement is mandatory. Role-name authorization is forbidden.
+- Read only the active tenant and authorized POS outlet/fulfilment scope.
+- The visible queue exposes one debounced server-side search and exactly six authoritative summary aggregates: New, Preparing, Ready, Delayed, Collected and Cancelled.
+- Render order cards, not a table. Each card contains only list projection facts and a chevron that opens detail without mutating fulfilment state.
+- Filters, status tabs, sorting, table headers, Open/Start actions and visible pagination are excluded from the approved queue. Bounded API query capabilities remain permitted internally.
+- `Delayed` is derived using lifecycle, collection window and server time. It must not override legitimate Ready, Collected, Cancelled or other terminal states merely because time passed.
+- Payment labels derive from existing payment/order authority. Product previews are projected in the list response and must not cause per-order or per-product network calls.
+- Loading, refresh, empty, empty-search, retry/error, denied, not-entitled and network/server failure states are explicit. Phone stacks cards; tablet/desktop use horizontal cards; no viewport may overflow or clip.
+- The approved orange priority star has no verified business authority and therefore has no persisted/API business field in this chunk.
 
 ## Backend Rules
 

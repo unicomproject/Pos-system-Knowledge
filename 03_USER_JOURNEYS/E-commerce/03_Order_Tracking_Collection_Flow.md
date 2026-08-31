@@ -54,7 +54,7 @@ Customer wants to check the status of their placed order or has arrived at the s
   - QR code becomes available ONLY when status is "Ready for Collection".
   - QR code must be strictly tied to the exact order and customer.
   - Only a valid, active QR can be used. One collection validation per order pickup.
-- **Payment & Handover:** Release 1 uses Pay at Pickup only. Order handover happens AFTER successful payment.
+- **Payment & Handover:** Release 1 operational collection supports Paid Online and Cash on Collection. Already-paid orders must not be charged again; cash is accepted through the unified payment authority. Handover happens only after authoritative payment completion.
 - **Finality:** Collected orders can no longer use the QR code.
 
 ## Validation And Error Cases
@@ -64,7 +64,7 @@ Customer wants to check the status of their placed order or has arrived at the s
 
 ## Outcome
 
-The customer successfully pays for and collects their items. The order is securely verified via QR code and marked as completed in the system.
+The customer securely collects the paid order, or pays cash when required, and the backend idempotently marks pickup collected and the sales order completed.
 
 ## Related Files
 

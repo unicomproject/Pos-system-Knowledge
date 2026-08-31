@@ -100,7 +100,7 @@ The Cash Payment screen enforces these rules:
 |---|---|
 | Authentication | Required |
 | Feature entitlement | POS/payment enabled |
-| Permission | Payment capture permission |
+| Permission | `pos.payments.cash.accept` (legacy alias: `payments.cash.accept`) |
 | Trusted device/open till | Required |
 
 ## Data and API References

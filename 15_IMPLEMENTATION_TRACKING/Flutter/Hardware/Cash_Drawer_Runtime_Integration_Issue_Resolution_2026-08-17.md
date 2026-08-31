@@ -1,7 +1,7 @@
 <!-- title: Cash Drawer Runtime Integration Issue Resolution -->
 <!-- status: Resolved -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-17 -->
+<!-- last_updated: 2026-08-18 -->
 
 # Cash Drawer Runtime Integration Issue Resolution
 
@@ -17,7 +17,7 @@
 | Developer | - |
 | Reviewer | Operator-confirmed physical acceptance |
 | PR / Commit | - |
-| Tests | Passed — analyze clean; 40 focused passed, 1 skipped; 1,119 full-suite passed, 1 skipped; debug APK built |
+| Tests | Passed for Cash Drawer scope — analyze clean; 66 focused drawer/cash tests passed; full Flutter regression currently has 2 unrelated failures; debug APK built |
 
 ## Issue
 
@@ -184,17 +184,29 @@ preserved.
 ## Regression Validation
 
 ```text
-dart format (3 targeted files): PASS
+dart format (3 targeted files): PASS — 0 files changed
 flutter analyze: PASS — No issues found
-focused drawer/Agent suite: PASS — 40 passed, 0 failed, 1 skipped
-flutter test: PASS — 1,119 passed, 0 failed, 1 skipped
-flutter build apk --debug: PASS
+focused drawer/cash suite: PASS — 66 passed, 0 failed
+flutter test: FAIL — 1,195 passed, 2 failed, 1 skipped
+flutter build apk --debug: PASS — built build/app/outputs/flutter-apk/app-debug.apk
 backend tests: Not rerun — no backend production code changed during cleanup
 Local Agent tests: Not rerun — no Local Agent production code changed during cleanup
 ```
 
-The skipped focused test is the opt-in live physical Agent test; this closure
-uses the separately completed operator-observed runtime acceptance above.
+Full-suite failures observed during final cleanup were outside the Cash Drawer
+runtime integration scope:
+
+```text
+test/features/pos_shell/pos_home_dashboard_test.dart
+  empty successful summary renders all five zero-value cards
+
+test/features/tenant_admin/inventory_visual_runtime_test.dart
+  Inventory visual runtime — 29 screens × viewports all locked screens render without overflow
+```
+
+The Cash Drawer focused suite, Flutter analyzer and debug APK build passed.
+This closure uses the separately completed operator-observed runtime acceptance
+above for physical drawer evidence.
 
 ## Final Classification
 

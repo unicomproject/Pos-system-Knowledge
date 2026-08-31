@@ -971,6 +971,26 @@ Base: `/api/v1/platform-admin/permission-catalog`
 | PUT | `/api/v1/tenant-admin/roles/{roleId}/permissions` | `roles.permissions.update` |
 | GET | `/api/v1/tenant-admin/context` | Authenticated; includes `effectivePermissions`, `enabledFeatures` |
 
+## Tenant Admin Users API
+
+Base: `/api/v1/tenant-admin/users`
+
+| Method | Route | Permission | Purpose | Status |
+|---|---|---|---|---|
+| GET | `/api/v1/tenant-admin/users` | `tenant.users.view` or `tenant.users.manage` | List tenant users with role/outlet summary and nullable resolved `profileImageUrl` | IMPLEMENTED; API runtime verified 2026-08-18 |
+| GET | `/api/v1/tenant-admin/users/create-options` | `tenant.users.create`, `tenant.users.invite`, or `tenant.users.manage` | Load assignable roles, outlets, permission groups and supported statuses | IMPLEMENTED |
+| GET | `/api/v1/tenant-admin/users/{userId}` | `tenant.users.details.view`, `tenant.users.view`, or `tenant.users.manage` | Load one tenant user detail with resolved `profileImageUrl` | IMPLEMENTED |
+| POST | `/api/v1/tenant-admin/users` | `tenant.users.create`, `tenant.users.invite`, or `tenant.users.manage` | Create/invite tenant user; optional profile media asset id | IMPLEMENTED |
+| PUT | `/api/v1/tenant-admin/users/{userId}` | `tenant.users.update` or `tenant.users.manage` | Update tenant user profile/access/status; optional profile media replace/remove | IMPLEMENTED |
+| POST | `/api/v1/tenant-admin/users/{userId}/resend-invite` | `tenant.users.invite` or `tenant.users.manage` | Resend invitation for eligible invited user | IMPLEMENTED |
+| POST | `/api/v1/tenant-admin/users/{userId}/revoke-invite` | `tenant.users.invite` or `tenant.users.manage` | Revoke invitation for eligible invited user | IMPLEMENTED |
+| DELETE | `/api/v1/tenant-admin/users/{userId}` | `tenant.users.delete` or `tenant.users.manage` | Disable/delete tenant user according to service rules | IMPLEMENTED |
+
+Users List profile image rule: the database stores a media asset id in
+`tenant_users.profile_image_url`; the API returns a nullable resolved URL as
+`profileImageUrl`. Missing, inactive, deleted, or invalid media remains `null`
+so clients can render initials fallback.
+
 ## Verification (2026-06-23)
 
 | Layer | Tests | Commit |
@@ -1576,6 +1596,39 @@ Same rule for `GET .../sales/search` and `GET .../sales/{saleId}/eligibility`:
 ---
 
 # POS Receipts API Endpoints (2026-08-05)
+
+# Tenant E-commerce Click & Collect Staff API (OO-01 target updated 2026-08-27)
+
+The single staff operational owner is `/api/v1/tenant/ecommerce/click-collect`. The operations below are **canonical / implementation pending**. Existing public storefront `GET /api/v1/ecommerce/storefront/fulfillment/...` reads are implemented customer APIs and remain separate. Older generic `/api/v1/fulfilment-orders`, `/api/v1/pickup-orders` and `/api/v1/pickup-events` descriptions are not competing public staff contracts.
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/api/v1/tenant/ecommerce/click-collect/orders` | Implemented bounded staff queue read with outlet/search/status/sort/paging, six full-scope aggregates, server time and card projections; approved UI exposes search only |
+| GET | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}` | Detail |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/fulfilment/start` | Atomic fulfilment start |
+| GET | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking` | Picking detail |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/lines/{lineId}/pick` | Barcode/quantity pick |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/lines/{lineId}/issues` | Record picking issue |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/pack` | Validate/create packages |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/ready` | Mark ready and notify |
+| GET | `/api/v1/tenant/ecommerce/click-collect/collection/ready` | Outlet ready queue |
+| POST | `/api/v1/tenant/ecommerce/click-collect/collection/qr/validate` | Server QR validation |
+| GET | `/api/v1/tenant/ecommerce/click-collect/collection/lookup` | Manual fallback lookup |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/collection/payment/cash` | Existing unified payment orchestration |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/collection/handover` | Idempotent finalization |
+
+Command DTOs carry idempotency and repository-standard concurrency where required. A generic `PATCH .../status`, if retained, is restricted/deprecated for cashier operations and cannot bypass command invariants.
+
+## OO-01 list-read details
+
+- Authorization: authenticated tenant staff + `click_collect` entitlement + `commerce.online_order.orders.access` + `commerce.online_order.orders.view` + tenant/outlet/resource scope. Role names do not authorize.
+- Outlet authorization requires an active same-tenant user and active same-tenant outlet. Only outlet assignments whose `revoked_at` is null are effective. Denial returns HTTP 403 with `online_orders.outlet_access_denied`; revoked history never grants access or disables the no-active-scope tenant-wide fallback.
+- Query capability: `outletId`, `search`, `status`, `sortBy`, `sortDirection`, `page`, `pageSize`. Only debounced `search` is visible in the approved queue; the remainder supports bounded server reads.
+- Response concepts: `items`, `summary`, `page`, `pageSize`, `totalCount`, `serverTime`. Summary provides New, Preparing, Ready, Delayed, Collected and Cancelled counts for the complete active scope, not the returned page.
+- Item projection: order ID/number, pickup or collection reference, customer name/phone, collection start/end/timezone snapshot, display/payment status, item/unit counts, product previews and remaining-preview count. Preview projections contain product/variant identity, product name, image URL and alt text.
+- Derivation: Delayed uses authoritative lifecycle + collection window + server time and cannot replace Ready, Collected, Cancelled or terminal states. Payment comes from existing payment/order authority.
+- Performance: use bounded efficient aggregate/joined or batched reads; no N+1 database queries or per-product image API calls.
+- Navigation: queue chevron reads `/orders/{orderId}` only; it invokes no mutation.
 
 Controller: `PosReceiptsController`
 Base: `/api/v1/pos/receipts`

@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin User Management Add New User Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-27 -->
+<!-- last_updated: 2026-08-18 -->
 
 # Tenant Admin User Management Add New User Flow
 
@@ -52,6 +52,7 @@ Tenant Admin opens user management.
 - Outlet access
 - User status
 - Invite email
+- Optional profile photo media asset
 
 ## Access And Security Rules
 
@@ -61,6 +62,8 @@ Tenant Admin opens user management.
 - All create/update/status actions should be audit logged.
 - Tenant user is tenant-scoped.
 - Do not mix tenant user with platform user or customer account.
+- User profile photos are stored as tenant-scoped media assets; list and detail
+  APIs expose a nullable resolved URL so clients can fall back to initials.
 
 ## Validation And Error Cases
 

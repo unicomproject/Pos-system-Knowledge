@@ -228,7 +228,7 @@ One row per journey. Implementation status reflects **production code**, not doc
 | POS-UJ-033 | - | POS | Cashier | - | Hardware Testing | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
 | POS-UJ-034 | - | POS | Cashier | - | Offline Cash Sale Capture | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
 | POS-UJ-035 | - | POS | Cashier | - | Sync Offline Transactions | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
-| POS-UJ-036 | - | POS | Cashier | - | Manage Online/Pickup Orders | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
+| POS-UJ-036 | - | POS | Cashier | Click & Collect | Online Order Fulfilment / Collection | Online order queue | Pickup collected; sales order completed | Y | CANONICALIZED / IMPLEMENTATION PENDING | 10 | [[Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]] | commerce.online_order.orders.access | Fulfilment/Pickup | Outlet HARD | 15-screen specification complete; application/runtime pending |
 | EC-UJ-001 | - | EC | E-commerce Customer | - | Browse Home Catalog | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | EC-UJ-002 | - | EC | E-commerce Customer | - | Browse Category | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | EC-UJ-003 | - | EC | E-commerce Customer | - | Search Products | - | - | Y | PARTIAL | 70 | - | - | - | - | - |

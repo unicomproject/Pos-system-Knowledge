@@ -26,6 +26,7 @@ status must still live in the backend and testing folders.
 | Wishlist | Testing | CustomerOnly wishlist APIs and implementation tracking are documented. Latest focused regression evidence still pending. |
 | Product Reviews | Testing | Public read and CustomerOnly mutation flows are documented. Latest focused regression evidence still pending. |
 | Orders and Tracking | Implemented | My Orders, order detail, cancellation, and tenant status update docs exist. |
+| Staff Click & Collect operations (POS-UJ-036) | Canonicalized / Implementation Pending | 15-screen preparation, collection, QR, payment and handover contract is documented; no staff runtime completion claimed. |
 | POS Customer / Customer Profile | Testing | Tenant/POS customer creation, update, lookup, order summary, and attach-to-sale tracking is documented. |
 | Angular Storefront | Implemented / migrated | Core account and storefront components are built; signal modernization is frontend code status. |
 

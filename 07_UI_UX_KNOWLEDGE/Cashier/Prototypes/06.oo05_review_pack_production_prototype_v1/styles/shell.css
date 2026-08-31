@@ -1,0 +1,249 @@
+/* ===== APP SHELL ===== */
+.app-header{
+  min-height:var(--shell-header-h);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:10px 24px;
+  background:var(--brand-black);
+  color:#fff;
+}
+
+.header-left,
+.header-right{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.brand{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  white-space:nowrap;
+}
+
+.brand-mark{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  color:var(--brand-orange);
+  font-size:20px;
+  font-weight:900;
+  font-style:italic;
+}
+
+.brand-name{
+  font-size:24px;
+  font-weight:780;
+  letter-spacing:-.3px;
+}
+.brand-name span{color:var(--brand-orange)}
+
+.session-card,
+.context-chip{
+  min-height:46px;
+  border:1px solid #2A3037;
+  border-radius:12px;
+  background:#070707;
+  color:#fff;
+}
+
+.session-card{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 14px;
+}
+
+.session-dot{
+  width:11px;
+  height:11px;
+  flex:0 0 auto;
+  border-radius:50%;
+  background:#22C55E;
+  box-shadow:0 0 12px rgba(34,197,94,.45);
+}
+
+.session-copy strong{
+  display:block;
+  font-size:14px;
+  line-height:1;
+}
+.session-copy small{
+  display:block;
+  margin-top:4px;
+  color:#D0D5DD;
+  font-size:10.5px;
+}
+
+.context-chip{
+  max-width:260px;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 14px;
+}
+.context-chip svg{
+  width:18px;
+  height:18px;
+  flex:0 0 auto;
+  stroke:#D6E4FF;
+}
+
+.notification-btn,
+.logout-btn{
+  width:44px;
+  height:44px;
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  position:relative;
+  border:1px solid #171717;
+  border-radius:50%;
+  background:#111;
+  color:#fff;
+}
+.notification-btn svg,
+.logout-btn svg{
+  width:20px;
+  height:20px;
+  stroke:currentColor;
+}
+
+.notification-btn .badge{
+  position:absolute;
+  top:1px;
+  right:2px;
+  min-width:17px;
+  height:17px;
+  display:grid;
+  place-items:center;
+  padding:0 4px;
+  border-radius:999px;
+  background:var(--brand-orange);
+  color:#fff;
+  font-size:10px;
+  font-weight:800;
+}
+
+.profile{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.avatar{
+  width:44px;
+  height:44px;
+  flex:0 0 auto;
+  position:relative;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#EF5A91;
+  color:#fff;
+  font-weight:800;
+}
+
+.avatar::after{
+  content:"";
+  position:absolute;
+  right:2px;
+  bottom:2px;
+  width:9px;
+  height:9px;
+  border:2px solid #000;
+  border-radius:50%;
+  background:#22C55E;
+}
+
+.profile-copy{
+  min-width:0;
+}
+.profile-copy strong{
+  display:block;
+  font-size:15px;
+  line-height:1.2;
+}
+.profile-copy small{
+  display:block;
+  margin-top:2px;
+  color:#D0D5DD;
+  font-size:12px;
+}
+
+.mobile-context-strip{
+  display:none;
+  gap:8px;
+  overflow-x:auto;
+  padding:7px 10px;
+  border-top:1px solid #161616;
+  background:#080808;
+  color:#fff;
+  scrollbar-width:none;
+}
+.mobile-context-strip::-webkit-scrollbar{display:none}
+
+.mobile-context-pill{
+  flex:0 0 auto;
+  padding:5px 9px;
+  border:1px solid #2A3037;
+  border-radius:999px;
+  font-size:11px;
+}
+.mobile-context-pill.open{color:#8BE4A8}
+
+.bottom-nav{
+  min-height:var(--shell-footer-h);
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  padding:0 36px;
+  background:var(--brand-black);
+  color:#fff;
+}
+
+.nav-item{
+  position:relative;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  border:0;
+  background:transparent;
+  color:#fff;
+}
+
+.nav-item svg{
+  width:23px;
+  height:23px;
+  stroke:currentColor;
+}
+
+.nav-item span{
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.nav-item.active{
+  color:var(--brand-orange);
+}
+
+.nav-item.active::after{
+  content:"";
+  position:absolute;
+  bottom:7px;
+  width:min(138px,70%);
+  height:3px;
+  border-radius:3px;
+  background:var(--brand-orange);
+}
