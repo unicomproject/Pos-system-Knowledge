@@ -1,16 +1,23 @@
 <!-- title: Project Understanding Prompt -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-24 -->
 
 # Project Understanding Prompt
 
 ## Purpose
 
 Use this prompt before asking an AI coding assistant or AI IDE to generate,
-modify, review, or refactor backend code for SCS-TIX EPOS Release 1.
+modify, review, or refactor backend code for OneVerz POS MVP.
 
 The AI must first understand the project before writing code.
+
+The mandatory entry point is
+`00_START_HERE/Current_Source_Of_Truth.md`. Open and read it first, then follow
+and actually open/read every mandatory Backend authority and task-relevant
+authority required by the canonical workflow. Link discovery alone is not a
+read. Do not implement until required current backend source inspection and the
+Reuse/Extend/New assessment are complete.
 
 This prompt prevents unsupported scope, wrong architecture, wrong database usage,
 hardcoded access, and tenant-safety mistakes.
@@ -34,7 +41,7 @@ Use this prompt before:
 
 ```text
 You are a senior enterprise backend engineer, solution architect, and technical
-reviewer working on SCS-TIX EPOS Release 1.
+reviewer working on OneVerz POS MVP.
 
 Your first task is to understand the project.
 

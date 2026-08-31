@@ -1,7 +1,7 @@
 <!-- title: POS Flow Test Cases -->
 <!-- status: Draft -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-08 -->
+<!-- last_updated: 2026-08-16 -->
 
 # POS Flow Test Cases
 
@@ -31,7 +31,8 @@
 |---|---|---|
 | Cash sale | Flutter cash/checkout and backend controller/repository tests | One full product-to-persisted-order/payment/receipt E2E run |
 | Card / QR / Split | Permission/placeholder route coverage | Provider, allocation, callback, failure and idempotency tests |
-| Cash In / Out | Form/provider behavior | Mutation API, persistence, permission and audit tests |
+| Cash In | Chunk 2/3 Flutter + authenticated API/DB E2E | Keep regression green; no new Cash In blockers |
+| Cash Drop / Out | Automated CD-001…CD-021 + PG concurrency; live E2E blocked | Live authenticated re-run when API up; optional print CD-022 |
 | Park / Recall | Flutter local storage tests and backend Holds tests separately | Flutter-to-backend contract, outlet isolation and concurrent recall |
 | Till close / logout | Close form/provider/API/repository tests | Full End Shift close-to-logout and logout-failure recovery |
 | Loyalty | Deferred / not Release 1 | Future earn/redeem/ledger/store-credit flow; no active Cashier UI |
@@ -44,6 +45,42 @@
 
 Manual and physical cases remain `Not Verified` until a dated device/result
 record exists. Test filenames alone are not pass evidence.
+
+## Cash Drop / Cash Out cases (canonical — 2026-08-16)
+
+Authority: [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/07_Cash_Drop_Feature]].
+Do **not** mark PASS without dated runtime evidence. As of 2026-08-16, successful
+OUT create is blocked by backend; most cases remain **Planned**.
+
+| ID | Scenario | Expected | Status |
+|---|---|---|---|
+| CD-001 | Valid Cash Drop | One `cash_movements` OUT row; expected cash decreases | PASS (automated) |
+| CD-002 | Zero amount | Reject; no row | PASS (unit) |
+| CD-003 | Negative amount | Reject; no row | PASS (unit) |
+| CD-004 | Amount > available cash | Reject; no row; refresh summary | PASS (integration) |
+| CD-005 | Missing reason / type | Reject | PASS (Flutter + service) |
+| CD-006 | Closed till | Block submit | PASS (integration + Flutter) |
+| CD-007 | No `cash_drawer.view` | Forbidden / no summary | PASS (unit) |
+| CD-008 | No `cash_drawer.movement.create` | Forbidden mutation | PASS (unit + Api) |
+| CD-009 | Inactive movement type | Reject; refresh catalog | PASS (OUT inactive integration) |
+| CD-010 | IN type used for Cash Drop | Reject | PASS (OUT-only catalog) |
+| CD-011 | Foreign tenant movement type | Reject; no leak | PASS (OUT foreign integration) |
+| CD-012 | Backend currency authority | Currency from session, not client | PASS (OUT USD integration) |
+| CD-013 | Expected cash decreases correctly | Summary matches ledger | PASS (integration) |
+| CD-014 | Duplicate tap | Single mutation | PASS (Flutter guard + requestId) |
+| CD-015 | Same RequestId replay | Safe same result; no duplicate | PASS (integration) |
+| CD-016 | Conflicting RequestId replay | Conflict | PASS (integration) |
+| CD-017 | Concurrent available-cash change | Later request rejected | PASS (PostgreSQL concurrency) |
+| CD-018 | Network timeout after commit | Replay same RequestId; no duplicate | PASS (boundary: replay path; no timeout inject) |
+| CD-019 | Form preservation after failure | Amount/reason/note kept | PASS (code: reset only on success) |
+| CD-020 | Successful summary refresh | UI shows backend values | PASS (provider refresh path) |
+| CD-021 | Tenant isolation | Cross-tenant impossible | PASS (foreign type + trust tests) |
+| CD-022 | Slip print failure | Finance not reversed/duplicated | NOT APPLICABLE (print not implemented) |
+
+Live authenticated CD re-run: **PASS** (Pixel Tablet Flutter UI 2026-08-16 — see [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Cash_Drop_Chunk_2_Production_Acceptance_2026-08-16]]).
+
+Related OUT-reject unit evidence (not a Drop success pass): repository rejects
+non-IN types without persistence.
 
 ## Product Discovery Segment Test Cases
 

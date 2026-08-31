@@ -75,6 +75,10 @@ this can be marked Completed.
 
 ## Known Follow-up
 
+## Staff operational boundary
+
+This tracker proves only public storefront store/collection-option reads. Cashier preparation and collection use the canonical `/api/v1/tenant/ecommerce/click-collect/...` family defined in [[../../../04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]] and remain implementation pending. Do not infer start/pick/pack/ready/QR/cash/handover completion from this storefront status.
+
 - Add relational provider tests for fulfillment store repository behavior.
 - Confirm active/effective `online_store` and `click_collect` enforcement for both endpoints.
 - Record latest full regression before marking Completed.

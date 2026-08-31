@@ -1,4 +1,4 @@
-﻿<!-- title: Pricing & Tax Management Functional Rules -->
+<!-- title: Pricing & Tax Management Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-08-01 -->
@@ -19,10 +19,10 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - selling_price must be non-negative; compare_at_price must be null or greater than or equal to selling_price.
 - min_quantity enables quantity-tier pricing and must be greater than zero.
 - Tax jurisdictions may be hierarchical, but a jurisdiction cannot be its own parent.
-- Tax rates must be greater than zero and less than or equal to 100 percent.
+- Tax rates must be greater than or equal to zero and less than or equal to 100 percent (0% zero-rated taxes are explicitly permitted).
+- Tax Jurisdictions: The Tenant Tax Aggregate implicitly resolves a system-managed default jurisdiction using the tenant's primary country code (e.g., `DEFAULT-{COUNTRY_CODE}`). This ensures UI simplification.
+- Tax Type: Belongs to `tax_classes` and explicitly categorizes taxes (e.g., VAT, GST, SALES_TAX, SERVICE_TAX, OTHER).
 - Product tax assignments must not overlap for the same product/variant when active.
-- Tax must be calculated from assigned tax class/rate rules.
-- Checkout snapshots price and tax on order lines.
 - Cached price/tax is only a reference; backend validates final totals.
 - Do not store gateway fees or accounting tax journals here.
 - Cashier variant changes re-resolve the active variant/UOM price; the popup is display-only for money and the backend cart-calculation response remains authoritative. Preserve decimal precision.

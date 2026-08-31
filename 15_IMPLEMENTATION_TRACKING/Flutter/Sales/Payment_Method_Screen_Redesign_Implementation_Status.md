@@ -52,7 +52,17 @@ such as icon, colour and description.
 - Card, QR Pay and Split Payment are visible but non-executable with safe reasons.
 - The reusable count-derived grid supports 1 through 5 equal cards.
 - Existing checkout summary, Cash start-payment, success, receipt, print and
-  drawer business logic was not replaced.
+drawer business logic was not replaced.
+
+## 2026-08-13 — Authoritative Pricing Gate
+
+- Payment Method now accepts summary data only when its pricing-input
+  fingerprint matches the current cart/customer/discount inputs.
+- Refresh/reload is rendered as loading instead of reusing Riverpod's retained
+  prior data; stale and failed states cannot enable Continue Payment.
+- Summary/network failure provides Retry and never substitutes local cart totals.
+- Automated pricing/payment regressions pass, but authenticated runtime payment
+  acceptance remains required before the screen is called release-complete.
 - Backend and database were not modified.
 
 Flutter files changed:

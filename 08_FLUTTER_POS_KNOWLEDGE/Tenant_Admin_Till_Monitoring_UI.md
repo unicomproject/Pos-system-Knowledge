@@ -209,18 +209,19 @@ Preferred long-term: embed hardware connections into `GET /api/v1/tenant-admin/t
 - Desktop: `/tenant-admin/tills` (list + side panel)
 - Mobile: `/tenant-admin/tills` → `/tenant-admin/tills/:id`
 
-## Current Implementation Status (Evidence-Based, 2026-08-01)
+## Current Implementation Status (Evidence-Based, updated 2026-08-16)
 
 | Area | Status |
 |---|---|
 | Desktop split-view UI shell | **PARTIALLY COMPLETED** — layout implemented in Flutter (`till_monitoring_workspace.dart`, side panel, row selection by ID) |
 | Till summary/list Backend binding | **COMPLETED** (real summary/list; values not from reference image) |
-| Selected Till details (cashier/activity from readiness) | **PARTIALLY COMPLETED** — panel exists; readiness DTO currently lacks cashier/activity; mapper leaves them null / incomplete |
-| Hardware monitoring card | **PARTIALLY COMPLETED** — empty state "No hardware connections found" when Backend returns empty assignments |
-| Hardware registration / assignment APIs | **NOT IMPLEMENTED** (no Tenant Admin hardware-devices CRUD controller found) |
-| POS / hardware heartbeat for peripherals | **NOT IMPLEMENTED** for hardware devices; POS device heartbeat exists at `POST /api/v1/devices/heartbeat` |
-| Derived hardware alerts / View Alerts | **NOT IMPLEMENTED** — Flutter hardcodes `alertCount: 0` |
+| Selected Till details (cashier/activity from readiness) | **PARTIALLY COMPLETED** — panel exists; continue binding to readiness enrichment |
+| Hardware monitoring card | **PARTIALLY COMPLETED** — empty state when Backend returns empty assignments |
+| Hardware registration / assignment APIs | **COMPLETED** (software) — see Tenant Admin Hardware Read/Assignment implementation tracking |
+| POS / hardware heartbeat for peripherals | **COMPLETED** (software API); physical verification pending |
+| Derived hardware alerts / View Alerts | Treat as incomplete until Flutter consumes real `alertCount` (do not hardcode Connected) |
 | Physical network printer / drawer / card reader verification | **PHYSICAL VERIFICATION PENDING** |
+| Overall POS hardware production | **BLOCKED — HARDWARE NOT PRODUCTION READY** |
 
 ## Related Files
 

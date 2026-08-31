@@ -1,7 +1,7 @@
 <!-- title: Offers Product Discovery Feature Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-12 -->
 
 # Offers Product Discovery Feature
 
@@ -38,6 +38,11 @@ This feature reuses existing configuration tables:
 7. **Existing policy metadata**: the DTO may expose
    `requiresManagerApproval` from existing backend policy capability. The current
    MANUAL cashier Discount popup does not start approval or offer POLICY selection.
+8. **Manual cashier discount exclusion**: internal policies used as authority
+   envelopes for cashier-entered manual discounts must never be resolved or exposed
+   as automatic POS catalog offers. They must not populate `offerPolicyId`,
+   `offerPrice`, or `discountLabel`, and remain available only through the existing
+   manual Add Discount application/authorization workflow.
 
 ---
 

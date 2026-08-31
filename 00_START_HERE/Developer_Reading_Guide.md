@@ -1,7 +1,7 @@
 <!-- title: Developer Reading Guide -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-10 -->
+<!-- last_updated: 2026-08-21 -->
 
 
 # Developer Reading Guide
@@ -26,18 +26,42 @@ Always read source-of-truth and scope rules first.
 | 6 | [[../02_ACCESS_CONTROL/Access_Control_Overview]] | Understand entitlement and permission checks |
 | 7 | [[Markdown_Writing_Rules]] | Follow Second Brain writing rules |
 
+## POS Hardware (before any hardware code)
+
+Overall status is **BLOCKED — HARDWARE NOT PRODUCTION READY**. Read in order:
+
+1. [[Current_Source_Of_Truth]] (Hardware Production Status section)
+2. [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]]
+3. [[../12_INTEGRATIONS/POS_Hardware_Integration]]
+4. [[../12_INTEGRATIONS/Local_Print_Agent]]
+5. Device-specific integration (Receipt / Cash Drawer / Barcode / Card)
+6. [[../10_TESTING_QA/POS_Hardware_Production_Acceptance_Matrix]]
+
+Do **not** confuse financial Cash In/Drop software acceptance with physical
+drawer/printer production readiness. Next code chunk is **Local Print Agent
+production packaging / Windows service autostart**.
+
 ## Backend Developer Reading Path
 
-1. Read [[../05_BACKEND_ARCHITECTURE/Backend_Overview]].
-2. Read [[../05_BACKEND_ARCHITECTURE/Clean_Architecture_Layers]].
-3. Read [[../05_BACKEND_ARCHITECTURE/Module_Based_Folder_Structure]].
-4. Read [[../05_BACKEND_ARCHITECTURE/Authentication]].
-5. Read [[../05_BACKEND_ARCHITECTURE/Authorization_And_Permissions]].
-6. Read [[../05_BACKEND_ARCHITECTURE/Multi_Tenant_Handling]].
-7. Read [[../05_BACKEND_ARCHITECTURE/API_Standards]].
-8. Read the affected module knowledge file.
-9. Read the matching database table file.
-10. Read the relevant user journey.
+1. Read [[../05_BACKEND_ARCHITECTURE/Backend_Engineering_Canonical_Standard]].
+2. Read [[../05_BACKEND_ARCHITECTURE/Backend_Reusable_Service_Logic_Governance]].
+3. Follow [[../05_BACKEND_ARCHITECTURE/Backend_Feature_Development_Second_Brain_Workflow]].
+4. Use [[../05_BACKEND_ARCHITECTURE/Backend_Feature_Implementation_Specification_Template]].
+5. Read [[../05_BACKEND_ARCHITECTURE/Backend_Overview]].
+6. Read [[../05_BACKEND_ARCHITECTURE/Clean_Architecture_Layers]].
+7. Read [[../05_BACKEND_ARCHITECTURE/Module_Based_Folder_Structure]].
+8. Read [[../05_BACKEND_ARCHITECTURE/Authentication]].
+9. Read [[../05_BACKEND_ARCHITECTURE/Authorization_And_Permissions]].
+10. Read [[../05_BACKEND_ARCHITECTURE/Multi_Tenant_Handling]].
+11. Read [[../05_BACKEND_ARCHITECTURE/API_Standards]].
+12. Read affected release, journey, module, API, permission, database, and test files.
+13. Search current backend source and complete a Reuse Matrix before implementation.
+
+Canonical flow:
+
+```text
+Read → Search → Reuse → Specify → Design → Implement → Test → Update
+```
 
 ## Database Developer Reading Path
 
@@ -52,22 +76,47 @@ Always read source-of-truth and scope rules first.
 
 ## Flutter / EPOS Developer Reading Path
 
-1. Read [[../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_App_Architecture]].
-2. Read [[../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Folder_Structure]].
-3. Read [[../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_API_Integration]].
-4. Read [[../08_FLUTTER_POS_KNOWLEDGE/Flutter/Flutter_Local_Storage_Cache]].
-5. Read the offline operation and cache files when implementing offline behavior.
-6. Read POS, order, checkout, and payment journeys before UI work.
-7. Read permission UI rules before showing action buttons.
-8. Read hardware integration files before printer/scanner/drawer/card work.
-9. For the Dashboard Recall Sale list, read
+1. Read [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Engineering_Canonical_Standard]].
+2. Read [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Reusable_Component_Governance]].
+3. Follow [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Screen_Development_Second_Brain_Workflow]].
+4. Use [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Screen_Implementation_Specification_Template]].
+5. Read [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_App_Architecture]].
+6. Read [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Folder_Structure]].
+7. Read [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_API_Integration]].
+8. Read [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Local_Storage_Cache]].
+9. Read the design system, affected journey/module/screen/API/permission, offline,
+   hardware, and test authorities relevant to the screen.
+10. Search current Flutter source and complete a Reuse Matrix before implementation.
+11. For the Dashboard Recall Sale list, read
    [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Parked_Sales_Recall_Screen_Implementation_Specification]].
-10. For POS Device Activation, read
+12. For POS Device Activation, read
     [[../03_USER_JOURNEYS/Cashier/02_Device_Activation_Flow]] and
     [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Device_Activation_Screen_Implementation_Specification]];
     modify the existing screen and reuse the Login branding panel.
+13. For Open Till, read
+    [[../03_USER_JOURNEYS/Cashier/03_Till_Open_Flow]],
+    [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]] and
+    [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Till_Screen_Implementation_Specification]];
+    reuse existing open/current-session APIs and the Dashboard Top Bar; do not
+    invent API/table/permission or offline OPEN.
+14. For Close Till or End Shift, read
+    [[../03_USER_JOURNEYS/Cashier/11_Till_Close_Flow]],
+    [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]] and
+    [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Close_Till_Screen_Implementation_Specification]];
+    reuse current routes/schema/permission, but fix backend expected-cash authority
+    and reconciliation persistence before production acceptance.
+
+Canonical flow:
+
+```text
+Read → Search → Reuse → Specify → Implement → Test → Update
+```
 
 ## Online Store Developer Reading Path
+
+For cashier/store Online Order fulfilment, read in order: [[../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]] → [[../04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]] → [[../02_ACCESS_CONTROL/Permission_Code_List]] → [[../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]] → [[../06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup_UPDATED]] → [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Order_ClickCollect_Fulfilment]] → implementation tracking. Apply reuse governance before implementation.
+
+Before creating the Online Order HTML prototype, continue with [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Prototype_Flow]] → [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Visual_Direction]] → [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Component_Inventory]] → [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_UI_API_Mapping]] → [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_UI_DB_Mapping]]. The prototype is a visual validation artefact only.
 
 1. Read [[Current_Source_Of_Truth]].
 2. Read [[../01_RELEASE_SCOPE/Included_Features]].
@@ -81,11 +130,17 @@ Always read source-of-truth and scope rules first.
 ## Admin / Operations Developer Reading Path
 
 1. Read Platform Admin and Tenant Admin journeys.
-2. Read product, variant, inventory, order, reports, users, and permissions modules.
-3. Read entitlement and feature flag rules.
-4. Read database tables for product, inventory, user, outlet, till, order, and
+2. For Tenant Admin Add Product, read the 7-step contract, then
+   [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]],
+   [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]],
+   and
+   [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
+   before changing Step 1, inventory identity, or Product Setup authorization.
+3. Read product, variant, inventory, order, reports, users, and permissions modules.
+4. Read entitlement and feature flag rules.
+5. Read database tables for product, inventory, user, outlet, till, order, and
    reporting areas.
-5. Do not hardcode roles or access decisions.
+6. Do not hardcode roles or access decisions.
 
 ## QA Engineer Reading Path
 
@@ -109,6 +164,20 @@ Before generating code or documentation, AI assistants must read:
 6. The relevant database file.
 7. The relevant journey file.
 8. The relevant architecture file.
+
+For frontend or backend feature work, the matching canonical engineering
+standard, reuse governance, workflow, and specification template are mandatory
+before source implementation.
+
+## Second Brain Update Rule
+
+Update Second Brain when implementation introduces a new reusable UI component,
+reusable backend service, domain/business rule, API contract, permission,
+state/workflow, database rule, integration contract, design token, architecture
+decision, or important operational rule.
+
+If an existing component, service, or rule is reused unchanged, reference its
+canonical entry. Do not copy the same knowledge into another file.
 
 ## Work Rule
 

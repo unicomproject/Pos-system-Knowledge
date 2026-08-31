@@ -1,7 +1,7 @@
 <!-- title: Cashier POS Second Brain vs Code Comparison Status -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-15 -->
 
 
 # Cashier POS Second Brain vs Code Comparison
@@ -205,7 +205,7 @@ issues. No backend, database, migration or customer API contract changed.
 | Actual printing is only an audit snackbar | A local receipt-printer facade, ESC/POS generator and network transport exist; physical hardware remains unverified |
 | Scanner camera support is pending | Android/iOS camera source and automated coverage exist; physical Android verification remains pending |
 | Parked sale is backend-aware | Current Flutter park/recall is device-local secure storage; backend Holds is disconnected |
-| Cash drawer operations are a placeholder only | Cash Drawer/Cash In/Cash Drop UI exists, but cash mutation remains frontend-only |
+| Cash drawer operations are a placeholder only | UI and a legacy backend mutation exist; canonical `cash_movements` + catalog-backed Cash In remains pending |
 
 ### Remaining High-Risk Gaps
 
@@ -238,7 +238,7 @@ issues. No backend, database, migration or customer API contract changed.
 | Tenant login | Flutter uses `POST /api/v1/tenant-auth/login` | Integrated |
 | POS home / till / device | Unified-Commerce controllers merged on `POS_UI` | Integrated |
 | Close till + End Shift | Sidebar End Shift → close till → logout | Integrated |
-| Open Till layout | Full-screen tablet layout fix | Completed |
+| Open Till layout | Historical tablet layout fix (2026-07-10); approved UI contract PENDING | See [[../Till/Open_Till_Screen_Layout_Implementation_Status]] |
 | `GET /api/v1/pos/products` | Backend + Flutter list wiring | In Review (branch) |
 | Catalog mock fallback | `pos_catalog_fallback_data.dart` removed | Real data only |
 | Checkout / receipt APIs | Still absent in `E_POS.Api` | Blocked |

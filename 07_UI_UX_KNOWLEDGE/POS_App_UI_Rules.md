@@ -1,7 +1,7 @@
 <!-- title: POS App UI Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-27 -->
 
 # POS App UI Rules
 
@@ -46,6 +46,24 @@ The Fixed POS layout should include:
 - Clear subtotal, discount, tax, grand total, paid, and change.
 
 ## POS Home Rules
+
+### Shared POS Bottom Navigation
+
+The cashier POS uses one canonical shared bottom-navigation component:
+`PosCashierBottomNavigation`. Every destination renders as a compact horizontal
+pair in the form `[Icon] Navigation Name`.
+
+The fixed destination order is Home, New Sale, Orders, Customers, Settings.
+The icon appears on the left and the label on the right within the same row.
+Icon and label share the same active/inactive state, while the existing active
+underline remains the selected-route indicator.
+
+The shared component remains responsible for route selection and
+permission-aware destination visibility. Feature screens must reuse it rather
+than create screen-local navigation copies. On narrow viewports, the horizontal
+icon/label pair may scale down inside its existing touch target to prevent
+clipping or overflow; destination order, labels, routes, permission checks, and
+navigation behaviour must not change.
 
 POS home must show only permitted actions.
 
@@ -142,9 +160,42 @@ separate approved release decision activates it.
 
 Till open must show opening cash/float entry when required.
 
+Approved Open Till UI contract (2026-08-11):
+
+- Reuse the existing Dashboard Top Bar / POS shell header — do not create an
+  Open Till-only top bar.
+- OneVerz **orange** primary theme (not blue/purple).
+- Main content on a full **white** parent surface; preserve component-wise form
+  cards (float, keypad, quick amounts, note, till summary, CTA).
+- Important text dark and strong/bold.
+- Responsive Phone + Tablet + Desktop without overflow/clipping/unusable
+  targets.
+- Online backend confirmation only; never claim OPEN locally first.
+
+Canonical:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]],
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Till_Screen_Implementation_Specification]].
+
 Till close must show counted cash, expected cash, variance, and close note.
 
 Cash in/out must require type, amount, and reason.
+
+### Cash Drawer UI contract (2026-08-13)
+
+- Title **Cash Drawer** and subtitle inside the main **white** content card
+  below the standard POS top bar.
+- No back-arrow; no “Continue to Dashboard”.
+- Normal POS bottom navigation remains available.
+- Simplified summary: Till, Status, Opening Cash, Cash Sales, Current Expected
+  Cash (backend-authoritative Expected Cash).
+- Actions: Open Drawer, Cash In, Cash Out/Drop, Close Till.
+- Recent movements newest first; colour is semantic only.
+- Phone + Tablet + Desktop; reuse `TenantAdminBreakpoints`.
+- Orange primary / black shell via shared tokens only — no feature hex.
+
+Canonical:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]],
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]].
 
 ## Device UI Rules
 

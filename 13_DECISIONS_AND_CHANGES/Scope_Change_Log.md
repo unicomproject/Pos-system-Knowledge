@@ -1,11 +1,22 @@
-<!-- title: Scope Change Log -->
+﻿<!-- title: Scope Change Log -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-24 -->
 
 # Scope Change Log
 
-## 2026-08-09 — Current Release cashier Discount scope lock
+## 2026-08-24 — Product Setup Initial Tracking Details
+
+- Step 1 Basic Details now targets optional initial Batch Number, Expiry Date, and Serial Number capture during Tenant Admin Add Product.
+- Step 2 remains tracking-policy authority (`product_inventory_settings`).
+- Wizard stays 7 steps. No extra tracking step. No Channel Visibility step.
+- Actual identity persists at Step 7 Publish into `product_batches` / `serial_numbers`. Product master identity columns are forbidden.
+- Draft storage TARGET is dedicated `product_setup_initial_tracking`. VARIANT uses Option 2 assignment at Review. Bundle parent cannot receive physical identities.
+- Documentation-only decision; Flutter/backend/database production implementation was not performed.
+
+Decision: [[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]].
+
+## 2026-08-09 â€” Current Release cashier Discount scope lock
 
 - Locked MANUAL-only cashier popup and exactly one active Discount.
 - Order allows Percentage/Fixed; Item allows Percentage only with exact cart target.
@@ -21,7 +32,7 @@
 
 Decision: [[POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
 
-## 2026-08-06 — Park / Recall gap closure implementation
+## 2026-08-06 â€” Park / Recall gap closure implementation
 
 - **Canonical Endpoint**: Locked `/api/v1/tenant-admin/products` as primary boundary; legacy route `/api/v1/products` is deprecated.
 - **Product List States**: Resolved into First-use Empty (`catalogTotalCount=0`), Filtered Empty (`totalCount=0` with filters), and Populated List.
@@ -58,3 +69,20 @@ Decision: [[POS_CASHIER_DISCOUNT_CURRENT_RELEASE_DECISION_2026-08-09]].
   - Frontend extended to toggle between segments (preserving cart and session states) and display offer badges/strike-through pricing on tiles.
   - Curation of Popular products managed under the reserved `POS_POPULAR` collection in Tenant Admin.
   - Code implementation status set to `Not Started` / `Not Run`.
+
+<!-- RBAC_HARDENING_2026_08_15_START -->
+## 2026-08-15 - Tenant Admin RBAC Contract Hardening
+
+Scope type: Documentation correction / implementation gap closure.
+
+Changed:
+
+- Added canonical Tenant Effective Permission Resolution contract.
+- Accepted ADR 009 for additive tenant/outlet permission union semantics.
+- Corrected Role Setup flow from stale six-step wording to the approved five-step flow.
+- Marked Tenant Admin role and permission catalog backend APIs as missing until implemented.
+- Marked runtime resolver revoked-row and outlet-source handling as implementation gaps.
+
+No Flutter source, backend source, migrations, or database source changed in this documentation update.
+<!-- RBAC_HARDENING_2026_08_15_END -->
+

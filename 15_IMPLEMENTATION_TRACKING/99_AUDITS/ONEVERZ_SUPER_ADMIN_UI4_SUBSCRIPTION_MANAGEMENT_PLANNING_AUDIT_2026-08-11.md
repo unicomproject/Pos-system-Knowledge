@@ -325,7 +325,7 @@ Identity, pricing, limits, modules/features, lifecycle actions, active tenant co
 
 ### Create/Edit Plan — MODERNIZE (HIGH visual debt)
 
-6-step wizard: Basics → Modules → Features → Pricing → Limits → Review & Publish. Shared create/edit via `history.state`. Style budget **10.53 kB** warning. Local wizard chrome; publish modal (not shared ConfirmationDialog).
+6-step wizard: Basics → Modules → Features → Pricing → Limits → Review & Create. Shared create/edit via `history.state`. Style budget **10.53 kB** warning. Local wizard chrome; publish modal (not shared ConfirmationDialog).
 
 ### Tenant Subscription List — N/A
 

@@ -1,7 +1,7 @@
 <!-- title: Catalog Master Data & Product Core -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-05 -->
+<!-- last_updated: 2026-08-24 -->
 <!-- source: Updated from uploaded ERD image: 10_Catalog Master Data & Product Core(3).png -->
 
 # 10. Catalog Master Data & Product Core
@@ -26,6 +26,7 @@ This markdown version follows the uploaded ERD image as the source of truth. Ent
 | `unit_of_measures` | Stores global and tenant-specific unit of measure records. |
 | `return_policies` | Stores tenant product return policy records. |
 | `products` | Stores tenant product master records. |
+| `product_setup_initial_tracking` | TARGET 1:1 Product Setup draft for Initial Batch/Expiry/Serial (GAP until migration). |
 | `product_variants` | Stores sellable product variants. |
 | `product_reviews` | Stores 1-5 star customer ratings and text reviews for products. |
 | `product_rating_summaries` | Stores the aggregated rating summary for fast loading on product pages. |
@@ -285,6 +286,7 @@ Purpose: Stores tenant product master records.
 | `is_sellable`               | boolean      |     | NOT NULL DEFAULT true | Sellable flag                  |
 | `is_taxable`                | boolean      |     | NOT NULL DEFAULT true | Taxable flag                   |
 | `status`                    | varchar(40)  |     | NOT NULL              | Product status                 |
+| `reference_cost_price`      | numeric(18,4)|     | NULL                  | Reference cost price           |
 | `current_setup_step`        | int          |     | NOT NULL DEFAULT 1    | Wizard setup step progress     |
 | `draft_saved_at`            | timestamptz  |     | NULL                  | Draft creation timestamp       |
 | `published_at`              | timestamptz  |     | NULL                  | Timestamp of publication       |
@@ -313,9 +315,69 @@ UNIQUE(tenant_id, product_code)
 UNIQUE(tenant_id, product_slug)
 UNIQUE(tenant_id, id)
 CHECK(status IN ('DRAFT', 'ACTIVE', 'INACTIVE', 'ARCHIVED'))
-CHECK(current_setup_step BETWEEN 1 AND 8)
+CHECK(current_setup_step BETWEEN 1 AND 7)
 CHECK(row_version >= 0)
 ```
+
+CURRENT EF already enforces `ck_products_setup_step` as `BETWEEN 1 AND 7`
+(migration `ConsolidateProductWizardTo7Steps`). Stale `1 AND 8` documentation
+is superseded.
+
+Do **not** add `products.batch_number`, `products.expiry_date`, or
+`products.serial_number`. Initial Tracking Details are TARGET draft data on
+`product_setup_initial_tracking` (GAP until migration). Final identity remains
+`product_batches` / `serial_numbers`.
+
+## `product_setup_initial_tracking` (TARGET — GAP until migration)
+
+Purpose: 1:1 Product Setup draft store for optional Step 1 Initial Tracking
+Details. Not Product master identity. Not inventory quantity.
+
+| Attribute | Type | Key | Null | Reference / Note |
+| --- | --- | --- | --- | --- |
+| `id` | uuid | PK | NOT NULL | Own primary key |
+| `tenant_id` | uuid | FK | NOT NULL | References tenants(id) |
+| `product_id` | uuid | FK | NOT NULL | References products(tenant_id, id); 1:1 |
+| `initial_batch_number` | varchar(100) |  | NULL | Provisional Batch |
+| `initial_expiry_date` | date |  | NULL | Provisional Expiry |
+| `initial_serial_number` | varchar(150) |  | NULL | Provisional Serial |
+| `assigned_product_variant_id` | uuid | FK | NULL | VARIANT assignment at Step 7 |
+| `incompatible_clear_confirmed_at` | timestamptz |  | NULL | Last explicit incompatible clear |
+| `consumed_at` | timestamptz |  | NULL | Set when publish creates inventory identity |
+| `created_at` | timestamptz |  | NOT NULL | Created timestamp |
+| `created_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+| `updated_at` | timestamptz |  | NOT NULL | Updated timestamp |
+| `updated_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+| `row_version` | bigint |  | NOT NULL DEFAULT 1 | Internal increment with `products.row_version`. API token remains `products.row_version` / `expectedRowVersion` |
+
+Indexes / Constraints / Notes:
+
+```text
+PK(id)
+UNIQUE(tenant_id, id)
+UNIQUE(tenant_id, product_id)
+FK(tenant_id) REFERENCES tenants(id)
+FK(tenant_id, product_id) REFERENCES products(tenant_id, id)
+  ON DELETE CASCADE
+  NAME fk_product_setup_initial_tracking_product_id_products
+FK(tenant_id, assigned_product_variant_id) REFERENCES product_variants(tenant_id, id)
+  NAME fk_product_setup_initial_tracking_assigned_variant
+FK(created_by_tenant_user_id) REFERENCES tenant_users(id)
+  NAME fk_product_setup_initial_tracking_created_by
+FK(updated_by_tenant_user_id) REFERENCES tenant_users(id)
+  NAME fk_product_setup_initial_tracking_updated_by
+CHECK(row_version >= 1)
+INDEX(tenant_id, product_id)
+INDEX(tenant_id, consumed_at) WHERE consumed_at IS NULL
+```
+
+Do **not** add a CHECK that forbids Batch+Expiry+Serial together. Combination
+validation is application/domain until Step 2. Tenant isolation: every query
+filters `tenant_id`. Optimistic concurrency for clients uses parent
+`products.row_version` only.
+
+Authority:
+[[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
 
 ## `product_variants`
 
@@ -418,7 +480,7 @@ Indexes / Constraints / Notes:
 
 ## Module Notes
 
-- Every sellable product must have at least one `product_variants` row.
+- Every sellable product must have at least one `product_variants` row. Therefore, for `SIMPLE` and `BUNDLE` products, their Base SKU is stored in `product_variants.sku` on their single default variant row.
 - Only entity tables visible in the uploaded ERD image are included.
 - Tenant-owned tables include `tenant_id` for data isolation.
 

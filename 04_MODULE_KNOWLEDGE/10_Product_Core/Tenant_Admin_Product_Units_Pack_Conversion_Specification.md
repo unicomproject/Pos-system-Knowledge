@@ -1,9 +1,9 @@
-# Tenant Admin Add Product — Step 3: Units & Pack Conversion Specification
-
 <!-- title: Tenant Admin Add Product — Step 3: Units & Pack Conversion Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-11 -->
+<!-- last_updated: 2026-08-24 -->
+
+# Tenant Admin Add Product — Step 3: Units & Pack Conversion Specification
 
 ## 1. Executive Summary & Core Architectural Principles
 
@@ -465,7 +465,7 @@ Top-level HTTP status codes and standardized error response envelope:
 | **400** | `product.validation_failed` | `purchaseUnitId` | Purchase unit equals Base unit in MULTI mode |
 | **400** | `product.validation_failed` | `sellingUnitId` | Selling unit does not match any configured tier |
 | **400** | `product.validation_failed` | `itemsPerPurchaseUnit` | Items per purchase unit <= 0 or invalid decimal |
-| **403** | `auth.forbidden` | N/A | User lacks `catalog.products.create` or `product_catalog` entitlement |
+| **403** | `auth.forbidden` / `product.permission_denied` | N/A | User lacks `catalog.products.create` (or update on edit) or `product_catalog` entitlement. UOM configuration does **not** require `inventory.stock.adjust`. |
 | **404** | `product.not_found` | N/A | Product not found or foreign tenant ID |
 | **404** | `unit.uom_not_found` | `baseUnitId` / `purchaseUnitId` | Selected UOM ID invalid or foreign tenant |
 | **409** | `product.concurrency_conflict` | `expectedRowVersion` | `expectedRowVersion` does not match server `row_version` |
@@ -478,7 +478,8 @@ Top-level HTTP status codes and standardized error response envelope:
 - **Editing Existing Published Product**: Authorized by staff permission `catalog.products.update`.
 - **Resume GET `/setup`**: Authorized by `catalog.products.view` OR `catalog.products.create` OR `catalog.products.update`.
 - **Runtime Feature Entitlement Code**: `product_catalog` (checked via `ProductWizardAccessPolicy`).
-- **Module Code**: `product_management`.
+- **Module Code**: `product_management` (platform module grouping only — **not** a runtime entitlement check).
+- Canonical wizard permissions: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
 
 ---
 
@@ -536,12 +537,17 @@ Top-level HTTP status codes and standardized error response envelope:
 ## 22. Cleaned & Synchronized Second Brain Documents
 
 The following active canonical documents have been fully synchronized with this specification:
-1. [[05_Tenant_Admin_Add_Product_8_Step_Contract]]
+1. [[05_Tenant_Admin_Add_Product_7_Step_Contract]]
 2. [[Tenant_Admin_Product_Type_Tracking_Specification]]
 3. [[09_Product_Management_Flow]]
-4. [[Tenant_Admin_Add_Product_8_Step_UI_UX_Specification]]
+4. [[Tenant_Admin_Add_Product_7_Step_UI_UX_Specification]]
 5. [[10_Catalog_Master_Data_And_Product_Core_UPDATED]]
 6. [[16_Inventory_Foundation_Product_Tracking_And_Stock_Availability]]
 7. [[02_Functional_Rules]]
 8. [[03_Technical_Contract]]
 9. [[Full_Feature_Status_Index]]
+
+## Step 3 SKIP Rule
+For `productStructure = BUNDLE`:
+`Step 3 = NOT_APPLICABLE`.
+A Bundle parent does NOT own physical inventory, thus Step 3 conversions are not supported. Component UOM is derived directly from the selected components during Step 4.

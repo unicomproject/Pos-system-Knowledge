@@ -1,7 +1,7 @@
 ﻿<!-- title: Backend Subscription Plans -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-08-08 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-24 -->
 
 # Backend Subscription Plans
 
@@ -11,6 +11,11 @@ Implementation notes for the Super Admin Subscription Plans list backend API.
 
 ## Rules
 
+- Start from `00_START_HERE/Current_Source_Of_Truth.md`, then follow and actually
+  open/read the mandatory Backend canonical standard, reusable governance,
+  development workflow, and task-relevant authorities. A discovered link is not
+  read content. Complete the workflow-required current backend source search
+  before specification or implementation.
 - Reuse existing `subscription_plans`, `subscription_plan_features`, `platform_modules`, `platform_features`, and `tenant_subscriptions` entities.
 - Do not hardcode plan rows, module names, or feature names in API/service code.
 - Use Repository + Service pattern; no CQRS or MediatR.

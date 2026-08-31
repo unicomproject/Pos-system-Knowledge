@@ -1,5 +1,11 @@
 # FINAL REVALIDATED PROJECT ACTUAL STATUS AUDIT REPORT (2026-07-31)
 
+> **Supersession note (2026-08-11):** Open Till / Till Opening status in this
+> dated audit is historical. Canonical Open Till contract and readiness:
+> [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]],
+> [[Full_Feature_Status_Index]]. Correct Open Till routes are
+> `/api/v1/tills/open` and `/api/v1/tills/current-session` (not `/api/v1/pos/tills/...`).
+
 **Audit Date**: 2026-07-31  
 **Project**: OneVerz EPOS / Unified Commerce Project  
 **Auditor**: Senior Solution Architect, Technical Project Auditor, QA Lead & Product Delivery Manager  

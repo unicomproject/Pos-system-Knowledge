@@ -420,3 +420,35 @@ unit_of_measures
 - [[../Database_Overview]]
 - [[../Status_And_Type_Check_Rules]]
 - [[../Migration_Rules]]
+
+## Database Markdown - Real Schema
+
+`combo_definitions` relevant fields:
+```text
+id
+tenant_id
+product_id
+product_variant_id
+combo_code
+combo_name
+pricing_mode
+inventory_deduction_mode
+status
+audit fields
+```
+
+`combo_components` relevant fields:
+```text
+id
+tenant_id
+combo_definition_id
+component_product_id
+component_variant_id
+component_uom_id
+quantity
+base_price_adjustment
+sort_order
+status
+audit fields
+```
+**Database Lifecycle**: `combo_definitions` is created upon the first successful Save Draft. During DRAFT status, these records follow the draft product lifecycle. Removing a component physically deletes the `combo_components` row. Structure change (BUNDLE -> SIMPLE) deletes the entire Bundle configuration.

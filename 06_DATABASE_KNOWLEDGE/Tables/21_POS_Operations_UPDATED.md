@@ -1,7 +1,7 @@
 <!-- title: POS Operations -->
-<!-- status: Updated -->
+<!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-07 -->
+<!-- last_updated: 2026-08-15 -->
 <!-- source: 21_POS Operations ERD image -->
 
 # 21. POS Operations
@@ -81,7 +81,7 @@ application in other environments is not proven by this document.
 | 7 | `till_session_summaries` | Till closing summary. |
 | 8 | `till_session_payment_summaries` | Till summary split by payment method. |
 | 9 | `till_session_events` | Till session event/audit log. |
-| 10 | `till_cash_movements` | Cash drawer cash movement records. |
+| 10 | `cash_movements` + `cash_movement_types` | Canonical typed manual cash movement ledger. |
 
 ---
 
@@ -171,6 +171,8 @@ CHECK(event_type IN (
 | `outlet_id` | uuid | FK | NOT NULL | References `outlets(id)`. |
 | `till_id` | uuid | FK | NOT NULL | References `tills(id)`. |
 | `till_session_id` | uuid | FK | NOT NULL | References `till_sessions(id)`. |
+| `pos_device_id` | uuid | FK | NULL | References `pos_devices(id)`; trusted activated POS context. |
+| `request_id` | uuid | Unique per tenant | NULL | Stable financial movement idempotency key. |
 | `business_date` | date |  | NOT NULL | Business date. |
 | `issued_at` | timestamptz |  | NOT NULL | Issued timestamp. |
 | `issued_by_tenant_user_id` | uuid | FK | NOT NULL | Issuing user. |
@@ -491,9 +493,48 @@ CHECK(event_type IN ('OPENED', 'CLOSED', 'PAUSED', 'RESUMED', 'CASH_IN', 'CASH_O
 CHECK(amount IS NULL OR amount >= 0)
 ```
 
+### Runtime write behaviour (verified 2026-08-11)
+
+| Operation | Writes `till_session_events`? |
+|---|---|
+| Open Till (`POST /api/v1/tills/open`) | **No** — creates `till_sessions` only; no `OPENED` row |
+| Close Till (`POST /api/v1/tills/close`) | **Yes** — `CLOSED` via `TillSessionEvent.RecordClosed` |
+
+Schema allows `OPENED`, but Open Till does not currently emit it. This is a
+documented implementation gap, not a reason to invent a new Open Till API or
+table. Feature contract:
+[[../../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]].
+
 ---
 
-## 10. `till_cash_movements`
+## 10. Canonical cash movement model
+
+```text
+cash_movement_types -> cash_movements -> till_sessions
+```
+
+`cash_movement_types` owns the selectable reason/type, direction, active state,
+system ownership, tenant ownership, and whether the type affects expected cash.
+System IN defaults are Float Added, Petty Cash Added, Cash Correction, and
+Other. Global types have `tenant_id IS NULL`; tenant custom types are visible
+only to the owning tenant.
+
+`cash_movements` is the sole approved manual financial movement ledger. Its
+existing tenant, outlet, till, till-session, device, movement-type, amount,
+currency, optional reason/note, performer, and timestamp columns are the
+canonical foundation. No Cash In-specific table is required.
+
+The current canonical model lacks durable request idempotency. A future
+migration must add `request_id` with tenant-scoped uniqueness, or adopt an
+approved generic idempotency store, before the canonical mutation is complete.
+
+PostgreSQL nullable uniqueness must not rely only on unique
+`(tenant_id, movement_type_code)`: NULL values do not conflict. Required target
+indexes are partial unique indexes for global codes (`tenant_id IS NULL`) and
+tenant-owned codes (`tenant_id IS NOT NULL`). This is a documented migration
+delta until verified in schema.
+
+## Legacy `till_cash_movements` implementation drift
 
 | Attribute | Type | Key | Null | Reference / Note |
 |---|---|---|---|---|
@@ -517,9 +558,17 @@ FK(tenant_id) REFERENCES tenants(id)
 FK(till_session_id) REFERENCES till_sessions(id)
 FK(currency_code) REFERENCES currencies(currency_code)
 FK(performed_by_tenant_user_id) REFERENCES tenant_users(id)
-CHECK(movement_type IN ('CASH_IN', 'CASH_OUT', 'OPENING_FLOAT', 'CLOSING_REMOVE'))
+FK(pos_device_id) REFERENCES pos_devices(id)
+UNIQUE(tenant_id, request_id) WHERE request_id IS NOT NULL
+CHECK(movement_type IN ('CASH_IN', 'CASH_OUT', 'CASH_DROP', 'OPENING_FLOAT', 'CLOSING_REMOVE'))
 CHECK(amount > 0)
 ```
+
+Runtime decision (2026-08-14): this is the canonical manual Cash Drawer ledger
+The existing `GET/POST /api/v1/pos/cash-drawer/movements` implementation uses
+this legacy table. It must be cut over to `cash_movements`; it is not a second
+authority and must not be dual-written. Cash-sale/refund rows remain projected
+from `sales_payments` and are not duplicated in the manual movement ledger.
 
 ## External Reference Entities
 

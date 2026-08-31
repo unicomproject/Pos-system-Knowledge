@@ -21,7 +21,7 @@
 
 ## Wizard steps
 
-1. Basics â†’ 2. Modules â†’ 3. Features â†’ 4. Pricing â†’ 5. Limits â†’ 6. Review & Publish
+1. Basics â†’ 2. Modules â†’ 3. Features â†’ 4. Pricing â†’ 5. Limits â†’ 6. Review & Create
 
 ## Real API save flow
 

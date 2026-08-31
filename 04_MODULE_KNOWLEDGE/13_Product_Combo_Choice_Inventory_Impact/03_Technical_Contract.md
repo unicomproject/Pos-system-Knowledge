@@ -109,3 +109,29 @@ Test coverage must include:
 
 - [[04_MODULE_KNOWLEDGE/13_Product_Combo_Choice_Inventory_Impact/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/13_Product_Combo_Choice_Inventory_Impact/02_Functional_Rules]]
+
+## Persisted vs Derived Fields
+
+### Persisted Fields
+- `productStructure`
+- `comboDefinitionId`
+- `comboComponentId`
+- `componentProductId`
+- `componentVariantId`
+- `componentUomId`
+- `requiredQuantity`
+- `sortOrder`
+- `status`
+- `rowVersion`
+- `audit data`
+
+### Derived Fields (DO NOT persist in DB)
+- Inventory Method display
+- Available Stock
+- Supports Bundles
+- Bundle Available Quantity
+- Limiting Component
+- Tracking label
+- Total Components
+- Total Units
+- Estimated Component Cost

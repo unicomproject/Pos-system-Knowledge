@@ -1,14 +1,47 @@
 <!-- title: POS Hardware Production Acceptance Matrix -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-08-17 -->
 
 # POS Hardware Production Acceptance Matrix
+
+## Overall gate (2026-08-16)
+
+```text
+Overall hardware production sign-off: BLOCKED
+BLOCKED — HARDWARE NOT PRODUCTION READY
+Chunk 2 Receipt Printer: OPEN (closure attempt PARTIAL — physical gaps)
+```
+
+Closure attempt evidence:
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Chunk_2_Receipt_Printer_Closure_Attempt_2026-08-16]]
+
+This matrix is a **first-class production gate**. No production PASS for a
+claimed supported peripheral without physical evidence.
+
+Financial Cash In / Cash Drop software acceptance is **preserved separately**
+and is **not** a substitute for DR-* physical drawer rows.
+
+Canonical hardware authority:
+
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]]
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Android_Direct_Printer_Integration_2026-08-16]]
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Chunk_2_Receipt_Printer_Closure_Attempt_2026-08-16]]
+[[../12_INTEGRATIONS/POS_Hardware_Integration]]
+[[../12_INTEGRATIONS/Receipt_Printer_Integration]]
+[[../12_INTEGRATIONS/Local_Print_Agent]]
 
 ## Purpose
 
 Authoritative automated-versus-physical acceptance and failure matrix for
 cashier hardware. Unexecuted rows remain `Not Run` or `Blocked`.
+
+Every row must distinguish evidence class:
+
+```text
+Automated | Simulated | Physical
+PASS | FAIL | BLOCKED | NOT RUN | NOT APPLICABLE
+```
 
 ## Test Environment Record
 
@@ -27,12 +60,48 @@ evidence reference. Never store keys, PAN/CVV/PIN or receipt customer secrets.
 
 | ID | Hardware | Scenario | Preconditions | Steps | Expected | Actual | Automated | Physical | Evidence | Status |
 |---|---|---|---|---|---|---|---|---|---|---|
-| PR-01 | POS80 | Cash original v2 | Paid cash sale; Agent ready | Complete and print | One correct copy/audit | Not recorded for current contract | Passed | Not Run | - | Not Run |
-| PR-02 | POS80 | History reprint | Authorized receipt/reason | Reprint once | No new sale/payment; one audit | Not recorded | Passed | Not Run | - | Not Run |
-| PR-03 | POS80 | 80 mm barcode/cut | Valid receipt barcode | Print/scan/inspect edge | Scannable; footer above cut | Earlier output observed; current fix unconfirmed | Passed bytes | Not Run | - | Not Run |
-| PR-04 | 58 mm | Long/large receipt | 58 mm configured | Print long names/many lines | Wrapped, complete, one cut | Not recorded | Passed bytes | Not Run | - | Not Run |
-| PR-05 | POS80 | Discount/tax/copies | Authoritative v2 details | Print intended copies | Exact details/labels | Not recorded | Passed targeted | Not Run | - | Not Run |
-| PR-06 | Printer | Return/exchange/refund/report | Completed authoritative document | Print each type | Correct document; no sale mutation | Not complete | Partial | Not Run | - | Blocked |
+| PR-01 | POS80 | Cash original v2 | Paid cash sale; Agent ready | Complete and print | One correct copy/audit | Spooler accepted 2026-08-16 (`printed`, bytesWritten>0); visual field checklist open | Passed | Partial (spooler) | `chunk2-runtime/evidence/PR-01.json` + Flutter live test | Partial |
+| PR-02 | POS80 | History reprint | Authorized receipt/reason | Reprint once | No new sale/payment; one audit | Spooler accepted saleReprint; visual open | Passed | Partial (spooler) | `chunk2-runtime/evidence/PR-02.json` | Partial |
+| PR-03 | POS80 | 80 mm barcode/cut | Valid receipt barcode | Print/scan/inspect edge | Scannable; footer above cut | Spooler accepted 80mm; barcode scan/cut visual NOT VERIFIED | Passed bytes | Partial (spooler) | `chunk2-runtime/evidence/PR-03.json` | Partial |
+| PR-04 | 58 mm | Long/large receipt | 58 mm configured | Print long names/many lines | Wrapped, complete, one cut | Spooler accepted after PaperWidth=58mm; visual open | Passed bytes | Partial (spooler) | `chunk2-runtime/evidence/PR-04-58mm.json` | Partial |
+| PR-05 | POS80 | Discount/tax/copies | Authoritative v2 details | Print intended copies | Exact details/labels | USD currency spooler accepted; visual open | Passed targeted | Partial (spooler) | `chunk2-runtime/evidence/PR-05.json` | Partial |
+| PR-06 | Printer | Return/exchange/refund/report | Completed authoritative document | Print each type | Correct document; no sale mutation | All four purposes spooler PASS 2026-08-16; visual open | Passed | Partial (spooler) | `chunk2-runtime/evidence/PR-06-*.txt` | Partial |
+
+## Android Direct USB Matrix
+
+| ID | Hardware | Scenario | Preconditions | Steps | Expected | Actual | Automated | Physical | Evidence | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| USB-01 | Android tablet | Discovery | USB Host / hub | Enumerate bulk-OUT devices | Candidates listed; no silent random pick | Software implemented | Passed mocked | Not Run | Android direct record | Not Run |
+| USB-02 | Android tablet | Permission | Device present | Request USB permission | Grant/deny typed | Software implemented | Passed mocked | Not Run | - | Not Run |
+| USB-03 | Android tablet | Test print | Configured USB | Hardware Testing test print | Bytes accepted; typed errors | Software implemented | Passed mocked | Not Run | - | Not Run |
+| USB-04 | Android tablet | Sale receipt | Paid sale | Complete and print | One ESC/POS write; sale intact | Software path | Partial | Not Run | - | Not Run |
+| USB-05 | Android tablet | Reprint | Authorized reprint | Reprint once | No sale/payment duplicate | Software path | Partial | Not Run | - | Not Run |
+| USB-06 | Android tablet | 80mm | 80mm config | Print | Layout/cut bytes | Generator covered | Passed bytes | Not Run | - | Not Run |
+| USB-07 | Android tablet | 58mm | 58mm config | Print | Layout/cut bytes | Generator covered | Passed bytes | Not Run | - | Not Run |
+| USB-08 | Android tablet | Disconnect | Printer unplugged | Print | Safe typed failure | Software path | Passed mocked | Not Run | - | Not Run |
+| USB-09 | Android tablet | Reconnect | Reattach | Next deliberate print | Succeeds without blind replay | Software path | Passed mocked | Not Run | - | Not Run |
+| USB-10 | Android tablet | App restart | Saved config | Restart app / reprint | No stale auto print | Software path | Not Run | Not Run | - | Not Run |
+| USB-11 | Android tablet | Barcode/QR | Receipt with barcode | Print/scan | Scannable | Bytes preserved | Partial | Not Run | - | Not Run |
+| USB-12 | Android tablet | Cut | Auto-cut enabled | Print | Cut command present | Generator covered | Passed bytes | Not Run | - | Not Run |
+| USB-13 | Android tablet | Sale integrity | Print fails after pay | Observe sale | Sale/payment unchanged | Contract preserved | Passed related | Not Run | - | Not Run |
+
+## Android Direct Bluetooth Matrix
+
+| ID | Hardware | Scenario | Preconditions | Steps | Expected | Actual | Automated | Physical | Evidence | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| BT-01 | Android tablet | Paired selection | Bonded printer | Discover / select address | Explicit configured address | Software implemented | Passed mocked | Not Run | Android direct record | Not Run |
+| BT-02 | Android tablet | Permission | Android 12+ | List/connect | PERMISSION_DENIED typed if missing | Software implemented | Passed mocked | Not Run | - | Not Run |
+| BT-03 | Android tablet | Connect | Paired + enabled | Connect SPP | Bound timeout | Software implemented | Passed mocked | Not Run | - | Not Run |
+| BT-04 | Android tablet | Test print | Configured BT | Test print | Bytes accepted | Software implemented | Passed mocked | Not Run | - | Not Run |
+| BT-05 | Android tablet | Sale receipt | Paid sale | Complete and print | One write; sale intact | Software path | Partial | Not Run | - | Not Run |
+| BT-06 | Android tablet | Reprint | Authorized reprint | Reprint once | No sale/payment duplicate | Software path | Partial | Not Run | - | Not Run |
+| BT-07 | Android tablet | Disconnect / OOR | Printer off/range | Print | Safe failure | Software path | Passed mocked | Not Run | - | Not Run |
+| BT-08 | Android tablet | Reconnect | Printer returns | Next deliberate print | Succeeds; no blind replay | Software path | Passed mocked | Not Run | - | Not Run |
+| BT-09 | Android tablet | Bluetooth off/on | Toggle radio | Print / recover | Typed BLUETOOTH_DISABLED then recover | Software path | Passed mocked | Not Run | - | Not Run |
+| BT-10 | Android tablet | Tablet restart | Saved config | Restart | No stale auto print | Software path | Not Run | Not Run | - | Not Run |
+| BT-11 | Android tablet | Barcode/QR | Receipt barcode | Print/scan | Scannable | Bytes preserved | Partial | Not Run | - | Not Run |
+| BT-12 | Android tablet | Cut | Auto-cut | Print | Cut bytes | Generator covered | Passed bytes | Not Run | - | Not Run |
+| BT-13 | Android tablet | Sale integrity | Print fails after pay | Observe sale | Sale/payment unchanged | Contract preserved | Passed related | Not Run | - | Not Run |
 
 ## Barcode Scanner Matrix
 
@@ -47,9 +116,11 @@ evidence reference. Never store keys, PAN/CVV/PIN or receipt customer secrets.
 
 | ID | Hardware | Scenario | Preconditions | Steps | Expected | Actual | Automated | Physical | Evidence | Status |
 |---|---|---|---|---|---|---|---|---|---|---|
-| DR-01 | RJ11/RJ12 drawer | Cash auto-open | Approved config/open till | Complete Cash | One audited pulse | Not implemented | Not Run | Not Run | - | Blocked |
-| DR-02 | Drawer | Card/reprint suppression | Non-cash/reprint | Complete action | No pulse | Not implemented | Not Run | Not Run | - | Blocked |
-| DR-03 | Drawer | Manual/no-sale | Permission/reason/approval | Open once | One audited pulse | Not implemented | Not Run | Not Run | - | Blocked |
+| DR-01 | POS80 / Cashbox #1 / drawerPin2 | Cash auto-open | Approved config/open till | Complete Cash | Receipt auto-print; one automatic pulse; physical open | Checkout, receipt auto-print, authenticated Agent request, POS80 pulse and physical drawer movement observed PASS after clock synchronization on 2026-08-17 | Passed focused regression | Passed (operator observed) | [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Runtime_Integration_Issue_Resolution_2026-08-17]] | Passed |
+| DR-02 | Drawer | Card/reprint suppression | Non-cash/reprint | Complete action | No pulse | Software ready 2026-08-16 | Not Run | Not Run | - | Blocked (physical) |
+| DR-03 | Drawer | Manual/no-sale | Permission/reason/approval | Open once | One audited pulse | Software ready 2026-08-16 | Not Run | Not Run | - | Blocked (physical) |
+| DR-04 | POS80 / Cashbox #1 / drawerPin2 | Direct Local Agent pulse | Agent authenticated and printer configured | Send controlled hardware-test pulse | One pulse; physical open | Direct Agent pulse and physical movement observed PASS on 2026-08-17 | Passed contract/pulse tests | Passed (operator observed) | [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Runtime_Integration_Issue_Resolution_2026-08-17]] | Passed |
+| DR-05 | Local Print Agent | Stale request safety | Device clock intentionally drifted beyond safe window | Submit checkout drawer request | HTTP 400; no stale physical pulse | `invalid_drawer_request`; request older than 120 seconds rejected; synchronized checkout subsequently passed | Passed root-cause/focused regression | Passed runtime observation | [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Runtime_Integration_Issue_Resolution_2026-08-17]] | Passed |
 
 ## Card Terminal Matrix
 
@@ -108,7 +179,24 @@ regressions. No unrelated failing suite may be hidden.
 
 QA, product owner, security, operations and hardware owner record names/date,
 build, evidence links, accepted exceptions and rollback/support readiness.
-Overall sign-off remains `Blocked` while required physical rows are open.
+
+```text
+Overall sign-off: BLOCKED
+```
+
+Required physical gates still open for current hardware release:
+
+- Local Agent production packaging / reboot / auto-start (deployment)
+- PR-* Receipt Printer
+- Remaining DR-* Physical Cash Drawer scenarios (automatic Cash Sale on the
+  recorded POS80 / drawerPin2 setup is passed)
+- SC-* Barcode Scanner
+
+CT-* Card Terminal remains **Blocked / Not Applicable** while payment terminal
+is **OUT OF CURRENT HARDWARE RELEASE** (provider absent).
+
+Financial Cash In / Cash Drop software PASS records remain valid historical /
+software evidence and must not be downgraded because physical hardware is blocked.
 
 ## Hardware Chunk 1 automated evidence (2026-07-29)
 

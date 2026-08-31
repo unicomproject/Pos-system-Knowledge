@@ -1,6 +1,8 @@
 <!-- title: 17. Reservations, Stock Movements, Serial & Cost Allocation -->
 <!-- source: 17_Reservations, Stock Movements, Serial & Cost Allocation.png -->
-<!-- status: ERD image aligned -->
+<!-- status: Active -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-24 -->
 
 # 17. Reservations, Stock Movements, Serial & Cost Allocation
 
@@ -25,6 +27,10 @@ This module tracks inventory reservations, allocation to stock balances/serials,
 ## External Reference Entities
 
 `tenants`, `tenant_users`, `customers`, `sales_channels`, `outlets`, `products`, `product_variants`, `inventory_balances`, `serial_numbers`, `inventory_cost_layers`
+
+Product Setup Initial Tracking Details MUST NOT insert `stock_movements`,
+`stock_movement_serials`, or `stock_movement_cost_allocations`. Those remain
+quantity/cost ledger records owned by Opening Stock and inventory operations.
 
 
 ## inventory_reservations
