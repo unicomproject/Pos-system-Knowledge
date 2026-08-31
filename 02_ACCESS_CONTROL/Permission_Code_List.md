@@ -1,7 +1,7 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-27 -->
+<!-- last_updated: 2026-08-28 -->
 
 # Permission Code List
 
