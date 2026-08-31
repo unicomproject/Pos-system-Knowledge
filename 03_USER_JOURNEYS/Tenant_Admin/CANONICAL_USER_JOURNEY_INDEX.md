@@ -1,6 +1,6 @@
 ﻿<!-- title: Tenant Admin Canonical User Journey Index -->
 <!-- status: Canonical -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-27 -->
 <!-- parent: [[../00_Global_User_Journey_Register]] -->
 
 # Tenant Admin Canonical User Journey Index
@@ -72,3 +72,9 @@
 | TA-UJ-060 | Manage C&C Order Status (Staff) | NOT_STARTED | 25 |
 | TA-UJ-061 | Manage Expiry / Offer Discounts | NOT_STARTED | 5 |
 | TA-UJ-062 | Monitor Device / Hardware Readiness | PARTIAL | 50 |
+
+## Category Management journey status (2026-08-27)
+
+TA-UJ-035 … TA-UJ-039: **NOT_STARTED** (backend contract + implementation complete; **Flutter implementation pending**; end-to-end journey **NOT COMPLETE**). Canonical Category Management backend is IMPLEMENTED (ADR 010 — Category decoupled from Department). Do not mark these journeys COMPLETE because backend exists; Flutter Category Management is still Coming Soon.
+
+Authority: [[../../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_SECOND_BRAIN_GAP_CLOSURE_2026-08-27]]
