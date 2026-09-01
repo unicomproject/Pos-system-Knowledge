@@ -1,7 +1,7 @@
 <!-- title: Hardware Operations, Till Session & Cash Control Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-13 -->
+<!-- last_updated: 2026-08-16 -->
 
 # Hardware Operations, Till Session & Cash Control Functional Rules
 
@@ -15,8 +15,21 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 - Till session is required for POS sale, payment, receipt, and cash movements.
 - Cash movement amount is positive and uses a movement type.
+- Cash In **Reason** is the backend catalog selection
+  `cash_movement_types.id`; optional explanatory note maps to
+  `cash_movements.reason`.
+- Cash Drop **Reason** must use the same catalog model with `Direction=OUT`
+  (**software production-accepted**). See [[07_Cash_Drop_Feature]].
+- Visible IN/OUT types are active global system entries plus active
+  current-tenant entries. Cross-tenant types are forbidden.
+- Currency comes from the open `till_sessions.currency_code`; the client must
+  not set financial authority.
+- Manager PIN on the existing form is not authorization and must not be
+  persisted or logged without a separately approved policy.
 - Cash reconciliation records expected cash, counted cash, and variance.
-- Physical communication is handled by Flutter/local device code. A hardware test must not be reported as logged because no complete Cashier test-log API chain is currently implemented.
+- Physical communication is handled by Flutter / `E_POS.LocalPrintAgent`.
+  Hardware test-report APIs exist in software; physical acceptance remains
+  incomplete. Do not treat API presence as physical production readiness.
 - Cash drawer open requires permission, till context, and audit.
 - Local printer access must be device-configured, API-key authenticated, CIDR
   allow-listed, and limited to the trusted private LAN.
@@ -31,7 +44,11 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - **Latest Test Result**: Hardware test success/failure must be derived from `hardware_test_logs`.
 - **Warning/Error Rules**: A hardware device in warning (e.g., low paper) or error (e.g., disconnected) state contributes to the "Needs Attention" status of the Till.
 - **Alert Limitation**: Do not invent a `hardware_alerts` table. Alerts must be derived from missing assignments, offline devices, or failed `hardware_test_logs`.
-- **Current vs Planned Implementation**: The current backend implementation relies mostly on flat Till fields (`printerName`, `scannerName`). The planned implementation requires proper assignment checks, heartbeats, and test log resolution to support live readiness monitoring.
+- **Current vs Planned Implementation**: Tenant Admin hardware inventory,
+  assignment merge, heartbeat and test-report APIs are implemented in software.
+  Physical printer/drawer/scanner acceptance and Local Print Agent production
+  Windows-service deployment acceptance remain **BLOCKED**. Flat Till name
+  fields alone are never proof of Connected hardware.
 
 ## User Rules
 
@@ -48,15 +65,19 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Show this module only when the tenant plan, feature entitlement, and user permission allow it.
 - Use loading, empty, error, permission-denied, feature-disabled, offline, and conflict states where relevant.
 - Do not hardcode role names such as cashier, manager, or administrator as authorization logic.
-- Cash In/Cash Drop forms are currently frontend-only and must not show a
-  persisted-success outcome until a backend mutation succeeds.
+- Cash In, Cash Out and Cash Drop must show success only after the implemented
+  backend mutation succeeds; optimistic or local-only financial success is forbidden.
 - Cash Drawer main screen must follow [[06_Cash_Drawer_Feature]] and
-  [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]]:
+  [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]]:
   title inside white content card, no back-arrow / Continue-to-Dashboard,
   bottom nav available, orange/black Cashier POS tokens via shared theme only,
   Phone + Tablet + Desktop.
 - Open Drawer is hardware-only and must not create financial movements.
-- Expected Cash is backend-authoritative; Flutter totals are preview only.
+- Cash Drop is financial-only relative to expected cash; it must not be confused
+  with physical Open Drawer.
+- Expected Cash is backend-authoritative; Flutter remaining-cash totals are preview only.
+- Cash Drop amount must not exceed backend-authoritative available cash
+  (**REQUIRED** server check; client check alone is insufficient).
 - Scanner/printer package or adapter presence is not physical verification.
 - Hardware Testing must show Local Agent unreachable, unauthorized, incompatible
   contract, printer unavailable, and ready states without exposing the API key.
@@ -84,8 +105,9 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - **Close Till** is online backend-authoritative. Expected Cash is calculated by
   the backend from canonical session cash activity; Flutter supplies Counted Cash,
   an approved variance reason when required and an optional note. Session close,
-  `cash_reconciliations` and CLOSED event commit atomically. Current code does not
-  yet meet the first and reconciliation requirements. See [[05_Close_Till_Feature]].
+  `cash_reconciliations` and CLOSED event commit atomically. This contract is
+  implemented and automated-test verified as of 2026-08-15. See
+  [[05_Close_Till_Feature]].
 - **Cash In / Cash Out / Cash Drop** are online backend-authoritative until an
   approved offline cash-control contract exists. Do not silently queue high-risk
   cash-control mutations. See [[06_Cash_Drawer_Feature]].
@@ -115,6 +137,7 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]]
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]]
 - [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]]
+- [[04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/07_Cash_Drop_Feature]]
 
 
 ## Tenant Admin Till Hardware Functional Rules Addendum (2026-08-01)

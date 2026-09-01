@@ -10,7 +10,7 @@
 
 Locks **GAP 2 — Bootstrap product minimum field contract** for SA-ST-UJ-009 (manual onboarding).
 
-Super Admin bootstrap creates **minimum viable SIMPLE products** for operational go-live. It does **not** replicate Tenant Admin 8-step wizard.
+Super Admin bootstrap creates **minimum viable SIMPLE products** for operational go-live. It does **not** replicate Tenant Admin 7-step wizard.
 
 ## Scope
 
@@ -59,8 +59,8 @@ Super Admin bootstrap creates **minimum viable SIMPLE products** for operational
 | POS channel visibility flags | ACTIVE SIMPLE product visible to POS when entitled |
 | Online / e-commerce visibility | TA storefront configuration |
 | Images / media | TA product enrichment |
-| Variants / bundles | TA 8-step wizard |
-| Draft resume / 8-step state | TA lifecycle |
+| Variants / bundles | TA 7-step wizard |
+| Draft resume / 7-step state | TA lifecycle |
 | Low stock threshold | TA inventory settings |
 
 ## Server-side defaults (bootstrap create)

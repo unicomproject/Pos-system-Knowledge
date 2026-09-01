@@ -166,9 +166,9 @@ CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 | `id` | uuid | PK NOT NULL | Primary key. |
 | `tenant_id` | uuid | FK NOT NULL | References tenants(id). |
 | `parent_jurisdiction_id` | uuid | FK NULL CHECK | Self reference to tax_jurisdictions(id). |
-| `jurisdiction_code` | varchar(80) | NOT NULL UNIQUE | Tenant-unique jurisdiction code. |
+| `jurisdiction_code` | varchar(80) | NOT NULL UNIQUE | Tenant-unique jurisdiction code. Auto-generated as `DEFAULT-{COUNTRY_CODE}` for system default. |
 | `jurisdiction_name` | varchar(150) | NOT NULL | Display name. |
-| `jurisdiction_type` | varchar(40) | NOT NULL CHECK | Logical ERD type: tax_jurisdiction_type. |
+| `jurisdiction_type` | varchar(40) | NOT NULL CHECK | Logical ERD type: tax_jurisdiction_type. (e.g. `COUNTRY` for system default). |
 | `country_code` | char(2) | NOT NULL | Country code. |
 | `region_code` | varchar(50) | NULL | Region/state code. |
 | `locality_name` | varchar(120) | NULL | Locality/city name. |
@@ -199,8 +199,9 @@ CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 |---|---|---|---|
 | `id` | uuid | PK NOT NULL | Primary key. |
 | `tenant_id` | uuid | FK NOT NULL | References tenants(id). |
-| `tax_class_code` | varchar(80) | NOT NULL UNIQUE | Tenant-unique tax class code. |
+| `tax_class_code` | varchar(80) | NOT NULL UNIQUE | Tenant-unique tax class code. Used as the deterministic base for TaxRate. |
 | `tax_class_name` | varchar(150) | NOT NULL | Display name. |
+| `tax_type` | varchar(40) | NOT NULL | Tax type categorization (VAT, GST, SALES_TAX, SERVICE_TAX, OTHER). Added in Phase 1. |
 | `description` | text | NULL | Optional description. |
 | `is_default_tax_class` | boolean | NOT NULL DEFAULT false | Marks tenant default tax class. |
 | `status` | varchar(30) | NOT NULL CHECK | Logical ERD type: record_status. |

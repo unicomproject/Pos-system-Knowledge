@@ -208,7 +208,7 @@ Strategy: merge commit (not squash)
 | 3 Features | PASS |
 | 4 Pricing | PASS |
 | 5 Limits | PASS |
-| 6 Review & Publish | PASS |
+| 6 Review & Create | PASS |
 | Corrected stepper alignment | PASS |
 | Modules alignment | PASS |
 | Create mode | PASS |

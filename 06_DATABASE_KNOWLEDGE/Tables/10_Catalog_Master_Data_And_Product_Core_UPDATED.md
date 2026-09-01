@@ -1,7 +1,7 @@
 <!-- title: Catalog Master Data & Product Core -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-05 -->
+<!-- last_updated: 2026-08-27 -->
 <!-- source: Updated from uploaded ERD image: 10_Catalog Master Data & Product Core(3).png -->
 
 # 10. Catalog Master Data & Product Core
@@ -19,13 +19,14 @@ This markdown version follows the uploaded ERD image as the source of truth. Ent
 | Table | Purpose |
 | --- | --- |
 | `business_types` | Stores system/product business type classifications. |
-| `departments` | Stores tenant departments used to group categories. |
-| `categories` | Stores tenant categories with department and parent category hierarchy. |
+| `departments` | Stores tenant department master records. Remains for unrelated modules. **Not** part of TARGET Category Management (ADR 010). |
+| `categories` | Stores tenant categories in a recursive parent/child hierarchy. **No Department relationship** (migration `20260827140000_DecoupleCategoryFromDepartment` applied). |
 | `brands` | Stores tenant brand master records. |
 | `collections` | Stores tenant product collections and effective date windows. |
 | `unit_of_measures` | Stores global and tenant-specific unit of measure records. |
 | `return_policies` | Stores tenant product return policy records. |
 | `products` | Stores tenant product master records. |
+| `product_setup_initial_tracking` | TARGET 1:1 Product Setup draft for Initial Batch/Expiry/Serial (GAP until migration). |
 | `product_variants` | Stores sellable product variants. |
 | `product_reviews` | Stores 1-5 star customer ratings and text reviews for products. |
 | `product_rating_summaries` | Stores the aggregated rating summary for fast loading on product pages. |
@@ -57,7 +58,7 @@ CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 
 ## `departments`
 
-Purpose: Stores tenant departments used to group categories.
+Purpose: Stores tenant department master records. Not part of TARGET Category Management (ADR 010). CURRENT Category runtime still FKs here until TARGET MIGRATION.
 
 | Attribute                   | Type         | Key | Null               | Reference / Note              |     |     |
 | --------------------------- | ------------ | --- | ------------------ | ----------------------------- | --- | --- |
@@ -89,42 +90,65 @@ CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 
 ## `categories`
 
-Purpose: Stores tenant categories with department and parent category hierarchy.
+Purpose: Stores tenant categories in a recursive parent/child hierarchy. **No Department relationship.** Migration **`20260827140000_DecoupleCategoryFromDepartment`** applied.
 
 | Attribute | Type | Key | Null | Reference / Note |
 | --- | --- | --- | --- | --- |
 | `id` | uuid | PK | NOT NULL | Primary key |
 | `tenant_id` | uuid | FK | NOT NULL | References tenants(id) |
-| `department_id` | uuid | FK | NOT NULL | References departments(id) |
-| `parent_category_id` | uuid | FK | NULL | Self reference to categories(id); NULL means root |
-| `category_code` | varchar(80) |  | NOT NULL | Category code |
+| `parent_category_id` | uuid | FK | NULL | Self reference; NULL = root |
+| `category_code` | varchar(80) |  | NOT NULL | Stored normalized: trim + uppercase |
 | `category_name` | varchar(150) |  | NOT NULL | Display name |
 | `category_slug` | varchar(180) |  | NOT NULL | URL/display slug |
-| `description` | text |  | NULL | Optional description |
+| `description` | varchar(2000) |  | NULL | Optional description |
+| `image_media_asset_id` | uuid | FK | NULL | References media_assets(tenant_id, id) composite |
 | `sort_order` | int |  | NOT NULL DEFAULT 0 | Display order |
-| `status` | varchar(40) |  | NOT NULL | Record status |
+| `status` | varchar(40) |  | NOT NULL | ACTIVE / INACTIVE / DELETED |
 | `created_at` | timestamptz |  | NOT NULL | Created timestamp |
 | `created_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
 | `updated_at` | timestamptz |  | NOT NULL | Updated timestamp |
 | `updated_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
 
-Indexes / Constraints / Notes:
+Indexes / Constraints (CURRENT — post-migration):
 
 ```text
 PK(id)
 FK(tenant_id) REFERENCES tenants(id)
-FK(tenant_id, department_id) REFERENCES departments(tenant_id, id)
-FK(parent_category_id) REFERENCES categories(id)
+FK(tenant_id, parent_category_id) REFERENCES categories(tenant_id, id)   -- composite parent integrity
+FK(tenant_id, image_media_asset_id) REFERENCES media_assets(tenant_id, id)
 FK(created_by_tenant_user_id) REFERENCES tenant_users(id)
 FK(updated_by_tenant_user_id) REFERENCES tenant_users(id)
-UNIQUE(tenant_id, department_id, category_code)
-UNIQUE(tenant_id, category_slug)
-UNIQUE(tenant_id, id)
-UNIQUE(tenant_id, department_id, id)
+UNIQUE INDEX uq_categories_tenant_id_category_code (tenant_id, category_code)
+UNIQUE INDEX uq_categories_tenant_id_normalized_category_name (tenant_id, LOWER(BTRIM(category_name)))
+UNIQUE INDEX uq_categories_tenant_id_category_slug (tenant_id, category_slug)
+UNIQUE INDEX uq_categories_tenant_id_id (tenant_id, id)
 CHECK(parent_category_id IS NULL OR parent_category_id <> id)
 CHECK(sort_order >= 0)
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
+INDEX (tenant_id, status)
+INDEX (tenant_id, parent_category_id)
 ```
+
+**Uniqueness rules:**
+
+* **Code:** tenant-wide; `NormalizeCode` = trim + uppercase; DB enforces on stored column.
+* **Name:** tenant-wide, case-insensitive, trimmed, **including DELETED**; expression index `LOWER(BTRIM(category_name))`. No `normalized_category_name` physical column.
+
+**Parent integrity:** Application requires same-tenant parent. Database composite FK `(tenant_id, parent_category_id) → categories(tenant_id, id)` enforces tenant-safe parent links.
+
+**Duplicate error mapping:** `uq_categories_tenant_id_category_code` → `category.duplicate_code`; `uq_categories_tenant_id_normalized_category_name` → `category.duplicate_name`.
+
+Derived UI values (`level`, `hierarchy_path`, `child_count`, `product_count`, `has_children`) are **not** columns.
+
+**CAT-MIG-PREFLIGHT-001** (executed as part of migration readiness): checks duplicate normalized code/name per tenant, dangling parent, cross-tenant parent, self-parent, parent cycle, hierarchy depth > 5. On conflict: **STOP SAFELY** — no silent merge/rename/delete/ID regeneration/product remapping.
+
+Migration characteristics: Department decoupling; Category IDs preserved; `product_categories` mappings preserved; forward-only rollback (restore from backup).
+
+**HISTORICAL:** pre-migration schema included `department_id` and department-scoped unique indexes. See ADR 010 and migration file for audit evidence.
+
+`departments` table unchanged. Department remains available to unrelated modules only — not Category Management.
+
+Authority: [[../../13_DECISIONS_AND_CHANGES/ADR/ADR_010_Category_Decoupled_From_Department]], [[../../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_BACKEND_GAP_FIX_CLOSURE_2026-08-27]]
 
 ## `brands`
 
@@ -286,7 +310,9 @@ Purpose: Stores tenant product master records.
 | `long_description`          | text         |     | NULL                  | Long description               |
 | `is_sellable`               | boolean      |     | NOT NULL DEFAULT true | Sellable flag                  |
 | `is_taxable`                | boolean      |     | NOT NULL DEFAULT true | Taxable flag                   |
+| `is_tax_exclusive`          | boolean      |     | NOT NULL DEFAULT false| True if tax is calculated on top, false if inclusive |
 | `status`                    | varchar(40)  |     | NOT NULL              | Product status                 |
+| `reference_cost_price`      | numeric(18,4)|     | NULL                  | Reference cost price           |
 | `current_setup_step`        | int          |     | NOT NULL DEFAULT 1    | Wizard setup step progress     |
 | `draft_saved_at`            | timestamptz  |     | NULL                  | Draft creation timestamp       |
 | `published_at`              | timestamptz  |     | NULL                  | Timestamp of publication       |
@@ -315,9 +341,69 @@ UNIQUE(tenant_id, product_code)
 UNIQUE(tenant_id, product_slug)
 UNIQUE(tenant_id, id)
 CHECK(status IN ('DRAFT', 'ACTIVE', 'INACTIVE', 'ARCHIVED'))
-CHECK(current_setup_step BETWEEN 1 AND 8)
+CHECK(current_setup_step BETWEEN 1 AND 7)
 CHECK(row_version >= 0)
 ```
+
+CURRENT EF already enforces `ck_products_setup_step` as `BETWEEN 1 AND 7`
+(migration `ConsolidateProductWizardTo7Steps`). Stale `1 AND 8` documentation
+is superseded.
+
+Do **not** add `products.batch_number`, `products.expiry_date`, or
+`products.serial_number`. Initial Tracking Details are TARGET draft data on
+`product_setup_initial_tracking` (GAP until migration). Final identity remains
+`product_batches` / `serial_numbers`.
+
+## `product_setup_initial_tracking` (TARGET — GAP until migration)
+
+Purpose: 1:1 Product Setup draft store for optional Step 1 Initial Tracking
+Details. Not Product master identity. Not inventory quantity.
+
+| Attribute | Type | Key | Null | Reference / Note |
+| --- | --- | --- | --- | --- |
+| `id` | uuid | PK | NOT NULL | Own primary key |
+| `tenant_id` | uuid | FK | NOT NULL | References tenants(id) |
+| `product_id` | uuid | FK | NOT NULL | References products(tenant_id, id); 1:1 |
+| `initial_batch_number` | varchar(100) |  | NULL | Provisional Batch |
+| `initial_expiry_date` | date |  | NULL | Provisional Expiry |
+| `initial_serial_number` | varchar(150) |  | NULL | Provisional Serial |
+| `assigned_product_variant_id` | uuid | FK | NULL | VARIANT assignment at Step 7 |
+| `incompatible_clear_confirmed_at` | timestamptz |  | NULL | Last explicit incompatible clear |
+| `consumed_at` | timestamptz |  | NULL | Set when publish creates inventory identity |
+| `created_at` | timestamptz |  | NOT NULL | Created timestamp |
+| `created_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+| `updated_at` | timestamptz |  | NOT NULL | Updated timestamp |
+| `updated_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+| `row_version` | bigint |  | NOT NULL DEFAULT 1 | Internal increment with `products.row_version`. API token remains `products.row_version` / `expectedRowVersion` |
+
+Indexes / Constraints / Notes:
+
+```text
+PK(id)
+UNIQUE(tenant_id, id)
+UNIQUE(tenant_id, product_id)
+FK(tenant_id) REFERENCES tenants(id)
+FK(tenant_id, product_id) REFERENCES products(tenant_id, id)
+  ON DELETE CASCADE
+  NAME fk_product_setup_initial_tracking_product_id_products
+FK(tenant_id, assigned_product_variant_id) REFERENCES product_variants(tenant_id, id)
+  NAME fk_product_setup_initial_tracking_assigned_variant
+FK(created_by_tenant_user_id) REFERENCES tenant_users(id)
+  NAME fk_product_setup_initial_tracking_created_by
+FK(updated_by_tenant_user_id) REFERENCES tenant_users(id)
+  NAME fk_product_setup_initial_tracking_updated_by
+CHECK(row_version >= 1)
+INDEX(tenant_id, product_id)
+INDEX(tenant_id, consumed_at) WHERE consumed_at IS NULL
+```
+
+Do **not** add a CHECK that forbids Batch+Expiry+Serial together. Combination
+validation is application/domain until Step 2. Tenant isolation: every query
+filters `tenant_id`. Optimistic concurrency for clients uses parent
+`products.row_version` only.
+
+Authority:
+[[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
 
 ## `product_variants`
 
@@ -420,7 +506,7 @@ Indexes / Constraints / Notes:
 
 ## Module Notes
 
-- Every sellable product must have at least one `product_variants` row.
+- Every sellable product must have at least one `product_variants` row. Therefore, for `SIMPLE` and `BUNDLE` products, their Base SKU is stored in `product_variants.sku` on their single default variant row.
 - Only entity tables visible in the uploaded ERD image are included.
 - Tenant-owned tables include `tenant_id` for data isolation.
 

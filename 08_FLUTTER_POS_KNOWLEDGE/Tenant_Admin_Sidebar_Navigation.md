@@ -56,10 +56,11 @@ The top-level menu order is locked and must be implemented as follows:
 The `Products` menu item acts as a collapsible parent.
 - **Parent Navigation Action**: Clicking the `Products` parent label itself navigates to the Product List screen `/tenant-admin/products`.
 - **Submenu Toggle**: Clicking the expand/collapse indicator chevron toggles the visibility of the child items.
-- **Submenu Children**: The submenu must contain exactly these three items in this exact order:
+- **Submenu Children**: The submenu must contain exactly these four items in this exact order:
   1. **Add Product** (navigates to the verified Add Product route)
   2. **Categories & Subcategories** (navigates to the category/subcategory route)
   3. **Brand** (navigates to the brand route)
+  4. **Tax** (navigates to the tax route)
 
 **Prohibited Submenu Items**:
 - Do **not** display "Product List", "Product Dashboard", "Popular Products", "Inventory", "Product Inventory", "Import Products", "Import CSV", "Variant Templates", or any other child item in the submenu list.

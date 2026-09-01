@@ -165,11 +165,11 @@ One row per journey. Implementation status reflects **production code**, not doc
 | TA-UJ-032 | - | TA | Tenant Admin | - | Activate / Deactivate Product | - | - | Y | PARTIAL | 60 | - | - | - | - | - |
 | TA-UJ-033 | - | TA | Tenant Admin | - | View Product Dashboard | - | - | Y | COMPLETE | 80 | - | - | - | - | - |
 | TA-UJ-034 | - | TA | Tenant Admin | - | Curate Popular Products | - | - | Y | PARTIAL | 60 | - | - | - | - | - |
-| TA-UJ-035 | - | TA | Tenant Admin | - | Browse Categories | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
-| TA-UJ-036 | - | TA | Tenant Admin | - | Create Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
-| TA-UJ-037 | - | TA | Tenant Admin | - | View Category Details | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
-| TA-UJ-038 | - | TA | Tenant Admin | - | Edit Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
-| TA-UJ-039 | - | TA | Tenant Admin | - | Delete Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
+| TA-UJ-035 | - | TA | Tenant Admin | - | Browse Categories | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend contract + implementation complete. Flutter pending. E2E NOT COMPLETE. |
+| TA-UJ-036 | - | TA | Tenant Admin | - | Create Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend complete. Flutter pending. E2E NOT COMPLETE. |
+| TA-UJ-037 | - | TA | Tenant Admin | - | View Category Details | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend complete. Flutter pending. E2E NOT COMPLETE. |
+| TA-UJ-038 | - | TA | Tenant Admin | - | Edit Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend complete. Flutter pending. E2E NOT COMPLETE. |
+| TA-UJ-039 | - | TA | Tenant Admin | - | Delete Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend complete. Flutter pending. E2E NOT COMPLETE. |
 | TA-UJ-040 | - | TA | Tenant Admin | - | Browse Brands | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | TA-UJ-041 | - | TA | Tenant Admin | - | Create Brand | - | - | Y | NOT_STARTED | 20 | Backend P0 gate required | - | - | - | - |
 | TA-UJ-042 | - | TA | Tenant Admin | - | View Brand Details | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
@@ -228,7 +228,7 @@ One row per journey. Implementation status reflects **production code**, not doc
 | POS-UJ-033 | - | POS | Cashier | - | Hardware Testing | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
 | POS-UJ-034 | - | POS | Cashier | - | Offline Cash Sale Capture | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
 | POS-UJ-035 | - | POS | Cashier | - | Sync Offline Transactions | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
-| POS-UJ-036 | - | POS | Cashier | - | Manage Online/Pickup Orders | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
+| POS-UJ-036 | - | POS | Cashier | Click & Collect | Online Order Fulfilment / Collection | Online order queue | Pickup collected; sales order completed | Y | CANONICALIZED / IMPLEMENTATION PENDING | 10 | [[Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]] | commerce.online_order.orders.access | Fulfilment/Pickup | Outlet HARD | 15-screen specification complete; application/runtime pending |
 | EC-UJ-001 | - | EC | E-commerce Customer | - | Browse Home Catalog | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | EC-UJ-002 | - | EC | E-commerce Customer | - | Browse Category | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | EC-UJ-003 | - | EC | E-commerce Customer | - | Search Products | - | - | Y | PARTIAL | 70 | - | - | - | - | - |

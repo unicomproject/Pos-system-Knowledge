@@ -1,19 +1,19 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-27 -->
 
 # Platform Subscription Plan API Endpoints
 
 ## POS Cashier Discount
 
-| Method | Route | Current Release use |
-|---|---|---|
-| GET | `/api/v1/pos/discounts` | Load current Discount context/authority; cashier UI is MANUAL only |
-| POST | `/api/v1/pos/discounts/validate` | Online authoritative preview; above authority is rejected |
-| POST | `/api/v1/pos/discounts/apply` | Idempotently apply one eligible MANUAL Discount |
-| POST | `/api/v1/pos/discounts/{applicationId}/cancel` | Cancel unfinalized application and preserve audit |
-| POST | `/api/v1/pos/discounts/{applicationId}/approve` | Existing/deferred capability; not called by current cashier flow |
+| Method | Route                                           | Current Release use                                                |
+| ------ | ----------------------------------------------- | ------------------------------------------------------------------ |
+| GET    | `/api/v1/pos/discounts`                         | Load current Discount context/authority; cashier UI is MANUAL only |
+| POST   | `/api/v1/pos/discounts/validate`                | Online authoritative preview; above authority is rejected          |
+| POST   | `/api/v1/pos/discounts/apply`                   | Idempotently apply one eligible MANUAL Discount                    |
+| POST   | `/api/v1/pos/discounts/{applicationId}/cancel`  | Cancel unfinalized application and preserve audit                  |
+| POST   | `/api/v1/pos/discounts/{applicationId}/approve` | Existing/deferred capability; not called by current cashier flow   |
 
 Current matrix: Order Percentage/Fixed; Item Percentage only with exact cart
 variant; one active Discount; optional reason. Checkout summary and
@@ -29,15 +29,15 @@ Base route: `/api/v1/customers`; controller: `CustomersController`. Every route
 uses tenant authentication/context, the listed permission, and the current
 implementation's trusted-device, assigned-till, open-session resolution.
 
-| Method and route | Purpose | Query/body | Permission |
-|---|---|---|---|
-| `GET /summary` | Customer summary | `deviceId` | `customers.view` |
-| `GET /` | Search/filter/page | `deviceId`, `search`, `status`, `source`, `page`, `pageSize` | `customers.view` |
-| `GET /{customerId}` | Profile and completed-order aggregates | `deviceId` | `customers.view` |
-| `GET /{customerId}/orders` | Existing paginated purchase history | `deviceId`, `page`, `pageSize`, `fromDate`, `toDate`, `status` | `customers.view` |
-| `POST /` | Create POS customer | `deviceId`; full name, phone, optional email | `customers.create` |
-| `PUT /{customerId}` | Edit profile/status; also supports deactivate-to-INACTIVE | `deviceId`; full name, phone, optional email, status | `customers.update` |
-| `POST /{customerId}/attach-to-sale` | Validate ACTIVE customer and attach to cart/editable sale | `deviceId`; optional `saleId` | `customers.view` + `sales.cart.manage` |
+| Method and route                    | Purpose                                                   | Query/body                                                     | Permission                             |
+| ----------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------- |
+| `GET /summary`                      | Customer summary                                          | `deviceId`                                                     | `customers.view`                       |
+| `GET /`                             | Search/filter/page                                        | `deviceId`, `search`, `status`, `source`, `page`, `pageSize`   | `customers.view`                       |
+| `GET /{customerId}`                 | Profile and completed-order aggregates                    | `deviceId`                                                     | `customers.view`                       |
+| `GET /{customerId}/orders`          | Existing paginated purchase history                       | `deviceId`, `page`, `pageSize`, `fromDate`, `toDate`, `status` | `customers.view`                       |
+| `POST /`                            | Create POS customer                                       | `deviceId`; full name, phone, optional email                   | `customers.create`                     |
+| `PUT /{customerId}`                 | Edit profile/status; also supports deactivate-to-INACTIVE | `deviceId`; full name, phone, optional email, status           | `customers.update`                     |
+| `POST /{customerId}/attach-to-sale` | Validate ACTIVE customer and attach to cart/editable sale | `deviceId`; optional `saleId`                                  | `customers.view` + `sales.cart.manage` |
 
 List search covers name, phone/normalized phone, email/normalized email, and
 customer code. Status excludes `DELETED`; source is an exact current
@@ -67,12 +67,12 @@ Consuming-screen contract:
 
 Base route: `/api/v1/pos/holds` · Controller: `PosHoldsController`.
 
-| Method | Route | Current permission | Purpose |
-|---|---|---|---|
-| POST | `/api/v1/pos/holds` | `sales.park.create` | Persist a priced cart as a parked sale |
-| GET | `/api/v1/pos/holds` | `sales.park.view` | List active holds (tenant + current till + holding cashier + HELD + non-expired) |
-| POST | `/api/v1/pos/holds/{holdId}/recall` | `sales.park.recall` | Soft-revalidate and atomically release a hold for sale |
-| DELETE | `/api/v1/pos/holds/{holdId}?reason=...` | `sales.park.create` | Cancel an active hold; reason mandatory at service |
+| Method | Route                                   | Current permission  | Purpose                                                                          |
+| ------ | --------------------------------------- | ------------------- | -------------------------------------------------------------------------------- |
+| POST   | `/api/v1/pos/holds`                     | `sales.park.create` | Persist a priced cart as a parked sale                                           |
+| GET    | `/api/v1/pos/holds`                     | `sales.park.view`   | List active holds (tenant + current till + holding cashier + HELD + non-expired) |
+| POST   | `/api/v1/pos/holds/{holdId}/recall`     | `sales.park.recall` | Soft-revalidate and atomically release a hold for sale                           |
+| DELETE | `/api/v1/pos/holds/{holdId}?reason=...` | `sales.park.create` | Cancel an active hold; reason mandatory at service                               |
 
 Create accepts `deviceId`, `saleType`, optional `customerId`, cart `lines`,
 optional park `reason` (short note), `discountApplicationId`, required stable
@@ -126,12 +126,12 @@ See [[../04_MODULE_KNOWLEDGE/21_POS_Operations/08_Park_Recall_Sale_Feature]].
 
 Official base route: `/api/v1/platform-auth` · Controller: `PlatformAuthController`.
 
-| Method | Canonical Endpoint | Purpose | Auth |
-|---|---|---|---|
-| POST | `/api/v1/platform-auth/login` | Platform User login | Anonymous + rate limit |
-| POST | `/api/v1/platform-auth/refresh` | Rotate Platform Admin session | Anonymous with refresh cookie |
-| POST | `/api/v1/platform-auth/logout` | Revoke Platform Admin session | `PlatformOnly` |
-| GET | `/api/v1/platform-admin/audit-logs` | Read login security audit | `platform.audit.view` |
+| Method | Canonical Endpoint                  | Purpose                       | Auth                          |
+| ------ | ----------------------------------- | ----------------------------- | ----------------------------- |
+| POST   | `/api/v1/platform-auth/login`       | Platform User login           | Anonymous + rate limit        |
+| POST   | `/api/v1/platform-auth/refresh`     | Rotate Platform Admin session | Anonymous with refresh cookie |
+| POST   | `/api/v1/platform-auth/logout`      | Revoke Platform Admin session | `PlatformOnly`                |
+| GET    | `/api/v1/platform-admin/audit-logs` | Read login security audit     | `platform.audit.view`         |
 
 Refresh token cookie: `platform_refresh_token` · canonical path `/api/v1/platform-auth` · HttpOnly · SameSite=Strict.
 
@@ -141,11 +141,11 @@ Journey and full contract: [[../03_USER_JOURNEYS/Platform_Admin/01_Login_Flow]].
 
 Controller: `PlatformAuthLegacyController` · shared service: `PlatformAuthService`.
 
-| Method | Legacy Endpoint | Note |
-|---|---|---|
-| POST | `/api/v1/auth/platform-login` | Compatibility only — different response envelope and cookie path `/api/v1/auth` |
-| POST | `/api/v1/auth/platform-refresh` | Compatibility only |
-| POST | `/api/v1/auth/platform-logout` | Compatibility only — anonymous optional cookie logout; returns 200 boolean envelope |
+| Method | Legacy Endpoint                 | Note                                                                                |
+| ------ | ------------------------------- | ----------------------------------------------------------------------------------- |
+| POST   | `/api/v1/auth/platform-login`   | Compatibility only — different response envelope and cookie path `/api/v1/auth`     |
+| POST   | `/api/v1/auth/platform-refresh` | Compatibility only                                                                  |
+| POST   | `/api/v1/auth/platform-logout`  | Compatibility only — anonymous optional cookie logout; returns 200 boolean envelope |
 
 Do **not** document legacy aliases as equal primary contracts. New development and tests should target `/api/v1/platform-auth/*`. The current Angular Platform Admin client still uses the legacy paths (documented gap **SA-AUTH-GAP-01**).
 
@@ -155,31 +155,31 @@ Base route: `/api/v1/platform-admin/tenants` · Controller: `PlatformAdminTenant
 
 Journey and full contract: [[../03_USER_JOURNEYS/Platform_Admin/03_Tenant_Management_Flow]].
 
-| Method | Route | Permission | Purpose | Implementation Status |
-|---|---|---|---|---|
-| GET | `/api/v1/platform-admin/tenants/summary` | `platform.tenants.view` | Summary aggregate metrics (total, active, setup pending, suspended) | Implemented |
-| GET | `/api/v1/platform-admin/tenants/filter-options` | `platform.tenants.view` | Filter lookup values (plans, statuses, operating modes) | Implemented |
-| GET | `/api/v1/platform-admin/tenants/create-options` | `platform.tenants.create` | Create tenant wizard lookup options | Implemented |
-| GET | `/api/v1/platform-admin/tenants` | `platform.tenants.view` | Search, filter (5 R1 filters), sort, and paginate tenant list (Subscription payload requires `platform.tenant_subscriptions.view`) | Implemented (`SA-TENANT-GAP-01` pending) |
-| GET | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.view` | Tenant detail (profile, address, footprint, setup checklist, `concurrencyVersion`; Subscription requires `platform.tenant_subscriptions.view`) | Implemented (`SA-TENANT-GAP-01` pending) |
-| GET | `/api/v1/platform-admin/tenants/{tenantId}/entitlement-options` | `platform.tenants.entitlements.update` | Entitlement options for selected plan & catalog modules | Implemented |
-| GET | `/api/v1/platform-admin/tenants/{tenantId}/audit-logs` | `platform.audit.view` | Tenant-isolated audit log history | Target Endpoint (`SA-TENANT-GAP-05`) |
-| POST | `/api/v1/platform-admin/tenants` | `platform.tenants.create` | Create tenant via wizard payload | Implemented |
-| PUT | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.update` | Update tenant profile/address (`concurrencyVersion` check) | Implemented (`SA-TENANT-GAP-06` pending) |
-| POST | `/api/v1/platform-admin/tenants/{tenantId}/activate` | `platform.tenants.activate` | Activate tenant from `PENDING_ACTIVATION` (`tenant.activated`) | Implemented |
-| POST | `/api/v1/platform-admin/tenants/{tenantId}/suspend` | `platform.tenants.suspend` | Suspend active tenant (`tenant.suspended`) | Implemented |
-| POST | `/api/v1/platform-admin/tenants/{tenantId}/reactivate` | `platform.tenants.activate` | Reactivate tenant from `SUSPENDED` (`tenant.reactivated`) | Target Endpoint (`SA-TENANT-GAP-04`) |
-| PUT | `/api/v1/platform-admin/tenants/{tenantId}/entitlements` | `platform.tenants.entitlements.update` | Update feature entitlements (`concurrencyVersion` check) | Implemented |
-| POST | `/api/v1/platform-admin/tenants/{tenantId}/cancel` | N/A | Excluded from R1 self-service (`SA-TENANT-DECISION-PENDING-01`) | Excluded from R1 |
+| Method | Route                                                           | Permission                             | Purpose                                                                                                                                        | Implementation Status                    |
+| ------ | --------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| GET    | `/api/v1/platform-admin/tenants/summary`                        | `platform.tenants.view`                | Summary aggregate metrics (total, active, setup pending, suspended)                                                                            | Implemented                              |
+| GET    | `/api/v1/platform-admin/tenants/filter-options`                 | `platform.tenants.view`                | Filter lookup values (plans, statuses, operating modes)                                                                                        | Implemented                              |
+| GET    | `/api/v1/platform-admin/tenants/create-options`                 | `platform.tenants.create`              | Create tenant wizard lookup options                                                                                                            | Implemented                              |
+| GET    | `/api/v1/platform-admin/tenants`                                | `platform.tenants.view`                | Search, filter (5 R1 filters), sort, and paginate tenant list (Subscription payload requires `platform.tenant_subscriptions.view`)             | Implemented (`SA-TENANT-GAP-01` pending) |
+| GET    | `/api/v1/platform-admin/tenants/{tenantId}`                     | `platform.tenants.view`                | Tenant detail (profile, address, footprint, setup checklist, `concurrencyVersion`; Subscription requires `platform.tenant_subscriptions.view`) | Implemented (`SA-TENANT-GAP-01` pending) |
+| GET    | `/api/v1/platform-admin/tenants/{tenantId}/entitlement-options` | `platform.tenants.entitlements.update` | Entitlement options for selected plan & catalog modules                                                                                        | Implemented                              |
+| GET    | `/api/v1/platform-admin/tenants/{tenantId}/audit-logs`          | `platform.audit.view`                  | Tenant-isolated audit log history                                                                                                              | Target Endpoint (`SA-TENANT-GAP-05`)     |
+| POST   | `/api/v1/platform-admin/tenants`                                | `platform.tenants.create`              | Create tenant via wizard payload                                                                                                               | Implemented                              |
+| PUT    | `/api/v1/platform-admin/tenants/{tenantId}`                     | `platform.tenants.update`              | Update tenant profile/address (`concurrencyVersion` check)                                                                                     | Implemented (`SA-TENANT-GAP-06` pending) |
+| POST   | `/api/v1/platform-admin/tenants/{tenantId}/activate`            | `platform.tenants.activate`            | Activate tenant from `PENDING_ACTIVATION` (`tenant.activated`)                                                                                 | Implemented                              |
+| POST   | `/api/v1/platform-admin/tenants/{tenantId}/suspend`             | `platform.tenants.suspend`             | Suspend active tenant (`tenant.suspended`)                                                                                                     | Implemented                              |
+| POST   | `/api/v1/platform-admin/tenants/{tenantId}/reactivate`          | `platform.tenants.activate`            | Reactivate tenant from `SUSPENDED` (`tenant.reactivated`)                                                                                      | Target Endpoint (`SA-TENANT-GAP-04`)     |
+| PUT    | `/api/v1/platform-admin/tenants/{tenantId}/entitlements`        | `platform.tenants.entitlements.update` | Update feature entitlements (`concurrencyVersion` check)                                                                                       | Implemented                              |
+| POST   | `/api/v1/platform-admin/tenants/{tenantId}/cancel`              | N/A                                    | Excluded from R1 self-service (`SA-TENANT-DECISION-PENDING-01`)                                                                                | Excluded from R1                         |
 
 ## Tenant POS Login (Unified Commerce)
 
 Base route: `/api/v1/tenant-auth`
 
-| Method | Route | Unified Commerce status |
-|---|---|---|
-| POST | `/api/v1/tenant-auth/login` | **Implemented** — Flutter `ApiEndpoints.tenantLogin` |
-| POST | `/api/v1/tenant-auth/logout` | **Implemented** |
+| Method | Route                        | Unified Commerce status                              |
+| ------ | ---------------------------- | ---------------------------------------------------- |
+| POST   | `/api/v1/tenant-auth/login`  | **Implemented** — Flutter `ApiEndpoints.tenantLogin` |
+| POST   | `/api/v1/tenant-auth/logout` | **Implemented**                                      |
 
 Obsolete route `POST /api/v1/auth/tenant-login` belonged to legacy `SCS.Api`.
 Do not use it for Unified-Commerce integration.
@@ -198,11 +198,11 @@ from the tenant user email.
 
 ### POS Login Branding (Backend Chunk 1 complete; verified 2026-08-10)
 
-| Method | Route | Authentication / permission | Status |
-|---|---|---|---|
-| GET | `/api/v1/pos/public/login-branding/{tenantSlug}` | Anonymous public-safe read | **IMPLEMENTED; runtime verified** |
-| GET | `/api/v1/tenant-admin/settings/pos-login-branding` | Tenant auth + `tenant.settings.manage` | **IMPLEMENTED; authenticated runtime verified** |
-| PUT | `/api/v1/tenant-admin/settings/pos-login-branding` | Tenant auth + `tenant.settings.manage` | **IMPLEMENTED; authenticated runtime verified** |
+| Method | Route                                              | Authentication / permission            | Status                                          |
+| ------ | -------------------------------------------------- | -------------------------------------- | ----------------------------------------------- |
+| GET    | `/api/v1/pos/public/login-branding/{tenantSlug}`   | Anonymous public-safe read             | **IMPLEMENTED; runtime verified**               |
+| GET    | `/api/v1/tenant-admin/settings/pos-login-branding` | Tenant auth + `tenant.settings.manage` | **IMPLEMENTED; authenticated runtime verified** |
+| PUT    | `/api/v1/tenant-admin/settings/pos-login-branding` | Tenant auth + `tenant.settings.manage` | **IMPLEMENTED; authenticated runtime verified** |
 
 The public route uses the provisioned public tenant slug, not entered email or
 internal tenant ID. Exact DTO, status, validation, cache and isolation contracts:
@@ -220,26 +220,26 @@ device `tenantSlug`. Flutter consumption remains Chunk 2.
 
 ## Unified Commerce Cashier Bootstrap APIs (Verified 2026-07-10)
 
-| Method | Route | Status | Flutter wired |
-|---|---|---|---|
-| POST | `/api/v1/tenant-auth/login` | Implemented | Yes |
-| GET | `/api/v1/devices/current` | Implemented | Yes |
-| POST | `/api/v1/devices/activate` | Implemented | Yes |
-| GET | `/api/v1/tills/current-session` | Implemented | Yes |
-| POST | `/api/v1/tills/open` | Implemented | Yes |
-| POST | `/api/v1/tills/close` | Implemented | Yes |
-| GET | `/api/v1/pos/home` | Implemented | Yes |
-| GET | `/api/v1/pos/products` | Implemented on `Sale_Screen` branch | Yes |
+| Method | Route                           | Status                              | Flutter wired |
+| ------ | ------------------------------- | ----------------------------------- | ------------- |
+| POST   | `/api/v1/tenant-auth/login`     | Implemented                         | Yes           |
+| GET    | `/api/v1/devices/current`       | Implemented                         | Yes           |
+| POST   | `/api/v1/devices/activate`      | Implemented                         | Yes           |
+| GET    | `/api/v1/tills/current-session` | Implemented                         | Yes           |
+| POST   | `/api/v1/tills/open`            | Implemented                         | Yes           |
+| POST   | `/api/v1/tills/close`           | Implemented                         | Yes           |
+| GET    | `/api/v1/pos/home`              | Implemented                         | Yes           |
+| GET    | `/api/v1/pos/products`          | Implemented on `Sale_Screen` branch | Yes           |
 
 ### Open Till contract clarification — 2026-08-11
 
 No new Open Till endpoint is required. Reuse:
 
-| Method | Route | Role |
-|---|---|---|
-| GET | `/api/v1/devices/current` | Device/outlet/till bootstrap for Open Till context |
-| GET | `/api/v1/tills/current-session?deviceId=` | Detect/restore open session |
-| POST | `/api/v1/tills/open` | Open Till (`deviceId`, `tillId`, `openingFloat`, `openingNote`) |
+| Method | Route                                     | Role                                                            |
+| ------ | ----------------------------------------- | --------------------------------------------------------------- |
+| GET    | `/api/v1/devices/current`                 | Device/outlet/till bootstrap for Open Till context              |
+| GET    | `/api/v1/tills/current-session?deviceId=` | Detect/restore open session                                     |
+| POST   | `/api/v1/tills/open`                      | Open Till (`deviceId`, `tillId`, `openingFloat`, `openingNote`) |
 
 Success payload reuses `CurrentTillSessionDto` fields: `id`, `outletId`,
 `tillId`, `openedDeviceId`, `openingFloat`, `status`, `openedAt`,
@@ -252,10 +252,10 @@ backend-authoritative. Canonical:
 
 No parallel Close Till endpoint is approved. Reuse/modify:
 
-| Method | Route | Role |
-|---|---|---|
-| GET | `/api/v1/tills/current-session?deviceId=` | Extend/reuse for authoritative close summary |
-| POST | `/api/v1/tills/close` | Close and atomically persist reconciliation + CLOSED event |
+| Method | Route                                     | Role                                                       |
+| ------ | ----------------------------------------- | ---------------------------------------------------------- |
+| GET    | `/api/v1/tills/current-session?deviceId=` | Extend/reuse for authoritative close summary               |
+| POST   | `/api/v1/tills/close`                     | Close and atomically persist reconciliation + CLOSED event |
 
 Current close request includes `deviceId`, `tillId`, `countedCash`, optional
 `expectedCash`, `mismatchReason`, `closingNote`. The current repository trusts
@@ -266,33 +266,47 @@ and commits all close records atomically. Existing route is implemented but
 production-blocked. Canonical:
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/05_Close_Till_Feature]].
 
-### Cash Drawer contract clarification — 2026-08-13
+### Cash Drawer contract clarification — 2026-08-16
 
-Physical Open Drawer reuses existing HardwareCash endpoints (IMPLEMENTED):
+Physical Open Drawer reuses existing HardwareCash endpoints (IMPLEMENTED) —
+**separate from financial Cash In/Drop**:
 
-| Method | Route | Role |
-|---|---|---|
-| POST | `/api/v1/pos/hardware/drawer/operations` | Register drawer open operation |
-| PUT | `/api/v1/pos/hardware/drawer/operations/{operationId}/finalize` | Finalize result |
-| POST | `/api/v1/pos/hardware/drawer/operations/manual-open` | Manual / no-sale open |
-| GET | `/api/v1/pos/hardware/drawer/operations/history` | History by device |
-| GET | `/api/v1/pos/hardware/drawer/operations/{operationId}` | Status by id |
-| GET | `/api/v1/pos/hardware/drawer/operations/by-request/{requestId}` | Idempotent lookup |
+| Method | Route                                                           | Role                           |
+| ------ | --------------------------------------------------------------- | ------------------------------ |
+| POST   | `/api/v1/pos/hardware/drawer/operations`                        | Register drawer open operation |
+| PUT    | `/api/v1/pos/hardware/drawer/operations/{operationId}/finalize` | Finalize result                |
+| POST   | `/api/v1/pos/hardware/drawer/operations/manual-open`            | Manual / no-sale open          |
+| GET    | `/api/v1/pos/hardware/drawer/operations/history`                | History by device              |
+| GET    | `/api/v1/pos/hardware/drawer/operations/{operationId}`          | Status by id                   |
+| GET    | `/api/v1/pos/hardware/drawer/operations/by-request/{requestId}` | Idempotent lookup              |
 
-Financial Cash Drawer APIs are **APPROVED_TARGET_NOT_IMPLEMENTED** (no current
-controller under `/api/v1/pos/cash-drawer`):
+Financial Cash Drawer APIs (`PosCashDrawerController` /
+`PosCashMovementTypesController` in `PosDrawerController.cs`):
 
-| Method | Route | Status | Role |
-|---|---|---|---|
-| GET | `/api/v1/pos/cash-drawer/summary?deviceId=` | APPROVED_TARGET_NOT_IMPLEMENTED | Backend-authoritative till cash summary |
-| GET | `/api/v1/pos/cash-drawer/movements` | APPROVED_TARGET_NOT_IMPLEMENTED | Recent movements (paginated) |
-| POST | `/api/v1/pos/cash-drawer/movements` | APPROVED_TARGET_NOT_IMPLEMENTED | Create `CASH_IN` / `CASH_OUT` / `CASH_DROP` |
+| Method | Route                                                         | Auth         | Permission                    | Purpose                     | Status                                                            | Flutter                  |
+| ------ | ------------------------------------------------------------- | ------------ | ----------------------------- | --------------------------- | ----------------------------------------------------------------- | ------------------------ |
+| GET    | `/api/v1/pos/cash-drawer/summary?deviceId=`                   | Tenant staff | `cash_drawer.view`            | Authoritative expected cash | IMPLEMENTED                                                       | Wired                    |
+| GET    | `/api/v1/pos/cash-drawer/movements?deviceId=&page=&pageSize=` | Tenant staff | `cash_drawer.view`            | Movement history            | IMPLEMENTED                                                       | Wired                    |
+| GET    | `/api/v1/pos/cash-movement-types?direction=`                  | Tenant staff | `cash_drawer.view`            | Type catalog                | **IN and OUT** (invalid direction rejected)                       | Cash In + Drop wired     |
+| POST   | `/api/v1/pos/cash-drawer/movements`                           | Tenant staff | `cash_drawer.movement.create` | Create financial movement   | **IN VERIFIED; OUT IMPLEMENTED** (Chunk 1 automated; E2E pending) | Cash In + Drop canonical |
 
-Do not invent duplicate till/open/close endpoints for Cash Drawer. Permissions:
-`cash_drawer.view`, `cash_drawer.manage`, `cash_drawer.movement.create`,
-`pos.till.close`. Canonical:
+**Do not invent** `POST /cash-drop`, `POST /cash-out`, or `POST /safe-drop`.
+
+Canonical POST body (Cash In verified; Cash Drop target): `requestId`,
+`deviceId`, `movementTypeId`, `amount`, optional `note` (≤500). Currency and
+session context are server-owned. Idempotency: same `requestId` + same logical
+request → safe replay; conflicting payload → conflict.
+
+Cash Drop OUT support, OUT type seeds, and server available-cash checks are
+**implemented in Chunk 1** (automated). Authenticated production E2E and
+printing remain Chunk 2. Canonical feature:
+[[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/07_Cash_Drop_Feature]],
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drop_Chunk_1_Core_Implementation_Status]].
+
+Permissions: `cash_drawer.view`, `cash_drawer.manage` (physical only),
+`cash_drawer.movement.create`, `pos.till.close`. Also:
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]],
-[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]].
 
 ### Device activation contract clarification — 2026-08-10
 
@@ -334,20 +348,50 @@ and [[../15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/Pos_Products_List_Imp
 
 Base route: `/api/v1/tenant-admin/products` · Controller: `TenantAdminProductsController` · Auth Policy: `TenantOnly`.
 
-| Method | Canonical Endpoint | Permission | Purpose |
-| :--- | :--- | :--- | :--- |
-| GET | `/api/v1/tenant-admin/products` | `catalog.products.view` | Paginated product list with search and filters |
-| GET | `/api/v1/tenant-admin/products/filter-options` | `catalog.products.view` | Dropdown values for category, brand, and status filters |
-| POST | `/api/v1/tenant-admin/products` | `catalog.products.create` | Create a product wizard graph (DRAFT or published) |
-| GET | `/api/v1/tenant-admin/products/{id}` | `catalog.products.view` | Get complete details of a specific product |
-| PUT | `/api/v1/tenant-admin/products/{id}` | `catalog.products.update` | Update product details |
-| DELETE | `/api/v1/tenant-admin/products/{id}` | `catalog.products.delete` | Perform soft delete (ARCHIVE status mutation) |
-| GET | `/api/v1/tenant-admin/products/imports/template` | `catalog.products.import` | Download UTF-8 CSV import template |
-| POST | `/api/v1/tenant-admin/products/imports` | `catalog.products.import` | Upload CSV and create batch row logs |
-| GET | `/api/v1/tenant-admin/products/imports/{importId}` | `catalog.products.import` | Read batch upload status and stats |
-| GET | `/api/v1/tenant-admin/products/imports/{importId}/rows` | `catalog.products.import` | Read paginated valid or invalid row validation errors |
-| POST | `/api/v1/tenant-admin/products/imports/{importId}/commit` | `catalog.products.import` | Commit valid rows in batch to database |
-| GET | `/api/v1/tenant-admin/products/imports/{importId}/errors.csv` | `catalog.products.import` | Export validation failures CSV log |
+| Method | Canonical Endpoint                                            | Permission                                    | Purpose                                                                                                                                                                                                                     |
+| :----- | :------------------------------------------------------------ | :-------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| GET    | `/api/v1/tenant-admin/products`                               | `catalog.products.view`                       | Paginated product list with search and filters                                                                                                                                                                              | PARTIAL             |
+| GET    | `/api/v1/tenant-admin/products/create-options`                | `catalog.products.create` + `product_catalog` | Product Setup lookup options. **IMPLEMENTED:** ACTIVE hierarchy-aware `categories[]` depth 1–5. Apply **BR-CAT-PRODUCT-SELECT-001** for effective selectability. Do **not** call `/api/v1/categories/tree` for this picker. | PARTIAL             |
+| GET    | `/api/v1/tenant-admin/products/filter-options`                | `catalog.products.view`                       | Dropdown values for category, brand, and status filters                                                                                                                                                                     | PARTIAL             |
+| POST   | `/api/v1/tenant-admin/products`                               | `catalog.products.create`                     | Create a product wizard graph (DRAFT or published)                                                                                                                                                                          | PARTIAL             |
+| GET    | `/api/v1/tenant-admin/products/{id}`                          | `catalog.products.view`                       | Get complete details of a specific product                                                                                                                                                                                  | PARTIAL             |
+| GET    | `/api/v1/tenant-admin/products/{id}/setup`                    | view **OR** create **OR** update              | Get ProductSetupWizardDto Review snapshot and validation checklist                                                                                                                                                          | DOCUMENTED CONTRACT |
+| PUT    | `/api/v1/tenant-admin/products/{id}`                          | `catalog.products.update`                     | Update product details                                                                                                                                                                                                      | PARTIAL             |
+| POST   | `/api/v1/tenant-admin/products/{id}/publish`                  | `catalog.products.publish` + subgraph recheck | Finalize and publish the draft (transactional)                                                                                                                                                                              | DOCUMENTED CONTRACT |
+| DELETE | `/api/v1/tenant-admin/products/{id}`                          | `catalog.products.delete`                     | Perform soft delete (ARCHIVE status mutation)                                                                                                                                                                               | PARTIAL             |
+| GET    | `/api/v1/tenant-admin/products/imports/template`              | `catalog.products.import`                     | Download UTF-8 CSV import template                                                                                                                                                                                          | PARTIAL             |
+| POST   | `/api/v1/tenant-admin/products/imports`                       | `catalog.products.import`                     | Upload CSV and create batch row logs                                                                                                                                                                                        | PARTIAL             |
+| GET    | `/api/v1/tenant-admin/products/imports/{importId}`            | `catalog.products.import`                     | Read batch upload status and stats                                                                                                                                                                                          | PARTIAL             |
+| GET    | `/api/v1/tenant-admin/products/imports/{importId}/rows`       | `catalog.products.import`                     | Read paginated valid or invalid row validation errors                                                                                                                                                                       | PARTIAL             |
+| POST   | `/api/v1/tenant-admin/products/imports/{importId}/commit`     | `catalog.products.import`                     | Commit valid rows in batch to database                                                                                                                                                                                      | PARTIAL             |
+| GET    | `/api/v1/tenant-admin/products/imports/{importId}/errors.csv` | `catalog.products.import`                     | Export validation failures CSV log                                                                                                                                                                                          | PARTIAL             |
+
+### Step 1 Initial Tracking Details (TARGET / GAP)
+
+`PUT /api/v1/tenant-admin/products/{productId}/draft` and `GET .../setup` remain the only Product Setup draft routes. TARGET Step 1 fields: `initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`. Step 2 remains tracking policy (`productStructure`, `trackInventory`, `batchTracking`, `expiryTracking`, `serialTracking`) plus `confirmClearIncompatibleInitialTracking` when clearing incompatible Step 1 values. Step 7 VARIANT assignment: `initialTrackingAssignedVariantId`. CURRENT DTOs do not contain these fields. Authority: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Permission authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]. Entitlement: `product_catalog`; advanced tracking / non-empty identity: `inventory_tracking`.
+
+### Step 5 Barcode & SKU Payload & Duplicate Projection
+
+`PUT /api/v1/tenant-admin/products/{productId}/draft` accepts `UpdateProductDraftStep5RequestDto`.
+On duplicate detection, the endpoint returns a `409 Conflict` containing a structured duplicate projection payload:
+
+```json
+{
+  "errorCode": "product.duplicate_barcode",
+  "message": "Duplicate barcode detected.",
+  "conflictDetails": {
+    "barcode": "8901234567890",
+    "barcodeType": "EAN-13",
+    "productId": "...",
+    "productName": "Conflicting Product",
+    "productStructure": "SIMPLE",
+    "productVariantId": null,
+    "sku": "SKU-999",
+    "assignedLevel": "PRODUCT",
+    "status": "ACTIVE"
+  }
+}
+```
 
 Note: Legacy route `/api/v1/products` is maintained as compatibility alias pointing to the same application layer logic. Duplicate controller implementation must be retired.
 
@@ -359,13 +403,13 @@ All endpoints require platform JWT authentication.
 
 ## Endpoints
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/platform/subscription-plans` | `platform.subscription_plans.view` | List subscription plans |
-| POST | `/api/v1/platform/subscription-plans` | `platform.subscription_plans.create` | Create draft plan |
-| PATCH | `/api/v1/platform/subscription-plans/{planId}/pricing` | `platform.subscription_plans.edit` | Save draft `base_price` |
-| PATCH | `/api/v1/platform/subscription-plans/{planId}/limits` | `platform.subscription_plans.edit` | Save draft outlet/till/user limits |
-| POST | `/api/v1/platform/subscription-plans/{planId}/publish` | `platform.subscription_plans.edit` | Publish draft → DB `active` |
+| Method | Route                                                  | Permission                           | Purpose                            | Status |
+| ------ | ------------------------------------------------------ | ------------------------------------ | ---------------------------------- | ------ |
+| GET    | `/api/v1/platform/subscription-plans`                  | `platform.subscription_plans.view`   | List subscription plans            |
+| POST   | `/api/v1/platform/subscription-plans`                  | `platform.subscription_plans.create` | Create draft plan                  |
+| PATCH  | `/api/v1/platform/subscription-plans/{planId}/pricing` | `platform.subscription_plans.edit`   | Save draft `base_price`            |
+| PATCH  | `/api/v1/platform/subscription-plans/{planId}/limits`  | `platform.subscription_plans.edit`   | Save draft outlet/till/user limits |
+| POST   | `/api/v1/platform/subscription-plans/{planId}/publish` | `platform.subscription_plans.edit`   | Publish draft → DB `active`        |
 
 ## Release 1 write flow
 
@@ -376,11 +420,11 @@ All endpoints require platform JWT authentication.
 
 ## Status contract
 
-| Layer | Values |
-|---|---|
-| Database | `draft`, `active`, `retired` |
+| Layer                   | Values                                                  |
+| ----------------------- | ------------------------------------------------------- |
+| Database                | `draft`, `active`, `retired`                            |
 | API plan `status` field | Same DB values (no `published`/`archived` in responses) |
-| Frontend labels | UI may show Published for `active`; backend does not |
+| Frontend labels         | UI may show Published for `active`; backend does not    |
 
 Publish response example: `{ "status": "active", ... }`
 
@@ -416,9 +460,9 @@ Base route: `/api/v1/platform-admin/dashboard`
 
 All endpoints require platform JWT authentication (`PlatformOnly`).
 
-| Method | Endpoint | Purpose | Authentication | Permission | Current Status |
-|---|---|---|---|---|---|
-| GET | `/api/v1/platform-admin/dashboard` | Platform dashboard aggregate | PlatformOnly | `platform.dashboard.view` | **Mostly Implemented** |
+| Method | Endpoint                           | Purpose                      | Authentication | Permission                | Current Status         |
+| ------ | ---------------------------------- | ---------------------------- | -------------- | ------------------------- | ---------------------- |
+| GET    | `/api/v1/platform-admin/dashboard` | Platform dashboard aggregate | PlatformOnly   | `platform.dashboard.view` | **Mostly Implemented** |
 
 Product contract (user category, widgets, MRR, health, gaps): [[03_USER_JOURNEYS/Platform_Admin/02_Platform_Dashboard_Flow]].
 
@@ -437,30 +481,30 @@ Legacy `{ success, message, data }` wrapping `PlatformDashboardResponse`.
 
 ### Current `data` fields (implemented)
 
-| Field | Meaning |
-|---|---|
-| `totalTenants` | Tenant count |
-| `activeTenants` | Lifecycle status `active` |
-| `suspendedTenants` | Lifecycle status `suspended` |
-| `trialTenants` | Tenants with subscription status `TRIAL` (subscription dimension, not lifecycle) |
-| `totalSubscriptions` | All tenant subscriptions |
-| `activeSubscriptions` | Subscription status `ACTIVE` |
-| `pendingBillingCount` | Invoices `PENDING` with `balance_due > 0` |
-| `totalOutlets` | Outlets excluding status `DELETED` |
-| `totalTills` | Tills excluding status `DELETED` |
-| `totalUsers` | **Tenant users** excluding `DELETED` (not platform users) |
-| `recentTenants[]` | Latest five tenants by `createdAt` (`id`, `code`, `name`, `status`, `createdAt`) |
-| `attentionItems[]` | Attention rows (`type`, `title`, `description`, `count`, `severity`) |
-| `generatedAt` | UTC generation timestamp |
+| Field                 | Meaning                                                                          |
+| --------------------- | -------------------------------------------------------------------------------- |
+| `totalTenants`        | Tenant count                                                                     |
+| `activeTenants`       | Lifecycle status `active`                                                        |
+| `suspendedTenants`    | Lifecycle status `suspended`                                                     |
+| `trialTenants`        | Tenants with subscription status `TRIAL` (subscription dimension, not lifecycle) |
+| `totalSubscriptions`  | All tenant subscriptions                                                         |
+| `activeSubscriptions` | Subscription status `ACTIVE`                                                     |
+| `pendingBillingCount` | Invoices `PENDING` with `balance_due > 0`                                        |
+| `totalOutlets`        | Outlets excluding status `DELETED`                                               |
+| `totalTills`          | Tills excluding status `DELETED`                                                 |
+| `totalUsers`          | **Tenant users** excluding `DELETED` (not platform users)                        |
+| `recentTenants[]`     | Latest five tenants by `createdAt` (`id`, `code`, `name`, `status`, `createdAt`) |
+| `attentionItems[]`    | Attention rows (`type`, `title`, `description`, `count`, `severity`)             |
+| `generatedAt`         | UTC generation timestamp                                                         |
 
 ### Current attention types
 
-| `type` | Count definition (current implementation) |
-|---|---|
-| `suspended_tenants` | Tenants with status `suspended` |
-| `pending_activation` | Tenants with lifecycle status `PENDING_ACTIVATION` |
-| `past_due_subscriptions` | Tenant subscriptions with status `PAST_DUE` |
-| `pending_billing` | Subscription invoices with status `PENDING` and `balance_due > 0` |
+| `type`                   | Count definition (current implementation)                         |
+| ------------------------ | ----------------------------------------------------------------- |
+| `suspended_tenants`      | Tenants with status `suspended`                                   |
+| `pending_activation`     | Tenants with lifecycle status `PENDING_ACTIVATION`                |
+| `past_due_subscriptions` | Tenant subscriptions with status `PAST_DUE`                       |
+| `pending_billing`        | Subscription invoices with status `PENDING` and `balance_due > 0` |
 
 `pendingBillingCount` must equal the `pending_billing` attention count. SA-P0-02 fixed a crossed assignment between `past_due_subscriptions` and `pending_billing` counts (2026-07-20).
 
@@ -468,18 +512,18 @@ Legacy `{ success, message, data }` wrapping `PlatformDashboardResponse`.
 
 Documented final decisions in [[02_Platform_Dashboard_Flow]] (2026-07-29):
 
-| Addition | Approved rule |
-|---|---|
-| Per-currency MRR | `ACTIVE` only; no FX; monthly÷1, yearly÷12; quarterly÷3 when supported; currency precision; MRR currency groups include `currencyCode`, `decimalPlaces`, and `amount`; rounding mode `MidpointRounding.ToEven`; requires `platform.tenant_subscriptions.view` + `platform.billing.view`. If any eligible currency has missing/invalid central metadata → entire Revenue section UNAVAILABLE (`platform_dashboard.currency_metadata_unavailable` concept); empty eligible set → success empty/zero (not metadata failure). |
-| Historical trends / % change | Real series — not hard-coded zeros |
-| Real System Health | API, DB, jobs, email, payment, blob; HEALTHY/DEGRADED/CRITICAL/UNKNOWN |
-| Lifecycle / subscription separation | `DRAFT`, `PENDING_PAYMENT`, and `PENDING_ACTIVATION` are distinct lifecycle states; `setup_pending` is obsolete and must not be emitted; Trial is subscription-only |
-| Setup Pending | Dashboard count only; detail progress; count≡filter |
-| Permission-filtered widgets | `platform.tenants.view` (tenant data/nav) / `platform.tenant_subscriptions.view` (tenant subscription widgets + navigation) / `platform.billing.view` (MRR + revenue/financial values) / `platform.users.view`. **Partial BE filtering present**; permission-hidden metrics must be omitted/hidden — not authentic-looking zeros. |
-| Trend period timezone | Platform Default Timezone defines daily/weekly/monthly period boundaries (DST-safe); backend converts local boundaries to UTC for persisted-record queries; no client timezone override (no new query parameter); invalid/missing timezone → trends unavailable |
-| Currency precision source | Monetary precision follows central backend ISO-aligned currency metadata (`currencies.decimal_places`); frontend must not hard-code per-currency precision maps; missing/invalid metadata for any eligible MRR currency → whole Revenue UNAVAILABLE (closed SA-DASH-DECISION-PENDING-01) |
-| Section-level status / errors | HTTP 200 partial sections when any section succeeds; conceptual DTO not live |
-| Platform Users count | Distinct from `totalUsers` (tenant users); requires `platform.users.view` |
+| Addition                            | Approved rule                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Per-currency MRR                    | `ACTIVE` only; no FX; monthly÷1, yearly÷12; quarterly÷3 when supported; currency precision; MRR currency groups include `currencyCode`, `decimalPlaces`, and `amount`; rounding mode `MidpointRounding.ToEven`; requires `platform.tenant_subscriptions.view` + `platform.billing.view`. If any eligible currency has missing/invalid central metadata → entire Revenue section UNAVAILABLE (`platform_dashboard.currency_metadata_unavailable` concept); empty eligible set → success empty/zero (not metadata failure). |
+| Historical trends / % change        | Real series — not hard-coded zeros                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Real System Health                  | API, DB, jobs, email, payment, blob; HEALTHY/DEGRADED/CRITICAL/UNKNOWN                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Lifecycle / subscription separation | `DRAFT`, `PENDING_PAYMENT`, and `PENDING_ACTIVATION` are distinct lifecycle states; `setup_pending` is obsolete and must not be emitted; Trial is subscription-only                                                                                                                                                                                                                                                                                                                                                       |
+| Setup Pending                       | Dashboard count only; detail progress; count≡filter                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Permission-filtered widgets         | `platform.tenants.view` (tenant data/nav) / `platform.tenant_subscriptions.view` (tenant subscription widgets + navigation) / `platform.billing.view` (MRR + revenue/financial values) / `platform.users.view`. **Partial BE filtering present**; permission-hidden metrics must be omitted/hidden — not authentic-looking zeros.                                                                                                                                                                                         |
+| Trend period timezone               | Platform Default Timezone defines daily/weekly/monthly period boundaries (DST-safe); backend converts local boundaries to UTC for persisted-record queries; no client timezone override (no new query parameter); invalid/missing timezone → trends unavailable                                                                                                                                                                                                                                                           |
+| Currency precision source           | Monetary precision follows central backend ISO-aligned currency metadata (`currencies.decimal_places`); frontend must not hard-code per-currency precision maps; missing/invalid metadata for any eligible MRR currency → whole Revenue UNAVAILABLE (closed SA-DASH-DECISION-PENDING-01)                                                                                                                                                                                                                                  |
+| Section-level status / errors       | HTTP 200 partial sections when any section succeeds; conceptual DTO not live                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Platform Users count                | Distinct from `totalUsers` (tenant users); requires `platform.users.view`                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 ### Verification notes
 
@@ -496,18 +540,18 @@ Base route: `/api/v1/platform-admin/tenants`
 
 All endpoints require platform JWT authentication.
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/platform-admin/tenants` | `platform.tenants.view` | List tenants with paging/filter/sort |
-| GET | `/api/v1/platform-admin/tenants/summary` | `platform.tenants.view` | Load tenant summary cards |
-| GET | `/api/v1/platform-admin/tenants/filter-options` | `platform.tenants.view` | Load filter dropdown options |
-| GET | `/api/v1/platform-admin/tenants/create-options` | `platform.tenants.create` | Load tenant create wizard options |
-| GET | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.view` | Tenant detail |
-| POST | `/api/v1/platform-admin/tenants` | `platform.tenants.create` | Create tenant (legacy minimal or full 7-step wizard payload) |
-| PUT | `/api/v1/platform-admin/tenants/{tenantId}` | `platform.tenants.update` | Update tenant |
-| POST | `/api/v1/platform-admin/tenants/{tenantId}/activate` | `platform.tenants.activate` | Activate tenant |
-| POST | `/api/v1/platform-admin/tenants/{tenantId}/suspend` | `platform.tenants.suspend` | Suspend tenant |
-| PUT | `/api/v1/platform-admin/tenants/{tenantId}/entitlements` | `platform.tenants.entitlements.update` | Replace tenant plan/features |
+| Method | Route                                                    | Permission                             | Purpose                                                      | Status |
+| ------ | -------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------ | ------ |
+| GET    | `/api/v1/platform-admin/tenants`                         | `platform.tenants.view`                | List tenants with paging/filter/sort                         |
+| GET    | `/api/v1/platform-admin/tenants/summary`                 | `platform.tenants.view`                | Load tenant summary cards                                    |
+| GET    | `/api/v1/platform-admin/tenants/filter-options`          | `platform.tenants.view`                | Load filter dropdown options                                 |
+| GET    | `/api/v1/platform-admin/tenants/create-options`          | `platform.tenants.create`              | Load tenant create wizard options                            |
+| GET    | `/api/v1/platform-admin/tenants/{tenantId}`              | `platform.tenants.view`                | Tenant detail                                                |
+| POST   | `/api/v1/platform-admin/tenants`                         | `platform.tenants.create`              | Create tenant (legacy minimal or full 7-step wizard payload) |
+| PUT    | `/api/v1/platform-admin/tenants/{tenantId}`              | `platform.tenants.update`              | Update tenant                                                |
+| POST   | `/api/v1/platform-admin/tenants/{tenantId}/activate`     | `platform.tenants.activate`            | Activate tenant                                              |
+| POST   | `/api/v1/platform-admin/tenants/{tenantId}/suspend`      | `platform.tenants.suspend`             | Suspend tenant                                               |
+| PUT    | `/api/v1/platform-admin/tenants/{tenantId}/entitlements` | `platform.tenants.entitlements.update` | Replace tenant plan/features                                 |
 
 ## Tenant Detail Entitlements (2026-07-03)
 
@@ -632,29 +676,29 @@ Application validator `PlatformTenantCreateRequestValidator.ValidateWizard` runs
 
 Wizard path is selected when the request includes wizard-only blocks (`tenantAdmin`, `subscription`, `addons`, `address`, `primaryContact`, or profile identifiers). See [[../03_USER_JOURNEYS/Platform_Admin/16_Platform_Tenant_Create_Wizard_Alignment]] for the full request shape.
 
-| Field | Rule | Example valid | Example invalid |
-|---|---|---|---|
-| `countryCode` | Exactly 2 letters and in create-options catalogue when present | `LK` | `Sri Lanka`, unsupported ISO |
-| `address.countryCode` | Exactly 2 letters and in create-options catalogue when present | `LK` | `Sri Lanka` |
-| `baseCurrency` | Exactly 3 letters when present | `LKR` | `LK` |
-| `defaultLocale` | Create-options locale catalogue when present | `en-LK`, `en-GB` | `xx-YY` |
-| `operatingMode` | `unified_epos`, `pos_online_store`, `pos_only` when present | `pos_only` | `STANDARD` |
-| `businessType` | Active `business_types.business_code` when present (service resolve) | `retail` | unknown code |
-| `billingStatus` | One of allowed billing statuses | `pending` | `trial` |
-| `subscription.subscriptionStatus` | Valid subscription lifecycle value | `trial` | (empty when subscription block sent) |
-| `subscription.paymentMethod` | One of seeded payment methods | `manual`, `bank_transfer` | `pending` |
-| `tenantAdmin.email` | Required valid email when `tenantAdmin` block sent | `admin@tenant.com` | `not-an-email` |
+| Field                             | Rule                                                                 | Example valid             | Example invalid                      |
+| --------------------------------- | -------------------------------------------------------------------- | ------------------------- | ------------------------------------ |
+| `countryCode`                     | Exactly 2 letters and in create-options catalogue when present       | `LK`                      | `Sri Lanka`, unsupported ISO         |
+| `address.countryCode`             | Exactly 2 letters and in create-options catalogue when present       | `LK`                      | `Sri Lanka`                          |
+| `baseCurrency`                    | Exactly 3 letters when present                                       | `LKR`                     | `LK`                                 |
+| `defaultLocale`                   | Create-options locale catalogue when present                         | `en-LK`, `en-GB`          | `xx-YY`                              |
+| `operatingMode`                   | `unified_epos`, `pos_online_store`, `pos_only` when present          | `pos_only`                | `STANDARD`                           |
+| `businessType`                    | Active `business_types.business_code` when present (service resolve) | `retail`                  | unknown code                         |
+| `billingStatus`                   | One of allowed billing statuses                                      | `pending`                 | `trial`                              |
+| `subscription.subscriptionStatus` | Valid subscription lifecycle value                                   | `trial`                   | (empty when subscription block sent) |
+| `subscription.paymentMethod`      | One of seeded payment methods                                        | `manual`, `bank_transfer` | `pending`                            |
+| `tenantAdmin.email`               | Required valid email when `tenantAdmin` block sent                   | `admin@tenant.com`        | `not-an-email`                       |
 
 `billingStatus` is a billing concern only. It must **never** populate `tenants.status`.
 
 Persistence (wizard create):
 
-| Request field | Column / join |
-|---|---|
-| `defaultLocale` | `tenants.default_locale` |
-| `operatingMode` | `tenants.operating_mode` |
-| `businessType` | `tenant_profiles.business_type_id` → `business_types` |
-| `countryCode` / `address.countryCode` | `tenant_addresses.country_code` |
+| Request field                         | Column / join                                         |
+| ------------------------------------- | ----------------------------------------------------- |
+| `defaultLocale`                       | `tenants.default_locale`                              |
+| `operatingMode`                       | `tenants.operating_mode`                              |
+| `businessType`                        | `tenant_profiles.business_type_id` → `business_types` |
+| `countryCode` / `address.countryCode` | `tenant_addresses.country_code`                       |
 
 Country consistency: when both top-level and `address.countryCode` are present they must match; top-level-only country creates a primary REGISTERED address so country is not silently dropped.
 
@@ -683,7 +727,10 @@ Validation failure response shape:
   "message": "One or more tenant create fields are invalid.",
   "errorCode": "platform_tenants.validation_failed",
   "errors": [
-    { "field": "countryCode", "message": "Country code must be exactly 2 letters (for example LK)." }
+    {
+      "field": "countryCode",
+      "message": "Country code must be exactly 2 letters (for example LK)."
+    }
   ]
 }
 ```
@@ -704,15 +751,15 @@ All endpoints require platform JWT authentication.
 
 ## Endpoints
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/platform/subscription-plans` | `platform.subscription_plans.view` | List subscription plans |
-| GET | `/api/v1/platform/subscription-plans/catalog` | `platform.subscription_plans.view` | Read commercial subscription catalog (**subscription wizard only**; not the Modules & Features admin page) |
-| POST | `/api/v1/platform/subscription-plans` | `platform.subscription_plans.create` | Create draft plan |
-| PATCH | `/api/v1/platform/subscription-plans/{planId}/pricing` | `platform.subscription_plans.edit` | Save draft `base_price` |
-| PATCH | `/api/v1/platform/subscription-plans/{planId}/limits` | `platform.subscription_plans.edit` | Save draft outlet/till/user limits |
-| PATCH | `/api/v1/platform/subscription-plans/{planId}/features` | `platform.subscription_plans.edit` | Save draft module/feature entitlements |
-| POST | `/api/v1/platform/subscription-plans/{planId}/publish` | `platform.subscription_plans.edit` | Publish draft → DB `active` |
+| Method | Route                                                   | Permission                           | Purpose                                                                                                    | Status |
+| ------ | ------------------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------- | ------ |
+| GET    | `/api/v1/platform/subscription-plans`                   | `platform.subscription_plans.view`   | List subscription plans                                                                                    |
+| GET    | `/api/v1/platform/subscription-plans/catalog`           | `platform.subscription_plans.view`   | Read commercial subscription catalog (**subscription wizard only**; not the Modules & Features admin page) |
+| POST   | `/api/v1/platform/subscription-plans`                   | `platform.subscription_plans.create` | Create draft plan                                                                                          |
+| PATCH  | `/api/v1/platform/subscription-plans/{planId}/pricing`  | `platform.subscription_plans.edit`   | Save draft `base_price`                                                                                    |
+| PATCH  | `/api/v1/platform/subscription-plans/{planId}/limits`   | `platform.subscription_plans.edit`   | Save draft outlet/till/user limits                                                                         |
+| PATCH  | `/api/v1/platform/subscription-plans/{planId}/features` | `platform.subscription_plans.edit`   | Save draft module/feature entitlements                                                                     |
+| POST   | `/api/v1/platform/subscription-plans/{planId}/publish`  | `platform.subscription_plans.edit`   | Publish draft → DB `active`                                                                                |
 
 ## Release 1 write flow
 
@@ -724,11 +771,11 @@ All endpoints require platform JWT authentication.
 
 ## Status contract
 
-| Layer | Values |
-|---|---|
-| Database | `draft`, `active`, `retired` |
+| Layer                   | Values                                                  |
+| ----------------------- | ------------------------------------------------------- |
+| Database                | `draft`, `active`, `retired`                            |
 | API plan `status` field | Same DB values (no `published`/`archived` in responses) |
-| Frontend labels | UI may show Published for `active`; backend does not |
+| Frontend labels         | UI may show Published for `active`; backend does not    |
 
 Publish response example: `{ "status": "active", ... }`
 
@@ -758,9 +805,9 @@ Base: `/api/v1/platform-admin/catalog`
 
 All endpoints require platform JWT authentication (`PlatformOnly` policy).
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/platform-admin/catalog/modules` | `platform.modules.view` | Read active platform modules catalog for the Modules & Features admin page |
+| Method | Route                                    | Permission              | Purpose                                                                    | Status |
+| ------ | ---------------------------------------- | ----------------------- | -------------------------------------------------------------------------- | ------ |
+| GET    | `/api/v1/platform-admin/catalog/modules` | `platform.modules.view` | Read active platform modules catalog for the Modules & Features admin page |
 
 ## Feature visibility rule
 
@@ -813,9 +860,9 @@ All endpoints require platform JWT authentication (`PlatformOnly` policy).
 
 ## Verification (2026-07-03)
 
-| Layer | Result |
-|---|---|
-| Backend | `dotnet test`: 300/300 passed · commit `fd60e5a` |
+| Layer   | Result                                                         |
+| ------- | -------------------------------------------------------------- |
+| Backend | `dotnet test`: 300/300 passed · commit `fd60e5a`               |
 | Angular | `npm test -- --watch=false`: 186/186 passed · commit `1b67f1b` |
 
 ---
@@ -827,9 +874,9 @@ Base: `/api/v1/platform-admin/audit-logs`
 
 All endpoints require platform JWT authentication (`PlatformOnly` policy).
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/platform-admin/audit-logs` | `platform.audit.view` | Read paginated platform login/security audit list |
+| Method | Route                               | Permission            | Purpose                                           | Status |
+| ------ | ----------------------------------- | --------------------- | ------------------------------------------------- | ------ |
+| GET    | `/api/v1/platform-admin/audit-logs` | `platform.audit.view` | Read paginated platform login/security audit list |
 
 ## R1 data scope
 
@@ -840,16 +887,16 @@ All endpoints require platform JWT authentication (`PlatformOnly` policy).
 
 ## Query parameters
 
-| Parameter | Purpose |
-|---|---|
-| `pageNumber` | Page index (default `1`) |
-| `pageSize` | Page size (default `20`, max `100`) |
-| `from` | Inclusive start of date range on `occurredAt` |
-| `to` | Inclusive end of date range on `occurredAt` |
-| `action` | Filter by mapped action (`platform.login.success` / `platform.login.failed` / `platform.login.locked`) or raw login result (`SUCCESS` / `FAILED` / `LOCKED`) |
-| `actorPlatformUserId` | Filter by platform user actor |
-| `entityType` | R1 rows use `platform_user` only; other values return empty page |
-| `search` | Match actor email, login result, or action code |
+| Parameter             | Purpose                                                                                                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `pageNumber`          | Page index (default `1`)                                                                                                                                     |
+| `pageSize`            | Page size (default `20`, max `100`)                                                                                                                          |
+| `from`                | Inclusive start of date range on `occurredAt`                                                                                                                |
+| `to`                  | Inclusive end of date range on `occurredAt`                                                                                                                  |
+| `action`              | Filter by mapped action (`platform.login.success` / `platform.login.failed` / `platform.login.locked`) or raw login result (`SUCCESS` / `FAILED` / `LOCKED`) |
+| `actorPlatformUserId` | Filter by platform user actor                                                                                                                                |
+| `entityType`          | R1 rows use `platform_user` only; other values return empty page                                                                                             |
+| `search`              | Match actor email, login result, or action code                                                                                                              |
 
 Invalid date range (`from > to`) returns HTTP 400 `platform_audit.validation_failed`.
 
@@ -888,20 +935,20 @@ Invalid date range (`from > to`) returns HTTP 400 `platform_audit.validation_fai
 
 ## Field notes
 
-| Field | R1 note |
-|---|---|
-| `auditScope` | Always `platform_login_security` until generic audit migration |
-| `auditScopeDescription` | Explains login-only scope to UI consumers |
-| `ipAddress` | Always `null` — not stored on `platform_login_audits` |
-| `userAgent` | Always `null` — not stored on `platform_login_audits` |
-| `action` | Mapped from `login_result`: `SUCCESS` → `platform.login.success`, `FAILED` → `platform.login.failed`, `LOCKED` → `platform.login.locked` |
+| Field                   | R1 note                                                                                                                                  |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `auditScope`            | Always `platform_login_security` until generic audit migration                                                                           |
+| `auditScopeDescription` | Explains login-only scope to UI consumers                                                                                                |
+| `ipAddress`             | Always `null` — not stored on `platform_login_audits`                                                                                    |
+| `userAgent`             | Always `null` — not stored on `platform_login_audits`                                                                                    |
+| `action`                | Mapped from `login_result`: `SUCCESS` → `platform.login.success`, `FAILED` → `platform.login.failed`, `LOCKED` → `platform.login.locked` |
 
 Ordering: latest first (`occurredAt` descending, then `id` descending).
 
 ## Verification (2026-07-03)
 
-| Layer | Result |
-|---|---|
+| Layer   | Result                                                                                       |
+| ------- | -------------------------------------------------------------------------------------------- |
 | Backend | `dotnet test`: 380/380 passed · branch `feat/platform-audit-logs-minimal` · commit `ac1afae` |
 
 ---
@@ -915,27 +962,47 @@ architecture, frontend routes, alias rules, and known gaps.
 
 Base: `/api/v1/platform-admin/permission-catalog`
 
-| Method | Route | Permission |
-|---|---|---|
-| GET | `/api/v1/platform-admin/permission-catalog` | `platform.permissions.view` |
-| GET | `/api/v1/platform-admin/permission-catalog/flat` | `platform.permissions.view` |
+| Method | Route                                            | Permission                  |
+| ------ | ------------------------------------------------ | --------------------------- |
+| GET    | `/api/v1/platform-admin/permission-catalog`      | `platform.permissions.view` |
+| GET    | `/api/v1/platform-admin/permission-catalog/flat` | `platform.permissions.view` |
 
 ## Tenant Admin
 
-| Method | Route | Permission |
-|---|---|---|
-| GET | `/api/v1/tenant-admin/permission-catalog` | `roles.permissions.view` |
-| GET | `/api/v1/tenant-admin/roles/{roleId}/permissions` | `roles.permissions.view` |
-| PUT | `/api/v1/tenant-admin/roles/{roleId}/permissions` | `roles.permissions.update` |
-| GET | `/api/v1/tenant-admin/context` | Authenticated; includes `effectivePermissions`, `enabledFeatures` |
+| Method | Route                                             | Permission                                                        |
+| ------ | ------------------------------------------------- | ----------------------------------------------------------------- |
+| GET    | `/api/v1/tenant-admin/permission-catalog`         | `roles.permissions.view`                                          |
+| GET    | `/api/v1/tenant-admin/roles/{roleId}/permissions` | `roles.permissions.view`                                          |
+| PUT    | `/api/v1/tenant-admin/roles/{roleId}/permissions` | `roles.permissions.update`                                        |
+| GET    | `/api/v1/tenant-admin/context`                    | Authenticated; includes `effectivePermissions`, `enabledFeatures` |
+
+## Tenant Admin Users API
+
+Base: `/api/v1/tenant-admin/users`
+
+| Method | Route                                               | Permission                                                                 | Purpose                                                                            | Status                                       |
+| ------ | --------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------- |
+| GET    | `/api/v1/tenant-admin/users`                        | `tenant.users.view` or `tenant.users.manage`                               | List tenant users with role/outlet summary and nullable resolved `profileImageUrl` | IMPLEMENTED; API runtime verified 2026-08-18 |
+| GET    | `/api/v1/tenant-admin/users/create-options`         | `tenant.users.create`, `tenant.users.invite`, or `tenant.users.manage`     | Load assignable roles, outlets, permission groups and supported statuses           | IMPLEMENTED                                  |
+| GET    | `/api/v1/tenant-admin/users/{userId}`               | `tenant.users.details.view`, `tenant.users.view`, or `tenant.users.manage` | Load one tenant user detail with resolved `profileImageUrl`                        | IMPLEMENTED                                  |
+| POST   | `/api/v1/tenant-admin/users`                        | `tenant.users.create`, `tenant.users.invite`, or `tenant.users.manage`     | Create/invite tenant user; optional profile media asset id                         | IMPLEMENTED                                  |
+| PUT    | `/api/v1/tenant-admin/users/{userId}`               | `tenant.users.update` or `tenant.users.manage`                             | Update tenant user profile/access/status; optional profile media replace/remove    | IMPLEMENTED                                  |
+| POST   | `/api/v1/tenant-admin/users/{userId}/resend-invite` | `tenant.users.invite` or `tenant.users.manage`                             | Resend invitation for eligible invited user                                        | IMPLEMENTED                                  |
+| POST   | `/api/v1/tenant-admin/users/{userId}/revoke-invite` | `tenant.users.invite` or `tenant.users.manage`                             | Revoke invitation for eligible invited user                                        | IMPLEMENTED                                  |
+| DELETE | `/api/v1/tenant-admin/users/{userId}`               | `tenant.users.delete` or `tenant.users.manage`                             | Disable/delete tenant user according to service rules                              | IMPLEMENTED                                  |
+
+Users List profile image rule: the database stores a media asset id in
+`tenant_users.profile_image_url`; the API returns a nullable resolved URL as
+`profileImageUrl`. Missing, inactive, deleted, or invalid media remains `null`
+so clients can render initials fallback.
 
 ## Verification (2026-06-23)
 
-| Layer | Tests | Commit |
-|---|---|---|
+| Layer   | Tests                                                                 | Commit                                     |
+| ------- | --------------------------------------------------------------------- | ------------------------------------------ |
 | Backend | Build passed; migration applied; catalog GET/role GET/role PUT passed | `0c7008e8fda4c9eb0892b44cfe2468155f73ebf6` |
-| Angular | 95/95 passed | `9626a85f28bccf379b3bf48d6f51de9718b2bace` |
-| Flutter | 90/90 passed | `18e1b29` (`Nytroz-POS-App`) |
+| Angular | 95/95 passed                                                          | `9626a85f28bccf379b3bf48d6f51de9718b2bace` |
+| Flutter | 90/90 passed                                                          | `18e1b29` (`Nytroz-POS-App`)               |
 
 Tenant Admin save verification used real backend APIs, not mock data:
 
@@ -957,14 +1024,14 @@ Base: `/api/v1/platform-admin/users`
 
 All endpoints require platform JWT authentication (`PlatformOnly` policy).
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/platform-admin/users` | `platform.users.view` | List platform users with role summaries |
-| GET | `/api/v1/platform-admin/users/{userId}` | `platform.users.view` | Load one platform user detail |
-| POST | `/api/v1/platform-admin/users` | `platform.users.create` | Create platform user invite |
-| PUT | `/api/v1/platform-admin/users/{userId}` | `platform.users.update` | Update platform user status |
-| PUT | `/api/v1/platform-admin/users/{userId}/roles` | `platform.users.roles.assign` | Replace assigned platform roles |
-| POST | `/api/v1/platform-admin/users/{userId}/password-reset` | `platform.users.update` | Initiate admin password reset; ACS Email when configured (`deliveryMode: email`, `resetUrl: null`); Dev fallback may return `admin_secure_link` |
+| Method | Route                                                  | Permission                    | Purpose                                                                                                                                         | Status |
+| ------ | ------------------------------------------------------ | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| GET    | `/api/v1/platform-admin/users`                         | `platform.users.view`         | List platform users with role summaries                                                                                                         |
+| GET    | `/api/v1/platform-admin/users/{userId}`                | `platform.users.view`         | Load one platform user detail                                                                                                                   |
+| POST   | `/api/v1/platform-admin/users`                         | `platform.users.create`       | Create platform user invite                                                                                                                     |
+| PUT    | `/api/v1/platform-admin/users/{userId}`                | `platform.users.update`       | Update platform user status                                                                                                                     |
+| PUT    | `/api/v1/platform-admin/users/{userId}/roles`          | `platform.users.roles.assign` | Replace assigned platform roles                                                                                                                 |
+| POST   | `/api/v1/platform-admin/users/{userId}/password-reset` | `platform.users.update`       | Initiate admin password reset; ACS Email when configured (`deliveryMode: email`, `resetUrl: null`); Dev fallback may return `admin_secure_link` |
 
 ## Initiate password reset response shape
 
@@ -1070,8 +1137,8 @@ Role options for Angular create/edit must come from `GET /api/v1/platform-admin/
 
 ## Angular route
 
-| Route | Permission | Component |
-|---|---|---|
+| Route                   | Permission            | Component           |
+| ----------------------- | --------------------- | ------------------- |
 | `/admin/platform-users` | `platform.users.view` | `PlatformUsersPage` |
 
 Frontend tests (2026-07-03): `platform-users-page.spec.ts`, `platform-user-api.service.spec.ts`. Password reset UI/API tests added 2026-07-20 (SA-P1-06).
@@ -1084,12 +1151,12 @@ Controllers: `PlatformPasswordResetController` (canonical), `PlatformPasswordRes
 
 Public endpoints — `[AllowAnonymous]` with auth login rate limiting.
 
-| Method | Route | Auth | Purpose |
-|---|---|---|---|
-| POST | `/api/v1/platform-auth/password-reset/validate` | Anonymous + rate limit | Validate one-time reset token; returns `{ isValid, status, expiresAt }` |
-| POST | `/api/v1/platform-auth/password-reset/complete` | Anonymous + rate limit | Set new password; revokes sessions on success |
-| POST | `/api/v1/auth/platform-password-reset/validate` | Anonymous + rate limit | Legacy alias (legacy API envelope) |
-| POST | `/api/v1/auth/platform-password-reset/complete` | Anonymous + rate limit | Legacy alias (legacy API envelope) |
+| Method | Route                                           | Auth                   | Purpose                                                                 |
+| ------ | ----------------------------------------------- | ---------------------- | ----------------------------------------------------------------------- |
+| POST   | `/api/v1/platform-auth/password-reset/validate` | Anonymous + rate limit | Validate one-time reset token; returns `{ isValid, status, expiresAt }` |
+| POST   | `/api/v1/platform-auth/password-reset/complete` | Anonymous + rate limit | Set new password; revokes sessions on success                           |
+| POST   | `/api/v1/auth/platform-password-reset/validate` | Anonymous + rate limit | Legacy alias (legacy API envelope)                                      |
+| POST   | `/api/v1/auth/platform-password-reset/complete` | Anonymous + rate limit | Legacy alias (legacy API envelope)                                      |
 
 ## Validate request / response
 
@@ -1134,21 +1201,21 @@ Base: `/api/v1/platform-admin/roles`
 
 All endpoints require platform JWT authentication.
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/platform-admin/roles` | `platform.roles.view` | List platform roles with user and permission counts |
-| POST | `/api/v1/platform-admin/roles` | `platform.roles.create` | Create non-system platform role |
-| PUT | `/api/v1/platform-admin/roles/{roleId}` | `platform.roles.update` | Update non-system role name, description, status |
-| GET | `/api/v1/platform-admin/roles/{roleId}/permissions` | `platform.roles.permissions.view` | Read assigned platform permissions |
-| PUT | `/api/v1/platform-admin/roles/{roleId}/permissions` | `platform.roles.permissions.update` | Replace assigned platform permissions |
+| Method | Route                                               | Permission                          | Purpose                                             | Status |
+| ------ | --------------------------------------------------- | ----------------------------------- | --------------------------------------------------- | ------ |
+| GET    | `/api/v1/platform-admin/roles`                      | `platform.roles.view`               | List platform roles with user and permission counts |
+| POST   | `/api/v1/platform-admin/roles`                      | `platform.roles.create`             | Create non-system platform role                     |
+| PUT    | `/api/v1/platform-admin/roles/{roleId}`             | `platform.roles.update`             | Update non-system role name, description, status    |
+| GET    | `/api/v1/platform-admin/roles/{roleId}/permissions` | `platform.roles.permissions.view`   | Read assigned platform permissions                  |
+| PUT    | `/api/v1/platform-admin/roles/{roleId}/permissions` | `platform.roles.permissions.update` | Replace assigned platform permissions               |
 
 Verification on 2026-06-23 used real backend APIs: login `posunique001@gmail.com` / `123456`, catalog returned 15 modules, `super_administrator` returned 14 assigned permissions including the new role codes, smoke role `qa_platform_role_145431` was created, and two permissions were assigned through PUT successfully.
 
 ## Platform Admin Role Detail Endpoint 2026-06-23
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/platform-admin/roles/{roleId}` | `platform.roles.view` | Load one platform role detail for edit/view screens |
+| Method | Route                                   | Permission            | Purpose                                             | Status |
+| ------ | --------------------------------------- | --------------------- | --------------------------------------------------- | ------ |
+| GET    | `/api/v1/platform-admin/roles/{roleId}` | `platform.roles.view` | Load one platform role detail for edit/view screens |
 
 Response data includes `id`, `code`, `name`, `description`, `isSystem`, `status`, `assignedUserCount`, `permissionCount`, `createdAt`, and `updatedAt`.
 
@@ -1254,11 +1321,11 @@ See [[../99_Archive/04_MODULE_KNOWLEDGE/Subscription/04_Subscription_Catalog_Mod
 
 The production popup contract is **Documentation Ready; implementation remains pending verification/implementation**. Authority: [[../04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 
-| Method | Route | Target purpose | Status |
-|---|---|---|---|
-| GET | `/api/v1/pos/products/{productId}?deviceId={deviceId}` | Dynamic option/value/variant detail, authoritative price/stock and one resolved image | Pending verification/implementation |
-| GET | `/api/v1/pos/products/{productId}/recommendations?deviceId={deviceId}&type=frequently-bought-together&limit=3` | Up to three manually configured recommendations | Implementation Pending |
-| POST | `/api/v1/pos/cart/calculate` | Validate main/recommendation lines and return authoritative cart lines/totals | Implementation Pending for full popup contract |
+| Method | Route                                                                                                          | Target purpose                                                                        | Status                                         |
+| ------ | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| GET    | `/api/v1/pos/products/{productId}?deviceId={deviceId}`                                                         | Dynamic option/value/variant detail, authoritative price/stock and one resolved image | Pending verification/implementation            |
+| GET    | `/api/v1/pos/products/{productId}/recommendations?deviceId={deviceId}&type=frequently-bought-together&limit=3` | Up to three manually configured recommendations                                       | Implementation Pending                         |
+| POST   | `/api/v1/pos/cart/calculate`                                                                                   | Validate main/recommendation lines and return authoritative cart lines/totals         | Implementation Pending for full popup contract |
 
 Product detail uses ID-based option mappings and one resolved image, not a popup gallery. Cart request lines target `clientLineId`, `variantId`, `quantity`, `uomId`, nullable normalized `lineNote`, `source` and optional `recommendationParentReference`; responses return product/variant snapshots, SKU/name, quantity/UOM, unit price, discount, tax, total, stock status, conflict code and normalized `lineNote`. Preserve the line contract through checkout, supported hold/recall, completed sale and receipt. Do not log note text.
 
@@ -1271,17 +1338,17 @@ Product detail uses ID-based option mappings and one resolved image, not a popup
 Base routes: `/api/v1/pos/cart`, `/api/v1/pos/checkout`,
 `/api/v1/pos/sales`, `/api/v1/pos/payments`, `/api/v1/pos/receipts`.
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| POST | `/api/v1/pos/cart/calculate` | `sales.cart.update_item` in the direct controller; `sales.checkout` when called through checkout summary/start-payment | Backend cart totals without saving a sale |
-| POST | `/api/v1/pos/checkout/summary` | `sales.checkout` | Payment screen billing summary and permitted methods |
-| POST | `/api/v1/pos/checkout/start-payment` | `sales.checkout` + selected payment permission | Existing Flutter cash checkout entry point; creates sale/payment/receipt for cash |
-| POST | `/api/v1/pos/sales` | `sales.checkout` | Create draft POS sale |
-| POST | `/api/v1/pos/sales/checkout` | `sales.checkout` | Alias for draft sale creation; does not complete payment by itself |
-| GET | `/api/v1/pos/sales/{saleId}` | `sales.view` | Completed sale details |
-| POST | `/api/v1/pos/payments` | Payment method permission such as `payments.cash.accept` | Record payment against an existing draft sale |
-| GET | `/api/v1/pos/receipts/{saleId}` | `receipts.view` or `receipts.print` | Receipt preview data with `barcodeValue` |
-| POST | `/api/v1/pos/receipts/{saleId}/print` | `receipts.print` | Receipt print audit row |
+| Method | Route                                 | Permission                                                                                                             | Purpose                                                                           | Status |
+| ------ | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ------ |
+| POST   | `/api/v1/pos/cart/calculate`          | `sales.cart.update_item` in the direct controller; `sales.checkout` when called through checkout summary/start-payment | Backend cart totals without saving a sale                                         |
+| POST   | `/api/v1/pos/checkout/summary`        | `sales.checkout`                                                                                                       | Payment screen billing summary and permitted methods                              |
+| POST   | `/api/v1/pos/checkout/start-payment`  | `sales.checkout` + selected payment permission                                                                         | Existing Flutter cash checkout entry point; creates sale/payment/receipt for cash |
+| POST   | `/api/v1/pos/sales`                   | `sales.checkout`                                                                                                       | Create draft POS sale                                                             |
+| POST   | `/api/v1/pos/sales/checkout`          | `sales.checkout`                                                                                                       | Alias for draft sale creation; does not complete payment by itself                |
+| GET    | `/api/v1/pos/sales/{saleId}`          | `sales.view`                                                                                                           | Completed sale details                                                            |
+| POST   | `/api/v1/pos/payments`                | Payment method permission such as `payments.cash.accept`                                                               | Record payment against an existing draft sale                                     |
+| GET    | `/api/v1/pos/receipts/{saleId}`       | `receipts.view` or `receipts.print`                                                                                    | Receipt preview data with `barcodeValue`                                          |
+| POST   | `/api/v1/pos/receipts/{saleId}/print` | `receipts.print`                                                                                                       | Receipt print audit row                                                           |
 
 The Unified Commerce target writes `sales_orders`, `sales_order_lines`, payment/allocation records and `receipts`. Print audit writes
 `receipt_print_logs`.
@@ -1298,18 +1365,21 @@ simple/non-variant products so Flutter can send `{ variantId, qty }` to checkout
 summary/start-payment without substituting product IDs.
 
 Additionally, this endpoint supports a planned `segment` query parameter to filter and rank products (Implementation Target):
+
 - `all` (default): Returns all active, sellable products in the outlet.
 - `popular`: Returns manually curated products mapped to the tenant-scoped reserved collection code `POS_POPULAR` sorted by `sort_order`.
 - `frequently-sold`: Dynamically aggregates and ranks products based on net completed sales ($max(qty - cancelled - returned, 0)$) at the current outlet over a rolling 30-day window.
 - `offers`: Dynamically aggregates products with active targeted discount policies or special prices (compare-at price > selling price).
 
 Query parameters:
+
 - `deviceId` (Guid, required): Resolves the trusted tenant, outlet, and POS channel context.
 - `segment` (string, optional): One of `all`, `popular`, `frequently-sold`, `offers`. Invalid values return HTTP 400.
 - `categoryId` (Guid, optional): Filters results within the selected segment.
 - `search` (string, optional): Text search query evaluated within the selected segment.
 
 Computed offer projection properties in `PosProductSummaryResponseDto` (Planned):
+
 - `hasOffer` (bool): Indicates if an active offer or special price is available.
 - `offerType` (string): Promotion type (e.g. `percentage`, `fixed_amount`, `special_price`, `conditional`).
 - `offerPolicyId` (Guid, nullable): Unique identifier for the discount policy or price list.
@@ -1349,11 +1419,11 @@ lookup/search path.
 
 Flutter route: `/pos/returns-refunds`
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/pos/returns/sales/search` | exact `returns.view` | Search/list original outlet-scoped completed sales |
-| GET | `/api/v1/pos/returns/sales/{saleId}/eligibility` | exact `returns.view` | Sale eligibility/detail for the current till outlet |
-| POST | `/api/v1/pos/returns/sales/{saleId}/eligibility-check` | exact `returns.view` | Selected-line eligibility check; same outlet isolation |
+| Method | Route                                                  | Permission           | Purpose                                                | Status |
+| ------ | ------------------------------------------------------ | -------------------- | ------------------------------------------------------ | ------ |
+| GET    | `/api/v1/pos/returns/sales/search`                     | exact `returns.view` | Search/list original outlet-scoped completed sales     |
+| GET    | `/api/v1/pos/returns/sales/{saleId}/eligibility`       | exact `returns.view` | Sale eligibility/detail for the current till outlet    |
+| POST   | `/api/v1/pos/returns/sales/{saleId}/eligibility-check` | exact `returns.view` | Selected-line eligibility check; same outlet isolation |
 
 ### Step 3 — Select Items (2026-07-17)
 
@@ -1383,14 +1453,14 @@ Flutter route: `/pos/returns-refunds/check-eligibility`
 
 #### Checklist contract (`policyChecks`)
 
-| Code | Evaluation |
-|---|---|
-| `RETURN_WINDOW` | Line eligibility vs receipt `issued_at` + resolved policy window |
-| `ORIGINAL_RECEIPT` | Uses `return_policies.requires_receipt`. Required + ISSUED SALE receipt for till outlet → `PASSED`. Required missing/invalid → `FAILED`. Not required → `NOT_APPLICABLE` (never claims verified when optional). |
-| `PAYMENT_VERIFICATION` | Persisted `sales_payments` with status `PAID` or `PARTIALLY_REFUNDED`, positive `paid_amount`, currency match. Does **not** use display `paymentMethod` text. |
-| `PRODUCT_RETURN_POLICY` | Product `return_policy_id` → ACTIVE policy, else tenant default ACTIVE policy. Categories have no return-policy attribute; code is not a fake category pass. |
-| `INSPECTION_REQUIRED` | Preliminary only. `ReturnPolicy` has no `requires_inspection`; Step 4 flag is false/`NOT_APPLICABLE` until Step 5 reason may require inspection. |
-| `MANAGER_APPROVAL_REQUIRED` | From `return_policies.requires_manager_approval` → `REQUIRES_REVIEW` (Continue still allowed). No approval record is created at Step 4. |
+| Code                        | Evaluation                                                                                                                                                                                                      |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `RETURN_WINDOW`             | Line eligibility vs receipt `issued_at` + resolved policy window                                                                                                                                                |
+| `ORIGINAL_RECEIPT`          | Uses `return_policies.requires_receipt`. Required + ISSUED SALE receipt for till outlet → `PASSED`. Required missing/invalid → `FAILED`. Not required → `NOT_APPLICABLE` (never claims verified when optional). |
+| `PAYMENT_VERIFICATION`      | Persisted `sales_payments` with status `PAID` or `PARTIALLY_REFUNDED`, positive `paid_amount`, currency match. Does **not** use display `paymentMethod` text.                                                   |
+| `PRODUCT_RETURN_POLICY`     | Product `return_policy_id` → ACTIVE policy, else tenant default ACTIVE policy. Categories have no return-policy attribute; code is not a fake category pass.                                                    |
+| `INSPECTION_REQUIRED`       | Preliminary only. `ReturnPolicy` has no `requires_inspection`; Step 4 flag is false/`NOT_APPLICABLE` until Step 5 reason may require inspection.                                                                |
+| `MANAGER_APPROVAL_REQUIRED` | From `return_policies.requires_manager_approval` → `REQUIRES_REVIEW` (Continue still allowed). No approval record is created at Step 4.                                                                         |
 
 Statuses: `PASSED` | `FAILED` | `REQUIRES_REVIEW` | `NOT_APPLICABLE`.
 
@@ -1404,10 +1474,10 @@ Hard request conflicts remain HTTP **409** (`line_not_returnable`, `quantity_exc
 
 Flutter route: `/pos/returns-refunds/return-reason`
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/pos/returns/reasons` | `returns.view` + `returns.create` | Load active tenant Return/BOTH reasons |
-| POST | `/api/v1/pos/returns/sales/{saleId}/reasons/validate` | `returns.view` + `returns.create` | Validation-only reason/note assignment |
+| Method | Route                                                 | Permission                        | Purpose                                | Status |
+| ------ | ----------------------------------------------------- | --------------------------------- | -------------------------------------- | ------ |
+| GET    | `/api/v1/pos/returns/reasons`                         | `returns.view` + `returns.create` | Load active tenant Return/BOTH reasons |
+| POST   | `/api/v1/pos/returns/sales/{saleId}/reasons/validate` | `returns.view` + `returns.create` | Validation-only reason/note assignment |
 
 Rules:
 
@@ -1424,15 +1494,15 @@ Rules:
 
 Flutter route: `/pos/returns-refunds/inspect-items`
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/pos/returns/inspection/conditions` | `returns.view` + `returns.create` | Active tenant condition catalog |
-| GET | `/api/v1/pos/returns/sales/{saleId}/inspection/draft` | `returns.view` + `returns.create` | Load persisted draft (`version`, `expiresAt`) |
-| PUT | `/api/v1/pos/returns/sales/{saleId}/inspection/draft` | `returns.view` + `returns.create` | Save draft lines; optional `version` for optimistic concurrency |
-| POST | `/api/v1/pos/returns/sales/{saleId}/inspection/validate` | `returns.view` + `returns.create` | Validate persisted draft; marks `VALIDATED` when `canContinue` |
-| POST | `/api/v1/pos/returns/sales/{saleId}/inspection/media` | `returns.view` + `returns.create` | Multipart photo upload to staging |
-| DELETE | `/api/v1/pos/returns/inspection/media/{mediaId}` | `returns.view` + `returns.create` | Soft-delete staging row + remove file |
-| GET | `/api/v1/pos/returns/inspection/media/{mediaId}` | `returns.view` + `returns.create` | Authenticated photo bytes for preview |
+| Method | Route                                                    | Permission                        | Purpose                                                         | Status |
+| ------ | -------------------------------------------------------- | --------------------------------- | --------------------------------------------------------------- | ------ |
+| GET    | `/api/v1/pos/returns/inspection/conditions`              | `returns.view` + `returns.create` | Active tenant condition catalog                                 |
+| GET    | `/api/v1/pos/returns/sales/{saleId}/inspection/draft`    | `returns.view` + `returns.create` | Load persisted draft (`version`, `expiresAt`)                   |
+| PUT    | `/api/v1/pos/returns/sales/{saleId}/inspection/draft`    | `returns.view` + `returns.create` | Save draft lines; optional `version` for optimistic concurrency |
+| POST   | `/api/v1/pos/returns/sales/{saleId}/inspection/validate` | `returns.view` + `returns.create` | Validate persisted draft; marks `VALIDATED` when `canContinue`  |
+| POST   | `/api/v1/pos/returns/sales/{saleId}/inspection/media`    | `returns.view` + `returns.create` | Multipart photo upload to staging                               |
+| DELETE | `/api/v1/pos/returns/inspection/media/{mediaId}`         | `returns.view` + `returns.create` | Soft-delete staging row + remove file                           |
+| GET    | `/api/v1/pos/returns/inspection/media/{mediaId}`         | `returns.view` + `returns.create` | Authenticated photo bytes for preview                           |
 
 Rules:
 
@@ -1450,15 +1520,15 @@ Rules:
 
 ### Steps 7–10 — Resolution, Branches, and Completion (2026-07-17)
 
-| Method | Route | Permission | Purpose |
-|---|---|---|---|
-| GET | `/api/v1/pos/returns/sales/{saleId}/resolution` | `returns.view` + `returns.create` | Authoritative Step 7 hydration and branch availability |
-| PUT | `/api/v1/pos/returns/sales/{saleId}/resolution` | shared permissions + `refunds.create` or `exchanges.create` | Persist REFUND/EXCHANGE with `expectedVersion` |
-| GET/PUT | `/api/v1/pos/returns/sales/{saleId}/refund-method(s)` | `returns.view` + `returns.create` + `refunds.create` | Refund branch draft |
-| GET/PUT | `/api/v1/pos/returns/sales/{saleId}/exchange/replacement` | `returns.view` + `returns.create` + `exchanges.create` | Exchange replacement draft (`expectedVersion` on PUT; returns `version`, `expiresAt`) |
-| GET | `/api/v1/pos/returns/sales/{saleId}/exchange/products` | Exchange permissions | Name/SKU/barcode search with **current-outlet** sellable stock only |
-| POST | `/api/v1/pos/returns/sales/{saleId}/exchange-preview` | Exchange permissions | Authoritative exchange pricing/stock/difference (`canProceed`, tax/discount from return credit) |
-| POST | `/api/v1/pos/returns/sales/{saleId}/complete` | selected branch permissions | Idempotent Return/Refund or Return/Exchange completion |
+| Method  | Route                                                     | Permission                                                  | Purpose                                                                                         | Status |
+| ------- | --------------------------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------ |
+| GET     | `/api/v1/pos/returns/sales/{saleId}/resolution`           | `returns.view` + `returns.create`                           | Authoritative Step 7 hydration and branch availability                                          |
+| PUT     | `/api/v1/pos/returns/sales/{saleId}/resolution`           | shared permissions + `refunds.create` or `exchanges.create` | Persist REFUND/EXCHANGE with `expectedVersion`                                                  |
+| GET/PUT | `/api/v1/pos/returns/sales/{saleId}/refund-method(s)`     | `returns.view` + `returns.create` + `refunds.create`        | Refund branch draft                                                                             |
+| GET/PUT | `/api/v1/pos/returns/sales/{saleId}/exchange/replacement` | `returns.view` + `returns.create` + `exchanges.create`      | Exchange replacement draft (`expectedVersion` on PUT; returns `version`, `expiresAt`)           |
+| GET     | `/api/v1/pos/returns/sales/{saleId}/exchange/products`    | Exchange permissions                                        | Name/SKU/barcode search with **current-outlet** sellable stock only                             |
+| POST    | `/api/v1/pos/returns/sales/{saleId}/exchange-preview`     | Exchange permissions                                        | Authoritative exchange pricing/stock/difference (`canProceed`, tax/discount from return credit) |
+| POST    | `/api/v1/pos/returns/sales/{saleId}/complete`             | selected branch permissions                                 | Idempotent Return/Refund or Return/Exchange completion                                          |
 
 Resolution GET/PUT require `deviceId`, open till context, outlet-owned sale/draft,
 `VALIDATED`, unexpired, unconsumed draft. GET returns `draftId`, `version`,
@@ -1535,23 +1605,57 @@ Same rule for `GET .../sales/search` and `GET .../sales/{saleId}/eligibility`:
 
 # POS Receipts API Endpoints (2026-08-05)
 
+# Tenant E-commerce Click & Collect Staff API (OO-01 target updated 2026-08-27)
+
+The single staff operational owner is `/api/v1/tenant/ecommerce/click-collect`. The operations below are **canonical / implementation pending**. Existing public storefront `GET /api/v1/ecommerce/storefront/fulfillment/...` reads are implemented customer APIs and remain separate. Older generic `/api/v1/fulfilment-orders`, `/api/v1/pickup-orders` and `/api/v1/pickup-events` descriptions are not competing public staff contracts.
+
+| Method | Route                                                                                   | Purpose                                                                                                                                                                  |
+| ------ | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| GET    | `/api/v1/tenant/ecommerce/click-collect/orders`                                         | Implemented bounded staff queue read with outlet/search/status/sort/paging, six full-scope aggregates, server time and card projections; approved UI exposes search only |
+| GET    | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}`                               | Detail                                                                                                                                                                   |
+| POST   | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/fulfilment/start`              | Atomic fulfilment start                                                                                                                                                  |
+| GET    | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking`                       | Picking detail                                                                                                                                                           |
+| POST   | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/lines/{lineId}/pick`   | Barcode/quantity pick                                                                                                                                                    |
+| POST   | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/lines/{lineId}/issues` | Record picking issue                                                                                                                                                     |
+| POST   | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/pack`                          | Validate/create packages                                                                                                                                                 |
+| POST   | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/ready`                         | Mark ready and notify                                                                                                                                                    |
+| GET    | `/api/v1/tenant/ecommerce/click-collect/collection/ready`                               | Outlet ready queue                                                                                                                                                       |
+| POST   | `/api/v1/tenant/ecommerce/click-collect/collection/qr/validate`                         | Server QR validation                                                                                                                                                     |
+| GET    | `/api/v1/tenant/ecommerce/click-collect/collection/lookup`                              | Manual fallback lookup                                                                                                                                                   |
+| POST   | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/collection/payment/cash`       | Existing unified payment orchestration                                                                                                                                   |
+| POST   | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/collection/handover`           | Idempotent finalization                                                                                                                                                  |
+
+Command DTOs carry idempotency and repository-standard concurrency where required. A generic `PATCH .../status`, if retained, is restricted/deprecated for cashier operations and cannot bypass command invariants.
+
+## OO-01 list-read details
+
+- Authorization: authenticated tenant staff + `click_collect` entitlement + `commerce.online_order.orders.access` + `commerce.online_order.orders.view` + tenant/outlet/resource scope. Role names do not authorize.
+- Outlet authorization requires an active same-tenant user and active same-tenant outlet. Only outlet assignments whose `revoked_at` is null are effective. Denial returns HTTP 403 with `online_orders.outlet_access_denied`; revoked history never grants access or disables the no-active-scope tenant-wide fallback.
+- Query capability: `outletId`, `search`, `status`, `sortBy`, `sortDirection`, `page`, `pageSize`. Only debounced `search` is visible in the approved queue; the remainder supports bounded server reads.
+- Response concepts: `items`, `summary`, `page`, `pageSize`, `totalCount`, `serverTime`. Summary provides New, Preparing, Ready, Delayed, Collected and Cancelled counts for the complete active scope, not the returned page.
+- Item projection: order ID/number, pickup or collection reference, customer name/phone, collection start/end/timezone snapshot, display/payment status, item/unit counts, product previews and remaining-preview count. Preview projections contain product/variant identity, product name, image URL and alt text.
+- Derivation: Delayed uses authoritative lifecycle + collection window + server time and cannot replace Ready, Collected, Cancelled or terminal states. Payment comes from existing payment/order authority.
+- Performance: use bounded efficient aggregate/joined or batched reads; no N+1 database queries or per-product image API calls.
+- Navigation: queue chevron reads `/orders/{orderId}` only; it invokes no mutation.
+
 Controller: `PosReceiptsController`
 Base: `/api/v1/pos/receipts`
 
 All endpoints require tenant JWT authentication (`TenantOnly` policy).
 
-| Method | Route | Purpose |
-|---|---|---|
-| GET | `/api/v1/pos/receipts` | Search receipts (paginated) |
-| GET | `/api/v1/pos/receipts/{receiptId}` | Get receipt detail by `receiptId` (NOT `saleId`) |
-| POST | `/api/v1/pos/receipts/{receiptId}/reprint/authorize` | Authorize reprint |
-| POST | `/api/v1/pos/receipts/{saleId}/print` | Record print audit |
+| Method | Route                                                | Purpose                                          |
+| ------ | ---------------------------------------------------- | ------------------------------------------------ |
+| GET    | `/api/v1/pos/receipts`                               | Search receipts (paginated)                      |
+| GET    | `/api/v1/pos/receipts/{receiptId}`                   | Get receipt detail by `receiptId` (NOT `saleId`) |
+| POST   | `/api/v1/pos/receipts/{receiptId}/reprint/authorize` | Authorize reprint                                |
+| POST   | `/api/v1/pos/receipts/{saleId}/print`                | Record print audit                               |
 
 Receipt detail uses `receiptId` (not `saleId`). Do not document or implement the GET detail route as `{saleId}`.
 
 ## Checkout Success Response Contract Decision
 
 The existing `POST /api/v1/pos/checkout/start-payment` response (`PosCheckoutStartPaymentResponseDto`) contains:
+
 - `SaleId`, `SaleNumber`, `ReceiptNumber`, `ReceiptId`, `PaymentId`
 - `MerchantName`, `OutletName`, `TillId`, `TillName`, `CashierId`, `CashierName`
 - `Subtotal`, `DiscountTotal`, `TaxTotal`, `GrandTotal`, `CashReceived`, `ChangeDue`
@@ -1562,6 +1666,7 @@ The existing `POST /api/v1/pos/checkout/start-payment` response (`PosCheckoutSta
 - `receiptTemplateVersionId` is NOT exposed.
 
 **API Contract Decision**: Existing endpoints (`POST /api/v1/pos/checkout/start-payment` and `GET /api/v1/pos/receipts/{receiptId}`) are reused. The response DTOs (`PosCheckoutStartPaymentResponseDto` and `PosReceiptDetailDto`) have been successfully extended to include `ReceiptDataJson`. Currently the resolved receipt snapshot (`receipt_data_json`) is generated statically during checkout; dynamic template merging is pending. See [[Receipt_Template_Resolution_And_Snapshot_Contract]].
+
 # Tenant Admin Outlets API Endpoints
 
 Controller: `TenantAdminOutletsController`
@@ -1569,26 +1674,27 @@ Base: `/api/v1/tenant-admin/outlets`
 
 All endpoints require tenant JWT authentication and `TenantOnly` policy.
 
-| Method | Route | Permission | Purpose | Status |
-|---|---|---|---|---|
-| GET | `/api/v1/tenant-admin/outlets` | `tenant.outlets.view` | List outlets with pagination, sort, and filters (Type, Status, Needs Attention) | Existing |
-| GET | `/api/v1/tenant-admin/outlets/create-options` | `tenant.outlets.manage` | Load outlet creation lookup options | Proposed |
-| GET | `/api/v1/tenant-admin/outlets/{outletId}` | `tenant.outlets.view` | Outlet detail | Existing |
-| GET | `/api/v1/tenant-admin/outlets/{outletId}/overview` | `tenant.outlets.view` | Aggregate summary (Tills, Sales, Orders, Inventory, Health, Manager) | Proposed |
-| POST | `/api/v1/tenant-admin/outlets` | `tenant.outlets.manage` | Create new outlet | Existing |
-| PUT | `/api/v1/tenant-admin/outlets/{outletId}` | `tenant.outlets.manage` | Update outlet details | Existing |
-| PUT | `/api/v1/tenant-admin/outlets/{outletId}/activate` | `tenant.outlets.manage` | Set status to ACTIVE | Existing |
-| PUT | `/api/v1/tenant-admin/outlets/{outletId}/disable` | `tenant.outlets.manage` | Set status to INACTIVE | Existing |
-| PUT | `/api/v1/tenant-admin/outlets/{outletId}/manager` | `tenant.outlets.manage` | Assign primary manager | Proposed |
-| PUT | `/api/v1/tenant-admin/outlets/{outletId}/image` | `tenant.outlets.manage` | Upload or replace outlet image | Proposed |
-| DELETE | `/api/v1/tenant-admin/outlets/{outletId}/image` | `tenant.outlets.manage` | Remove outlet image | Proposed |
-| GET | `/api/v1/tenant-admin/outlets/{outletId}/alerts` | `tenant.outlets.view` | Get operational alerts | Proposed |
+| Method | Route                                              | Permission              | Purpose                                                                         | Status   |
+| ------ | -------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------- | -------- |
+| GET    | `/api/v1/tenant-admin/outlets`                     | `tenant.outlets.view`   | List outlets with pagination, sort, and filters (Type, Status, Needs Attention) | Existing |
+| GET    | `/api/v1/tenant-admin/outlets/create-options`      | `tenant.outlets.manage` | Load outlet creation lookup options                                             | Proposed |
+| GET    | `/api/v1/tenant-admin/outlets/{outletId}`          | `tenant.outlets.view`   | Outlet detail                                                                   | Existing |
+| GET    | `/api/v1/tenant-admin/outlets/{outletId}/overview` | `tenant.outlets.view`   | Aggregate summary (Tills, Sales, Orders, Inventory, Health, Manager)            | Proposed |
+| POST   | `/api/v1/tenant-admin/outlets`                     | `tenant.outlets.manage` | Create new outlet                                                               | Existing |
+| PUT    | `/api/v1/tenant-admin/outlets/{outletId}`          | `tenant.outlets.manage` | Update outlet details                                                           | Existing |
+| PUT    | `/api/v1/tenant-admin/outlets/{outletId}/activate` | `tenant.outlets.manage` | Set status to ACTIVE                                                            | Existing |
+| PUT    | `/api/v1/tenant-admin/outlets/{outletId}/disable`  | `tenant.outlets.manage` | Set status to INACTIVE                                                          | Existing |
+| PUT    | `/api/v1/tenant-admin/outlets/{outletId}/manager`  | `tenant.outlets.manage` | Assign primary manager                                                          | Proposed |
+| PUT    | `/api/v1/tenant-admin/outlets/{outletId}/image`    | `tenant.outlets.manage` | Upload or replace outlet image                                                  | Proposed |
+| DELETE | `/api/v1/tenant-admin/outlets/{outletId}/image`    | `tenant.outlets.manage` | Remove outlet image                                                             | Proposed |
+| GET    | `/api/v1/tenant-admin/outlets/{outletId}/alerts`   | `tenant.outlets.view`   | Get operational alerts                                                          | Proposed |
 
 ## Canonical Aggregate Overview (`GET .../overview`)
 
 This endpoint prevents multiple API calls from the UI right-side detail panel.
 
 Response structure (Proposed):
+
 ```json
 {
   "outlet": {
@@ -1610,11 +1716,11 @@ Response structure (Proposed):
     "onlineCount": 3
   },
   "sales": {
-    "todayNetSales": 125000.50,
+    "todayNetSales": 125000.5,
     "yesterdayComparisonPercentage": 5.2
   },
   "inventory": {
-    "stockValue": 4500000.00
+    "stockValue": 4500000.0
   },
   "orders": {
     "openOrderCount": 12
@@ -1628,7 +1734,8 @@ Response structure (Proposed):
 }
 ```
 
-*Note*: `stockValue` reuses the canonical Inventory valuation logic (Sum of `remaining_quantity * unit_cost`). Open orders rely on canonical `SalesOrder` statuses (Not `COMPLETED` and not `CANCELLED`).
+_Note_: `stockValue` reuses the canonical Inventory valuation logic (Sum of `remaining_quantity * unit_cost`). Open orders rely on canonical `SalesOrder` statuses (Not `COMPLETED` and not `CANCELLED`).
+
 ## Tenant Admin Brand API reconciliation (2026-08-15)
 
 CURRENT SOURCE: `GET /api/v1/brands`, `GET /api/v1/brands/{id}`, `POST /api/v1/brands`, `PUT /api/v1/brands/{id}`, `DELETE /api/v1/brands/{id}`, and `POST /api/v1/brands/{brandId}/logo` exist. Detail contains Description, SortOrder and resolved logo and is sufficient for Edit. POST/PUT accept SortOrder. BrandSlug is derived server-side when omitted. Dedicated logo removal does not exist.
@@ -1636,3 +1743,61 @@ CURRENT SOURCE: `GET /api/v1/brands`, `GET /api/v1/brands/{id}`, `POST /api/v1/b
 CURRENT GAPS: initial logo upload requires update/manage while create requires create/manage (P0); separate create+logo calls have no recoverable partial-success contract (P0); Brand validation errors are not stably field-addressable (P1); unsupported Brand media maps to 400 rather than target 415 (P1); Brand Edit concurrency and server idempotency are missing.
 
 LOCKED TARGET: initial logo is part of the authorized Create journey without broad update authority; later replacement remains Update. A created Brand stays created when optional logo upload fails, and the client receives a Brand ID/result enabling logo-only retry.
+
+---
+
+# Tenant Admin Category Management APIs
+
+Base route: `/api/v1/categories` · Controller: `CategoriesController` · Auth Policy: `TenantOnly`.
+Entitlement: **`product_catalog`** (enforced at CategoryService).
+Manage fallback: `catalog.categories.manage` satisfies view/create/update/delete.
+
+## Category CRUD (IMPLEMENTED)
+
+| Method | Endpoint                  | Permission                              | Purpose                                                                                                                                                  |
+| :----- | :------------------------ | :-------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/api/v1/categories`      | `catalog.categories.view` OR `manage`   | Paginated list. Query: `pageNumber`, `pageSize`, `search` (name/code), `status`, `parentCategoryId`, `rootOnly`. Excludes DELETED. No Department filter. |
+| GET    | `/api/v1/categories/tree` | `catalog.categories.view` OR `manage`   | Management tree: ACTIVE+INACTIVE, DELETED excluded. Preserves real hierarchy (no fake-root promotion). **No `status` query parameter.**                  |
+| GET    | `/api/v1/categories/{id}` | `catalog.categories.view` OR `manage`   | Detail with parent code/name, description, slug, derived level/path/counts. No Department fields.                                                        |
+| POST   | `/api/v1/categories`      | `catalog.categories.create` OR `manage` | Create. Body: `categoryCode`, `name`, `parentCategoryId?`, `status`, `description?`, `sortOrder`. **No `departmentId`. No write `imageUrl`.**            |
+| PUT    | `/api/v1/categories/{id}` | `catalog.categories.update` OR `manage` | Update attributes, parent, and status. **No `departmentId`.**                                                                                            |
+| DELETE | `/api/v1/categories/{id}` | `catalog.categories.delete` OR `manage` | Soft delete → 204. 409 `category.delete_conflict` if children or product links.                                                                          |
+
+## Category Media (IMPLEMENTED)
+
+| Method | Endpoint                                             | Permission                                                  | Purpose                                                                  |
+| :----- | :--------------------------------------------------- | :---------------------------------------------------------- | :----------------------------------------------------------------------- |
+| POST   | `/api/v1/tenant-admin/categories/{categoryId}/image` | `catalog.categories.update` OR `manage` + `product_catalog` | Upload/replace category image. Same-tenant Category and media ownership. |
+| DELETE | `/api/v1/tenant-admin/categories/{categoryId}/image` | `catalog.categories.update` OR `manage` + `product_catalog` | Remove category image.                                                   |
+
+Category create flow: `POST /categories` first; if image selected, `POST .../image` second. Optional image failure does not rollback master create.
+
+## Redundant endpoints (do not add)
+
+| Method | Endpoint                           | Classification                                          |
+| :----- | :--------------------------------- | :------------------------------------------------------ |
+| GET    | `/api/v1/categories/{id}/children` | REDUNDANT — use `GET /categories?parentCategoryId={id}` |
+| PATCH  | `/api/v1/categories/{id}/status`   | REDUNDANT — PUT owns status                             |
+
+## Product Setup Category Source
+
+**LOCKED:** `GET /api/v1/tenant-admin/products/create-options` (`product_catalog` + `catalog.products.create`).
+
+- ACTIVE effectively-selectable categories only in `categories[]`; **BR-CAT-PRODUCT-SELECT-001 enforced in backend**
+- Hierarchy-aware depth 1–5
+- Persist selected `categoryId` only
+- Product Setup must **not** call `/api/v1/categories/tree`
+
+**HISTORICAL:** prior `categories` + `subCategories` two-list response was LEGACY FLAT child-Category representation, not a SubCategory entity.
+
+## Entitlement and duplicate error mapping
+
+| Condition                                                    | HTTP / code                       |
+| ------------------------------------------------------------ | --------------------------------- |
+| `product_catalog` disabled                                   | 403 `category.entitlement_denied` |
+| Category permission missing                                  | 403 `category.permission_denied`  |
+| Entitlement infrastructure failure                           | 500 `category.unexpected_failure` |
+| `uq_categories_tenant_id_category_code` violation            | 409 `category.duplicate_code`     |
+| `uq_categories_tenant_id_normalized_category_name` violation | 409 `category.duplicate_name`     |
+
+Authority: [[../13_DECISIONS_AND_CHANGES/ADR/ADR_010_Category_Decoupled_From_Department]], [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_BACKEND_GAP_FIX_CLOSURE_2026-08-27]]

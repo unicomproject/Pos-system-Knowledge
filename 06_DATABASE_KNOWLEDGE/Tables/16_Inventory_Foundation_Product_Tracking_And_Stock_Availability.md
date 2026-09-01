@@ -1,6 +1,8 @@
 <!-- title: 16. Inventory Foundation, Product Tracking & Stock Availability -->
 <!-- source: 16_Inventory Foundation, Product Tracking & Stock.png -->
-<!-- status: ERD image aligned -->
+<!-- status: Active -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-24 -->
 
 # 16. Inventory Foundation, Product Tracking & Stock Availability
 
@@ -101,8 +103,12 @@ UNIQUE(tenant_id, product_variant_id) WHERE product_variant_id IS NOT NULL
 CHECK(requires_expiry_tracking = false OR requires_batch_tracking = true)
 CHECK(requires_batch_tracking = false OR is_stock_tracked = true)
 CHECK(requires_serial_tracking = false OR is_stock_tracked = true)
+CHECK(requires_serial_tracking = false OR (requires_batch_tracking = false AND requires_expiry_tracking = false))
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 ```
+
+CURRENT EF already includes `ck_product_inventory_settings_serial_no_batch_or_expiry`.
+This table is **tracking policy**, not actual Batch/Serial identity.
 
 ## product_batches
 
@@ -320,3 +326,22 @@ CHECK(max_stock_quantity IS NULL OR min_stock_quantity IS NULL OR max_stock_quan
 CHECK(lead_time_days IS NULL OR lead_time_days >= 0)
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 ```
+
+## Traceability of Inventory
+- **UI**: Available Stock -> **Flutter State**: `BundleAvailabilitySummary` -> **API**: Draft Resume / Candidate -> **App Logic**: `SupportsBundles` formula -> **Domain**: Component based tracking -> **DB**: `inventory_balances` mapped by `component_product_id` and `inventory_locations`.
+
+## Product Setup Initial Tracking vs Inventory Identity
+
+| Label | Store | When written |
+|---|---|---|
+| CURRENT policy | `product_inventory_settings` | Step 2 draft |
+| TARGET Step 1 draft (GAP) | `product_setup_initial_tracking` | Step 1/2 wizard draft. Full schema: [[10_Catalog_Master_Data_And_Product_Core_UPDATED]] |
+| CURRENT Batch + Expiry identity | `product_batches.batch_number`, `product_batches.expiry_date` | Step 7 Publish if applicable; later receiving |
+| CURRENT Serial identity | `serial_numbers.serial_number` | Step 7 Publish if applicable; later receiving |
+| Quantity | `inventory_balances`, `stock_movements` | Opening Stock / stock receiving — **not** Product Setup identity input |
+
+Do not add Product master identity columns. Identity-without-stock is allowed:
+`serial_numbers.current_inventory_balance_id` may be NULL; `product_batches` has
+no quantity column. `expiry_date >= manufactured_at` uses CURRENT column
+`manufactured_at` (not `manufactured_date`). Serial uniqueness CURRENT is
+`UNIQUE(tenant_id, product_id, serial_number)` — product-scoped.

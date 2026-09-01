@@ -1,4 +1,4 @@
-<!-- title: Tenant Users, Roles, Permissions & Outlet Access Module Overview -->
+﻿<!-- title: Tenant Users, Roles, Permissions & Outlet Access Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
 <!-- last_updated: 2026-06-29 -->
@@ -76,3 +76,19 @@ merchandising, attractions, and temporary retail locations.
 
 - [[04_MODULE_KNOWLEDGE/05_Tenant_User_Permission_Access/02_Functional_Rules]]
 - [[04_MODULE_KNOWLEDGE/05_Tenant_User_Permission_Access/03_Technical_Contract]]
+
+<!-- RBAC_HARDENING_2026_08_15_START -->
+## RBAC Contract Correction - 2026-08-15
+
+The module supports tenant users, tenant roles, tenant role permissions, direct tenant user permissions, outlet roles, outlet direct permissions, permission definitions, role templates, and role template versions at the data-model level.
+
+Current verified gaps:
+
+- Tenant Admin role management backend APIs are missing.
+- Runtime effective permission resolvers need revoked-row hardening.
+- Outlet-scoped grants are not fully represented in the session effective permission resolver.
+- Explicit deny is not implemented.
+
+Canonical role setup is five steps: Role Details & Template, Select Modules, Configure Permissions, Assign Users & Access Scope, Review & Create.
+<!-- RBAC_HARDENING_2026_08_15_END -->
+

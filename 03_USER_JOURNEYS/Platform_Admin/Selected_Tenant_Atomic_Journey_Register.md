@@ -256,7 +256,7 @@ Global journey count: **173** (Super Admin = 57). ST-UX-001 is **not** counted a
 | **DB Dependency** | product core tables, optional stock |
 | **Audit Event** | `platform.tenant_bootstrap.product_created` |
 | **Related TA Journey** | `09_Product_Management_Flow` |
-| **Excluded** | Full 8-step TA wizard parity |
+| **Excluded** | Full 7-step TA wizard parity |
 
 ---
 

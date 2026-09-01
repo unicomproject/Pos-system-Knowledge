@@ -3,14 +3,14 @@
 <!-- title: Tenant Admin Add Product — Step 4: Variant Configuration Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-11 -->
+<!-- last_updated: 2026-08-13 -->
 
 ## 1. Executive Summary & Core Architectural Principles
 
 This document defines the final canonical Second Brain specification for **Step 4: Variant Configuration** within the Tenant Admin **Add Product Wizard**.
 
 ### 1.1 Core Business Purpose
-Step 4 allows Tenant Admin users to configure multi-variant products (e.g. apparel with Size, Colour, Material combinations) by defining options, selecting option values, generating a Cartesian variant matrix, customising individual variant labels and images, and toggling variant inclusion before configuring pricing, inventory, and sales channel visibility in downstream steps.
+Step 4 allows Tenant Admin users to configure multi-variant products (e.g. apparel with Size, Colour, Material combinations) by defining options, selecting option values, generating a Cartesian variant matrix, customising individual variant labels and images, and toggling variant inclusion before configuring downstream steps.
 
 ### 1.2 Polymorphic Step 4 Behavior
 Step 4 is polymorphic based on `product_structure` selected in Step 2:
@@ -19,7 +19,7 @@ Step 4 is polymorphic based on `product_structure` selected in Step 2:
 3. **BUNDLE / Kit Product (`product_structure = BUNDLE`)**: Step 4 renders **Bundle/Kit Component Configuration** (assembly of component products/variants).
 
 > [!IMPORTANT]
-> Step 4 for VARIANT mode defines options, option values, combination matrix generation, display labels, variant inclusion toggles, and variant image overrides. It MUST NOT include SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility controls. Those belong strictly to Step 5 (`Barcode & SKU`), Step 6 (`Pricing & Tax`), and Step 7 (`Channel & Store Visibility`).
+> Step 4 for VARIANT mode defines options, option values, combination matrix generation, display labels, variant inclusion toggles, and variant image overrides. It MUST NOT include SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility controls. Those belong strictly to Step 5 (`Barcode & SKU`), Step 6 (`Pricing & Tax`), and Step 1 (`Basic Details`).
 
 ---
 
@@ -141,60 +141,62 @@ Step 4 reuses existing catalog entities without duplicating schemas:
 4. **Validation**: Every selected attribute row MUST have at least one selected value before `Generate Variants` or `Save & Continue`.
 5. **Cross-Tenant Guard**: Option template IDs and value IDs submitted in requests must belong to public system templates or the active tenant. Foreign tenant IDs are rejected with HTTP 403/400.
 
-### 4.3 Resolution of API Implementation Blocker
-The existing `GET /api/v1/tenant-admin/products/create-options` endpoint exposed `VariantOptionTemplates` headers without nested values.
+### 4.3 Stable Identity: ProductOption
+For a Product, `Product + sourceOptionTemplateId` identifies the logical ProductOption.
+- **Never existed**: Create active ProductOption.
+- **Already exists and selected**: Reuse existing ProductOption ID.
+- **Previously selected, then removed**: Do not create another identity. Apply existing inactive/archive status behavior.
+- **Removed and later reselected**: Reactivate/reuse the existing ProductOption ID. NO duplicates allowed across Save Draft, Generate Variants, or resume operations.
 
-**Canonical Decision**:
-Extend `TenantAdminProductCreateOptionsResponse` so `VariantOptionTemplates` exposes active template values as typed nested DTOs:
+### 4.4 Stable Identity: ProductOptionValue
+For one ProductOption, `ProductOption + sourceOptionTemplateValueId` identifies the logical ProductOptionValue.
+- **Never existed**: Create ProductOptionValue.
+- **Already selected**: Reuse existing ProductOptionValue ID.
+- **Removed**: Use the existing inactive/archive state rather than creating a replacement identity.
+- **Re-selected later**: Reactivate/reuse the existing ProductOptionValue ID. No new IDs are created.
 
-```csharp
-public sealed record TenantAdminProductVariantOptionTemplateValueResponse(
-    Guid ValueId,
-    string ValueCode,
-    string ValueName,
-    string? DisplayName,
-    string? ColorHex,
-    int SortOrder);
-
-public sealed record TenantAdminProductVariantOptionTemplateResponse(
-    Guid TemplateId,
-    string TemplateCode,
-    string TemplateName,
-    string OptionType,
-    IReadOnlyList<TenantAdminProductVariantOptionTemplateValueResponse> Values);
-```
+Stable ProductOption and ProductOptionValue IDs are strictly required for deterministic variant reconciliation, canonical combination hash stability, image group association, and tombstone stability.
 
 ---
 
 ## 5. Deterministic Cartesian Variant Generation Algorithm
 
-### 5.1 Server-Authoritative Matrix Reconciliation
-While Flutter computes a client-side preview for instant UI feedback, the backend is the final authority. On Save Draft or Save & Continue, the backend validates option/value IDs, recomputes the Cartesian matrix, calculates canonical identity hashes, and reconciles against existing variants.
+### 5.1 Pre-Persistence Client Identity (`clientCombinationKey`)
+A newly generated Variant may not yet have a real `productVariantId`. Frontend MUST NOT create fake ProductVariant GUIDs. 
+Before first persistence, every generated combination uses a deterministic `clientCombinationKey`.
 
-### 5.2 Canonical Hash Algorithm (`option_combination_hash`)
-`product_variants.option_combination_hash` is a `char(64)` column used for strict duplicate prevention and reconciliation.
+**Input**: Only immutable source master identities are used. For each selected Attribute Value, pair `(sourceOptionTemplateId, sourceOptionTemplateValueId)`.
+**Sort & Serialization**: Sort deterministically (e.g. by sourceOptionTemplateId ascending). Join using one documented canonical client format. The same semantic source-ID combination must ALWAYS produce the exact same `clientCombinationKey`.
+**Purpose**: Used by Flutter for generated row identity, Edit Variant selection, drawer state, display labels, image staging, and tombstone state prior to server persistence. 
+
+### 5.2 Server-Authoritative Matrix Reconciliation & Persistence
+While Flutter computes a preview matrix, the backend is authoritative during `Save Draft` and `Save & Continue`. Backend validates against selected immutable Option/Value identities and computes the backend canonical hash.
+
+### 5.3 Canonical Hash Algorithm (`option_combination_hash`)
+`product_variants.option_combination_hash` is a `char(64)` column used for strict duplicate prevention and backend reconciliation.
 
 **Calculation Standard**:
-1. Collect all `(product_option_id, product_option_value_id)` pairs for the variant.
-2. Sort pairs deterministically by `product_option_id` (ascending GUID string order).
-3. Format each pair as `opt:{optionId:D}|val:{valueId:D}`.
-4. Join sorted pairs with a semicolon `;`.
-5. Compute SHA-256 hash of the UTF-8 encoded string.
-6. Format result as 64-character lowercase hex string.
+1. Resolve persisted Product-specific option/value identities.
+2. Collect all `(product_option_id, product_option_value_id)` pairs for the variant.
+3. Sort pairs deterministically by `product_option_id` (ascending GUID string order).
+4. Format each pair EXACTLY as `opt:<productOptionId>|val:<productOptionValueId>`.
+5. Join sorted pairs with a semicolon `;`.
+6. Compute SHA-256 hash of the UTF-8 encoded string.
+7. Format result as 64-character lowercase hex string.
 
-$$\text{Hash} = \text{SHA256}\left( \text{join}_{;}\left( \text{sort}_{\text{optId}}\left( \text{"opt:"} + \text{optId} + \text{"\|val:"} + \text{valId} \right) \right) \right)$$
+Because ProductOption and ProductOptionValue IDs are stable and reused, the same Product semantic combination (e.g. Red/S) will resolve to the SAME canonical hash across saves, regeneration, or attribute remove/re-add.
 
-This hash is completely deterministic, independent of UI row ordering, and guaranteed unique per variant within a product (`uq_product_variants_tenant_id_product_id_option_combination_hash`).
+### 5.4 Matrix Regeneration & Variant Reconciliation Algorithm
+For each expected Cartesian combination, backend validates:
+- **Existing hash found**: Reuse existing ProductVariant. Preserve approved custom state: ProductVariant ID, Variant Code, Display Label, Include Variant, exact image, and lifecycle state.
+- **Hash not found and not tombstoned**: Create a new Variant in the `DRAFT` lifecycle.
+- **Hash tombstoned**: Do not regenerate it.
+- **Existing active/draft Variant no longer present**: Transition to existing canonical Step 4 removal/archive behavior (`ARCHIVED`).
 
-### 5.3 Matrix Regeneration & State Preservation Rules
-When `Generate Variants` is clicked again or draft is saved:
-
-1. **Idempotency**: Regenerating with identical attributes and values preserves all existing variant IDs, display labels, Include Variant state, exact image overrides, colour-group overrides, and manual deletion tombstones.
-2. **Matrix Changes**:
-   - Matching hashes: Preserved untouched.
-   - Genuinely new combinations: Assigned new `variant_id` GUIDs, default display label, `is_sellable = true`, `status = 'ACTIVE'`.
-   - Obsolete combinations (no longer in Cartesian set): Safely soft-deleted / archived (`status = 'ARCHIVED'`).
-3. **Tombstone Safety**: Manually deleted combinations (marked as `ARCHIVED` tombstones) MUST NOT automatically reappear upon regeneration unless the user explicitly modifies attribute selections.
+### 5.5 Delete / Tombstone Permanent Exclusion
+An explicitly deleted canonical Variant combination must NEVER automatically return through "Generate Variants" merely because attribute selections changed and reverted.
+- **Before first persistence**: Tombstone state is maintained via `clientCombinationKey` and survives `Save Draft`.
+- **After persistence**: Backend tombstoning uses `status = 'ARCHIVED'`. Physical destruction is forbidden to preserve historical identity.
 
 ---
 
@@ -214,43 +216,30 @@ Users are NOT asked to type `variantCode` in Step 4.
 
 **Generation Standard**:
 `VAR-{ProductCode|ProductId_Short}-{HexPrefix8}`
-Example: `VAR-PRD001-A4F89C12`.
-If SKU is configured later in Step 5, SKU takes precedence for inventory tracking, but `variantCode` remains stable system key.
+Example: `VAR-PRD001-A4F89C12`. Immutable after creation. Reused on repeated reconciliation.
 
 ---
 
 ## 7. "Include Variant" Semantics & Persistence Lifecycle
 
 ### 7.1 "Include Variant" vs. Channel Visibility
-"Include Variant" is a **global catalog configuration flag**. It is NOT outlet availability or channel visibility (which belong to Step 7).
+"Include Variant" is a **global catalog configuration flag** (`is_sellable`). It is NOT outlet availability or channel visibility (which belong to Step 1). Include OFF is independent and does NOT create a tombstone/delete.
 
-### 7.2 Inclusion Lifecycle
+### 7.2 Inclusion Lifecycle & Draft State
+New included Step 4 Variants remain in a wizard **DRAFT** lifecycle status. Step 4 NEVER publishes/activates variants.
 
-| State | `is_sellable` | `status` | Downstream Step Impact |
-|---|---|---|---|
-| **ON (Included)** | `true` | `'ACTIVE'` | Fully eligible for Step 5 (SKU/Barcode), Step 6 (Pricing/Tax), Step 7 (Channels). |
-| **OFF (Excluded)** | `false` | `'ACTIVE'` | Excluded from mandatory SKU/Price configuration. Step 5/6/7 skip required inputs for this variant. |
-
-Reversing OFF to ON restores the variant to active downstream eligibility without losing its option value mappings.
-
----
-
-## 8. Delete / Manual Exclusion & Operational Safety
-
-### 8.1 Delete vs. Include OFF
-- **Include OFF**: Reversible toggle (`is_sellable = false`). Variant remains in Step 4 matrix.
-- **Delete**: Destructive exclusion of a combination. Variant row is archived (`status = 'ARCHIVED'`).
-
-### 8.2 Operational Safety Rules
-1. **DRAFT Variants (No Operational History)**:
-   - When deleted in Step 4, set `status = 'ARCHIVED'` (tombstone) to prevent hash collision upon regeneration.
-2. **PUBLISHED Variants (With Operational History)**:
-   - If variant has sales transactions, stock balances, batch records, or purchase orders, hard deletion or archiving is blocked with HTTP 400 (`variant.has_operational_history`).
-   - The UI modal warning explicitly scopes: "This variant has historical transactions and cannot be deleted. Set 'Include Variant' to OFF instead."
+| Condition | Variant Status | Include/is_sellable |
+|---|---|---|
+| New included wizard Variant | `DRAFT` | `true` |
+| New excluded wizard Variant | `DRAFT` | `false` |
+| Included state changed OFF | `DRAFT` | `false` |
+| Included state changed ON | `DRAFT` | `true` |
+| Explicitly deleted | `ARCHIVED` | no longer active |
+| Final Step 7 successful create | final lifecycle status | preserve approved inclusion |
 
 ---
 
-## 9. Downstream Step Invalidation & Cleanup Rules
+## 8. Downstream Step Invalidation & Cleanup Rules
 
 When a user returns to Step 4 from Step 5, 6, or 7 and alters the variant matrix (deleting a variant or changing attribute values):
 
@@ -260,48 +249,35 @@ When a user returns to Step 4 from Step 5, 6, or 7 and alters the variant matrix
 
 ---
 
-## 10. Variant Image Hierarchy & Logic
+## 9. Variant Image Hierarchy & Logic
 
-### 10.1 Canonical Image Resolution Order
-When displaying a variant thumbnail (in Step 4 table, POS cashier grid, or online storefront), image resolution evaluates in strict priority order:
-
+### 9.1 Canonical Image Resolution Order
 $$\text{Resolved Image} = \text{Coalesce}(\text{Exact Override}, \text{Colour Group Image}, \text{Step 1 Primary Product Image}, \text{Placeholder})$$
-
-1. **Exact Variant Override**: Image assigned directly to the variant (`product_images.product_variant_id = variantId`).
-2. **Same-Colour Group Image**: Image assigned to the matching Colour option value (`product_option_values.image_media_asset_id`).
-3. **Step 1 Primary Product Image**: Primary product image (`product_images.is_primary_image = true` where `product_variant_id IS NULL`).
-4. **Standard Placeholder**: Default fallback asset if no images exist.
-
-### 10.2 Image Operations & Staging Architecture
-- **Change Image**: Uses standard media staging endpoint (`POST /api/v1/tenant-admin/products/images/stage`). Returns `mediaAssetId`.
-- **Apply Image To**:
-  - `Only this variant`: Creates/updates `product_images` with `product_variant_id = variantId`.
-  - `All variants with Colour: Red`: Updates `product_option_values.image_media_asset_id` for the selected Colour value.
-- **Remove Override**: Deletes exact variant image override row, allowing fallback to group image or primary product image.
 
 ---
 
-## 11. Unit of Measure (UOM) Inheritance Rules
+## 10. Unit of Measure (UOM) Inheritance Rules
 
-Every variant requires `stock_uom_id` and `sales_uom_id` (`NOT NULL` in `product_variants`).
+Every variant requires `stock_uom_id` and `sales_uom_id` (`NOT NULL` in `product_variants`). There is exactly one canonical rule:
 
 1. **VARIANT + Track Inventory ON (`is_stock_tracked = true`)**:
    - Inherits Step 3 parent base UOM (`base_unit_id`) as `stock_uom_id`.
    - Inherits Step 3 parent selling UOM (`selling_unit_id`) as `sales_uom_id`.
    - Inherits Step 3 `allow_decimal_quantity` as `allow_fractional_quantity`.
+   - No per-Variant UOM conversion configuration in Release 1.
 2. **VARIANT + Track Inventory OFF (`is_stock_tracked = false`)**:
-   - Step 3 was bypassed.
-   - Backend resolves system default UOM (`PCS` / Piece) for both `stock_uom_id` and `sales_uom_id`.
+   - Step 3 was bypassed (NOT_APPLICABLE).
+   - Backend resolves system default UOM for both `stock_uom_id` and `sales_uom_id` using the **one canonical Product Wizard default UOM resolver**. No manual UOM field is displayed. All conflicting references to PCS/PIECE fall back to this single source of truth.
 
 ---
 
-## 12. Save / Back / Resume Semantics & State Persistence
+## 11. Save / Back / Resume Semantics & State Persistence
 
-### 12.1 Shared Wizard Pipeline
+### 11.1 Shared Wizard Pipeline
 Step 4 mutations persist via the shared draft endpoint:
 - `PUT /api/v1/tenant-admin/products/{productId}/draft`
 
-### 12.2 Request Payload Graph (`currentSetupStep = 4`)
+### 11.2 Request Payload Graph (`currentSetupStep = 4`)
 
 ```json
 {
@@ -313,224 +289,111 @@ Step 4 mutations persist via the shared draft endpoint:
     "options": [
       {
         "sourceOptionTemplateId": "c1a2b3c4-0000-0000-0000-000000000001",
-        "optionCode": "COLOUR",
-        "optionName": "Colour",
-        "optionType": "COLOUR",
         "sortOrder": 1,
         "values": [
           {
             "sourceOptionTemplateValueId": "v1000000-0000-0000-0000-000000000001",
-            "valueCode": "RED",
-            "valueName": "Red",
-            "displayName": "Red",
-            "colorHex": "#FF0000",
             "sortOrder": 1,
             "imageMediaAssetId": "m9990000-0000-0000-0000-000000000001"
-          },
-          {
-            "sourceOptionTemplateValueId": "v1000000-0000-0000-0000-000000000002",
-            "valueCode": "BLUE",
-            "valueName": "Blue",
-            "displayName": "Blue",
-            "colorHex": "#0000FF",
-            "sortOrder": 2,
-            "imageMediaAssetId": null
-          }
-        ]
-      },
-      {
-        "sourceOptionTemplateId": "c1a2b3c4-0000-0000-0000-000000000002",
-        "optionCode": "SIZE",
-        "optionName": "Size",
-        "optionType": "TEXT",
-        "sortOrder": 2,
-        "values": [
-          {
-            "sourceOptionTemplateValueId": "v2000000-0000-0000-0000-000000000001",
-            "valueCode": "S",
-            "valueName": "S",
-            "displayName": "Small",
-            "colorHex": null,
-            "sortOrder": 1
-          },
-          {
-            "sourceOptionTemplateValueId": "v2000000-0000-0000-0000-000000000002",
-            "valueCode": "M",
-            "valueName": "M",
-            "displayName": "Medium",
-            "colorHex": null,
-            "sortOrder": 2
           }
         ]
       }
     ],
     "variants": [
       {
-        "variantId": "var11111-0000-0000-0000-000000000001",
+        "clientCombinationKey": "sourceOptTplId1:sourceValTplId1;sourceOptTplId2:sourceValTplId2",
+        "productVariantId": "var11111-0000-0000-0000-000000000001",
+        "selectedValues": [
+          {
+            "sourceOptionTemplateId": "c1a2b3c4-0000-0000-0000-000000000001",
+            "sourceOptionTemplateValueId": "v1000000-0000-0000-0000-000000000001"
+          }
+        ],
         "displayLabel": "Home Jersey - Red / S",
         "included": true,
-        "exactImageMediaAssetId": null,
-        "optionValueCodes": ["RED", "S"]
+        "exactImageMediaAssetId": null
       },
       {
-        "variantId": "var11111-0000-0000-0000-000000000002",
-        "displayLabel": "Home Jersey - Red / M",
+        "clientCombinationKey": "sourceOptTplId1:sourceValTplId2;...",
+        "productVariantId": null,
+        "selectedValues": [
+           // ...
+        ],
+        "displayLabel": "Home Jersey - New / S",
         "included": true,
-        "exactImageMediaAssetId": null,
-        "optionValueCodes": ["RED", "M"]
-      },
-      {
-        "variantId": "var11111-0000-0000-0000-000000000003",
-        "displayLabel": "Home Jersey - Blue / S",
-        "included": false,
-        "exactImageMediaAssetId": null,
-        "optionValueCodes": ["BLUE", "S"]
-      },
-      {
-        "variantId": "var11111-0000-0000-0000-000000000004",
-        "displayLabel": "Home Jersey - Blue / M",
-        "included": true,
-        "exactImageMediaAssetId": null,
-        "optionValueCodes": ["BLUE", "M"]
+        "exactImageMediaAssetId": null
       }
     ],
-    "excludedCombinationHashes": []
+    "deletedCombinations": [
+      {
+        "clientCombinationKey": "...",
+        "productVariantId": "var11111-0000-0000-0000-000000000005",
+        "selectedValues": [
+           // ...
+        ]
+      }
+    ]
   }
 }
 ```
+*Note: Fake GUIDs as primary identity for unsaved variants are explicitly banned. `productVariantId` is null for new variants, and `clientCombinationKey` is the authoritative client identity.*
 
-### 12.3 GET Setup Resume Response (`GET /api/v1/tenant-admin/products/{productId}/setup`)
-Restores complete Step 4 graph including options, values, generated variants, display labels, inclusion states, exact images, group images, and excluded hashes.
+### 11.3 GET Setup Resume Response (`GET /api/v1/tenant-admin/products/{productId}/setup`)
+Restores complete Step 4 graph including options, values, generated variants, display labels, inclusion states, exact images, group images, and excluded hashes for exact reconciliation. Includes `clientCombinationKey` and `productVariantId`.
 
 ---
 
-## 13. Access Control, Permissions & Entitlements
+## 12. Access Control, Permissions & Entitlements
 
-### 13.1 Permission Matrix
+### 12.1 Permission Matrix
 
-| Operation | Canonical Permission Code | Legacy Permission Code | Description |
+| Operation | Canonical Permission Code | Description |
+|---|---|---|
+| Step 4 Draft Create (Initial Add Product) | `catalog.products.create` + `catalog.variants.manage` | Save Step 4 draft on new product |
+| Step 4 Draft Update (Existing Product Edit) | `catalog.products.update` + `catalog.variants.manage` | Update Step 4 draft on existing product |
+| Image Mutation | Product access + `catalog.variants.manage` + `catalog.product_media.manage` | Upload and assign variant images |
+
+Missing product entitlement is completely denied.
+**Resume/Setup access**: Approved creator/updater access works according to Product Wizard policy (original creator does not suddenly require Update permission merely because Step 1 produced a Product ID).
+
+### 12.2 Feature Entitlement
+- Runtime Feature Entitlement Code: `product_catalog`.
+- All checks refer strictly to `product_catalog`.
+
+---
+
+## 13. Comprehensive Database Traceability
+
+| DTO/Domain Property | DB Table | DB Column | Data Type / Nullability |
 |---|---|---|---|
-| Step 4 Draft Create | `catalog.products.create` | `tenant.products.create` | Save Step 4 draft on new product |
-| Step 4 Draft Update | `catalog.products.update` | `tenant.products.update` | Update Step 4 draft on existing product |
-| Manage Variants | `catalog.variants.manage` | `tenant.products.update` | Generate, edit, and delete variant combinations |
-| Stage Variant Image | `catalog.product_media.manage` | `tenant.products.update` | Upload and assign variant images |
-| View Step 4 Graph | `catalog.products.view` | `tenant.products.view` | Resume wizard at Step 4 |
-
-### 13.2 Feature Entitlement
-- Runtime Feature Entitlement Code: `product_catalog` (Module: `product_management`).
-- Evaluated at runtime via `ITenantFeatureEntitlementEvaluator`. Missing entitlement returns HTTP 403 (`product.entitlement_denied`).
+| `ProductOption` | `product_options` | `product_option_id` | `uuid` |
+| `ProductOptionValue` | `product_option_values` | `product_option_value_id` | `uuid` |
+| `ProductVariant` | `product_variants` | `variant_id` | `uuid` |
+| `ProductVariantOptionValue` | `product_variant_option_values` | (composite) | Join table |
 
 ---
 
-## 14. Comprehensive Database Traceability & Migration Decision
+## 14. Validation & Reconciliation NFRs
 
-### 14.1 Complete Element Traceability Matrix
-
-| UI Element | Flutter State Property | DTO JSON Property | Command Property | Domain Entity Property | DB Table | DB Column | Data Type / Nullability |
-|---|---|---|---|---|---|---|---|
-| Attribute Name | `optionCode` | `options[].optionCode` | `OptionCode` | `ProductOption.OptionCode` | `product_options` | `option_code` | `varchar(80)` NOT NULL |
-| Attribute Label | `optionName` | `options[].optionName` | `OptionName` | `ProductOption.OptionName` | `product_options` | `option_name` | `varchar(150)` NOT NULL |
-| Value Selection | `valueCode` | `values[].valueCode` | `ValueCode` | `ProductOptionValue.ValueCode` | `product_option_values` | `value_code` | `varchar(80)` NOT NULL |
-| Colour Group Image | `groupImageId` | `values[].imageMediaAssetId` | `ImageMediaAssetId` | `ProductOptionValue.ImageMediaAssetId` | `product_option_values` | `image_media_asset_id` | `uuid` NULLable |
-| Combination Label | `combinationLabel` | `variants[].combinationLabel` | N/A (Computed) | N/A (Computed) | N/A | N/A | Calculated string |
-| Display Label | `displayLabel` | `variants[].displayLabel` | `VariantName` | `ProductVariant.VariantName` | `product_variants` | `variant_name` | `varchar(150)` NOT NULL |
-| Variant Code | `variantCode` | `variants[].variantCode` | `VariantCode` | `ProductVariant.VariantCode` | `product_variants` | `variant_code` | `varchar(80)` NOT NULL |
-| Include Variant | `included` | `variants[].included` | `IsSellable` | `ProductVariant.IsSellable` | `product_variants` | `is_sellable` | `boolean` NOT NULL |
-| Combination Hash | `hash` | `variants[].optionCombinationHash` | `OptionCombinationHash` | `ProductVariant.OptionCombinationHash` | `product_variants` | `option_combination_hash` | `char(64)` NULLable |
-| Exact Variant Image | `exactImageId` | `variants[].exactImageMediaAssetId` | `MediaAssetId` | `ProductImage.MediaAssetId` | `product_images` | `media_asset_id` | `uuid` NULLable |
-| Stock UOM | `stockUomId` | N/A (Inherited) | `StockUomId` | `ProductVariant.StockUomId` | `product_variants` | `stock_uom_id` | `uuid` NOT NULL |
-| Sales UOM | `salesUomId` | N/A (Inherited) | `SalesUomId` | `ProductVariant.SalesUomId` | `product_variants` | `sales_uom_id` | `uuid` NOT NULL |
-
-### 14.2 Database Migration Decision
-> [!NOTE]
-> **DATABASE MIGRATION REQUIRED: NO**
->
-> All required tables (`product_options`, `product_option_values`, `product_variants`, `product_variant_option_values`, `product_images`, `media_assets`) and columns (`option_combination_hash`, `is_sellable`, `image_media_asset_id`, `variant_code`, `variant_name`) already exist in the EF Core ModelSnapshot and production PostgreSQL schema.
+1. **Tenant Isolation**: Every database query and command filters by `TenantId`. Cross-tenant option IDs or media asset IDs return HTTP 403.
+2. **Server-Authoritative Validation**: Client IDs are treated as untrusted inputs. ProductOption and ProductOptionValue reconciliation is deterministic and idempotent.
+3. **Optimistic Concurrency**: Enforced via `expectedRowVersion` vs `Product.RowVersion`. Stale updates return HTTP 409.
+4. **Cartesian Safeguard Limit**: `MaxVariantCombinationsPerProduct = 100`. Matrix sizes $> 100$ are rejected before generation. No N+1 queries.
+5. **Atomic Full Save**: Any failure rolls back the entire Step 4 transaction. No partial graph commits. No duplicate Option/Value/Hashes permitted.
 
 ---
 
-## 15. Validation & Error Code Matrix
+## 15. QA & Automated Test Matrix
 
-| Error Scenario | HTTP Code | Error Code | Message | Field / Target |
-|---|---|---|---|---|
-| No Attribute Selected | 400 | `product.variant_options_required` | `At least one attribute must be defined for a Variant product.` | `variantConfiguration.options` |
-| Attribute Has No Values | 400 | `product.option_values_required` | `Attribute '{0}' must contain at least one selected value.` | `options[{i}].values` |
-| Duplicate Attribute Selected | 400 | `product.duplicate_attribute` | `Attribute '{0}' cannot be selected more than once.` | `options[{i}].optionCode` |
-| Duplicate Option Value | 400 | `product.duplicate_option_value` | `Value '{0}' cannot be repeated in attribute '{1}'.` | `options[{i}].values[{j}]` |
-| Zero Included Variants | 400 | `product.included_variant_required` | `At least one variant must be included in the product setup.` | `variantConfiguration.variants` |
-| Exceeds Max Variant Limit | 400 | `product.max_variants_exceeded` | `Cartesian matrix produces {0} variants, exceeding maximum allowed limit of 100.` | `variantConfiguration` |
-| Invalid Media Asset | 400 | `product.invalid_media_asset` | `Staged media asset '{0}' was not found or is invalid.` | `exactImageMediaAssetId` |
-| Concurrency Conflict | 409 | `product.concurrency_conflict` | `The product draft has been modified by another user.` | `expectedRowVersion` |
+Test specification must prove the following:
+1. **ProductOption/ProductOptionValue Identity**: First selection creates one logical active entity. Repeated save reuses same ID. Remove/re-add reuses same ID (no duplicates).
+2. **Variant Identity**: Unsaved Variant has `clientCombinationKey`. First save returns real `productVariantId`. Repeated save reuses Variant ID. Attribute/Value remove/re-add preserves identical semantic matrix hash.
+3. **Tombstone Stability**: Generate Red/M -> Delete Red/M -> Generate unchanged -> Red/M is absent. Modify matrix and return to original -> Red/M still absent. Save Draft and reopen -> Red/M absent. No silent resurrection.
+4. **Variant Lifecycle**: New Included Step 4 Variant is DRAFT+is_sellable=true. Include OFF is DRAFT+is_sellable=false. Deleted is ARCHIVED. Final Step 7 saves final status. Step 4 NEVER publishes variants.
+5. **UOM Resolution**: Track Inventory ON correctly inherits from Step 3. Track Inventory OFF correctly resolves via canonical Product Wizard default UOM resolver. No manual Step 4 UOM field.
+6. **Permission**: Create+Variant Manage works for new product. Missing Product entitlement is Denied.
+7. **Idempotency**: Same request repeated -> no duplicates. Concurrent stale rowVersion request rejected.
 
 ---
 
-## 16. Non-Functional Requirements (NFR), Security & Governance
-
-1. **Tenant Isolation**: Every database query and command filters by `TenantId` extracted from JWT claims. Cross-tenant option IDs or media asset IDs return HTTP 403.
-2. **Optimistic Concurrency**: Enforced via `expectedRowVersion` vs `Product.RowVersion`. Stale updates return HTTP 409.
-3. **Cartesian Safeguard Limit**: `MaxVariantCombinationsPerProduct = 100`. Matrix sizes $> 100$ are rejected before generation.
-4. **Audit Logging**: Emits structured domain events: `ProductStep4SavedEvent`, `VariantMatrixGeneratedEvent`, `VariantImageOverriddenEvent`, `VariantArchivedEvent`.
-
----
-
-## 17. Flutter / Riverpod Frontend State Contract
-
-### 17.1 State Model (`Step4VariantConfigurationState`)
-```dart
-class Step4VariantConfigurationState {
-  final List<AttributeConfigRow> attributeRows;
-  final List<GeneratedVariantRow> generatedVariants;
-  final Set<String> excludedCombinationHashes;
-  final String? selectedVariantIdForEdit;
-  final bool isGenerating;
-  final bool isSaving;
-  final Map<String, String> fieldErrors;
-  final int? expectedRowVersion;
-
-  int get totalGeneratedCount => generatedVariants.length;
-  int get includedCount => generatedVariants.where((v) => v.isIncluded).length;
-  int get activeAttributeCount => attributeRows.where((r) => r.isValid).length;
-}
-```
-
-### 17.2 Controller Operations
-`AddProductWizardController`:
-- `loadStep4()`
-- `addAttributeRow()`
-- `removeAttributeRow(int index)`
-- `selectAttribute(int index, String templateId)`
-- `selectValues(int index, List<String> valueIds)`
-- `generateVariants()`
-- `openEditDrawer(String variantId)`
-- `updateVariantDisplayLabel(String variantId, String label)`
-- `toggleVariantInclusion(String variantId, bool included)`
-- `stageVariantImage(String variantId, File file)`
-- `applyColourGroupImage(String optionValueId, String mediaAssetId)`
-- `removeVariantImageOverride(String variantId)`
-- `saveDrawerChanges()`
-- `confirmDeleteVariant(String variantId)`
-- `saveDraftStep4()`
-- `saveAndContinueStep4()`
-
----
-
-## 18. QA & Automated Test Matrix
-
-### 18.1 Backend API Integration Tests
-1. **3x2x1 Generation Test**: 3 Sizes, 2 Colours, 1 Material produces exactly 6 combinations with unique deterministic hashes.
-2. **Idempotency Test**: Executing `generateVariants` twice with same options preserves variant GUIDs and custom display labels.
-3. **Include OFF Test**: Disabling Include Variant sets `is_sellable = false` and bypasses downstream Step 5 SKU requirement.
-4. **Image Fallback Test**: Verifies exact override takes priority over colour-group image, which takes priority over primary product image.
-5. **Delete Tombstone Test**: Deleting combination `Red / M` archives variant and prevents recreation upon regeneration.
-
----
-
-## 19. Summary of Canonical Decisions
-
-1. **Step 4 Label**: Stepper = `Product Configuration`; Page Heading = `Variant Configuration`.
-2. **Toggle Label**: Always use **`Include Variant`** (never "Availability").
-3. **Option Template API**: Extended `GET /create-options` to include nested `Values` array in `VariantOptionTemplates`.
-4. **Display Label vs Combination Label**: `combinationLabel` is read-only computed; `displayLabel` maps to `product_variants.variant_name`.
-5. **Variant Code**: Server-generated, SKU-independent, not typed by user.
-6. **Database Migration**: None required (all tables and columns exist).
-7. **Max Variant Limit**: Enforce 100 combinations per product limit.
+*This document is the sole source of truth for Step 4 Variant Configuration.*

@@ -1,7 +1,7 @@
 <!-- title: End Shift And Close Till Implementation Status -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-15 -->
 
 # End Shift And Close Till Implementation Status
 
@@ -13,13 +13,24 @@
 | Feature | Close Till and End Shift |
 | Documentation | Complete for production implementation |
 | Screen/API wiring | Implemented |
-| Production status | **Blocked — Chunk 3 runtime acceptance incomplete** |
-| Blockers | Post-fix runtime build plus balanced/short/over, concurrency, security, failure, responsive and End Shift evidence are still required |
+| Production status | Close Till financial sync complete; combined End Shift acceptance blocked |
+| Blockers | Authenticated variance and End Shift runtime acceptance remain |
 | Runtime acceptance | Started 2026-08-12; release-critical matrix not completed |
 
 Chunk 1 backend remediation and Chunk 2 Flutter implementation are present in
 the current working trees. Production status remains blocked until the full
 Chunk 3 runtime matrix is executed against a build containing those changes.
+
+### Financial contract sync verification — 2026-08-15
+
+- Flutter no longer sends `expectedCash` in the Close Till request.
+- `TillSession` parses `currencyCode`, `expectedCash`, `tillName` and
+  `openedByName`; `ClosedTillSession` parses `outletId`.
+- `CashMovement` parses backend `direction` and `currencyCode`.
+- Focused Flutter contract/provider tests: 8/8 PASS.
+- `flutter analyze`: PASS; full Flutter regression: 1048/1048 PASS.
+- Backend focused Close Till repository tests: 15/15 PASS; full backend:
+  2174/2174 PASS; EF pending model changes: none.
 
 ## Implemented Current Behaviour
 

@@ -55,12 +55,12 @@ A user still needs permission for protected actions.
 
 ## Permission Rule
 
-Permission codes represent actions.
+Permission codes represent actions and must strictly follow the **Canonical 4-Tier Taxonomy**: `domain.module.feature.action` (see [[../13_DECISIONS_AND_CHANGES/ADR/ADR_007_Permission_Code_Strategy]]).
 
 Do not hardcode role names such as owner, manager, cashier, or ecommerce staff in
 frontend or backend authorization logic.
 
-Roles are only groups of permissions.
+Roles are only groups of permissions. Single source of truth: [[Permission_Code_List]].
 
 ## POS Access Rule
 
@@ -111,5 +111,7 @@ permission, tenant isolation, and audit.
 
 - [[Feature_Entitlement_Matrix]]
 - [[Permission_Code_List]]
+- [[../13_DECISIONS_AND_CHANGES/ADR/ADR_007_Permission_Code_Strategy]]
+- [[Backend_Driven_Permission_Catalog]]
 - [[API_Authorization_Rules]]
 - [[../01_RELEASE_SCOPE/Release_1_Scope]]

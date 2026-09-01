@@ -36,7 +36,7 @@ Exact commit `d1ba8cf` implements the approved Premium Blue **Create/Edit Subscr
 Independent evidence shows:
 
 - Scope limited to **7 files** under `platform-create-subscription-plan-page/`; UI-4A list/detail blobs unchanged  
-- Six-step wizard: Basics → Modules → Features → Pricing → Limits → Review & Publish  
+- Six-step wizard: Basics → Modules → Features → Pricing → Limits → Review & Create  
 - Equal-width stepper rail with Modules alignment preserved; no active/completed geometry shift on current label  
 - Shared `PlatformCreateSubscriptionPlanPage` for Create + Draft Edit via `history.state.planId`  
 - No dedicated edit route; Active/Retired edit blocked at status gate + detail pre-navigation  
@@ -187,7 +187,7 @@ Verified exact labels and order:
 3. Features
 4. Pricing
 5. Limits
-6. Review & Publish
+6. Review & Create
 ```
 
 Spec test asserts exact array match. Footer navigation drives step changes; stepper is presentational.
@@ -204,7 +204,7 @@ Spec test asserts exact array match. Footer navigation drives step changes; step
 | `step-rail` connectors | Per-step rail segment in wizard-nav template |
 | Indicator baseline | Fixed `2rem × 2rem`; num/check share grid cell |
 | No active font-weight geometry shift | Base + current label both `font-weight: 600`; `min-height: 2.05rem` on labels |
-| Review & Publish contained | Label wrap stabilized at 768 |
+| Review & Create contained | Label wrap stabilized at 768 |
 | `aria-current="step"` | On current step item |
 
 Production nav SCSS harness: **PASS** at 1440/1280/1024/768 — Modules aligned, no page overflow at 768 (contained scroll).
@@ -216,7 +216,7 @@ Production nav SCSS harness: **PASS** at 1440/1280/1024/768 — Modules aligned,
 **Equal Step Distribution:** PASS  
 **Active-State Geometry Shift:** NONE  
 **Completed-State Geometry Shift:** NONE  
-**Review & Publish Alignment:** PASS
+**Review & Create Alignment:** PASS
 
 ---
 
@@ -339,11 +339,11 @@ Flat limits: `maxOutlets`, `maxTills`, `maxUsers` each ≥ 1.
 
 ---
 
-## 20. Review & Publish
+## 20. Review & Create
 
 Review step reflects live form: name, code, cycle, currency, price, module/feature counts, limits, Draft status pre-publish. Publish opens ConfirmationDialog with approved copy.
 
-**Review & Publish:** PASS  
+**Review & Create:** PASS  
 **Review Truthfulness:** PASS
 
 ---

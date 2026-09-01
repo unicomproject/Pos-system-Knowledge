@@ -1,7 +1,7 @@
 <!-- title: Flutter Folder Structure -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-14 -->
 
 
 # Flutter Folder Structure
@@ -113,6 +113,32 @@ features/discount/
       discount_sync_conflict_panel.dart
       pos_discount_dialog.dart
 ```
+
+### Canonical Cash Drawer Feature Ownership
+
+```text
+features/cash_drawer/
+  data/
+    datasources/
+      cash_drawer_remote_datasource.dart
+    repositories/
+      cash_drawer_repository_impl.dart
+  domain/
+    entities/                 # summary, movement and reason models
+    repositories/
+  presentation/
+    providers/                # summary/history and mutation state
+    screens/                  # management, Cash In, Cash Drop, Close Till
+    widgets/                  # header, summary, actions and recent movements
+```
+
+`features/cash_drawer` owns Cash Drawer financial management UI and data flow.
+It reuses till-session state from `features/till` and physical drawer transport
+from the hardware integration. Do not create a duplicate Cash Drawer feature
+under `hardware`, `pos`, or `tenant_admin`. Widgets must not call Dio directly.
+
+Canonical specification:
+[[Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]].
 
 ## Core Folder Meaning
 

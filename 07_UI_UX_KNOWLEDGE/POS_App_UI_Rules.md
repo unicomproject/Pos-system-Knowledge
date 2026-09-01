@@ -1,7 +1,7 @@
 <!-- title: POS App UI Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-13 -->
+<!-- last_updated: 2026-08-27 -->
 
 # POS App UI Rules
 
@@ -46,6 +46,24 @@ The Fixed POS layout should include:
 - Clear subtotal, discount, tax, grand total, paid, and change.
 
 ## POS Home Rules
+
+### Shared POS Bottom Navigation
+
+The cashier POS uses one canonical shared bottom-navigation component:
+`PosCashierBottomNavigation`. Every destination renders as a compact horizontal
+pair in the form `[Icon] Navigation Name`.
+
+The fixed destination order is Home, New Sale, Orders, Customers, Settings.
+The icon appears on the left and the label on the right within the same row.
+Icon and label share the same active/inactive state, while the existing active
+underline remains the selected-route indicator.
+
+The shared component remains responsible for route selection and
+permission-aware destination visibility. Feature screens must reuse it rather
+than create screen-local navigation copies. On narrow viewports, the horizontal
+icon/label pair may scale down inside its existing touch target to prevent
+clipping or overflow; destination order, labels, routes, permission checks, and
+navigation behaviour must not change.
 
 POS home must show only permitted actions.
 
@@ -177,7 +195,7 @@ Cash in/out must require type, amount, and reason.
 
 Canonical:
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]],
-[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]].
 
 ## Device UI Rules
 

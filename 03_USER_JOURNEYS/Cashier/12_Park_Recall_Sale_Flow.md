@@ -83,7 +83,7 @@ Cancel/X preserves cart. Timeout/`4xx`/`5xx` preserves cart and key.
    refreshes the list and navigates to `/pos/new-sale`.
 5. Cancel Parked Sale confirms a required trimmed reason (max 250), performs no
    hard delete and refreshes only after success.
-6. Start New Sale uses `sales.create` and `/pos/new-sale`; it must not silently
+6. Start New Sale uses `pos.sales.new_sale.create` (legacy alias: `sales.create`) and `/pos/new-sale`; it must not silently
    discard an active cart.
 
 Current cards/refresh/recall/cancel exist. Filters, table, View, summary totals,

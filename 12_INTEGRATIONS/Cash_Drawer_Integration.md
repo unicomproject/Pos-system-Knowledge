@@ -1,19 +1,61 @@
 <!-- title: Cash Drawer Integration -->
-<!-- status: Draft -->
+<!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-13 -->
+<!-- last_updated: 2026-08-17 -->
 
 # Cash Drawer Integration
 
-## Purpose
+## Canonical status (2026-08-17)
 
-Define the printer-driven **physical** cash-drawer architecture and record the
-current foundation without claiming unfinished financial Cash In/Out APIs.
+```text
+PHYSICAL CASH DRAWER: CASH-SALE PATH PHYSICALLY ACCEPTED 2026-08-17
+  (POSPrinter POS80, Cashbox #1 / drawerPin2, 100/200 ms pulse)
+Overall hardware module: BLOCKED — HARDWARE NOT PRODUCTION READY
+```
 
-Financial Cash Drawer screen / movements authority lives in:
+Software pulse path exists via:
+
+- Android USB / Bluetooth (capability-gated) through typed `CashDrawerTransport`
+- Optional Windows `E_POS.LocalPrintAgent` (`POST /api/drawer/open`)
+
+Automatic Cash Sale physical RJ11/RJ12 acceptance is complete for the recorded
+POS80 / Cashbox #1 / `drawerPin2` environment. Other drawer scenarios remain
+open; Agent acceptance alone still does not mean physically opened. Evidence:
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Runtime_Integration_Issue_Resolution_2026-08-17]].
+
+### A. Financial Cash Management (separate)
+
+Examples: Cash In, Cash Drop, till movement, expected cash, reconciliation.
+
+These are **software/financial** features. Cash In and Cash Drop are
+**software production-accepted**. They are **not** physical drawer I/O.
+
+### Policy field `never` (clarified 2026-08-16)
+
+`policy=never` means **no manager-approval gate** for manual/no-sale open.
+Automatic cash/split/refund pulse is controlled by `openOnCashSale` /
+`openOnCashSplit` / `openOnCashRefund`. Hardware Test uses purpose
+`hardwareTest` and is not blocked by `never`.
+
+### B. Physical Drawer Control (this document)
+
+Examples: Manual Open Drawer, cash-sale automatic drawer open, test drawer
+pulse, ESC/POS drawer kick.
+
+Authority for financial screen:
 
 - [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]]
-- [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]]
+
+Overall hardware authority:
+
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]]
+[[Local_Print_Agent]]
+
+## Purpose
+
+Define the printer-driven **physical** cash-drawer architecture and its boundary
+from the implemented financial Cash Drawer management workflow.
 
 This integration document covers **hardware pulse only**. Physical Open Drawer
 must not create financial cash movements.
@@ -29,11 +71,24 @@ Authorized business action → drawer policy/controller → configured printer
 transport → ESC/POS `ESC p m t1 t2` → printer drawer port → physical drawer →
 typed result/audit. Pulse ownership must be single and explicit.
 
+Production transports (printer-driven only):
+
+| Transport | Status |
+|---|---|
+| Android USB Host | SUPPORTED (software); physical pending |
+| Android Bluetooth Classic SPP | CAPABILITY-GATED (software); physical N/A unless drawer port present |
+| Windows LocalPrintAgent | OPTIONAL |
+| Direct standalone drawer USB | NOT SUPPORTED |
+
+Shared pulse builders: Flutter `EscPosDrawerPulseBuilder` and Agent
+`EscPosDrawerPulseBuilder` (exact-byte parity tests).
+
 ## Component Responsibilities
 
-Backend owns policy, permission and audit. Flutter owns orchestration and
-operator UI. The final hardware transport owns the pulse bytes. Printer/Agent
-must not pulse implicitly merely because a receipt prints.
+Backend owns policy, permission and audit (stable request IDs from
+sale/return + purpose). Flutter owns orchestration and operator UI via
+`CashDrawerController` → `CashDrawerTransport`. Transports own pulse bytes.
+Printer/Agent must not pulse implicitly merely because a receipt prints.
 
 ## Supported Platforms And Transports
 
@@ -69,17 +124,16 @@ confirmation and is not physical-open proof.
 
 ## Database And Audit Contract
 
-Existing hardware/cash-control schema is foundation only. Required audit:
+Existing hardware/cash-control schema is foundation. Required audit:
 automatic/manual, sale/payment/refund reference, till session, operator,
 approver where required, reason, configured hardware, pulse result and time.
-Missing end-to-end persistence is a production gap.
 
 ## Permission And Business Rules
 
 Existing codes are `cash_drawer.view`, `cash_drawer.manage` and
 `cash_drawer.movement.create`. Physical Open Drawer uses `cash_drawer.manage`.
-Manual Cash In/Out/Drop uses `cash_drawer.movement.create` (seed/enforce gap as
-of 2026-08-13). Backend remains authority. Open till and assigned activated
+Manual Cash In/Out/Drop uses the seeded and API-enforced
+`cash_drawer.movement.create`. Backend remains authority. Open till and assigned activated
 device are required. No merchant-copy or receipt permission implies
 drawer-open permission.
 
@@ -94,6 +148,8 @@ Automatic pulse uses stable payment/action identity. UI rebuild, receipt retry
 or audit retry must not repeat it. Unknown pulse outcome requires operator
 verification, not automatic replay.
 
+**Do not blindly queue/replay drawer-open commands after reconnect.**
+
 ## Failure And Recovery Rules
 
 Printer unavailable, unsupported pulse, disconnected drawer and unknown result
@@ -102,16 +158,46 @@ controlled manual procedure and records the failure/recovery.
 
 ## Offline Behavior
 
-Offline/restart cash drawer pulse recovery is fully operational. On checkout, the authoritative drawer operation settings and operation ID are stored in the client-side secure store (`DrawerOperationStore`) before calling the Local Agent. Upon startup or network reconnection, unresolved cash drawer operations are reconciled by checking status via backend endpoints or using the interactive `DrawerRecoveryCard` in the testing UI, preventing duplicate pulses.
+Offline/restart recovery must reconcile unresolved operations without duplicate
+pulses. Durable client-side operation identity + Agent request-ID reuse are the
+software controls. **Physical acceptance of recovery behaviour remains incomplete.**
 
 ## Automated Testing
 
 Required tests cover Cash/Split Cash trigger, Card/QR/reprint suppression,
 permission/till/policy, exact bytes, duplicate/rebuild, failure and unknown.
 
-## Physical Verification
+## Physical Verification / Production Acceptance
 
-Not Run. No physical drawer movement evidence exists.
+```text
+Physical RJ11/RJ12 Cash Sale verification completed on 2026-08-17.
+
+Printer: POSPrinter POS80
+Drawer: printer-driven drawer via Cashbox #1 / drawerPin2
+Direct Local Agent pulse: PASS
+Cash checkout automatic pulse: PASS
+Receipt auto-print: PASS
+Physical drawer movement: PASS
+```
+
+The accepted path is Cash Sale only. Split Cash, refund, manual/no-sale,
+`drawerPin5`, and other printer/drawer models remain unverified.
+
+Drawer requests contain `requestedAt`; the Local Print Agent rejects requests
+older than its 120-second safe window. POS device system time must remain
+synchronized. Never disable stale-request validation to compensate for clock
+drift.
+
+Production acceptance must include:
+
+- Actual RJ11/RJ12 drawer test where applicable
+- Configured printer/drawer path
+- Permission validation
+- Manual open
+- Sale-triggered open
+- Audit evidence
+- Failure behaviour
+- No dangerous delayed open/replay
 
 ## Production Definition Of Done
 
@@ -120,25 +206,39 @@ automated tests and physical RJ11/RJ12 acceptance must pass.
 
 ## Current Implementation Status
 
-Implemented. Local Agent pulse generation, validation, dedicated endpoint, RAW spooler routing, durable transport idempotency, typed Flutter request/response transport, backend cash-drawer configuration validation, and Hardware Testing lifecycle exist. Automatic cash-sale/split/refund hooks, manual no-sale authorization flow with manager credentials verification, dedicated immutable drawer-operation audit, and interactive cash drawer configuration and test UI in Flutter are fully implemented.
+```text
+SOFTWARE PATH: Implemented (Agent pulse + Flutter transport + backend audit path)
+AUTOMATIC CASH-SALE PHYSICAL ACCEPTANCE: Passed 2026-08-17
+OTHER PHYSICAL DRAWER SCENARIOS: Incomplete
+CANONICAL STATUS: CASH-SALE PATH ACCEPTED; OVERALL HARDWARE PARTIAL
+```
 
-**Chunk 6 Update (2026-07-30)**: Offline/restart failure recovery is fully implemented, including durable `DrawerOperationStore` client-side transaction logging, startup recovery/reconciliation mechanisms, idempotency token reuse with Print Agent request ID, and backend sync finalization. Fully covered by automated test suites. Required physical acceptance is pending.
+Do not mark physical drawer production-ready from software tests alone.
 
 ## Known Gaps
 
-- Physical drawer verification (hardware pulse).
-- Financial Cash Drawer APIs and Flutter Cash In/Out backend wiring — see
-  [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]].
+- Split Cash, refund, manual/no-sale, `drawerPin5`, and alternate hardware
+  physical verification remain pending.
+- Local Print Agent production Windows-service deployment acceptance incomplete.
+- The accepted POS80 / Cashbox #1 / `drawerPin2` result does not prove other
+  printer/drawer models or configurations.
 
 ## Implementation Sequence
 
-Hardware Chunk 4 follows device configuration/test-audit foundation and printer
-acceptance. Cash Drawer financial implementation is a separate chunk plan after
-Second Brain alignment (2026-08-13).
+Financial Cash Drawer management (In/Drop) is software-accepted. Remaining
+**physical** release work follows Hardware Code Chunks:
+
+```text
+Chunk 1 — Local Print Agent production packaging/autostart
+Chunk 3 — Physical Cash Drawer production acceptance (after Chunk 2 printer)
+```
 
 ## Related Files
 
 - [[POS_Hardware_Integration]]
+- [[Local_Print_Agent]]
 - [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]]
-- [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Implementation_Specification]]
-- [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Second_Brain_Alignment_2026-08-13]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]]
+- [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Management_Screen_Second_Brain_Alignment_2026-08-14]]
+- [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_Drawer_Runtime_Integration_Issue_Resolution_2026-08-17]]
+- [[../10_TESTING_QA/POS_Hardware_Production_Acceptance_Matrix]]
