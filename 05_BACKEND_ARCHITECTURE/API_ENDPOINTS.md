@@ -1597,15 +1597,15 @@ Same rule for `GET .../sales/search` and `GET .../sales/{saleId}/eligibility`:
 
 # POS Receipts API Endpoints (2026-08-05)
 
-# Tenant E-commerce Click & Collect Staff API (OO-01 target updated 2026-08-27)
+# Tenant E-commerce Click & Collect Staff API (OO-02 contract updated 2026-08-31)
 
-The single staff operational owner is `/api/v1/tenant/ecommerce/click-collect`. The operations below are **canonical / implementation pending**. Existing public storefront `GET /api/v1/ecommerce/storefront/fulfillment/...` reads are implemented customer APIs and remain separate. Older generic `/api/v1/fulfilment-orders`, `/api/v1/pickup-orders` and `/api/v1/pickup-events` descriptions are not competing public staff contracts.
+The single staff operational owner is `/api/v1/tenant/ecommerce/click-collect`. OO-01 list, OO-02 detail and OO-03 Start operations below are implemented; later operations remain governed by their own tracking. Existing public storefront `GET /api/v1/ecommerce/storefront/fulfillment/...` reads are customer APIs and remain separate. Older generic `/api/v1/fulfilment-orders`, `/api/v1/pickup-orders` and `/api/v1/pickup-events` descriptions are not competing public staff contracts.
 
 | Method | Route | Purpose |
 |---|---|---|
 | GET | `/api/v1/tenant/ecommerce/click-collect/orders` | Implemented bounded staff queue read with outlet/search/status/sort/paging, six full-scope aggregates, server time and card projections; approved UI exposes search only |
-| GET | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}` | Detail |
-| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/fulfilment/start` | Atomic fulfilment start |
+| GET | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}?outletId={outletId}` | Implemented side-effect-free OO-02 aggregate detail including nullable `fulfillmentVersion` |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/fulfilment/start?outletId={outletId}` | Implemented atomic OO-03 start; body requires `expectedVersion`; stale/state/reservation conflict returns 409 |
 | GET | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking` | Picking detail |
 | POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/lines/{lineId}/pick` | Barcode/quantity pick |
 | POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/lines/{lineId}/issues` | Record picking issue |
@@ -1629,6 +1629,14 @@ Command DTOs carry idempotency and repository-standard concurrency where require
 - Derivation: Delayed uses authoritative lifecycle + collection window + server time and cannot replace Ready, Collected, Cancelled or terminal states. Payment comes from existing payment/order authority.
 - Performance: use bounded efficient aggregate/joined or batched reads; no N+1 database queries or per-product image API calls.
 - Navigation: queue chevron reads `/orders/{orderId}` only; it invokes no mutation.
+
+## OO-02 detail / OO-03 start boundary
+
+- Detail query: `GET .../orders/{orderId}?outletId={outletId}`; requires `commerce.online_order.orders.access` and `commerce.online_order.orders.view`, entitlement and tenant/outlet/resource scope. It returns the aggregate order/customer/collection/payment/line contract and performs no mutation.
+- Start command: `POST .../orders/{orderId}/fulfilment/start?outletId={outletId}`; requires `commerce.online_order.fulfilment.start` and a positive `expectedVersion`. It validates active tenant/user/outlet, entitlement, outlet/resource scope, sales/fulfilment state, confirmed pickup-slot reservation and confirmed unexpired inventory reservation, then atomically sets `PENDING`/`ALLOCATED` fulfilment to `PICKING`, assigns the actor, increments `row_version` and appends one `FULFILLMENT_STARTED` event. Stale EF/client versions and invalid state/reservation return HTTP 409.
+- Success returns authoritative identifiers/status/assignment/timestamp/version. Conflict returns 409 and requires refetch; 401/403/404 remain non-disclosing and use the common error envelope.
+- Live-source status on 2026-09-01: the existing `ClickCollectOrdersController`, application services and repositories implement list, detail and Start. The retained generic status PATCH is not an OO-03 substitute.
+- Safe Start observability may record correlation/trace id, tenant/outlet/order/fulfilment/actor identifiers, operation, prior/target state, result and latency. QR hashes, auth/payment secrets and unnecessary customer PII are prohibited.
 
 Controller: `PosReceiptsController`
 Base: `/api/v1/pos/receipts`

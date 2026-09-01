@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-01 -->
 
 
 # Current Source Of Truth
@@ -76,6 +76,7 @@ Authorities:
 - [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Reusable_Component_Governance]]
 - [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Screen_Development_Second_Brain_Workflow]]
 - [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Screen_Implementation_Specification_Template]]
+- [[../07_UI_UX_KNOWLEDGE/POS_Reusable_Component_Specifications]]
 
 ### Backend feature development
 
@@ -191,9 +192,9 @@ Overall POS Hardware remains **BLOCKED** until physical PR/DR/SC gates pass.
 
 ## Highest Priority Decision
 
-## Online Order Fulfilment / Click & Collect authority (updated 2026-08-27)
+## Online Order Fulfilment / Click & Collect authority (updated 2026-08-31)
 
-Cashier/store operational Click & Collect is governed by [[../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]], module contract [[../04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]], database contract [[../06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup_UPDATED]], and Flutter ownership [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Order_ClickCollect_Fulfilment]]. The approved 2026-08-27 OO-01 target supersedes the earlier table/tab/filter queue: its contract is canonicalized, the new staff list API is pending Chunk 2, Flutter under `lib/features/fulfilment_pickup/` is pending Chunk 3, and authenticated E2E remains pending. The 2026-08-24 implementation audit is historical evidence for the superseded implementation and is not target-screen completion proof. Public storefront fulfilment reads do not prove staff operational completion.
+Cashier/store operational Click & Collect is governed by [[../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]], module contract [[../04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]], database contract [[../06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup_UPDATED]], and Flutter ownership [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Order_ClickCollect_Fulfilment]]. The approved OO-01 queue supersedes the earlier table/tab/filter queue and is accepted by [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO01_Canonicalization_Status_2026-08-27]]; its sole active widget owner is `oo01_online_orders_widgets.dart`. OO-02 Order Detail is canonicalized by those same authorities and [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO02_Canonicalization_Status_2026-08-31]]. OO-03 Start Fulfilment Confirmation is governed by [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO03_Canonicalization_Status_2026-09-01]]: it is a side-effect-free shared-modal confirmation until Confirm invokes the existing Start POST with current `expectedVersion`. Online-order semantics and shared CTA/modal ownership are recorded in [[../07_UI_UX_KNOWLEDGE/POS_Reusable_Component_Specifications]]. The staff detail GET and atomic Start Fulfilment POST are implemented. Shared `FulfillmentOrder.row_version` optimistic concurrency rejects stale Start commands with HTTP 409 and protects future fulfilment mutations. Backend Chunk 2 for OO-03 is verification-only; no new controller/API/table/column/migration is expected. Authenticated UI-to-database Start/Picking, two-session runtime conflict evidence and actual-device confirmation comparison remain required, so production acceptance is still open. Public storefront reads and the generic status PATCH are not substitutes for these staff contracts.
 
 The approved prototype/UI layer is governed by [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Prototype_Flow]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Visual_Direction]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Component_Inventory]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_UI_API_Mapping]], and [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_UI_DB_Mapping]]. Prototype values remain display-only. Production Flutter composes the approved structure from staff API/provider data; the prototype never overrides journey, module, permission, API, or database authorities.
 
@@ -412,48 +413,16 @@ Step 1 Basic Details may collect optional **Initial Tracking Details** (Batch Nu
 
 Product Setup authorization authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]. Canonical permission namespace is `catalog.*`. Runtime Product Setup entitlement is `product_catalog`. Advanced tracking entitlement is `inventory_tracking`. Closure audit: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-08-24_Tenant_Admin_Product_Setup_Permission_NFR_API_DB_Contract_Closure_Audit]].
 
-Implementation status (2026-08-24): permission-first + Initial Tracking code is in Unified Commerce and Nytroz POS App, including `product_setup_initial_tracking` migration `20260824095742_AddProductSetupInitialTracking`. Live 7-scenario E2E, persona permission E2E, PostgreSQL integration, and 1024x768 tablet verification are not complete. Authority for remaining gaps: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/TENANT_ADMIN_PRODUCT_SETUP_INITIAL_TRACKING_PERMISSION_FIRST_IMPLEMENTATION_CLOSURE_2026-08-24]].
+Global POS frontend authority (2026-08-31): UI entry points and notifications
+are entitlement- and granular-permission-driven; permitted components are
+filtered before responsive composition so hidden items reserve no space.
+Frontend gating is UX/defence-in-depth and backend authorization remains final.
+Authenticated POS branding is backend-driven by `GET /api/v1/pos/theme` using
+`pos.theme.primary_color` / `pos.theme.secondary_color`, with defaults
+`#FF6A00` / `#000000`; semantic status colours remain independent. Canonical
+detail: [[../02_ACCESS_CONTROL/Access_Control_Overview]],
+[[../07_UI_UX_KNOWLEDGE/Permission_Based_UI_Rules]],
+[[../07_UI_UX_KNOWLEDGE/Design_System]], and
+[[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Engineering_Canonical_Standard]].
 
-## Category Management Rule
-
-**Tenant Admin Category Management**
-
-| Aspect | Status |
-|---|---|
-| Canonical contract | READY |
-| Backend | **IMPLEMENTED / VERIFIED** |
-| Flutter | **PENDING** |
-| E2E | **PENDING** |
-
-Category Management is a tenant-owned recursive hierarchy (max depth 5). There is no separate SubCategory entity. “Subcategory” is a UI label for a child Category.
-
-**Department:** decoupled from Category (ADR 010, migration `20260827140000_DecoupleCategoryFromDepartment` applied). No `department_id` on Category.
-
-**Hierarchy:** recursive Category, depth 5.
-
-**Permissions:** `catalog.categories.view|create|update|delete|manage`
-
-**Entitlement:** `product_catalog`
-
-**API:**
-
-```http
-GET    /api/v1/categories
-GET    /api/v1/categories/tree
-GET    /api/v1/categories/{id}
-POST   /api/v1/categories
-PUT    /api/v1/categories/{id}
-DELETE /api/v1/categories/{id}
-POST   /api/v1/tenant-admin/categories/{categoryId}/image
-DELETE /api/v1/tenant-admin/categories/{categoryId}/image
-```
-
-**Media:** upload/replace/remove via tenant-admin category image endpoints (not write `imageUrl` on Create/Update).
-
-**Product Setup:** recursive effectively-ACTIVE category hierarchy via `GET /api/v1/tenant-admin/products/create-options` (backend enforces **BR-CAT-PRODUCT-SELECT-001**); persist `CategoryId` only.
-
-**Management tree:** `GET /api/v1/categories/tree` — ACTIVE+INACTIVE, DELETED excluded, no `status` query parameter.
-
-Journeys **TA-UJ-035 … TA-UJ-039 remain NOT COMPLETE** (Flutter pending). Do not mark full journey COMPLETE.
-
-Authority: [[../13_DECISIONS_AND_CHANGES/ADR/ADR_010_Category_Decoupled_From_Department]], [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_PERMISSION_FIRST_BACKEND_IMPLEMENTATION_CLOSURE_2026-08-27]], [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_BACKEND_GAP_FIX_CLOSURE_2026-08-27]].
+Implementation status (2026-08-24): permission-first + Initial Tracking code is in Unified Commerce and Nytroz POS App, including `product_setup_initial_tracking` migration `20260824095742_AddProductSetupInitialTracking`. Live 7-scenario E2E, persona permission E2E, PostgreSQL integration, and 1024×768 tablet verification are not complete. Authority for remaining gaps: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/TENANT_ADMIN_PRODUCT_SETUP_INITIAL_TRACKING_PERMISSION_FIRST_IMPLEMENTATION_CLOSURE_2026-08-24]].

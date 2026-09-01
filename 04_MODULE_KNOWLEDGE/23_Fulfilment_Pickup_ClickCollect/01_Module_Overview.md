@@ -22,7 +22,7 @@ merchandising, attractions, and temporary retail locations.
 | Module number | 23 |
 | Primary users | Customer, Fulfilment staff, Store Manager, Cashier |
 | Frontend surfaces | Pickup slot selection, Order preparation board, Ready for collection state, Collection confirmation |
-| Staff operational API | `/api/v1/tenant/ecommerce/click-collect/...` (canonical; implementation pending) |
+| Staff operational API | `/api/v1/tenant/ecommerce/click-collect/...` (canonical; OO-01 list, OO-02 detail and OO-03 Start implemented; later commands tracked separately) |
 | Public storefront reads | Existing `/api/v1/ecommerce/storefront/fulfillment/...` routes remain customer-facing |
 
 ## Main Tables
