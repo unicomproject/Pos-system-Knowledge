@@ -1,7 +1,7 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-18 -->
+<!-- last_updated: 2026-08-27 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -351,6 +351,7 @@ Base route: `/api/v1/tenant-admin/products` · Controller: `TenantAdminProductsC
 | Method | Canonical Endpoint | Permission | Purpose |
 | :--- | :--- | :--- | :--- |
 | GET | `/api/v1/tenant-admin/products` | `catalog.products.view` | Paginated product list with search and filters | PARTIAL |
+| GET | `/api/v1/tenant-admin/products/create-options` | `catalog.products.create` + `product_catalog` | Product Setup lookup options. **IMPLEMENTED:** ACTIVE hierarchy-aware `categories[]` depth 1–5. Apply **BR-CAT-PRODUCT-SELECT-001** for effective selectability. Do **not** call `/api/v1/categories/tree` for this picker. | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/filter-options` | `catalog.products.view` | Dropdown values for category, brand, and status filters | PARTIAL |
 | POST | `/api/v1/tenant-admin/products` | `catalog.products.create` | Create a product wizard graph (DRAFT or published) | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/{id}` | `catalog.products.view` | Get complete details of a specific product | PARTIAL |
@@ -1731,3 +1732,61 @@ Response structure (Proposed):
 ```
 
 *Note*: `stockValue` reuses the canonical Inventory valuation logic (Sum of `remaining_quantity * unit_cost`). Open orders rely on canonical `SalesOrder` statuses (Not `COMPLETED` and not `CANCELLED`).
+
+---
+
+# Tenant Admin Category Management APIs
+
+Base route: `/api/v1/categories` · Controller: `CategoriesController` · Auth Policy: `TenantOnly`.
+Entitlement: **`product_catalog`** (enforced at CategoryService).
+Manage fallback: `catalog.categories.manage` satisfies view/create/update/delete.
+
+## Category CRUD (IMPLEMENTED)
+
+| Method | Endpoint | Permission | Purpose |
+| :--- | :--- | :--- | :--- |
+| GET | `/api/v1/categories` | `catalog.categories.view` OR `manage` | Paginated list. Query: `pageNumber`, `pageSize`, `search` (name/code), `status`, `parentCategoryId`, `rootOnly`. Excludes DELETED. No Department filter. |
+| GET | `/api/v1/categories/tree` | `catalog.categories.view` OR `manage` | Management tree: ACTIVE+INACTIVE, DELETED excluded. Preserves real hierarchy (no fake-root promotion). **No `status` query parameter.** |
+| GET | `/api/v1/categories/{id}` | `catalog.categories.view` OR `manage` | Detail with parent code/name, description, slug, derived level/path/counts. No Department fields. |
+| POST | `/api/v1/categories` | `catalog.categories.create` OR `manage` | Create. Body: `categoryCode`, `name`, `parentCategoryId?`, `status`, `description?`, `sortOrder`. **No `departmentId`. No write `imageUrl`.** |
+| PUT | `/api/v1/categories/{id}` | `catalog.categories.update` OR `manage` | Update attributes, parent, and status. **No `departmentId`.** |
+| DELETE | `/api/v1/categories/{id}` | `catalog.categories.delete` OR `manage` | Soft delete → 204. 409 `category.delete_conflict` if children or product links. |
+
+## Category Media (IMPLEMENTED)
+
+| Method | Endpoint | Permission | Purpose |
+| :--- | :--- | :--- | :--- |
+| POST | `/api/v1/tenant-admin/categories/{categoryId}/image` | `catalog.categories.update` OR `manage` + `product_catalog` | Upload/replace category image. Same-tenant Category and media ownership. |
+| DELETE | `/api/v1/tenant-admin/categories/{categoryId}/image` | `catalog.categories.update` OR `manage` + `product_catalog` | Remove category image. |
+
+Category create flow: `POST /categories` first; if image selected, `POST .../image` second. Optional image failure does not rollback master create.
+
+## Redundant endpoints (do not add)
+
+| Method | Endpoint | Classification |
+| :--- | :--- | :--- |
+| GET | `/api/v1/categories/{id}/children` | REDUNDANT — use `GET /categories?parentCategoryId={id}` |
+| PATCH | `/api/v1/categories/{id}/status` | REDUNDANT — PUT owns status |
+
+## Product Setup Category Source
+
+**LOCKED:** `GET /api/v1/tenant-admin/products/create-options` (`product_catalog` + `catalog.products.create`).
+
+* ACTIVE effectively-selectable categories only in `categories[]`; **BR-CAT-PRODUCT-SELECT-001 enforced in backend**
+* Hierarchy-aware depth 1–5
+* Persist selected `categoryId` only
+* Product Setup must **not** call `/api/v1/categories/tree`
+
+**HISTORICAL:** prior `categories` + `subCategories` two-list response was LEGACY FLAT child-Category representation, not a SubCategory entity.
+
+## Entitlement and duplicate error mapping
+
+| Condition | HTTP / code |
+|---|---|
+| `product_catalog` disabled | 403 `category.entitlement_denied` |
+| Category permission missing | 403 `category.permission_denied` |
+| Entitlement infrastructure failure | 500 `category.unexpected_failure` |
+| `uq_categories_tenant_id_category_code` violation | 409 `category.duplicate_code` |
+| `uq_categories_tenant_id_normalized_category_name` violation | 409 `category.duplicate_name` |
+
+Authority: [[../13_DECISIONS_AND_CHANGES/ADR/ADR_010_Category_Decoupled_From_Department]], [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_BACKEND_GAP_FIX_CLOSURE_2026-08-27]]

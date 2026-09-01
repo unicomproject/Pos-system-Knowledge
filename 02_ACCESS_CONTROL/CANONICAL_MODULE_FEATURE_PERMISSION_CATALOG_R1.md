@@ -1,13 +1,87 @@
-﻿# OneVerz Canonical Module â†’ Feature â†’ Permission Catalog (Release 1)
+# OneVerz Canonical Module → Feature → Permission Catalog (Release 1)
 
 <!-- title: Canonical Module, Feature and Permission Catalog (Release 1) -->
-<!-- status: LOCK CANDIDATE — OWNER DECISIONS COMPLETE -->
+<!-- status: CANONICAL — LOCKED & MERGED -->
 <!-- system: OneVerz POS MVP / Unified Commerce -->
-<!-- last_updated: 2026-08-20 -->
+<!-- last_updated: 2026-08-28 -->
 
 > [!NOTE]
-> **Authoritative Single Source of Truth Candidate**  
-> This catalog provides a mathematically reconciled and itemized master audit of all Modules, Features, Permission Definitions, Commercial Subscription Entitlements, Scoping Rules, and default Role Template Mappings across Backend (.NET), Database (PostgreSQL/EF Core), Platform Admin (Angular), Tenant Admin & POS (Flutter), and Second Brain Documentation.
+> **Authoritative Single Source of Truth**  
+> This catalog provides the locked, canonical, and mathematically reconciled master audit of all Modules, Features, Permission Definitions, Commercial Subscription Entitlements, Scoping Rules, and default Role Template Mappings across Backend (.NET), Database (PostgreSQL/EF Core), Platform Admin (Angular), Tenant Admin & POS (Flutter), and Second Brain Documentation.
+
+> [!IMPORTANT]
+> **CAPABILITY REGISTRY STATUS: CLOSED — PRODUCTION READY (2026-08-28)**  
+> **Architecture**: CANONICAL  
+> **Implementation**: MERGED  
+> **Database**: MIGRATED  
+> **Authorization**: VERIFIED  
+> **Entitlements**: VERIFIED  
+> **Second Brain**: RECONCILED  
+> **P0 Blockers**: 0  
+> **P1 Blockers**: 0  
+
+---
+
+## CAPABILITY REGISTRY FINAL RECONCILIATION & CLOSURE
+
+```text
+ONEVERZ EPOS CAPABILITY REGISTRY
+
+PLATFORM SCOPE
+
+Module
+  └── Feature
+       └── Platform Permission
+
+
+TENANT SCOPE
+
+Module
+  └── Feature
+       └── Tenant Permission
+            +
+         Tenant Entitlement
+```
+
+### Key Architectural Contracts
+
+1. **One Canonical Registry Principle**:  
+   One canonical capability registry does **NOT** require a single physical permission table. The persistence layer intentionally separates `platform_permissions` (Platform scope) and `permission_definitions` (Tenant scope). Both remain part of one unified canonical capability registry because both are deterministic 3-level children of the same `Module -> Feature` hierarchy.
+2. **Deterministic Platform Scope Persistence**:  
+   `platform_permissions` rows are persisted with required non-null foreign keys:
+   - `platform_permissions.platform_module_id` → `platform_modules.id`
+   - `platform_permissions.platform_feature_id` → `platform_features.id`
+   - **FK Invariant**: `PlatformPermission.PlatformModuleId == PlatformPermission.PlatformFeature.PlatformModuleId`.
+3. **Explicit Scope Constraints**:  
+   Database DDL enforces explicit `CHECK (scope IN ('PLATFORM', 'TENANT'))` on `platform_modules`, `platform_features`, and `permission_definitions`.
+   - **Persisted Scope**: `PLATFORM` | `TENANT` (Database scope values strictly restricted to `PLATFORM` and `TENANT`).
+   - **API Query Filter**: `ALL` | `PLATFORM` | `TENANT` (`ALL` is an API-level filter parameter for `GET /api/v1/platform-admin/catalog/modules?scope=all|platform|tenant`, NEVER persisted in the database).
+4. **Backend-Driven Catalog Endpoints**:  
+   - **Super Admin Modules & Features**: Serves `GET /api/v1/platform-admin/catalog/modules?scope=all|platform|tenant`. Returns a backend-driven capability tree for Platform and Tenant scopes. Case-insensitive parameter parsing. Invalid scope inputs return HTTP **400 Bad Request**.
+   - **Tenant Admin Role & Access**: Serves `GET /api/v1/tenant-admin/permission-catalog`. Queries `permission_definitions` (Scope = `TENANT`) joined with `platform_modules` & `platform_features`, filtered dynamically by tenant active commercial feature entitlements (`tenant_feature_entitlements` / `subscription_plan_features`).
+5. **Runtime Authorization & Entitlement Separation**:  
+   - **UI Visibility != Authorization**. Frontend UI visibility controls menus and button rendering, while security remains strictly enforced at the backend runtime layer.
+   - **Platform Scope**: Enforced by `PlatformOnly` policy and `PlatformPermissionChecker` against `platform.*` permission codes.
+   - **Tenant Scope**: Enforced by `TenantOnly` policy, tenant context (`tenant_id`), and role-permission resolution. Commercial capabilities require BOTH active tenant feature entitlement AND granted user permission.
+
+---
+
+### Final Verified Verification Metrics
+
+| Metric / Check | Value | Verdict |
+|---|---|---|
+| Active Platform permissions unmapped to module | 0 | **PASS** |
+| Active Platform permissions unmapped to feature | 0 | **PASS** |
+| Platform permission module/feature mismatch | 0 | **PASS** |
+| Scope mismatch records | 0 | **PASS** |
+| Invalid persisted scopes (`ALL` in DB) | 0 | **PASS** |
+| Broken platform role-permission references | 0 | **PASS** |
+| EF Pending Model Changes | NONE | **PASS** |
+| PostgreSQL Runtime Migration History | APPLIED (`20260828160000_LinkPlatformPermissionsToCapabilityRegistry`, `SyncCapabilityRegistryModelSnapshot`) | **PASS** |
+| Backend Solution Build & Tests | 1,156 Unit Tests PASS, 480 API Tests PASS, 0 Failures | **PASS** |
+| Platform Admin Angular Build | `npm run build` PASSED (0 Errors) | **PASS** |
+| Backend Merged Commit SHA | `0fa4cc1206751de2450fd19e64d6ef5f0adee606` | **MERGED** |
+| Platform Admin Merged Commit SHA | `c17ec7cc42b6d13cf1424ed0b666a7b744d0ed69` | **MERGED** |
 
 ---
 
@@ -1535,3 +1609,5 @@ ONEVERZ RELEASE 1 AUTHORIZATION CONTRACT FINAL MATHEMATICAL RECONCILIATION
       * FUTURE (Add-ons): 0
       * LEGACY_ACTIVE: 0 (pos.sale.create and tenant.till.manage listed under legacy tokens)
       * Total Reconciled: 196 + 21 + 0 + 0 = 217. (MATCHED)
+
+      Tenant entitlement controls whether a commercial feature is available to the tenant. Permissions control which authorized tenant users may access or perform actions within that available feature. Entitlement is not a child of a permission.

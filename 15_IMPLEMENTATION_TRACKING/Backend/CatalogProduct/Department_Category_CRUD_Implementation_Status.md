@@ -1,11 +1,17 @@
 <!-- title: Department Category CRUD Implementation Status -->
-<!-- status: Completed -->
-<!-- system: OneVerz POS MVP -->
-<!-- module: CatalogProduct -->
-<!-- feature: Department CRUD / Category CRUD -->
-<!-- last_updated: 2026-07-03 -->
+<!-- status: Superseded -->
+<!-- superseded_by: Tenant Admin Category Management backend closure 2026-08-27 -->
+<!-- last_updated: 2026-08-30 -->
 
 # Department CRUD / Category CRUD Implementation Status
+
+> **Status: SUPERSEDED** — This document reflects the **2026-07-03 Department-based Category architecture**. It is retained as **historical audit evidence** only. Do **not** treat it as current runtime authority for Category Management.
+>
+> **Current authority:**
+> - [[../../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/Tenant_Admin_Category_Management_Specification]]
+> - [[../../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_PERMISSION_FIRST_BACKEND_IMPLEMENTATION_CLOSURE_2026-08-27]]
+> - [[../../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_BACKEND_GAP_FIX_CLOSURE_2026-08-27]]
+> - ADR 010 — Category decoupled from Department; migration `20260827140000_DecoupleCategoryFromDepartment`
 
 ## Implementation Status
 

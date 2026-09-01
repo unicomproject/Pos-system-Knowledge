@@ -1,9 +1,20 @@
 ﻿<!-- title: Scope Change Log -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-08-27 -->
 
 # Scope Change Log
+
+## 2026-08-27 — Category decoupled from Department
+
+- Tenant Admin Category Management no longer depends on Department (ADR 010).
+- Category model has no `department_id`. API/Flutter have no Department fields.
+- Category Code and Name uniqueness are tenant-wide.
+- Product Setup Category picker is recursive ACTIVE depth 1–5; persist `categoryId` only; **BR-CAT-PRODUCT-SELECT-001** for effective selectability.
+- **Backend IMPLEMENTED** (2026-08-27): migration `20260827140000_DecoupleCategoryFromDepartment` applied. Flutter Category Management pending.
+- Department feature remains for unrelated modules only.
+
+Decision: [[ADR/ADR_010_Category_Decoupled_From_Department]].
 
 ## 2026-08-24 — Product Setup Initial Tracking Details
 

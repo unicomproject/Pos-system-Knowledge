@@ -1,15 +1,32 @@
-﻿<!-- title: Backend Driven Permission Catalog -->
-<!-- status: Active -->
+<!-- title: Backend Driven Permission Catalog -->
+<!-- status: CANONICAL — LOCKED & MERGED -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-27 -->
+<!-- last_updated: 2026-08-28 -->
 
 # Backend Driven Permission Catalog
+
+> **Permission & Entitlement Contract Reconciled: 2026-08-28 — CANONICAL / LOCKED FOR RELEASE 1**  
+> Full Release-1 catalog: [CANONICAL_MODULE_FEATURE_PERMISSION_CATALOG_R1.md](file:///c:/Users/User/Desktop/Nytroz__POS/Nytroz%20POS%20-%20Second%20Brain/Pos-system-Knowledge/02_ACCESS_CONTROL/CANONICAL_MODULE_FEATURE_PERMISSION_CATALOG_R1.md).
 
 ## Purpose
 
 This document defines the backend-driven permission catalog architecture for the OneVerz POS / Unified Commerce system.
 
 The frontend must not own the permission catalog or define standalone permission trees. The backend database seeds and catalog APIs (`/api/v1/permissions/catalog`) are the authoritative source of truth.
+
+```text
+NO production frontend-owned permission list as Source of Truth.
+```
+
+```text
+Canonical Permission Definitions
+        ↓
+Database / Backend Seed
+        ↓
+Backend Permission Catalog API
+        ↓
+Frontend Rendering
+```
 
 ---
 
@@ -83,6 +100,7 @@ flowchart TD
 
 ## Related Files
 
+- [[CANONICAL_PERMISSION_AND_FEATURE_ENTITLEMENT_CONTRACT_R1]]
 - [[Permission_Code_List]]
 - [[../13_DECISIONS_AND_CHANGES/ADR/ADR_007_Permission_Code_Strategy]]
 - [[Feature_Entitlement_Matrix]]

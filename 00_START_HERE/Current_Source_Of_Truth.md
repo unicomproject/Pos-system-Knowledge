@@ -404,6 +404,7 @@ tables, screens, or flows.
 - [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
 - [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
 - [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
+- [[../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_PRODUCT_TAX_INCLUSIVE_EXCLUSIVE_DECISION_2026-08-27]]
 
 ## Wizard Step Rule
 The Tenant Admin Add Product workflow is strictly a 7-step wizard. Step 7 is Review & Create. Legacy 8-step documentation and standalone Channel Visibility steps are obsolete.

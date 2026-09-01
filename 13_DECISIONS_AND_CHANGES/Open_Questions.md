@@ -1,7 +1,7 @@
 ﻿<!-- title: Open Questions -->
 <!-- status: Draft -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-08-27 -->
 
 # Open Questions
 
@@ -83,4 +83,12 @@ and wider transport policy remain open.
 | PRODUCT-PERM-003 | Does Initial Tracking require stock.adjust? | Identity without quantity | LOCKED: Product Setup create/update + `inventory_tracking`; never `inventory.stock.adjust` | Access/Inventory — Resolved 2026-08-24 |
 
 Authority: [[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]].
+
+## Tenant Admin Category Management — 2026-08-27
+
+| ID | Question | Why required | Current safe position | Owner/status |
+|---|---|---|---|---|
+| CAT-DEPT-001 | Does Category remain bound to Department (Option A) or is Category decoupled (Option B)? | Runtime `department_id` NOT NULL vs approved UI | **RESOLVED 2026-08-27:** Category decoupled from Department (Option B). Department remains for unrelated modules. | Product/Architecture — Resolved ADR 010 |
+
+Authority: [[ADR/ADR_010_Category_Decoupled_From_Department]], [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_SECOND_BRAIN_FINAL_CONTRACT_CLOSURE_2026-08-27]].
 

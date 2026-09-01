@@ -23,6 +23,10 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Tax Jurisdictions: The Tenant Tax Aggregate implicitly resolves a system-managed default jurisdiction using the tenant's primary country code (e.g., `DEFAULT-{COUNTRY_CODE}`). This ensures UI simplification.
 - Tax Type: Belongs to `tax_classes` and explicitly categorizes taxes (e.g., VAT, GST, SALES_TAX, SERVICE_TAX, OTHER).
 - Product tax assignments must not overlap for the same product/variant when active.
+- **Tax Calculation Contract**: Products define their tax model via `taxExclusive` flag.
+  - **Inclusive (`taxExclusive = false`)**: The selling price already includes tax. Base Price = Inclusive Price / (1 + TaxRate / 100). Tax Amount = Inclusive Price - Base Price. Never add tax again to an inclusive price.
+  - **Exclusive (`taxExclusive = true`)**: The selling price excludes tax. Tax Amount = Selling Price × TaxRate / 100. Tax is added once on top of the taxable selling amount.
+- **Discount Order**: Tax is calculated on the *effective* selling price (e.g., Discount Price if active). The sequence is: 1) determine effective price, 2) determine Tax calculation type, 3) compute tax amount.
 - Cached price/tax is only a reference; backend validates final totals.
 - Do not store gateway fees or accounting tax journals here.
 - Cashier variant changes re-resolve the active variant/UOM price; the popup is display-only for money and the backend cart-calculation response remains authoritative. Preserve decimal precision.

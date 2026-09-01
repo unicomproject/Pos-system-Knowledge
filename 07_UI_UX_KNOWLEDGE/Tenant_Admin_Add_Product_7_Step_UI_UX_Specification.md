@@ -159,7 +159,9 @@ Step 6 renders a simplified single-column form:
 2. **Tax Section**:
    - `Tax Name`: Dropdown selector populated from active tenant taxes. (Required)
    - `Tax Rate`: Read-only field auto-filled based on the selected tax.
-   - `Tax Exclusive`: Read-only / locked state indicating the pricing model is tax exclusive.
+   - `Tax Calculation`: Segmented control or radio selector with options `Inclusive` and `Exclusive`.
+     - `Inclusive`: Displays helper text "Tax is already included in the selling price."
+     - `Exclusive`: Displays helper text "Tax will be added on top of the selling price."
 
 ### Exclusions (Important)
 - Do NOT display Margin or Margin %.

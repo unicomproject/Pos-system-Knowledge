@@ -25,6 +25,22 @@ CURRENT `AddProductWizardState` and Step 1 widgets do **not** contain these fiel
 
 ---
 
+## 1.1 Category picker (LOCKED)
+
+Product Setup **must** load Category options from `GET /api/v1/tenant-admin/products/create-options` (`product_catalog` + `catalog.products.create`).
+
+Do **not** call Category Management `GET /api/v1/categories/tree` or `lib/features/tenant_admin/categories/` repositories to populate this picker.
+
+**IMPLEMENTED backend:** single hierarchy-aware `categories[]` (`id`, `categoryCode`, `categoryName`, `parentCategoryId`, `level`, `hierarchyPath`, `hasChildren`, `sortOrder`) covering levels 1–5. ACTIVE status in response. Persist selected `categoryId` only. Path `A → B → C` selected `C` stores `C` only.
+
+**BR-CAT-PRODUCT-SELECT-001 (Flutter applies for UX parity):** Category is effectively selectable only when Category and **all ancestors** are ACTIVE. **Backend enforces** this in create-options and Product create/update.
+
+**HISTORICAL / LEGACY COMPATIBILITY:** prior `categories` + `subCategories` was a flat child-Category representation, not a SubCategory entity.
+
+Shared query/DTO types may be reused only if they stay consistent with Product Setup authorization ownership.
+
+---
+
 ## 2. Directory & Component Architecture
 
 ```text
@@ -160,6 +176,8 @@ Canonical: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Mat
 - [[../07_UI_UX_KNOWLEDGE/Tenant_Admin_Add_Product_7_Step_UI_UX_Specification]]
 - [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
 - [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
+- [[../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/Tenant_Admin_Category_Management_Specification]]
+- [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_FINAL_CONTRACT_HARDENING_2026-08-27]]
 
 ## Implementation-Grade Flutter File
 

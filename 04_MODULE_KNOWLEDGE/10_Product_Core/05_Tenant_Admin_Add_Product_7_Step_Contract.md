@@ -2,7 +2,7 @@
 <!-- title: Tenant Admin Add Product 7-Step Implementation Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-08-27 -->
 
 # Tenant Admin Add Product 7-Step Implementation Contract
 
@@ -43,7 +43,7 @@ The Add Product experience is structured into exactly 7 sequential steps:
 |---|---|---|---|---|---|---|---|---|
 | Product Name | YES | String | Max 200 chars, Non-empty | None | `productName` | `Product.ProductName` | `products.product_name` | Mandatory |
 | Short Name / Internal Code | NO | String | Max 80 chars, Alphanumeric/dash | Auto-slug | `shortName` / `productCode` | `Product.ProductCode` | `products.product_code` | Auto-generated if blank upon Save |
-| Category | YES | UUID | Must exist in `categories` | None | `categoryId` | `Product.CategoryId` | `product_categories.category_id` | Primary category map |
+| Category | YES | UUID | Must exist in `categories`; effectively selectable ACTIVE only (**BR-CAT-PRODUCT-SELECT-001**: Category + all ancestors ACTIVE) | None | `categoryId` | `Product.CategoryId` | `product_categories.category_id` | Primary category map. Canonical picker source: **`GET /api/v1/tenant-admin/products/create-options`** (`product_catalog` + `catalog.products.create`). Do **not** call `/api/v1/categories/tree` or require `catalog.categories.view`. **IMPLEMENTED backend:** recursive ACTIVE hierarchy depth 1–5 from single hierarchy-aware `categories[]`; persist selected `CategoryId` only. **HISTORICAL / LEGACY COMPATIBILITY:** prior `categories` + `subCategories` was a flat child-Category list, not a SubCategory entity. |
 | Brand | NO (Optional) | UUID | Must exist in `brands` | NULL | `brandId` | `Product.BrandId` | `products.brand_id` | **Optional** |
 | Short Description | NO | String | Max 500 chars | NULL | `shortDescription` | `Product.ShortDescription` | `products.short_description` | Text |
 | Long Description | NO | String | Max 4000 chars | NULL | `longDescription` | `Product.LongDescription` | `products.long_description` | Rich text / markdown |
@@ -618,8 +618,9 @@ Initial Tracking TARGET events (existing `audit_logs` family; GAP until implemen
 - Every sellable product must have at least one `product_variants` row. Therefore, the Base SKU for `SIMPLE` and `BUNDLE` products is stored in `product_variants.sku` on their single default variant row.
 
 ### Step 6 — Pricing & Tax
-- **Simplified UI**: Contains ONLY `Cost Price`, `Standard Selling Price`, `Discount Price`, `Tax Name` (dropdown), `Tax Rate` (read-only), and `Tax Exclusive` (fixed true).
-- **Exclusions**: No Margin calculation, no Tax Inclusive toggle, no Price List selector, no Outlet-specific overrides.
+- **Simplified UI**: Contains ONLY `Cost Price`, `Standard Selling Price`, `Discount Price`, `Tax Name` (dropdown), `Tax Rate` (read-only), and `Tax Calculation` (Inclusive | Exclusive).
+- **Exclusions**: No Margin calculation, no Price List selector, no Outlet-specific overrides.
+- **Tax Calculation**: Uses `taxExclusive` flag. `taxExclusive = false` (Inclusive) implies selling price already contains tax. `taxExclusive = true` (Exclusive) implies tax will be added on top.
 - **Cost Price**: Standard/Reference acquisition cost.
 - **Selling Price**: `Standard Selling Price` maps to `selling_price` (no discount) or `compare_at_price` (when discounted). `Discount Price` maps to `selling_price` when active.
 - **Discount Calculation Rule**: 
@@ -643,7 +644,7 @@ Initial Tracking TARGET events (existing `audit_logs` family; GAP until implemen
 
 | Operation | Endpoint | Method | Permission | DTO / Contract |
 |---|---|---|---|---|
-| Create Options | `/api/v1/tenant-admin/products/create-options` | GET | `catalog.products.create` + `product_catalog` | `TenantProductCreateOptionsDto` |
+| Create Options | `/api/v1/tenant-admin/products/create-options` | GET | `catalog.products.create` + `product_catalog` | `TenantProductCreateOptionsDto`. Canonical Product Setup Category source. **IMPLEMENTED:** single ACTIVE hierarchy-aware `categories[]` (levels 1–5). Apply **BR-CAT-PRODUCT-SELECT-001** for effective selectability. Do not call `/api/v1/categories/tree`. |
 | Save Draft (create) | `/api/v1/tenant-admin/products/draft` | POST | `catalog.products.create` + `product_catalog` | `SaveProductDraftRequestDto` -> `ProductDraftResponseDto` |
 | Resume Draft | `/api/v1/tenant-admin/products/{id}/setup` | GET | view **OR** create **OR** update + `product_catalog` | `ProductSetupWizardDto` (redact cost/stock) |
 | Update Draft Step | `/api/v1/tenant-admin/products/{id}/draft` | PUT | create (initial draft) **or** update + step specialized perms | `UpdateProductDraftStepRequestDto` |
@@ -710,6 +711,7 @@ Full matrix: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permissio
 - [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
 - [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
 - [[../../15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-08-24_Tenant_Admin_Product_Setup_Permission_NFR_API_DB_Contract_Closure_Audit]]
+- [[../../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_FINAL_CONTRACT_HARDENING_2026-08-27]]
 
 ## Step 3 — Units & Pack Conversion (NOT_APPLICABLE for BUNDLE)
 For `BUNDLE`: `Step 3 = NOT_APPLICABLE`.
