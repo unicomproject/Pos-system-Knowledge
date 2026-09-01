@@ -1,12 +1,12 @@
 # Online Order Component Inventory
 
-Status: **OO-01 TARGET CANONICALIZED; IMPLEMENTATION PENDING** · Scope: `POS-UJ-036` · Updated: 2026-08-27
+Status: **OO-01 ACCEPTED; OO-02/OO-03 OWNERSHIP IMPLEMENTED / ACCEPTANCE OPEN** · Scope: `POS-UJ-036` · Updated: 2026-09-01
 
 ## Governance
 
 Apply [[../../08_FLUTTER_POS_KNOWLEDGE/Frontend_Reusable_Component_Governance]], [[../../08_FLUTTER_POS_KNOWLEDGE/Frontend_Engineering_Canonical_Standard]], [[../../07_UI_UX_KNOWLEDGE/Design_System]], and [[Online_Order_Prototype_Flow]]. The approved target supersedes earlier OO-01 table/tab/filter ownership notes. Canonical feature ownership is `lib/features/fulfilment_pickup/`; Chunk 3 must reconcile any existing competing `lib/features/online_orders/` implementation without duplicating functionality.
 
-## Canonical OO-01 ownership (pending Chunk 3)
+## Canonical feature ownership
 
 | Area | Production owner |
 |---|---|
@@ -29,8 +29,8 @@ Apply [[../../08_FLUTTER_POS_KNOWLEDGE/Frontend_Reusable_Component_Governance]],
 | Six status summary cards | Authoritative queue aggregates | OO-01 | New/Preparing/Ready/Delayed/Collected/Cancelled counts | none | `.access`, `.view` | list summary | fulfilment-pickup feature | six across when possible; responsive wrap | NEW FEATURE-SPECIFIC |
 | Online order card | Operational list entry | OO-01 | order/pickup, customer, window, count, status/payment, previews | chevron opens detail only | `.access`, `.view` | list/detail | fulfilment-pickup feature | horizontal tablet/desktop; stacked phone | NEW FEATURE-SPECIFIC |
 | Countdown indicator | Delay/expiry visibility | OO-01,02,07,08,10,11 | backend timestamps; overdue states | none | read permission | response timestamps | shared time pattern | announced text; no color-only | EXTEND |
-| Detail header and summary groups | Stable order context | OO-02–07,10–13 | order, collection, payment, items | back/refresh | contextual view | detail | online-order feature | sticky/contextual | NEW FEATURE-SPECIFIC |
-| Start preparation dialog | Confirm start/assignment | OO-03 | outlet, reservation, assignee, pending/error | confirm/cancel | `.fulfilment.start` | start | shared confirmation dialog | focus trap, Esc/cancel | EXTEND |
+| Detail header and summary groups | Stable order context | OO-02–07,10–13 | order, collection, payment, items | back/refresh/view details | contextual view | detail | `online_order_detail_screen.dart` + `online_order_detail_widgets.dart` | grouped wide layout; stacked narrow layout | REUSE / EXTEND |
+| Start Fulfilment confirmation composition | Summarize and confirm Start/assignment | OO-03 | order, customer, outlet, collect-by/remaining-or-overdue, item/unit totals | confirm/cancel | `.fulfilment.start` | existing Start POST only after confirm | FEATURE-LOCAL `start_fulfilment_dialog.dart` using shared modal/action owners | dialog wide; scroll-safe sheet narrow; semantic title/actions, focus/cancel/text-scale safety | FEATURE-LOCAL composition; shared primitives REUSE |
 | Picking progress/steps | Unit and line progress | OO-04–06 | required/picked/remaining; current step | select item | `.picking.view` | picking detail | online-order feature | compact progress + text | NEW FEATURE-SPECIFIC |
 | Picking item/location card | Identify next work | OO-04–06 | media, product, variant, SKU, qty, location | open/confirm | contextual picking | detail/pick | product media + feature card | image alt/fallback | EXTEND |
 | Barcode scan panel/manual entry | Capture item evidence | OO-05 | scanner status, entered barcode, match/mismatch | scan/manual submit | `.picking.scan`, `.picking.manual_entry` | pick | shared scanner capability | hardware/keyboard/touch; focus | EXTEND |
@@ -52,4 +52,13 @@ Do not duplicate shell/navigation, search/filter/pagination, status chips, loadi
 
 ## Implementation gate
 
-OO-01 target ownership is canonicalized but implementation is pending Chunk 3. The queue must not expose filters, tabs, sorting, table headers, Open/Start buttons or visible pagination. Existing source under a competing feature path is migration/reconciliation input, not proof that this target is complete. Downstream OO-02+ rows remain governed by their own implementation evidence.
+OO-01 completion follows its accepted tracker. The queue must not expose filters, tabs, sorting, table headers, Open/Start buttons or visible pagination. Any source under a competing feature path is migration/reconciliation input, not a second owner. Downstream OO-02+ rows remain governed by their own implementation evidence.
+
+For OO-02, canonical ownership is exclusively `lib/features/fulfilment_pickup/`: route screen → detail screen → detail widgets/start dialog → provider → repository → datasource. The existing components are reuse/extension targets, not permission or business-rule authorities. Do not create another detail screen under `lib/features/online_orders/`, duplicate the POS shell, or combine OO-02 read and OO-03 mutation into one widget callback without confirmation.
+
+OO-03 reuse matrix: `showAppDialog`/`showAppModalBottomSheet` → REUSE;
+`PosPrimaryActionButton` → REUSE; `PosBottomOutlinedButton` → REUSE;
+`ThemeData` and canonical typography/spacing/radius → REUSE;
+`StartFulfilmentDialog` and its summary-row composition → FEATURE-LOCAL. Do not
+create a separate feature folder, direct Dio call, feature-local brand palette,
+or one Dart class per small summary row.

@@ -92,3 +92,38 @@ The 2026-08-24 audit records the older visible table/tab/filter/pagination queue
 - Search debounce, six summary counts, real order cards, product previews and detail navigation are covered by the combined automated and runtime evidence above.
 - Desktop, tablet landscape, tablet portrait, phone and small-phone responsive contracts pass without overflow.
 - Unauthorized and API failure states are covered by focused permission/access tests without exposing backend exception text.
+
+## 2026-08-31 root queue route regression repair
+
+Authenticated runtime acceptance later proved that the active backend
+`ClickCollectOrdersController` did not contain a parameterless `[HttpGet]`
+action. The canonical root queue URL therefore returned HTTP 404 while its
+GUID-constrained detail and Start routes remained registered.
+
+The repair restores the existing bounded OO-01 list contract inside the same
+controller/service/repository authority. It preserves `outletId`, `search`,
+`status`, `sortBy`, `sortDirection`, `page`, and `pageSize`; the response still
+provides items, six-bucket summary, pagination, total count and authoritative
+server time. TenantOnly authentication, active tenant/user/outlet, Click &
+Collect entitlement, both Online Order read permissions, tenant isolation and
+outlet scope remain enforced. No competing controller was created.
+
+Validation: solution build PASS; controller 12/12, auth/route pipeline 13/13,
+application service 10/10 and repository integration 6/6 focused tests PASS.
+The HTTP test host proves authorized root 200, unauthenticated root 401, detail
+200 and Start 200 without route ambiguity. Real POS authenticated rerun remains
+pending because the local API process could not remain available in this tool
+session; no production-data success is claimed from the test host.
+
+## 2026-09-01 frontend component-ownership cleanup
+
+- `oo01_online_orders_widgets.dart` is the sole active OO-01 widget owner.
+- The unreferenced alternate `online_orders_queue_widgets.dart` implementation
+  was removed after proving zero production references; its two stale test
+  references were migrated to the active owner.
+- Six summary cards now consume named `OnlineOrderSummarySemantic` values.
+- Payment presentation now uses exact normalized backend status mapping, so
+  `UNPAID` cannot be classified as `PAID` by substring matching.
+- Flutter analyze passed, focused Online Orders/shared-modal validation passed
+  50/50, and the full Flutter suite passed 1,346 tests with one existing skip.
+- No route, permission, API, backend, database or migration behaviour changed.

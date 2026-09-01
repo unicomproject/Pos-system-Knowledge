@@ -1,7 +1,7 @@
 <!-- title: Access Control Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-08 -->
+<!-- last_updated: 2026-08-31 -->
 
 
 # Access Control Overview
@@ -61,6 +61,35 @@ Do not hardcode role names such as owner, manager, cashier, or ecommerce staff i
 frontend or backend authorization logic.
 
 Roles are only groups of permissions. Single source of truth: [[Permission_Code_List]].
+
+## Permission-Driven Presentation Rule
+
+All frontend feature entry points and business actions are derived from the
+authenticated user's effective granular permissions plus tenant entitlement.
+This includes bottom/side navigation, dashboards, cards, menu items, tabs,
+shortcuts, contextual actions, and buttons. Role-name checks such as
+`role == Cashier` or `role == Manager` are forbidden.
+
+Unauthorized feature entries are hidden by default. The frontend decision is
+UX gating only: every backend API independently validates authentication,
+tenant, entitlement, permission, and applicable outlet/resource scope.
+
+## Permission-Scoped Notification Rule
+
+`notifications.view` grants access to notification infrastructure; it does not
+grant access to every feature described by a notification. A visible or
+deliverable notification requires authenticated user, tenant entitlement,
+notification feature/domain, underlying feature permission, and applicable
+outlet/resource scope.
+
+Backend/server filtering is authoritative wherever supported. Frontend
+presentation filtering is defence-in-depth. A notification and its deep link
+must be absent or non-actionable when the user cannot access the destination;
+route/API authorization still applies independently.
+
+Example: if New Sale is permitted and Online Orders is not, New Sale UI and
+allowed sale notifications may appear, while Online Orders UI and Online Order
+notifications do not.
 
 ## POS Access Rule
 

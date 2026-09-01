@@ -1,6 +1,6 @@
 <!-- title: Fulfilment & Pickup / Click & Collect Technical Contract -->
-<!-- status: Canonicalized - Implementation Pending -->
-<!-- last_updated: 2026-08-27 -->
+<!-- status: Canonicalized - OO-01/OO-02/OO-03 implemented; later operations tracked separately -->
+<!-- last_updated: 2026-09-01 -->
 
 # Fulfilment & Pickup / Click & Collect Technical Contract
 
@@ -50,11 +50,46 @@ Summary values are tenant/outlet/query-scoped aggregate counts, never current-pa
 
 The queue chevron navigates to `GET /api/v1/tenant/ecommerce/click-collect/orders/{orderId}` only. No queue mutation command is exposed.
 
+## OO-02 detail and start contract
+
+### Detail read
+
+`GET /api/v1/tenant/ecommerce/click-collect/orders/{orderId}?outletId={outletId}` is the single staff detail route. It requires the Online Orders access/view permissions and repeats entitlement, tenant, active-user, active-outlet and outlet-scope checks. It is side-effect free.
+
+The typed response must provide, where authoritative: order id/number/external reference, lifecycle and display status, placed/updated timestamps, source/customer classification, customer id/name/phone/email/notes, outlet id/name, collection start/end/timezone, payment status and currency, subtotal/discount/tax/charges/total/paid/balance, fulfilment id/assignment, and ordered lines. Each line may include line id/number, product name, variant/options, SKU/barcode, image metadata, ordered quantity, unit price and line total. Line/unit totals are response facts or deterministic sums of returned lines; no prototype value is hardcoded.
+
+The canonical contract does not require a second detail endpoint. The backend now implements this GET on the existing `ClickCollectOrdersController` family with a dedicated application query and bounded repository projection. It does not mutate the order, status history, fulfilment events or pickup evidence.
+
+### Start command
+
+`POST /api/v1/tenant/ecommerce/click-collect/orders/{orderId}/fulfilment/start?outletId={outletId}` requires `commerce.online_order.fulfilment.start` in addition to access context. Its only body field is positive `expectedVersion`, sourced from the current detail `fulfillmentVersion`; clients must not send lifecycle input or retry a stale version blindly.
+
+The application transaction revalidates tenant, actor, entitlement, outlet/resource ownership, order and fulfilment eligibility, pickup/slot reservation, requested quantities, assignment, idempotency and optimistic concurrency. It transitions the canonical fulfilment from an eligible pre-picking state to `PICKING`, assigns the current tenant user when policy allows, updates audit columns and appends a fulfilment event. It must not create a parallel order/payment/inventory model.
+
+The result returns order id, fulfilment id/number, resulting status, assignment, start timestamp and updated fulfilment version. HTTP 409 represents stale/ineligible/concurrent state; the client refetches detail and does not enter picking. Successful clients invalidate/refetch queue and detail, then navigate to `/pos/online-orders/:orderId/picking`.
+
+OO-03 opening performs no network request when current OO-02 detail is available. The backend transaction order is authenticated tenant/user → entitlement → permission → outlet/resource scope → tracked aggregate → expected/current version → sales/fulfilment lifecycle → pickup reservation → inventory reservation → actor assignment → `PICKING` → version increment → one `FULFILLMENT_STARTED` event → save/commit. Any failure rolls back. Server time owns the event timestamp and time comparisons.
+
+### Verified implementation status (2026-08-31)
+
+| Surface | Live-source finding | Classification |
+|---|---|---|
+| Flutter detail route/screen/model/provider/repository/client | Present; route reads detail, shared-modal confirmation precedes client Start, duplicate submission locks, 409 refetches, success refreshes then navigates | IMPLEMENTED / RUNTIME ACCEPTANCE OPEN |
+| Staff detail GET | Implemented on the existing staff controller; permission, entitlement, active context, outlet scope and non-disclosing resource checks are enforced | IMPLEMENTED / FOCUSED TESTS PASS |
+| Staff start POST | Implemented on the existing staff controller with expected-version validation, transaction, assignment, reservation validation and event append | IMPLEMENTED / FOCUSED TESTS PASS |
+| Existing fulfilment/order/pickup/payment/reservation tables | Present and reusable | REUSE |
+| OO-02-specific table/column | Not required | NOT NEEDED |
+| Concurrency/idempotency implementation for start | `FulfillmentOrder.row_version` is an EF concurrency token; detail returns it, Start verifies/increments it, and stale state maps to 409 | IMPLEMENTED |
+
 ## Database contract
 
 Reuse fulfilment methods/outlets, slots/reservations, sales orders/lines/payments, inventory reservations/lines, inventory locations/balances/movements, fulfilment orders/lines/events, pickup orders/events, customers, outlets, tenant users and audit infrastructure. Add only `fulfillment_packages`, `fulfillment_package_lines`, `fulfillment_order_lines.inventory_reservation_line_id`, and repository-standard concurrency fields on fulfilment/pickup headers (canonical target `row_version`).
 
 For OO-01 specifically: **New API = YES; New table = NO; New database column/attribute = NO.** Display status, delayed state, counts and previews are read projections. No `online_orders`, `delayed_orders`, `ready_orders`, priority column or summary-count column is introduced.
+
+For OO-02: **Competing/new detail API family = NO; canonical GET and Start POST are implemented on the existing staff controller family. New OO-02 table = NO. New OO-02-specific column = NO.** Migration `20260831064535_AddSharedFulfillmentOrderConcurrency` adds the approved shared `fulfillment_orders.row_version` infrastructure for all fulfilment mutations. Existing sales order/lines, fulfilment order/lines/events, pickup/slot reservation, customer, payment, outlet/user and inventory reservation authorities are reused.
+
+For OO-03 specifically: **new controller/API/table/column/migration = NO.** It reuses the same detail/Start contracts and shared concurrency infrastructure. The existing shared migration is a prerequisite already implemented; it is not an OO-03-specific migration.
 
 ## Backend ownership and reuse
 
@@ -67,7 +102,11 @@ For OO-01 specifically: **New API = YES; New table = NO; New database column/att
 
 Do not create duplicate OnlineOrderPaymentService, OnlineOrderInventoryService, payment records, stock ledgers, notification outboxes or audit tables.
 
-OO-01 remains under E-commerce / Customer Orders / Click & Collect ownership. Prefer extending the canonical Click Collect controller. The smallest pending backend addition is a list-read service, repository query and typed request/list-item/summary/response DTOs; do not create a parallel module or controller family.
+OO-01 remains under E-commerce / Customer Orders / Click & Collect ownership.
+The bounded list-read service, repository query and typed
+request/list-item/summary/response DTOs are implemented through the canonical
+`ClickCollectOrdersController` family. Do not create a parallel module or
+controller family.
 
 ## Guarantees
 

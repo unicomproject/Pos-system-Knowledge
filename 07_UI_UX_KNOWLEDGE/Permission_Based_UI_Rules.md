@@ -1,7 +1,7 @@
 ﻿<!-- title: Permission Based UI Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-31 -->
 
 
 # Permission Based UI Rules
@@ -61,6 +61,38 @@ Example:
 | Inventory disabled | Hide Inventory |
 | Device not trusted | Show activation block, not POS home |
 
+## Global Entry-Point Rule
+
+Permission and entitlement filtering applies to bottom navigation, side
+navigation, dashboard actions, buttons, cards, menu items, tabs, shortcuts,
+contextual actions, and every other feature entry point. Build the visible
+collection before composing layout:
+
+```text
+all components
+→ entitlement/permission filter
+→ visible components
+→ responsive layout
+```
+
+Unauthorized entries are hidden by default, not shown disabled, unless a
+specific approved UX contract requires disabled discoverability.
+
+## Permission-Aware Responsive Reflow
+
+After filtering, remaining components reflow at phone, tablet portrait, tablet
+landscape, and desktop sizes. Do not leave blank placeholders, empty grid slots,
+fixed gaps, or invisible widgets consuming space. Use existing responsive
+utilities and a collection-driven layout rather than a separate layout for
+every permission combination.
+
+- Zero visible actions: render the approved empty/no-actions state.
+- One visible action: expand or reposition it appropriately.
+- Multiple visible actions: distribute only permitted items responsively.
+
+Permissions determine **what** is visible; responsive rules determine **how**
+visible items are arranged.
+
 ## Button Rule
 
 Buttons must be hidden or disabled based on permission and context.
@@ -89,6 +121,24 @@ UI hiding is not security.
 
 Backend APIs must still return 403 for blocked entitlement, permission, outlet,
 device, or till-session context.
+
+## Notification Rule
+
+A notification is visible/actionable only when the authenticated user has the
+tenant entitlement, underlying feature/domain permission, and applicable
+outlet/resource scope. `notifications.view` alone is insufficient when the
+notification exposes another protected feature.
+
+Prefer authoritative backend/server filtering. Flutter also presentation-gates
+the received set as defence-in-depth. Notification taps and deep links pass the
+same route permission guards and never create a path into an unauthorized
+screen.
+
+- New Sale = YES, Online Orders = NO: show New Sale; hide Online Orders and
+  Online Order notifications.
+- Online Orders = YES, New Sale = NO: show Online Orders; hide New Sale and
+  sale-only actions unless independently permitted.
+- One permitted dashboard action: reflow it without empty slots.
 
 ## Tenant Admin Rule
 

@@ -1,7 +1,7 @@
 <!-- title: POS App UI Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-27 -->
+<!-- last_updated: 2026-08-31 -->
 
 # POS App UI Rules
 
@@ -53,7 +53,9 @@ The cashier POS uses one canonical shared bottom-navigation component:
 `PosCashierBottomNavigation`. Every destination renders as a compact horizontal
 pair in the form `[Icon] Navigation Name`.
 
-The fixed destination order is Home, New Sale, Orders, Customers, Settings.
+The canonical relative destination order is Home, New Sale, Orders, Customers,
+Settings, after entitlement/permission filtering. A destination that is not
+entitled and permitted is absent; its slot is not reserved.
 The icon appears on the left and the label on the right within the same row.
 Icon and label share the same active/inactive state, while the existing active
 underline remains the selected-route indicator.
@@ -64,6 +66,12 @@ than create screen-local navigation copies. On narrow viewports, the horizontal
 icon/label pair may scale down inside its existing touch target to prevent
 clipping or overflow; destination order, labels, routes, permission checks, and
 navigation behaviour must not change.
+
+The shared navigation lays out only filtered permitted destinations and reflows
+for zero, one, or multiple visible items across supported viewports. It must not
+use invisible children that preserve empty gaps. Notification entry points
+follow the same underlying feature permission and entitlement rules;
+`notifications.view` alone does not reveal protected feature notifications.
 
 POS home must show only permitted actions.
 
@@ -164,7 +172,8 @@ Approved Open Till UI contract (2026-08-11):
 
 - Reuse the existing Dashboard Top Bar / POS shell header — do not create an
   Open Till-only top bar.
-- OneVerz **orange** primary theme (not blue/purple).
+- Resolved backend-driven POS primary theme (OneVerz orange by default; tenant
+  primary override supported, with no feature-local blue/purple override).
 - Main content on a full **white** parent surface; preserve component-wise form
   cards (float, keypad, quick amounts, note, till summary, CTA).
 - Important text dark and strong/bold.
@@ -191,7 +200,8 @@ Cash in/out must require type, amount, and reason.
 - Actions: Open Drawer, Cash In, Cash Out/Drop, Close Till.
 - Recent movements newest first; colour is semantic only.
 - Phone + Tablet + Desktop; reuse `TenantAdminBreakpoints`.
-- Orange primary / black shell via shared tokens only — no feature hex.
+- Resolved POS primary / secondary shell via shared theme tokens only — no
+  feature hex (defaults remain orange / black).
 
 Canonical:
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/06_Cash_Drawer_Feature]],

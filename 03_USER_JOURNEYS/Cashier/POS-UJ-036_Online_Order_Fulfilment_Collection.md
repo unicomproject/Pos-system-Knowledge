@@ -1,12 +1,12 @@
 <!-- title: POS-UJ-036 Online Order Fulfilment and Collection -->
-<!-- status: Canonicalized - Implementation Pending -->
-<!-- last_updated: 2026-08-27 -->
+<!-- status: Canonicalized - OO-01 accepted; OO-02/OO-03 implemented / runtime acceptance open -->
+<!-- last_updated: 2026-09-01 -->
 
 # POS-UJ-036 — Online Order Fulfilment and Collection
 
 ## Authority and outcome
 
-Canonical cashier/store Click & Collect journey. The approved OO-01 queue target is canonicalized; its new staff list API, Flutter implementation and runtime acceptance remain pending. Downstream OO-02–OO-15 behaviour remains unchanged.
+Canonical cashier/store Click & Collect journey. OO-01 is accepted by its implementation tracker. OO-02 detail and OO-03 confirmed Start are implemented on the canonical Flutter/backend owners; authenticated UI-to-database acceptance remains governed by their trackers. OO-04–OO-15 retain their existing authority.
 
 ## Preconditions
 
@@ -52,6 +52,35 @@ Sales order state stays with the Sales Order authority. Fulfilment owns `PENDING
 - The visible target excludes filter controls, status tabs, queue heading, sort controls, table headers, Open/Start buttons and pagination controls. The backend may retain bounded status/sort/page capability.
 - Loading, refreshing-with-valid-data, empty, empty-search, retry/error, permission-denied, feature-not-entitled and network/server failure states are distinct.
 - The orange priority star in the approved visual is a visual requirement not yet backed by verified business authority. It creates no priority field, status, schema or mutation.
+
+## OO-02 Order Detail / Start Fulfilment contract
+
+1. OO-01 navigates to `/pos/online-orders/:orderId`. Opening detail is a read and must never mutate order or fulfilment state.
+2. The read requires `commerce.online_order.orders.access` and `commerce.online_order.orders.view`, tenant entitlement and authoritative outlet/resource access. The backend repeats every check; route guards are UX only.
+3. OO-02 renders authoritative order number, display status, placed/source facts when supplied, customer identity, collection outlet/window and derived remaining/overdue presentation, payment status/currency/totals, line count, unit count and order lines. A line may show product, variant/options, SKU, image and ordered quantity only when present in the response.
+4. Anonymous/Guest classification is shown only when an authoritative customer classification exists. Missing customer data must not be converted into a fabricated Guest classification.
+5. Each line shows its own authoritative ordered quantity. A repeated order-level phrase such as `3 items to pick` on every line is forbidden. Picking progress belongs to OO-04 unless an authoritative line progress field is returned.
+6. Back returns to OO-01. `View Details` is non-mutating disclosure/navigation. `Start Fulfilment` is visible only when `commerce.online_order.fulfilment.start` exists and enabled only for an eligible backend-authoritative lifecycle; permission absence removes the action region and reserved space.
+7. Selecting Start opens OO-03 confirmation first. OO-02 itself sends no start command. Confirming OO-03 submits one atomic, retry-safe start command.
+8. The server validates tenant, actor, entitlement, permissions, outlet, order, fulfilment, pickup/reservation, quantities, assignment, concurrency and idempotency. On success it transitions the eligible fulfilment to `PICKING`, assigns the authoritative tenant user and appends event/audit evidence in one transaction.
+9. The client invalidates/refetches detail and queue state after success, then enters OO-04. On HTTP 409 it stays out of OO-04, refreshes authoritative detail and presents a conflict-safe message. Repeated confirmation must not create duplicate fulfilments, assignments or events.
+10. Loading, not-found, permission-denied, feature-disabled, offline/network, server-error and conflict states retain the POS shell and expose a safe recovery action. No state may reveal another tenant or outlet's order existence.
+
+## OO-03 Start Fulfilment Confirmation contract
+
+1. OO-03 is a feature-local confirmation modal/sheet opened only from an eligible, permitted OO-02 Start action. Opening it uses the already-loaded authoritative detail and performs no request or mutation.
+2. It summarizes order number, customer, collection outlet, collect-by time with server-time-derived remaining/overdue text, item count and unit count. It does not contain picking controls or prototype values.
+3. Cancel closes OO-03 only. It sends no Start request and changes no lifecycle state.
+4. Confirm sends one `POST /api/v1/tenant/ecommerce/click-collect/orders/{orderId}/fulfilment/start?outletId={outletId}` with the current positive `expectedVersion`. The UI locks repeat submission while the request is in flight.
+5. Success uses the authoritative response, refreshes detail/list authority and enters OO-04. No local optimistic `PICKING` state or frontend event is permitted.
+6. HTTP 409 never enters OO-04: refetch OO-02 detail, replace stale lifecycle/version and show a safe conflict message. A stale request is never blindly retried.
+7. Read context requires `commerce.online_order.orders.access` and `.orders.view`; Start requires `commerce.online_order.fulfilment.start`. Missing Start permission removes the complete action region and OO-02 reflows without reserved space. Backend enforcement remains independent and authoritative; role-name checks are forbidden.
+
+### OO-02 responsive and accessibility rules
+
+- Desktop/tablet landscape use the available width for grouped summary cards plus the line list; tablet portrait and phone stack groups in reading order and allow page/content scrolling without horizontal clipping.
+- The shared POS header and bottom navigation remain owned by the shell. OO-02 does not duplicate or remove them.
+- Touch targets are at least 44 logical pixels, keyboard/focus order follows visual order, status is not colour-only, images have useful semantics or are decorative, and loading/error announcements are accessible.
 
 ## Inventory, picking and packages
 
