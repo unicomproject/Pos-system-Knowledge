@@ -220,6 +220,22 @@ existing assignment/audit fields and `fulfillment_order_events`. Successful
 Start persists one `FULFILLMENT_STARTED` event with prior/current status,
 authenticated tenant-user actor and server timestamp in the same transaction.
 
+OO-04 adds no table, column or migration. It reuses
+`fulfillment_orders.row_version`, fulfilment-line requested/picked quantities,
+line status/picker, and append-only events. Location display may use existing
+`inventory_locations.location_code` and `location_name`; aisle/rack/bin,
+remaining/count/progress and Today/Tomorrow/overdue labels are not columns.
+Chunk 2 persists `FULFILLMENT_LINE_PICKED`,
+`FULFILLMENT_LINE_ISSUE_REPORTED` and `FULFILLMENT_PICKING_COMPLETED` in the
+existing event table. Line identity and safe operation facts use existing event
+payload JSON. Issue is audit-only and non-blocking. Picking Note reuses
+`fulfillment_order_events.event_note` with event type
+`FULFILLMENT_PICKING_NOTE_ADDED`, existing tenant/fulfilment association,
+`event_by_tenant_user_id`, `event_at` and sequence. It increments the aggregate
+row version atomically but changes no quantity/status/pack eligibility. No
+issue/note table, column or migration was added. Progress and `canPack` are
+derived from existing quantities.
+
 ## `fulfillment_order_lines`
 
 Purpose: Stores fulfillment order line execution quantities.

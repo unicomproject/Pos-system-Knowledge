@@ -114,6 +114,36 @@ Start, pick, pack, ready, QR validation, cash payment and handover use optimisti
 
 ## Related files
 
+## OO-04 implementation boundary (2026-09-02)
+
+The canonical picking GET, pick-line POST and issue POST listed above are
+implemented by the existing `ClickCollectOrdersController` and Customer Orders
+service/repository family. Pick body is
+`{ quantity, barcode?, inputMethod: SCAN|MANUAL, expectedVersion }`; issue body is
+`{ reason: ITEM_NOT_FOUND, note?, expectedVersion }`. Note is trimmed and limited
+to 500 characters. Both mutations require `PICKING`, increment `row_version`
+exactly once and map stale EF/client versions to HTTP 409 without partial state.
+No new controller family, table, column or migration is required.
+Existing location authority is `inventory_locations.location_code` and
+`location_name`; aisle/rack/bin are not authoritative. Only
+Implemented events are `FULFILLMENT_LINE_PICKED`,
+`FULFILLMENT_LINE_ISSUE_REPORTED`, and `FULFILLMENT_PICKING_COMPLETED`. Completion
+keeps lifecycle `PICKING` for downstream packing. Issue is audit-only/non-blocking.
+Picking Note is implemented as `POST
+/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/notes?outletId={outletId}`
+with `{ note, expectedVersion }`. It requires
+`commerce.online_order.picking.note`, PICKING lifecycle, a trimmed 1–500 character
+plain-text note and the current positive aggregate version. Success atomically
+increments `fulfillment_orders.row_version`, appends one
+`FULFILLMENT_PICKING_NOTE_ADDED` event to `fulfillment_order_events.event_note`,
+and returns the saved note plus its actor/server timestamp and new version. Stale
+version is 409. GET returns derived progress and `canPack`, source-location
+code/name, media, server time, current fulfilment version, and at most the latest
+50 saved notes ordered oldest-to-newest. Notes never alter quantity, lifecycle or
+pack eligibility. Full decision matrix:
+[[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
+
+
 - [[../../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]]
 - [[../../06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup_UPDATED]]
 - [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Order_ClickCollect_Fulfilment]]

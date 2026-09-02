@@ -79,6 +79,32 @@ shared blurred modal helpers and shared primary/secondary action controls.
 
 - Owner: `lib/features/fulfilment_pickup/presentation/widgets/start_fulfilment_dialog.dart`; no `online_orders`, `start_fulfilment` or `order_detail` feature root is authorized.
 - Data flow: OO-02/OO-03 → `pos_online_orders_provider.dart` → domain repository → repository implementation → remote datasource → existing staff API. The dialog performs no Dio call and owns no business mutation.
+
+## OO-04 Picking owner and Chunk 3 boundary (2026-09-02)
+
+The existing owner is `lib/features/fulfilment_pickup/`: picking route/screen,
+`picking_widgets.dart`, `pos_online_orders_provider.dart`, the shared online-order
+entity/repository and remote datasource. Backend Chunk 2 now implements picking
+GET, scan/manual pick and issue routes. Flutter remains **PARTIAL scaffolding**
+because current mutation payloads omit `expectedVersion` and do not consume the
+backend-authoritative `canPack`/updated version contract.
+
+Chunk 3 must reuse POS shell, backend ThemeData, shared actions, status/state,
+image/progress/modal/scanner patterns and design tokens. Permission-filter scan,
+manual and issue controls before layout. Wide layout uses item-list left and
+progress/actions right with bounded item-list scrolling; portrait/phone stack
+without overflow. No direct Dio widget, role checks, hardcoded brand orange,
+mock picked success or client-only pack eligibility. On 409 refetch and replace
+state. Add Picking Note is now backend-owned by `POST
+.../orders/{orderId}/picking/notes?outletId=...`; show it only with
+`commerce.online_order.picking.note`, validate 1–500 trimmed characters, send the
+latest `fulfillmentVersion`, lock duplicate submit, and display only the
+backend-confirmed saved note. On 409 close/no fake success and refetch Picking
+Detail. Pick, issue and note requests must send the latest positive `fulfillmentVersion` as
+`expectedVersion`; a stale 409 always refetches instead of retrying blindly.
+Accessibility requires semantic actions, 44px targets, text-and-colour state,
+logical focus, text scaling and image fallbacks. Full contract:
+[[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
 - Opening reuses current `PosOnlineOrderDetail`; a fresh GET is required only for normal detail load or conflict refresh.
 - Shared owners: `showAppDialog`, `showAppModalBottomSheet`, `PosPrimaryActionButton`, `PosBottomOutlinedButton`, runtime `ThemeData` and canonical typography/spacing/radius. The summary composition remains FEATURE-LOCAL.
 - Required facts: order, customer, collection outlet, collect-by plus remaining/overdue derived from response `serverTime`, item count and unit count. No mock values, full picking lines or client-authoritative version are permitted.

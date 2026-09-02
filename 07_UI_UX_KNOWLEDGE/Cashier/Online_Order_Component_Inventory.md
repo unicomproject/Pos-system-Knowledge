@@ -52,6 +52,16 @@ Do not duplicate shell/navigation, search/filter/pagination, status chips, loadi
 
 ## Implementation gate
 
+OO-04 current Flutter owners (`pos_online_order_picking_screen.dart`,
+`picking_widgets.dart`, provider/entity/repository/datasource) are PARTIAL
+scaffolding. Reuse the POS shell, ThemeData, shared actions, media/status/state/
+progress/modal/scanner patterns and tokens. Picking header/summary/stepper/item
+cards/sidebar are feature-local compositions. Wide layout keeps item list left
+and progress/actions right with bounded list scrolling; narrow layouts stack.
+Permission-filter scan/manual/issue before layout. The current picking-note
+placeholder is not production-authorized until a backend owner exists. See
+[[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
+
 OO-01 completion follows its accepted tracker. The queue must not expose filters, tabs, sorting, table headers, Open/Start buttons or visible pagination. Any source under a competing feature path is migration/reconciliation input, not a second owner. Downstream OO-02+ rows remain governed by their own implementation evidence.
 
 For OO-02, canonical ownership is exclusively `lib/features/fulfilment_pickup/`: route screen → detail screen → detail widgets/start dialog → provider → repository → datasource. The existing components are reuse/extension targets, not permission or business-rule authorities. Do not create another detail screen under `lib/features/online_orders/`, duplicate the POS shell, or combine OO-02 read and OO-03 mutation into one widget callback without confirmation.

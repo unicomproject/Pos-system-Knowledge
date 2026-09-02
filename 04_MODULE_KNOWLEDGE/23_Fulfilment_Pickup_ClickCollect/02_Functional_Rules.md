@@ -124,5 +124,30 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 ## Related Files
 
+## OO-04 Picking canonical rule (2026-09-02)
+
+OO-04 is backend-authoritative and accepts line mutations only for an authorized
+same-tenant/outlet Click & Collect fulfilment in `PICKING`. Scan requires
+`.picking.pick` + `.picking.scan`; manual entry requires `.picking.pick` +
+`.picking.manual_entry`; issue reporting requires `.picking.report_issue`.
+Quantities cannot over-pick, barcode must belong to the current order line, and
+all successful mutations use `expectedVersion`/`fulfillment_orders.row_version`
+atomically with event/audit evidence. Review & Pack requires backend-confirmed
+zero remaining quantity on every required line and no blocking unresolved issue.
+Client counts, device time and generic status PATCH are not transition authority.
+Pick uses positive increment semantics. `SCAN` additionally validates the scoped
+sales-line barcode; `MANUAL` remains line-scoped. `ITEM_NOT_FOUND` issue reporting
+increments the aggregate version and writes audit only: it never changes quantity,
+substitutes, cancels or blocks packing. `canPack` is true only when at least one
+line exists and every requested quantity is covered by picked plus cancelled
+quantity. Picking Note is a PICKING-only, plain-text audit mutation. It requires
+`commerce.online_order.picking.note`, trims and validates 1–500 characters,
+increments `row_version`, and appends exactly one event without changing line
+quantities, lifecycle or `canPack`. Implemented events are
+`FULFILLMENT_LINE_PICKED`, `FULFILLMENT_LINE_ISSUE_REPORTED`,
+`FULFILLMENT_PICKING_COMPLETED` and `FULFILLMENT_PICKING_NOTE_ADDED`. Authority:
+[[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
+
+
 - [[04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]]

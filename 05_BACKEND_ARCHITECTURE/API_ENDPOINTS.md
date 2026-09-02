@@ -1609,6 +1609,7 @@ The single staff operational owner is `/api/v1/tenant/ecommerce/click-collect`. 
 | GET | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking` | Picking detail |
 | POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/lines/{lineId}/pick` | Barcode/quantity pick |
 | POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/lines/{lineId}/issues` | Record picking issue |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/notes` | Persist a PICKING-only operational note with optimistic concurrency |
 | POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/pack` | Validate/create packages |
 | POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/ready` | Mark ready and notify |
 | GET | `/api/v1/tenant/ecommerce/click-collect/collection/ready` | Outlet ready queue |
@@ -1634,6 +1635,25 @@ Command DTOs carry idempotency and repository-standard concurrency where require
 
 - Detail query: `GET .../orders/{orderId}?outletId={outletId}`; requires `commerce.online_order.orders.access` and `commerce.online_order.orders.view`, entitlement and tenant/outlet/resource scope. It returns the aggregate order/customer/collection/payment/line contract and performs no mutation.
 - Start command: `POST .../orders/{orderId}/fulfilment/start?outletId={outletId}`; requires `commerce.online_order.fulfilment.start` and a positive `expectedVersion`. It validates active tenant/user/outlet, entitlement, outlet/resource scope, sales/fulfilment state, confirmed pickup-slot reservation and confirmed unexpired inventory reservation, then atomically sets `PENDING`/`ALLOCATED` fulfilment to `PICKING`, assigns the actor, increments `row_version` and appends one `FULFILLMENT_STARTED` event. Stale EF/client versions and invalid state/reservation return HTTP 409.
+
+OO-04 target routes are `GET .../orders/{orderId}/picking`, `POST
+.../orders/{orderId}/picking/lines/{lineId}/pick`, and `POST
+.../orders/{orderId}/picking/lines/{lineId}/issues`, and `POST
+.../orders/{orderId}/picking/notes`, all outlet-scoped. As of
+2026-09-02 they are implemented by `ClickCollectOrdersController`. Pick uses
+positive increment semantics with body
+`{ quantity, barcode?, inputMethod: SCAN|MANUAL, expectedVersion }`; permissions
+are `.picking.pick` plus the matching input permission, and SCAN validates the
+scoped line barcode. Issue uses `{ reason: ITEM_NOT_FOUND, note?, expectedVersion }`
+with `.picking.report_issue`; note is optional and at most 500 characters. Add
+Picking Note uses `{ note, expectedVersion }`, requires
+`commerce.online_order.picking.note`, trims and enforces 1–500 plain-text
+characters, and appends `FULFILLMENT_PICKING_NOTE_ADDED` to the existing event
+authority. Success returns the saved note, actor/server timestamp and incremented
+version. Picking Detail returns the latest 50 notes oldest-to-newest. Generic
+status PATCH is not a substitute. Responses expose current version/progress and backend-derived
+`canPack`; validation is 400, inaccessible scope is 403/404, and stale/lifecycle
+conflict is 409.
 - Success returns authoritative identifiers/status/assignment/timestamp/version. Conflict returns 409 and requires refetch; 401/403/404 remain non-disclosing and use the common error envelope.
 - Live-source status on 2026-09-01: the existing `ClickCollectOrdersController`, application services and repositories implement list, detail and Start. The retained generic status PATCH is not an OO-03 substitute.
 - Safe Start observability may record correlation/trace id, tenant/outlet/order/fulfilment/actor identifiers, operation, prior/target state, result and latency. QR hashes, auth/payment secrets and unnecessary customer PII are prohibited.

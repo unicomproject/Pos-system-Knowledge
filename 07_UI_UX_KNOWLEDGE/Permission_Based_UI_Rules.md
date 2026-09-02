@@ -1,4 +1,4 @@
-﻿<!-- title: Permission Based UI Rules -->
+<!-- title: Permission Based UI Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-08-31 -->
