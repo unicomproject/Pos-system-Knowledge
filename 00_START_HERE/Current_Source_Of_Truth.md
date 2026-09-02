@@ -192,11 +192,29 @@ Overall POS Hardware remains **BLOCKED** until physical PR/DR/SC gates pass.
 
 ## Highest Priority Decision
 
-## Online Order Fulfilment / Click & Collect authority (updated 2026-08-31)
+## Online Order Fulfilment / Click & Collect authority (updated 2026-09-02)
 
 Cashier/store operational Click & Collect is governed by [[../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]], module contract [[../04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]], database contract [[../06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup_UPDATED]], and Flutter ownership [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Order_ClickCollect_Fulfilment]]. The approved OO-01 queue supersedes the earlier table/tab/filter queue and is accepted by [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO01_Canonicalization_Status_2026-08-27]]; its sole active widget owner is `oo01_online_orders_widgets.dart`. OO-02 Order Detail is canonicalized by those same authorities and [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO02_Canonicalization_Status_2026-08-31]]. OO-03 Start Fulfilment Confirmation is governed by [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO03_Canonicalization_Status_2026-09-01]]: it is a side-effect-free shared-modal confirmation until Confirm invokes the existing Start POST with current `expectedVersion`. Online-order semantics and shared CTA/modal ownership are recorded in [[../07_UI_UX_KNOWLEDGE/POS_Reusable_Component_Specifications]]. The staff detail GET and atomic Start Fulfilment POST are implemented. Shared `FulfillmentOrder.row_version` optimistic concurrency rejects stale Start commands with HTTP 409 and protects future fulfilment mutations. Backend Chunk 2 for OO-03 is verification-only; no new controller/API/table/column/migration is expected. Authenticated UI-to-database Start/Picking, two-session runtime conflict evidence and actual-device confirmation comparison remain required, so production acceptance is still open. Public storefront reads and the generic status PATCH are not substitutes for these staff contracts.
 
 The approved prototype/UI layer is governed by [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Prototype_Flow]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Visual_Direction]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Component_Inventory]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_UI_API_Mapping]], and [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_UI_DB_Mapping]]. Prototype values remain display-only. Production Flutter composes the approved structure from staff API/provider data; the prototype never overrides journey, module, permission, API, or database authorities.
+
+OO-04 Picking is canonicalized by
+[[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
+Existing Flutter picking code is partial scaffolding only. Backend picking
+detail/pick/issue contracts, runtime permission catalogues/enforcement, atomic
+events, backend `canPack` and expected-version conflict handling are implemented
+under the existing `ClickCollectOrdersController`/Customer Orders ownership with
+no new table, column or migration. Implemented events are
+`FULFILLMENT_LINE_PICKED`, `FULFILLMENT_LINE_ISSUE_REPORTED` and
+`FULFILLMENT_PICKING_COMPLETED` and `FULFILLMENT_PICKING_NOTE_ADDED`. Picking
+Note reuses `fulfillment_order_events.event_note`: `POST
+.../orders/{orderId}/picking/notes?outletId=...` requires
+`commerce.online_order.picking.note`, a trimmed note of 1–500 characters and a
+positive current `expectedVersion`; it is PICKING-only, increments `row_version`,
+and is returned in the existing Picking Detail as the latest 50 notes in
+oldest-to-newest order. It never changes quantity, lifecycle or `canPack`. Chunk
+3 must add `expectedVersion` to Flutter mutations, consume backend
+eligibility/version/notes, refetch 409 and complete authenticated E2E.
 
 Cashier **Open Till** requirements are governed by
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]] and

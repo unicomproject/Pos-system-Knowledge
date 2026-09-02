@@ -89,6 +89,18 @@ Sales order state stays with the Sales Order authority. Fulfilment owns `PENDING
 - Pack requires resolved lines. One fulfilment can have multiple packages; never add one bag field to its header.
 - Existing inventory/reservation services own allocation and stock. `fulfillment_order_lines.inventory_reservation_line_id` gives exact traceability.
 
+### OO-04 Picking / Pick Order boundary
+
+OO-04 loads only after authoritative OO-03 `PICKING` success. It shows backend
+line/unit quantities and derives remaining progress; scan/manual/issue actions
+are independently permission-filtered with no empty slots. Mutations validate
+current order line/barcode, positive non-over-picking quantity, tenant/outlet,
+lifecycle and `expectedVersion`, then atomically persist quantity, actor, version
+and event/audit. A 409 refetches instead of retaining local success. Review & Pack
+is eligible only when backend confirms all required lines resolved and no blocking
+issue. Wide screens bound scrolling to the arbitrary item list; narrow screens
+stack accessibly without changing business logic.
+
 ## QR, payment and handover
 
 - QR is generated/exposed only when fulfilment and pickup are READY. Store hash/version/expiry only; raw tokens are not stored or logged.
