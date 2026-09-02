@@ -60,7 +60,7 @@ The 19 functional business modules that define the Release-1 POS product offerin
 
 | BM ID | Business Module Name | Purpose | Primary Personas | Technical Module Mapping | R1 Status |
 | --- | --- | --- | --- | --- | --- |
-| **BM-01** | Authentication & Workspace | Staff/Admin login, OTP, JWT, tenant/outlet selection context | Cashier, Tenant Admin, Super Admin | `TenantAuth`, `TenantFoundation` | **IMPLEMENTED — NOT YET E2E CLOSED** |
+| **BM-01** | Authentication & Workspace | Staff/Admin login, OTP, JWT, tenant/outlet selection context | Cashier, Tenant Admin, Super Admin | `TenantAuth`, `TenantFoundation` | **PRODUCTION READY / CLOSED** |
 | **BM-02** | Outlet & Till Management | Outlets & Tills CRUD, store hierarchy setup | Tenant Admin, Super Admin | `OutletTillDevice` | **IMPLEMENTED — NOT YET E2E CLOSED** |
 | **BM-03** | Users, Roles & Permissions | User accounts, role definitions, permissions mapping | Tenant Admin | `AccessControl`, `TenantFoundation` | **PRODUCTION READY / CLOSED** |
 | **BM-04** | Devices & Hardware | Peripheral pairing (printers, cash drawer, barcode scanner) | Cashier, Tenant Admin | `HardwareCash`, `OutletTillDevice` | **PARTIAL** |
