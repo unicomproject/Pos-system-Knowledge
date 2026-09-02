@@ -9,8 +9,8 @@
 
 | Status Category | Count | Description |
 | --- | ---: | --- |
-| **IMPLEMENTED** | 185 | Production code and backend API path fully operational |
-| **PARTIAL** | 42 | Feature partially implemented; E2E closure or edge cases pending |
+| **IMPLEMENTED** | 187 | Production code and backend API path fully operational |
+| **PARTIAL** | 40 | Feature partially implemented; E2E closure or edge cases pending |
 | **MISSING** | 36 | Required R1 capability pending implementation |
 | **DEFERRED / EXCLUDED** | 0 | (Excluded features such as Discounts/Loyalty not counted in R1 use cases) |
 | **TOTAL RELEASE 1 USE CASES** | **263** | **100% Accounted for in Master Register** |
@@ -21,7 +21,7 @@
 
 | BM ID | Business Module | Total Use Cases | Implemented | Partial | Missing | Key Journey Mapping |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| **BM-01** | Authentication & Workspace | 12 | 10 | 2 | 0 | `TA-UJ-001..003`, `POS-UJ-001`, `SA-UJ-001..003` |
+| **BM-01** | Authentication & Workspace | 12 | 12 | 0 | 0 | `TA-UJ-001..003`, `POS-UJ-001`, `SA-UJ-001..003` (Closed) |
 | **BM-02** | Outlet & Till Management | 16 | 14 | 2 | 0 | `TA-UJ-007..016`, `SA-UJ-051..052` |
 | **BM-03** | Users, Roles & Permissions | 18 | 18 | 0 | 0 | `TA-UJ-017..026`, `SA-UJ-053..054` (Closed) |
 | **BM-04** | Devices & Hardware | 14 | 6 | 4 | 4 | `POS-UJ-030..036`, `TA-UJ-040..044` |
