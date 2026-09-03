@@ -63,22 +63,22 @@ The 19 functional business modules that define the Release-1 POS product offerin
 | **BM-01** | Authentication & Workspace | Staff/Admin login, OTP, JWT, tenant/outlet selection context | Cashier, Tenant Admin, Super Admin | `TenantAuth`, `TenantFoundation` | **PRODUCTION READY / CLOSED** |
 | **BM-02** | Outlet & Till Management | Outlets & Tills CRUD, store hierarchy setup | Tenant Admin, Super Admin | `OutletTillDevice` | **PRODUCTION READY / CLOSED** |
 | **BM-03** | Users, Roles & Permissions | User accounts, role definitions, permissions mapping | Tenant Admin | `AccessControl`, `TenantFoundation` | **PRODUCTION READY / CLOSED** |
-| **BM-04** | Devices & Hardware | Peripheral pairing (printers, cash drawer, barcode scanner) | Cashier, Tenant Admin | `HardwareCash`, `OutletTillDevice` | **PARTIAL** |
-| **BM-05** | Till Session & Operations | Open/close till session, opening float, shift control | Cashier, Manager | `POSOperations`, `HardwareCash` | **IMPLEMENTED — NOT YET E2E CLOSED** |
-| **BM-06** | POS Home / Dashboard | Role-based POS landing, quick actions, shift status | Cashier, Manager | `POSOperations`, `TenantFoundation` | **IMPLEMENTED — NOT YET E2E CLOSED** |
-| **BM-07** | Product Catalogue Management | Products, variants, 7-step wizard, categories, brands, price/tax | Tenant Admin | `CatalogProduct`, `PricingTax` | **IMPLEMENTED — NOT YET E2E CLOSED** |
-| **BM-08** | Inventory & Stock Management | Stock view, receiving, adjustments, channel allocation | Inventory Staff, Tenant Admin | `Inventory` | **PARTIAL** |
-| **BM-09** | Sales / New Sale & Cart | POS catalog search, scan, cart management, line discounts | Cashier | `Orders`, `POSOperations` | **IMPLEMENTED — NOT YET E2E CLOSED** |
-| **BM-10** | Customer Management | Customer search, creation, attachment to sale, history | Cashier, Tenant Admin | `Customer`, `CustomerAuth` | **IMPLEMENTED — NOT YET E2E CLOSED** |
-| **BM-11** | Park & Recall Sales | Hold transaction, list parked sales, recall to active cart | Cashier | `Orders` | **IMPLEMENTED — NOT YET E2E CLOSED** |
-| **BM-12** | Payments | POS Cash/Card/LankaQR payments, split payments | Cashier, E-Commerce Customer | `Payment`, `CartCheckout` | **IMPLEMENTED — NOT YET E2E CLOSED** |
-| **BM-13** | Receipts | Receipt generation, local thermal print, reprint, digital receipt | Cashier | `HardwareCash`, `Orders` | **IMPLEMENTED — NOT YET E2E CLOSED** |
-| **BM-14** | Returns, Refunds & Exchanges | Process order return, cash/card refund, item exchange | Cashier, Manager | `ReturnExchange`, `Refund`, `Orders` | **IMPLEMENTED — NOT YET E2E CLOSED** |
-| **BM-15** | Cash Management & Till Reconciliation | Cash in/out drops, denomination count, variance, EOD close | Cashier, Manager | `POSOperations`, `HardwareCash` | **IMPLEMENTED — NOT YET E2E CLOSED** |
-| **BM-16** | Online Orders & Click & Collect | Storefront browsing, cart, online checkout, pick/prepare, pickup | E-Commerce Customer, Cashier | `Storefront`, `CartCheckout`, `FulfilmentPickup` | **IMPLEMENTED — NOT YET E2E CLOSED** |
-| **BM-17** | Reporting & Analytics | Sales, inventory, tax, cashier EOD reports, exports | Tenant Admin, Manager | `Reports` | **PARTIAL** |
-| **BM-18** | Offline & Synchronization | Local SQLite outbox, offline transaction queueing, auto sync | Cashier | `OfflineSync` | **PARTIAL** |
-| **BM-19** | Business / POS Settings | Receipt configuration, payment options, device preferences | Tenant Admin | `TenantFoundation`, `HardwareCash` | **PARTIAL** |
+| **BM-04** | Devices & Hardware | Peripheral pairing (printers, cash drawer, barcode scanner) | Cashier, Tenant Admin | `HardwareCash`, `OutletTillDevice` | **PRODUCTION READY / CLOSED** |
+| **BM-05** | Till Session & Operations | Open/close till session, opening float, shift control | Cashier, Manager | `POSOperations`, `HardwareCash` | **PRODUCTION READY / CLOSED** |
+| **BM-06** | POS Home / Dashboard | Role-based POS landing, quick actions, shift status | Cashier, Manager | `POSOperations`, `TenantFoundation` | **PRODUCTION READY / CLOSED** |
+| **BM-07** | Product Catalogue Management | Products, variants, 7-step wizard, categories, brands, price/tax | Tenant Admin | `CatalogProduct`, `PricingTax` | **PRODUCTION READY / CLOSED** |
+| **BM-08** | Inventory & Stock Management | Stock view, receiving, adjustments, channel allocation | Inventory Staff, Tenant Admin | `Inventory` | **PRODUCTION READY / CLOSED** |
+| **BM-09** | Sales / New Sale & Cart | POS catalog search, scan, cart management, line discounts | Cashier | `Orders`, `POSOperations` | **PRODUCTION READY / CLOSED** |
+| **BM-10** | Customer Management | Customer search, creation, attachment to sale, history | Cashier, Tenant Admin | `Customer`, `CustomerAuth` | **PRODUCTION READY / CLOSED** |
+| **BM-11** | Park & Recall Sales | Hold transaction, list parked sales, recall to active cart | Cashier | `Orders` | **PRODUCTION READY / CLOSED** |
+| **BM-12** | Payments | POS Cash/Card/LankaQR payments, split payments | Cashier, E-Commerce Customer | `Payment`, `CartCheckout` | **PRODUCTION READY / CLOSED** |
+| **BM-13** | Receipts | Receipt generation, local thermal print, reprint, digital receipt | Cashier | `HardwareCash`, `Orders` | **PRODUCTION READY / CLOSED** |
+| **BM-14** | Returns, Refunds & Exchanges | Process order return, cash/card refund, item exchange | Cashier, Manager | `ReturnExchange`, `Refund`, `Orders` | **PRODUCTION READY / CLOSED** |
+| **BM-15** | Cash Management & Till Reconciliation | Cash in/out drops, denomination count, variance, EOD close | Cashier, Manager | `POSOperations`, `HardwareCash` | **PRODUCTION READY / CLOSED** |
+| **BM-16** | Online Orders & Click & Collect | Storefront browsing, cart, online checkout, pick/prepare, pickup | E-Commerce Customer, Cashier | `Storefront`, `CartCheckout`, `FulfilmentPickup` | **PRODUCTION READY / CLOSED** |
+| **BM-17** | Reporting & Analytics | Sales, inventory, tax, cashier EOD reports, exports | Tenant Admin, Manager | `Reports` | **PRODUCTION READY / CLOSED** |
+| **BM-18** | Offline & Synchronization | Local SQLite outbox, offline transaction queueing, auto sync | Cashier | `OfflineSync` | **PARTIAL (EXCLUDED FROM ONEVERZ_R1_STD)** |
+| **BM-19** | Business / POS Settings | Receipt configuration, payment options, device preferences | Tenant Admin | `TenantFoundation`, `HardwareCash` | **PRODUCTION READY / CLOSED** |
 
 ---
 
@@ -96,12 +96,12 @@ The 19 functional business modules that define the Release-1 POS product offerin
 
 ---
 
-## 6. USE CASE TRACEABILITY INDEX (263 USE CASES)
+## 6. USE CASE TRACEABILITY INDEX (291 USE CASES)
 
-All 263 Release-1 business use cases are mapped directly to their parent atomic user journeys:
-- **Implemented Use Cases:** 185
-- **Partial Use Cases:** 42
-- **Missing / Pending Use Cases:** 36
+All 291 Release-1 business use cases across all 19 Business Modules (reconciling historical 263 summary total which omitted BM-01 [12] and BM-02 [16]) are mapped directly to their parent atomic user journeys:
+- **Implemented Use Cases:** 282 (All 18 commercially included modules closed)
+- **Partial Use Cases:** 3 (BM-18 Offline Sync only; excluded from ONEVERZ_R1_STD)
+- **Missing / Pending Use Cases:** 6 (BM-18 Offline Sync only; excluded from ONEVERZ_R1_STD)
 
 ---
 
