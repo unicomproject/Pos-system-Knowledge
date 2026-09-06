@@ -5,6 +5,14 @@
 
 # POS App UI Rules
 
+## Payment Method Selection (2026-09-03)
+
+Reuse the accepted POS shell. Render an authorized count-driven 4/3/2/1 grid;
+zero methods renders an unavailable state and disables Continue. Card tap selects
+only; Continue explicitly transitions. Use shared tokens, accessible states and
+responsive layouts without clipping/overflow. Store Credit and Credit Sale/Pay
+Later are outside current scope.
+
 > Payment Method screen decision (2026-08-02): the active release surface shows
 > Cash, Card, QR Pay and Split Payment only. Its reusable equal-card component
 > derives 1/2/3/4/5-card layouts from count; the four-method release is 2 x 2.
@@ -71,7 +79,7 @@ The shared navigation lays out only filtered permitted destinations and reflows
 for zero, one, or multiple visible items across supported viewports. It must not
 use invisible children that preserve empty gaps. Notification entry points
 follow the same underlying feature permission and entitlement rules;
-`notifications.view` alone does not reveal protected feature notifications.
+`pos.notifications.alerts.view` alone does not reveal protected feature notifications.
 
 POS home must show only permitted actions.
 
@@ -154,6 +162,12 @@ Normative screen specification:
 
 Payment screen supports the approved Release 1 payment methods. Store credit is
 future/deferred and is not Release 1 Customer Management functionality.
+
+The Payment Method screen groups its reusable Sale Summary and payment-selection
+panels inside one white parent workspace card. The wrapper is presentation-only:
+wide layouts keep both panels side by side and narrow layouts stack them without
+duplicating data/state ownership or changing backend-authoritative totals and
+payment-method availability.
 
 Card payment must reflect real reader/provider integration where configured.
 

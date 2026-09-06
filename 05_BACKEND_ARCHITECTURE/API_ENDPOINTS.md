@@ -5,6 +5,15 @@
 
 # Platform Subscription Plan API Endpoints
 
+## POS Payment Method Selection Clarification (2026-09-03)
+
+`POST /api/v1/pos/checkout/summary` supplies authoritative checkout data and
+currently supported backend payment-method information.
+`POST /api/v1/pos/checkout/start-payment` is the execution transition and must
+revalidate the selected method. No selection-only endpoint is required. Rich
+`paymentMethods[]` metadata (display/type/availability/reason/sort order) remains
+an enhancement until implemented and verified.
+
 ## POS Cashier Discount
 
 | Method | Route | Current Release use |
@@ -31,16 +40,18 @@ implementation's trusted-device, assigned-till, open-session resolution.
 
 | Method and route | Purpose | Query/body | Permission |
 |---|---|---|---|---|
-| `GET /summary` | Customer summary | `deviceId` | `customers.view` |
-| `GET /` | Search/filter/page | `deviceId`, `search`, `status`, `source`, `page`, `pageSize` | `customers.view` |
-| `GET /{customerId}` | Profile and completed-order aggregates | `deviceId` | `customers.view` |
-| `GET /{customerId}/orders` | Existing paginated purchase history | `deviceId`, `page`, `pageSize`, `fromDate`, `toDate`, `status` | `customers.view` |
-| `POST /` | Create POS customer | `deviceId`; full name, phone, optional email | `customers.create` |
+| `GET /summary` | Customer summary | `deviceId` | `pos.customers.management.view` |
+| `GET /` | Search/filter/page | `deviceId`, `search`, `status`, `source`, `page`, `pageSize` | `pos.customers.management.view` |
+| `GET /{customerId}` | Profile and completed-order aggregates | `deviceId` | `pos.customers.management.view` |
+| `GET /{customerId}/orders` | Existing paginated purchase history | `deviceId`, `page`, `pageSize`, `fromDate`, `toDate`, `status` | `pos.customers.management.view` |
+| `POST /` | Create POS customer | `deviceId`; full name, phone, optional email | `pos.customers.management.create` |
 | `PUT /{customerId}` | Edit profile/status; also supports deactivate-to-INACTIVE | `deviceId`; full name, phone, optional email, status | `customers.update` |
-| `POST /{customerId}/attach-to-sale` | Validate ACTIVE customer and attach to cart/editable sale | `deviceId`; optional `saleId` | `customers.view` + `sales.cart.manage` |
+| `POST /{customerId}/attach-to-sale` | Validate ACTIVE customer and attach to cart/editable sale | `deviceId`; optional `saleId` | `pos.customers.management.view` + `pos.sales.cart.manage` |
 
 List search covers name, phone/normalized phone, email/normalized email, and
-customer code. Status excludes `DELETED`; source is an exact current
+customer code. A phone-shaped search containing at least seven digits is
+normalized and matched by exact `normalized_phone` equality; other search terms
+retain partial matching. Status excludes `DELETED`; source is an exact current
 `source_type` filter. Order history already returns `outletDisplayName`, not
 till name. No new Recent Purchases endpoint is required.
 
@@ -60,8 +71,17 @@ Consuming-screen contract:
   and stored on the completed `sales_orders` record.
 - `POST /api/v1/customers/{customerId}/attach-to-sale` remains a supported
   backend/Customer Management capability where implemented. It is not a
-  required cashier checkout UX step: the approved full-screen checkout selector
-  auto-associates on select/create and auto-returns to Payment Method.
+  cashier checkout API. The full-screen workflow commits a found customer only
+  after **ADD TO SALE & CONTINUE**, or a created customer after successful
+  **ADD CUSTOMER & CONTINUE**, through active cart state; it then revalidates
+  checkout and returns to Payment Method.
+- Checkout discovery is mobile-only. `GET /api/v1/customers` now guarantees
+  deterministic exact normalized-phone resolution when `search` is phone-shaped
+  and contains at least seven digits; checkout also supplies `status=ACTIVE`.
+- Quick-create uses `POST /api/v1/customers` with `FullName`, `Phone`, and Email
+  omitted/null. Revalidation uses `POST /api/v1/pos/checkout/summary` with the
+  selected `CustomerId`; final mutation uses
+  `POST /api/v1/pos/checkout/start-payment` with nullable `CustomerId`.
 
 ## POS Park / Recall Sale
 
@@ -1335,13 +1355,14 @@ Base routes: `/api/v1/pos/cart`, `/api/v1/pos/checkout`,
 
 | Method | Route | Permission | Purpose | Status |
 |---|---|---|---|---|
-| POST | `/api/v1/pos/cart/calculate` | `sales.cart.update_item` in the direct controller; `sales.checkout` when called through checkout summary/start-payment | Backend cart totals without saving a sale |
-| POST | `/api/v1/pos/checkout/summary` | `sales.checkout` | Payment screen billing summary and permitted methods |
-| POST | `/api/v1/pos/checkout/start-payment` | `sales.checkout` + selected payment permission | Existing Flutter cash checkout entry point; creates sale/payment/receipt for cash |
-| POST | `/api/v1/pos/sales` | `sales.checkout` | Create draft POS sale |
-| POST | `/api/v1/pos/sales/checkout` | `sales.checkout` | Alias for draft sale creation; does not complete payment by itself |
+| POST | `/api/v1/pos/cart/calculate` | `pos.sales.cart.update_item` in the direct controller; `pos.sales.checkout.execute` through checkout summary/start-payment | Backend cart totals without saving a sale |
+| POST | `/api/v1/pos/checkout/summary` | `pos.sales.checkout.execute` | Payment screen billing summary and permitted methods |
+| POST | `/api/v1/pos/checkout/start-payment` | `pos.sales.checkout.execute` + selected canonical payment permission | Existing Flutter cash checkout entry point; creates sale/payment/receipt for cash |
+| POST | `/api/v1/pos/sales` | `pos.sales.checkout.execute` | Create draft POS sale |
+| POST | `/api/v1/pos/sales/checkout` | `pos.sales.checkout.execute` | Alias for draft sale creation; does not complete payment by itself |
+| GET | `/api/v1/pos/notifications?page={page}&pageSize={pageSize}` | `pos.notifications.alerts.view` plus source feature permission | Tenant-user inbox; records and unread count are filtered before DTO projection |
 | GET | `/api/v1/pos/sales/{saleId}` | `sales.view` | Completed sale details |
-| POST | `/api/v1/pos/payments` | Payment method permission such as `payments.cash.accept` | Record payment against an existing draft sale |
+| POST | `/api/v1/pos/payments` | Payment method permission such as `pos.payments.cash.accept` | Record payment against an existing draft sale |
 | GET | `/api/v1/pos/receipts/{saleId}` | `receipts.view` or `receipts.print` | Receipt preview data with `barcodeValue` |
 | POST | `/api/v1/pos/receipts/{saleId}/print` | `receipts.print` | Receipt print audit row |
 

@@ -1,9 +1,47 @@
 <!-- title: Permission Code List -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-28 -->
+<!-- last_updated: 2026-09-06 -->
 
 # Permission Code List
+
+> Cashier POS fine-grained **Chunk 14** = **PASS** — final system validation /
+> production-readiness closure (see
+> [[Cashier_POS_Canonical_Permission_Registry_Chunk_14]]).
+> Cashier POS fine-grained **Chunk 13** = **PASS** (final completion) — Cash Drawer /
+> Movements / Open Drawer / Cash In / Cash Drop / Open Till (incl. per-key numpad) /
+> Close Till Flutter visibility complete (see
+> [[Cashier_POS_Canonical_Permission_Registry_Chunk_13]]).
+> Cashier POS fine-grained **Chunk 12** = **PASS** — Customers / Receipt History /
+> Online Orders / Returns Flutter visibility complete (see
+> [[Cashier_POS_Canonical_Permission_Registry_Chunk_12]]).
+> Cashier POS fine-grained **Chunk 11** = **PASS** — Payment Method / Cash / Card /
+> QR / Split / Sale Complete / Receipt Flutter visibility complete (see
+> [[Cashier_POS_Canonical_Permission_Registry_Chunk_11]]).
+> Cashier POS fine-grained **Chunk 10** = **PASS** — Home / New Sale / Catalog / Cart /
+> Held Sales Flutter visibility complete (see [[Cashier_POS_Canonical_Permission_Registry_Chunk_10]];
+> Part 0 confirmed Bottom Nav Orders = receipt history).
+> Cashier POS fine-grained **Chunk 9** applies Global Shell / Top Bar / Bottom
+> Navigation / Notifications Flutter visibility via Chunk 8 gates. See
+> [[Cashier_POS_Canonical_Permission_Registry_Chunk_9]].
+> Cashier POS fine-grained **Chunk 8** establishes Flutter centralized permission
+> state, membership API, and `PermissionGate` (infrastructure only). See
+> [[Cashier_POS_Canonical_Permission_Registry_Chunk_8]].
+> Chunk 7 enforces sensitive DTO / field-level response filtering:
+> [[Cashier_POS_Canonical_Permission_Registry_Chunk_7]].
+> Chunk 6 enforces backend business API authorization (401/403):
+> [[Cashier_POS_Canonical_Permission_Registry_Chunk_6]].
+> Chunk 5 resolver + session loading:
+> [[Cashier_POS_Canonical_Permission_Registry_Chunk_5]].
+> Chunk 4 assignment validation:
+> [[Cashier_POS_Canonical_Permission_Registry_Chunk_4]].
+> Chunk 3 seeds + one-time parent→child backfill:
+> [[Cashier_POS_Canonical_Permission_Registry_Chunk_3]].
+> Chunk 2 leaf definitions:
+> [[Cashier_POS_Canonical_Permission_Registry_Chunk_2]].
+> Chunk 1 mapping foundation:
+> [[Cashier_POS_Canonical_Permission_Registry_Chunk_1]].
+> Final production regression remains **deferred to Chunk 14**.
 
 > **Permission & Entitlement Contract Reconciled: 2026-08-21 — SUPERSEDED BY OWNER-APPROVED R1 SCOPE LOCK**  
 > The authoritative Release 1 scope is locked in [ONEVERZ_RELEASE_1_SCOPE_LOCK.md](file:///c:/Users/User/Desktop/Nytroz__POS/Nytroz%20POS%20-%20Second%20Brain/Pos-system-Knowledge/01_RELEASE_SCOPE/ONEVERZ_RELEASE_1_SCOPE_LOCK.md).  
@@ -205,9 +243,10 @@ $$\mathbf{domain.module.feature.action}$$
 | `pos.sales.checkout.execute` | Proceed to Payment / execute checkout | `sales.checkout` |
 | `pos.sales.manual_discount.apply` | Validate, apply, and cancel manual discount | `sales.discount.apply`, `pos.discount.apply` |
 | `pos.sales.discount.approve` | Approve discount exceeding authority (deferred) | `sales.discount.approve` |
-| `pos.sales.held_sales.create` | Park active cart / cancel parked sale | `sales.park.create`, `pos.sale.park` |
+| `pos.sales.held_sales.create` | Park active cart | `sales.park.create`, `pos.sale.park` |
 | `pos.sales.held_sales.view` | View active held/parked sales list & count | `sales.park.view`, `pos.sale.park.view` |
 | `pos.sales.held_sales.recall` | Recall eligible held/parked sale to cart | `sales.park.recall`, `pos.sale.recall` |
+| `pos.sales.held_sales.cancel` | Cancel/discard a parked sale (Chunk 2 approved) | `sales.park.cancel` (documented-only → approved) |
 | `pos.sales.order_history.view` | View completed sale summary and lines | `sales.view` |
 | `pos.payments.cash.accept` | Accept cash payment in payment sheet | `payments.cash.accept` |
 | `pos.payments.card.accept` | Accept card payment (placeholder route) | `payments.card.accept` |
@@ -229,7 +268,13 @@ $$\mathbf{domain.module.feature.action}$$
 | `pos.exchanges.processing.create` | Complete exchange settlement branch | `exchanges.create`, `pos.exchange.process` |
 | `pos.cash_drawer.position.view` | View till cash drawer position & balance | `cash_drawer.view` |
 | `pos.cash_drawer.physical.manage` | Physical / manual trigger open cash drawer | `cash_drawer.manage` |
-| `pos.cash_drawer.movements.create` | Record Cash In, Cash Out, and Cash Drop | `cash_drawer.movement.create`, `pos.cash.movement` |
+| `pos.cash_drawer.movements.create` | Record cash movements (umbrella parent) | `cash_drawer.movement.create`, `pos.cash.movement` |
+| `pos.cash_drawer.movements.cash_in` | Cash In movement action (Chunk 2) | — |
+| `pos.cash_drawer.movements.cash_out` | Cash Out movement action (Chunk 2) | — |
+| `pos.cash_drawer.movements.cash_drop` | Cash Drop movement action (Chunk 2) | — |
+| `pos.customers.management.attach_sale` | Attach customer to active sale (Chunk 2) | — |
+| `pos.customers.management.deactivate` | Deactivate customer (Chunk 2) | — |
+| `pos.shell.navigation.settings` | POS Settings navigation destination (Chunk 2) | — |
 | `pos.till.session.open` | Open till session with opening float | `pos.till.open` |
 | `pos.till.session.close` | Close till session / End Shift with cash count | `pos.till.close` |
 | `pos.till.session.view` | View top bar / header till session status | `till.session.view`, `pos.till.view` |

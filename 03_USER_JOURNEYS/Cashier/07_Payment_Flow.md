@@ -5,6 +5,23 @@
 
 # Payment Flow
 
+## Cash Payment redesign sequence (2026-09-04)
+
+`Current Sale -> Customer Find/Add/Skip -> Payment Method -> select Cash ->
+Continue Payment -> Cash Payment -> enter/select received amount -> Complete
+Sale -> Payment Success`.
+
+Cash Payment reuses the same shared `SALE SUMMARY` panel used by Payment Method;
+it does not own a separate `ORDER SUMMARY`. Back to Payment Methods preserves
+cart/customer/tender context. Only confirmed backend completion advances to
+Payment Success.
+
+> Payment selection canonicalization (2026-09-03): card taps select only;
+> `Continue Payment` enters the selected execution flow. The eligible
+> Cash/Card/QR/Split list is backend-authorized and availability-driven. Store
+> Credit and Credit Sale/Pay Later are outside current scope. See
+> [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_POS_Payment_Method_Selection_Implementation_Specification]].
+
 > Current Payment Method UI decision (2026-08-02): Cash, Card, QR Pay and Split
 > Payment only; Pay Later is excluded. Cash is executable. Card, QR Pay and Split
 > remain safely unavailable until their real capability is proven and never fall
@@ -48,11 +65,11 @@ coupon, AI, or accounting scope.
 | 5 | Confirm cash payment | Order, payment, stock and receipt are committed by backend, including nullable `customerId` |
 | 6 | Show success and receipt actions | Authoritative sale/payment/receipt values are displayed |
 
-Customer may be changed only while on Payment Method. Every select, replace, or
-Use Walk-in transition must revalidate/recalculate checkout and discounts before
-return. Once payment execution begins, return to Payment Method and restart
-validation before changing the customer. Back from the selector preserves the
-same cart, customer, discount, totals, till, and checkout context.
+The shared Sale Summary customer entry is available from Payment Method and Cash
+Payment. Every select, replace, or Use Walk-in transition reuses the checkout-
+customer journey and must revalidate/recalculate checkout and discounts before
+return. Back from the selector preserves the same cart, customer, discount,
+totals, till, payment intent and checkout context.
 
 ## Journey Diagram
 
@@ -86,9 +103,12 @@ flowchart TD
 ### Cash Payment Screen
 
 The Cash Payment screen enforces these rules:
+- **Shared Sale Summary**: Reuses the Payment Method `SALE SUMMARY`; no separate
+  Cash `ORDER SUMMARY` or fixed Cash-specific 2/5 summary is canonical.
 - **Checkout Summary**: Loaded authoritatively from `POST /api/v1/pos/checkout/summary`.
 - **Dynamic Quick Amounts**: Generated strictly as Exact Total Due and the next LKR 1000 boundary (e.g. 1700 -> 1700, 2000).
-- **Amount Entry**: Cashier selects a Quick Amount, uses **Exact Cash**, or uses **Other Amount** for manual keypad entry.
+- **Amount Entry**: Cashier selects a Quick Amount, uses **Exact Cash**, or enters
+  a manual amount through the always-available numeric keypad.
 - **Validation**: Submission is blocked for insufficient amounts.
 - **Complete Sale**: Uses idempotent submission to `POST /api/v1/pos/checkout/start-payment`.
 - **Success/Failure**: Backend values are authoritative. Cart clears only after success. Intent state is preserved on failure for safe retry.
@@ -100,7 +120,7 @@ The Cash Payment screen enforces these rules:
 |---|---|
 | Authentication | Required |
 | Feature entitlement | POS/payment enabled |
-| Permission | `pos.payments.cash.accept` (legacy alias: `payments.cash.accept`) |
+| Permission | `pos.payments.cash.accept` |
 | Trusted device/open till | Required |
 
 ## Data and API References

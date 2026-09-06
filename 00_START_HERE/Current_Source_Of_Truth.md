@@ -6,6 +6,14 @@
 
 # Current Source Of Truth
 
+## POS Payment Method Selection (2026-09-03)
+
+The documentation-only selection contract is canonicalized in
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_POS_Payment_Method_Selection_Implementation_Specification]].
+It governs Sale -> Customer -> Payment Method -> separate execution, a
+backend-authorized Cash/Card/QR/Split list, explicit Continue and the 4/3/2/1/0
+responsive grid. Store Credit and Credit Sale/Pay Later are excluded.
+
 ## Purpose
 
 This file defines which project inputs control the OneVerz POS MVP Second Brain.
@@ -189,6 +197,18 @@ Chunk 4 — Barcode Scanner (SOFTWARE hardened 2026-08-16; PHYSICAL acceptance P
 Overall hardware production readiness remains **BLOCKED** until mandatory physical gates close.
 
 Overall POS Hardware remains **BLOCKED** until physical PR/DR/SC gates pass.
+
+## POS Checkout Find Or Add Customer Authority (2026-09-03)
+
+The canonical checkout customer journey is governed by
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Checkout_Customer_Selection_Implementation_Specification]].
+The canonical route order is `Current Sale (Cart) -> Find/Add/Skip Customer (/pos/new-sale/customer) -> Payment Method (/pos/new-sale/payment) -> Payment Execution`.
+The old route order (`Cart -> Payment Method -> Customer -> Payment Method`) is explicitly superseded as the primary checkout flow.
+Customer is OPTIONAL: Cashier may press **SKIP** on initial phone entry to continue as Walk-in (`CustomerId = null`), explicitly press **ADD TO SALE & CONTINUE** for a found customer, or press **ADD CUSTOMER & CONTINUE** for quick-created customer.
+Dedicated full-screen mobile search/create workflow is distinct from Customer Management (`/pos/customers`).
+Payment Method Customer card provides re-entry to edit or clear the customer.
+Second Brain is READY/CANONICALIZED; existing backend APIs are reused with deterministic exact
+normalized-phone behaviour; no database change is required.
 
 ## Highest Priority Decision
 

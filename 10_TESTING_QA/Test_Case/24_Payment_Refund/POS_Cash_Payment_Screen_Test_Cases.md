@@ -43,7 +43,7 @@ Detailed test cases specifically for verifying the correct behavior of the Flutt
 
 ### 6. Error Handling and Edge Cases
 - **400/401/403/409/500 Handling:** Verify specific UI responses for various HTTP errors without exposing raw keys.
-- **Permission Denied:** Verify `payments.cash.accept` and `sales.checkout` absence properly denies access.
+- **Permission Denied:** Verify `pos.payments.cash.accept` and `pos.sales.checkout.execute` absence properly denies access.
 - **Disabled Cash Payment Method:** Verify the flow aborts if Cash is not allowed by the tenant.
 - **Closed Till:** Verify payment is rejected if till session is closed.
 - **Invalid Device:** Verify payment is rejected if device is untrusted/inactive.

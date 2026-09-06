@@ -1,10 +1,25 @@
 <!-- title: Cashier POS Second Brain vs Code Comparison Status -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-15 -->
+<!-- last_updated: 2026-09-03 -->
 
 
 # Cashier POS Second Brain vs Code Comparison
+
+> **Superseding checkout-customer decision (2026-09-03):** historical Step 2/3
+> and target-UI closure evidence below applies to the former generic selector.
+> It does not complete the newly approved mobile-only, seven-state **FIND OR ADD
+> CUSTOMER** target. Current status is Second Brain READY/CANONICALIZED, Flutter
+> PENDING, backend reuse with exact normalized-phone behaviour to verify, DB
+> change none, and E2E PENDING. See
+> [[POS_Checkout_Find_Or_Add_Customer_Implementation_Status]].
+
+Current checkout route order (verified 2026-09-03) is **Current Sale → Customer
+Find/Add/Skip → Payment Method → Payment Execution**. The Payment Method
+Customer card is an optional re-entry path only. Focused Flutter coverage is
+22/22, full Flutter regression is 1508 pass / 1 intentional skip, and exact
+normalized-phone backend repository coverage is 4/4. Authenticated runtime E2E
+remains pending.
 
 ## Park / Recall Sale reconciliation
 
@@ -53,7 +68,8 @@ Cashier POS status.
 
 ## Checkout Customer Flow Reconciliation — 2026-08-07
 
-Status: **Step 3 Checkout Customer Persistence Fully Complete**.
+Historical status: **Step 3 checkout persistence evidence complete for the
+former selector; revised Find Or Add Customer Flutter target PENDING**.
 
 The approved Payment Method journey uses a clickable Customer card and a
 separate full-screen checkout customer selection/add screen. Existing selection
@@ -128,7 +144,7 @@ handoff tests**, combined focused Flutter regressions **37/37**, backend checkou
 repository integration **15/15**, checkout controller **8/8**, focused Flutter
 analysis clean, and backend Release build succeeded with zero warnings/errors.
 
-### Checkout Customer target UI closure — 2026-08-07
+### Historical Checkout Customer target UI closure — 2026-08-07 (superseded)
 
 Status: **Target UI implemented and authenticated visual verification passed**.
 

@@ -6,6 +6,18 @@
 
 # Permission Based UI Rules
 
+## Payment and Notification Deep Filtering (2026-09-03)
+
+Payment Method requires `pos.sales.checkout.execute`; each offered method requires
+its existing `pos.payments.<method>.accept` permission and real configuration/capability.
+Backend responses omit unauthorized methods; frontend hiding is not an
+authorization boundary. `pos.notifications.alerts.view` enables notification access but not
+unrelated feature records. Backend filtering applies effective feature
+permissions before payload return and unread-count calculation.
+
+The authoritative POS badge is the filtered unread count returned by the POS
+backend. Flutter must not reconstruct or increase it from unfiltered records.
+
 ## Purpose
 
 This file defines how OneVerz POS MVP UI must respond to feature entitlement,
@@ -126,7 +138,7 @@ device, or till-session context.
 
 A notification is visible/actionable only when the authenticated user has the
 tenant entitlement, underlying feature/domain permission, and applicable
-outlet/resource scope. `notifications.view` alone is insufficient when the
+outlet/resource scope. `pos.notifications.alerts.view` alone is insufficient when the
 notification exposes another protected feature.
 
 Prefer authoritative backend/server filtering. Flutter also presentation-gates
