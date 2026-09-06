@@ -477,6 +477,14 @@ CHECK(sequence_number > 0)
 CHECK(affected_quantity IS NULL OR affected_quantity >= 0)
 ```
 
+## POS Checkout Customer Selection Note
+
+The Payment Method Find Or Add Customer screen reuses `customers` and nullable
+`sales_orders.customer_id`. Existing customer snapshot columns retain their
+current contract; this screen alone does not establish new phone/email snapshot
+population. No checkout-customer table, country-code column, other new column,
+or migration is required. Walk-in remains null and is not a synthetic customer.
+
 ## External Reference Entities
 
 `tenants`, `tenant_users`, `customers`, `sales_channels`, `fulfillment_method_outlets`, `outlets`, `tills`, `till_sessions`, `currencies`, `price_lists`, `price_list_items`, `products`, `product_variants`, `unit_of_measures`, `product_choice_groups`, `product_choice_options`, `combo_definitions`, `combo_components`, `combo_group_items`, `discount_policies`, `discount_types`, `tax_jurisdictions`, `tax_classes`, `tax_rates`.

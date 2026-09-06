@@ -5,6 +5,16 @@
 
 # POS Operations Functional Rules
 
+## Payment Method Selection (2026-09-03)
+
+The checkout sequence is Sale -> Customer Find/Add/Skip -> Payment Method ->
+Payment Execution. Cards select only. Continue requires a current
+backend-authorized/configured method and authoritative checkout validation.
+Change Customer preserves lines and recalculates checkout; Back to Sale preserves
+safe cart context. Current methods are Cash, Card, QR and Split. Store Credit and
+Credit Sale/Pay Later are excluded. See
+[[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_POS_Payment_Method_Selection_Implementation_Specification]].
+
 ## Purpose
 
 Defines business and UX rules for `POS_Operations` in the new OneVerz POS MVP scope.
@@ -40,21 +50,23 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Approved list-screen target uses Today/This Shift/All Parked Sales, no Cashier
   column, backend-filtered count/value, View/Recall/Cancel and existing theme/
   shell components. Current card screen is not target completion. See
-  [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Parked_Sales_Recall_Screen_Implementation_Specification]].
 - Implementation tracking records chunk evidence separately; do not treat docs as
   feature Completed.
 - Cash movement schema is not a successful cashier movement without a mutation
   API and persistence result.
-- Checkout customer selection is optional. Walk-in/guest checkout remains valid
-  with nullable `customerId` and must never be blocked.
-- The Payment Method Customer card opens a dedicated full-screen checkout
-  selection/add flow. It must not open a popup/modal/dialog or reuse the
-  bottom-navigation `/pos/customers` Customer Management screen.
-- Existing selection and successful Add Customer creation automatically
-  associate the customer with the active cart/checkout and automatically return
-  to Payment Method. No Attach or Save/Attach step is part of cashier checkout.
+- **Canonical Checkout Journey**: Pressing **Proceed to Payment** from Current
+  Sale/cart navigates to the dedicated full-screen checkout customer selection
+  flow (`/pos/new-sale/customer`). Customer is OPTIONAL:
+  - **SKIP** allows continuing as a Walk-in customer (`CustomerId = null`) directly
+    to Payment Method (`/pos/new-sale/payment`).
+  - **Existing Customer Search**: Requires explicit **ADD TO SALE & CONTINUE** to
+    commit the customer, revalidate checkout summary, and advance to Payment Method.
+  - **New Customer Quick-Create**: Requires **ADD CUSTOMER & CONTINUE** to create
+    via real backend, select the customer, revalidate checkout summary, and advance
+    to Payment Method.
+  - Re-entry from Payment Method via Customer card is supported for editing/clearing.
 - When selected, `customerId` remains attached through checkout/payment and is
-  stored on the completed sale.
+  stored on the completed sale. Walk-in sales store `customerId = null`.
 - The complete normative contract is
   [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Checkout_Customer_Selection_Implementation_Specification]].
 - Every walk-in/customer transition and customer replacement uses the existing

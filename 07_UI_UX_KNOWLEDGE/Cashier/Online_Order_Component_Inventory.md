@@ -14,7 +14,7 @@ Apply [[../../08_FLUTTER_POS_KNOWLEDGE/Frontend_Reusable_Component_Governance]],
 | Page header, debounced search, six aggregate cards and responsive order-card list | `lib/features/fulfilment_pickup/presentation/widgets/` |
 | Detail screen and detail composition | `presentation/screens/online_order_detail_screen.dart`, `presentation/widgets/online_order_detail_widgets.dart` |
 | Start confirmation | `presentation/widgets/start_fulfilment_dialog.dart` |
-| Picking workspace | `presentation/screens/pos_online_order_picking_screen.dart`, `presentation/widgets/picking_widgets.dart` |
+| Picking workspace | `presentation/screens/pos_online_order_picking_screen.dart`, `presentation/widgets/picking/` |
 | Review/pack and ready | `presentation/screens/review_pack_screen.dart`, `presentation/screens/ready_for_collection_screen.dart` |
 | Shared feature UI tokens/status primitives | `presentation/widgets/online_order_ui.dart` |
 | State/query coordination | `lib/features/fulfilment_pickup/presentation/providers/` |
@@ -53,7 +53,7 @@ Do not duplicate shell/navigation, search/filter/pagination, status chips, loadi
 ## Implementation gate
 
 OO-04 current Flutter owners (`pos_online_order_picking_screen.dart`,
-`picking_widgets.dart`, provider/entity/repository/datasource) are PARTIAL
+`presentation/widgets/picking/`, provider/entity/repository/datasource) are PARTIAL
 scaffolding. Reuse the POS shell, ThemeData, shared actions, media/status/state/
 progress/modal/scanner patterns and tokens. Picking header/summary/stepper/item
 cards/sidebar are feature-local compositions. Wide layout keeps item list left

@@ -83,7 +83,7 @@ shared blurred modal helpers and shared primary/secondary action controls.
 ## OO-04 Picking owner and Chunk 3 boundary (2026-09-02)
 
 The existing owner is `lib/features/fulfilment_pickup/`: picking route/screen,
-`picking_widgets.dart`, `pos_online_orders_provider.dart`, the shared online-order
+`presentation/widgets/picking/` widgets, `pos_online_orders_provider.dart`, the shared online-order
 entity/repository and remote datasource. Backend Chunk 2 now implements picking
 GET, scan/manual pick and issue routes. Flutter remains **PARTIAL scaffolding**
 because current mutation payloads omit `expectedVersion` and do not consume the

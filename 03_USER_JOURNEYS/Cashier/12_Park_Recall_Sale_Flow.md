@@ -66,6 +66,10 @@ Cancel/X preserves cart. Timeout/`4xx`/`5xx` preserves cart and key.
 - Recall revalidates device, session, price, tax, discount and totals; soft stock
   warnings may return; then `HELD → RELEASED` once. SalesOrder stays `DRAFT`.
 - Success restores the cart on New Sale and switches action to Park Sale.
+- **Recall navigation rule (2026-09-06):** Successful Recall must restore the
+  active sale/cart first, then dismiss Parked Sales (modal `pop` or route
+  `go('/pos/new-sale')`). Failed Recall remains on Parked Sales with cart
+  unchanged. No permission/backend change.
 - **Cancel:** confirmation with Park Reference, warning, required **Cancel Reason**,
   Back/Close, Confirm Cancel. Reason mandatory at service (trim; not blank; max 250).
 - Expired/released/cancelled records stay off the active list and cannot be recalled.

@@ -1,13 +1,21 @@
 <!-- title: Park Recall Sale Flutter Implementation Status -->
 <!-- status: Completed -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-07 -->
+<!-- last_updated: 2026-09-06 -->
 
 # Park Recall Sale Flutter Implementation Status
 
 ## Status
 
 **COMPLETED — AUTHENTICATED RUNTIME E2E ACCEPTED 2026-08-07.**
+
+### Parked Sale Recall navigation fix (2026-09-06)
+
+Successful Recall no longer leaves Parked Sales open after the row unmounts.
+`beginParkedSaleRecall` always notifies the parent after cart hydration; the
+New Sale dialog pops the root navigator; `/pos/parked-sales` still
+`go('/pos/new-sale')`. Failure stays on Parked Sales. Permissions/backend
+unchanged.
 
 Online Park/Recall uses backend Holds API (`PosHoldsController`). Product-contract
 UX (mutually exclusive Park/Recall, product-name summary, mandatory Cancel Reason,

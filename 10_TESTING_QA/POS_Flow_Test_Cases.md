@@ -9,7 +9,7 @@
 
 | ID | Scenario | Preconditions | Expected Result |
 |---|---|---|---|
-| POS-CASH-001 | Cashier opens New Sale and proceeds to payment | POS user logged in, trusted device, open till, `pos.new_sale.view`, product/cart permissions, `sales.checkout`, and `payments.cash.accept` | Checkout summary loads from backend and Cash payment option is available. |
+| POS-CASH-001 | Cashier opens New Sale and proceeds to payment | POS user logged in, trusted device, open till, `pos.new_sale.view`, product/cart permissions, `pos.sales.checkout.execute`, and `pos.payments.cash.accept` | Checkout summary loads from backend and Cash payment option is available. |
 | POS-CASH-002 | Cashier confirms valid cash payment | Cart has items; cash received is equal to or greater than grand total | Backend creates sale, payment allocation, completed sale status, receipt number, and `barcodeValue`; Flutter navigates to payment success. |
 | POS-CASH-003 | Cash received is below total | Same as POS-CASH-002 but tendered amount is too low | Backend rejects payment; sale is not completed. |
 | POS-CASH-004 | Checkout summary request fails | Backend summary request fails | Flutter shows unavailable/error state and cash confirmation remains blocked; no local total is treated as successful checkout authority. |

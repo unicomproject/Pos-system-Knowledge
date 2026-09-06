@@ -54,7 +54,7 @@ The following tokens exist in legacy documentation, database migrations, or code
 | 8 | pos.products | INVALID_TECHNICAL_GROUPING | products.view / products.search | No | Group header placeholder; replaced by catalog and cashier view permissions. |
 | 9 | pos.receipts | INVALID_TECHNICAL_GROUPING | receipts.view / receipts.print | No | Group header placeholder; replaced by specific receipt action tokens. |
 | 10 | pos.returns | INVALID_TECHNICAL_GROUPING | returns.view / returns.create | No | Group header placeholder; replaced by return policy actions. |
-| 11 | pos.sales | INVALID_TECHNICAL_GROUPING | sales.create / sales.view / sales.checkout | No | Group header placeholder; replaced by active transaction tokens. |
+| 11 | pos.sales | INVALID_TECHNICAL_GROUPING | sales.create / sales.view / pos.sales.checkout.execute | No | Group header placeholder; replaced by active transaction tokens. |
 | 12 | pos.till | INVALID_TECHNICAL_GROUPING | pos.till.open / pos.till.close | No | Group header placeholder; replaced by cashier open/close shift flows. |
 | 13 | tenant.till_ops | LEGACY_ALIAS | pos.till.open / pos.till.close | No | Deprecated prefix used in early drafts; replaced by pos_sales module. |
 | 14 | tenant.till.manage | LEGACY_ALIAS | tenant.tills.manage | Yes (in DB seeds only) | Seeded as active in DB for backward compatibility, but legacy duplicate. Replaced in C# by tenant.tills.manage. |
@@ -510,7 +510,7 @@ The following tables list the exact **217 active permission definitions** compil
 | 177 | `sales.discount.approve` | pos_sales | TILL | R1 | SeedPosCashierPermissions.cs |
 | 178 | `sales.create` | pos_sales | TILL | R1 | DevelopmentPosNewSalePermissionsSeedData.cs |
 | 179 | `sales.view` | pos_sales | TILL | R1 | DevelopmentPosPaymentReceiptPermissionsSeedData.cs |
-| 180 | `sales.checkout` | pos_sales | TILL | R1 | DevelopmentPosPaymentReceiptPermissionsSeedData.cs |
+| 180 | `pos.sales.checkout.execute` | pos_sales | TILL | R1 | DevelopmentPosPaymentReceiptPermissionsSeedData.cs |
 | 181 | `sales.cart.manage` | pos_sales | TILL | R1 | DevelopmentPosNewSalePermissionsSeedData.cs |
 | 182 | `sales.cart.add_item` | pos_sales | TILL | R1 | DevelopmentPosNewSalePermissionsSeedData.cs |
 | 183 | `sales.cart.update_item` | pos_sales | TILL | R1 | DevelopmentPosNewSalePermissionsSeedData.cs |
@@ -765,7 +765,7 @@ TENANT OPERATIONS & ADMINISTRATION (Tenant / Outlet / Till Scope)
 â”‚   â”œâ”€â”€ sales.discount.approve
 â”‚   â”œâ”€â”€ sales.create
 â”‚   â”œâ”€â”€ sales.view
-â”‚   â”œâ”€â”€ sales.checkout
+â”‚   â”œâ”€â”€ pos.sales.checkout.execute
 â”‚   â”œâ”€â”€ sales.cart.manage
 â”‚   â”œâ”€â”€ sales.cart.add_item
 â”‚   â”œâ”€â”€ sales.cart.update_item
@@ -824,7 +824,7 @@ ole_management | Role Setup | tenant.roles.view, tenant.roles.create, tenant.rol
 | till_management | Till Registers | tenant.tills.view, tenant.tills.create, tenant.tills.update, tenant.tills.delete, tenant.tills.manage, tenant.tills.assign_outlet, tenant.tills.details.view, tenant.hardware.view, tenant.hardware.manage | Outlet Scoped |
 | product_catalog | Product Master | tenant.products.view, tenant.products.dashboard.view, tenant.products.details.view, tenant.products.create, tenant.products.update, tenant.products.delete, catalog.products.view, catalog.products.create, catalog.products.update, catalog.products.delete, catalog.products.manage, catalog.products.publish, catalog.variants.manage, catalog.product_media.manage, catalog.combo_components.manage, catalog.product_cost.view, catalog.barcodes.manage, tenant.product_media.manage, catalog.departments.view, catalog.departments.create, catalog.departments.update, catalog.departments.delete, catalog.departments.manage, catalog.categories.view, catalog.categories.create, catalog.categories.update, catalog.categories.delete, catalog.categories.manage, catalog.brands.view, catalog.brands.create, catalog.brands.update, catalog.brands.delete, catalog.brands.manage, catalog.collections.view, catalog.collections.create, catalog.collections.update, catalog.collections.delete, catalog.collections.manage, catalog.product_channels.manage, catalog.return_policies.view, catalog.return_policies.create, catalog.return_policies.update, catalog.return_policies.delete, catalog.return_policies.manage, products.view, products.search | Tenant Wide |
 | inventory_tracking | Stock Ledger | inventory.stock.view, tenant.stock.view, tenant.stock.dashboard.view, tenant.stock.in, tenant.stock.out, tenant.stock.value.view, tenant.stock.movements.view, tenant.stock.expiry.view, tenant.stock.adjustments.view, tenant.stock.transfers.view, tenant.stock.opening | Outlet Scoped |
-| pos_checkout | POS Checkout | pos.home.view, pos.dashboard.view, pos.new_sale.view, pos.till.open, pos.till.close, till.session.view, pos.hardware.settings, pos.refund.approve, sales.discount.approve, sales.create, sales.view, sales.checkout, sales.cart.manage, sales.cart.add_item, sales.cart.update_item, sales.cart.remove_item, sales.cart.clear, sales.discount.apply, sales.park.create, sales.park.view, sales.park.recall, orders.view, returns.view, returns.create, refunds.view, refunds.create, exchanges.view, exchanges.create, receipts.view, receipts.print, receipts.reprint, cash_drawer.view, cash_drawer.manage, cash_drawer.movement.create, payments.cash.accept, payments.card.accept, payments.qr.accept, payments.split.accept, notifications.view, customers.view, customers.create, customers.update | Till / Device Scoped |
+| pos_checkout | POS Checkout | pos.home.view, pos.dashboard.view, pos.new_sale.view, pos.till.open, pos.till.close, till.session.view, pos.hardware.settings, pos.refund.approve, sales.discount.approve, sales.create, sales.view, pos.sales.checkout.execute, sales.cart.manage, sales.cart.add_item, sales.cart.update_item, sales.cart.remove_item, sales.cart.clear, sales.discount.apply, sales.park.create, sales.park.view, sales.park.recall, orders.view, returns.view, returns.create, refunds.view, refunds.create, exchanges.view, exchanges.create, receipts.view, receipts.print, receipts.reprint, cash_drawer.view, cash_drawer.manage, cash_drawer.movement.create, pos.payments.cash.accept, pos.payments.card.accept, pos.payments.qr.accept, pos.payments.split.accept, pos.notifications.alerts.view, pos.customers.management.view, pos.customers.management.create, pos.customers.management.update | Till / Device Scoped |
 | online_store | E-Commerce Store | tenant.online_store.view, tenant.online_store.manage | Tenant Wide |
 | sales_orders | Sales Orders | fulfillment.orders.view, fulfillment.orders.manage | Outlet Scoped |
 | click_collect | Pickup Orders | fulfillment.orders.view, fulfillment.orders.manage | Outlet Scoped |
@@ -970,7 +970,7 @@ Includes all entitled tenant-scoped permission definitions (bounded by subscript
 - `sales.discount.approve`
 - `sales.create`
 - `sales.view`
-- `sales.checkout`
+- `pos.sales.checkout.execute`
 - `sales.cart.manage`
 - `sales.cart.add_item`
 - `sales.cart.update_item`
@@ -1031,7 +1031,7 @@ Assigned to manage physical outlet environments:
 - sales.discount.approve
 - sales.create
 - sales.view
-- sales.checkout
+- pos.sales.checkout.execute
 - sales.cart.manage
 - sales.cart.add_item
 - sales.cart.update_item
@@ -1073,7 +1073,7 @@ Granular, till-scoped checkout capabilities (strictly excludes manager approval 
 - pos.till.close
 - till.session.view
 - sales.create
-- sales.checkout
+- pos.sales.checkout.execute
 - sales.cart.manage
 - sales.cart.add_item
 - sales.cart.update_item
@@ -1358,7 +1358,7 @@ Every one of the **217 active permission definitions** is audited and grouped in
 | 177 | `sales.discount.approve` | pos_sales | TILL | **R1_ACTIVE** | ACTIVE | Provide manager approval code to unlock cashier discount override |
 | 178 | `sales.create` | pos_sales | TILL | **R1_ACTIVE** | ACTIVE | Initiate new POS sale checkout block |
 | 179 | `sales.view` | pos_sales | TILL | **R1_ACTIVE** | ACTIVE | View listing of completed cashier checkout sales |
-| 180 | `sales.checkout` | pos_sales | TILL | **R1_ACTIVE** | ACTIVE | Execute payment checkout processing flow |
+| 180 | `pos.sales.checkout.execute` | pos_sales | TILL | **R1_ACTIVE** | ACTIVE | Execute payment checkout processing flow |
 | 181 | `sales.cart.manage` | pos_sales | TILL | **R1_ACTIVE** | ACTIVE | Full management delegation for active cashier cart |
 | 182 | `sales.cart.add_item` | pos_sales | TILL | **R1_ACTIVE** | ACTIVE | Add item lines to cashier cart |
 | 183 | `sales.cart.update_item` | pos_sales | TILL | **R1_ACTIVE** | ACTIVE | Update quantities/modifiers of items in cashier cart |
