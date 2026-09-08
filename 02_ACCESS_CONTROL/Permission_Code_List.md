@@ -171,8 +171,13 @@ $$\mathbf{domain.module.feature.action}$$
 | `catalog.audit.history.view` | View standard product audit histories | `catalog.product_audit.view` |
 | `catalog.audit.sensitive.view` | View sensitive product audit details | `catalog.product_audit_sensitive.view` |
 | `catalog.combos.components.manage` | Manage bundle kits and combo component rules | `catalog.combo_components.manage` |
-| `pricing.tax_classes.master.view` | View tax classes | `pricing.tax_classes.view`, `catalog.tax_classes.view` (deprecated) |
-| `pricing.tax_rates.master.view` | View tax rates | `pricing.tax_rates.view` |
+| `pricing.tax_classes.master.view` | View Tax Setups (list/detail) | `pricing.tax_classes.view`, `tax.classes.view`, `catalog.tax_classes.view` (deprecated) |
+| `pricing.tax_classes.master.create` | Create Tax Setup | `pricing.tax_classes.create`, `tax.classes.create` |
+| `pricing.tax_classes.master.update` | Edit Tax Setup basic details | `pricing.tax_classes.update`, `tax.classes.update` |
+| `pricing.tax_classes.status.manage` | Activate / Deactivate Tax Setup | `pricing.tax_classes.status.manage` |
+| `pricing.tax_classes.products.view` | View products using a Tax Setup | `pricing.tax_classes.products.view` |
+| `pricing.tax_rates.master.view` | View tax rates / history | `pricing.tax_rates.view`, `tax.rates.view` |
+| `pricing.tax_rates.schedule.manage` | Schedule / edit / delete future rates | `pricing.tax_rates.schedule.manage`, `tax.rates.create`, `tax.rates.update`, `tax.rates.delete` |
 | `pricing.price_lists.master.view` | Read price list setups | `catalog.price_lists.view` |
 
 ---

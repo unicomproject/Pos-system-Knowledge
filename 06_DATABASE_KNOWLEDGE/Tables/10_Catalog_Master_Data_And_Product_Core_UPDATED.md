@@ -1,7 +1,7 @@
 <!-- title: Catalog Master Data & Product Core -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-27 -->
+<!-- last_updated: 2026-09-01 -->
 <!-- source: Updated from uploaded ERD image: 10_Catalog Master Data & Product Core(3).png -->
 
 # 10. Catalog Master Data & Product Core
@@ -348,14 +348,14 @@ CURRENT EF already enforces `ck_products_setup_step` as `BETWEEN 1 AND 7`
 is superseded.
 
 Do **not** add `products.batch_number`, `products.expiry_date`, or
-`products.serial_number`. Initial Tracking Details are TARGET draft data on
-`product_setup_initial_tracking` (GAP until migration). Final identity remains
-`product_batches` / `serial_numbers`.
+`products.serial_number`. Initial Tracking Details are draft data on
+`product_setup_initial_tracking` (collected on Step 2 after Product Type is
+selected). Final identity remains `product_batches` / `serial_numbers`.
 
-## `product_setup_initial_tracking` (TARGET — GAP until migration)
+## `product_setup_initial_tracking` (draft store)
 
-Purpose: 1:1 Product Setup draft store for optional Step 1 Initial Tracking
-Details. Not Product master identity. Not inventory quantity.
+Purpose: 1:1 Product Setup draft store for optional Initial Tracking
+Details collected on Step 2. Not Product master identity. Not inventory quantity.
 
 | Attribute | Type | Key | Null | Reference / Note |
 | --- | --- | --- | --- | --- |
@@ -401,7 +401,8 @@ filters `tenant_id`. Optimistic concurrency for clients uses parent
 `products.row_version` only.
 
 Authority:
-[[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
+[[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]],
+[[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]].
 
 ## `product_variants`
 

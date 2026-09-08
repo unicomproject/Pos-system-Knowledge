@@ -1406,15 +1406,15 @@ Every one of the **217 active permission definitions** is audited and grouped in
 | 151 | `pricing.product_tax_assignments.update` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Update tax assignments for catalog products |
 | 152 | `pricing.product_tax_assignments.delete` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Delete tax assignments for catalog products |
 | 153 | `pricing.product_tax_assignments.manage` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Full management delegation for tax assignments |
-| 154 | `tax.classes.view` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | View tax classes definitions |
-| 155 | `tax.classes.create` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Create tax class definition |
-| 156 | `tax.classes.update` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Update tax class attributes |
-| 157 | `tax.classes.delete` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Delete tax class definition |
+| 154 | `tax.classes.view` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | View tax classes definitions. **TARGET alias:** `pricing.tax_classes.view` (Tax Setup Canonical Contract 2026-09-03) |
+| 155 | `tax.classes.create` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Create tax class definition. **TARGET alias:** `pricing.tax_classes.create` |
+| 156 | `tax.classes.update` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Update tax class attributes. **TARGET alias:** `pricing.tax_classes.update` |
+| 157 | `tax.classes.delete` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Delete tax class definition (restricted; prefer ACTIVE/INACTIVE lifecycle) |
 | 158 | `tax.classes.manage` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Full management delegation for tax classes |
-| 159 | `tax.rates.view` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | View tax rate structures |
-| 160 | `tax.rates.create` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Create tax rate structure |
-| 161 | `tax.rates.update` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Update tax rate structure |
-| 162 | `tax.rates.delete` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Delete tax rate structure |
+| 159 | `tax.rates.view` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | View tax rate structures. **TARGET alias:** `pricing.tax_rates.view` |
+| 160 | `tax.rates.create` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Create tax rate structure. **TARGET:** prefer `pricing.tax_rates.schedule.manage` for TA schedule UX |
+| 161 | `tax.rates.update` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Update tax rate structure. **TARGET:** prefer `pricing.tax_rates.schedule.manage` for future rates |
+| 162 | `tax.rates.delete` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Delete tax rate structure (future-only when safe) |
 | 163 | `tax.rates.manage` | pricing_tax | TENANT | **R1_ACTIVE** | ACTIVE | Full management delegation for tax rates |
 | 164 | `discount.policy.view` | discount_engine | TENANT | **R1_ACTIVE** | ACTIVE | View dynamic discount policy configurations |
 | 165 | `discount.policy.create` | discount_engine | TENANT | **R1_ACTIVE** | ACTIVE | Create dynamic discount policy rules |

@@ -340,6 +340,7 @@ flowchart TD
 - Returned quantity must not exceed sold quantity.
 - Refund amount must not exceed refundable value.
 - Customer credit is separate from refund payment.
+- **Tax on return/refund (DEC-TAX-009):** reverse tax using the **original sale tax snapshot** (`sales_order_taxes` rate/treatment/amounts). Do **not** recalculate returned lines using today's live Tax Setup rate after a later schedule change. Authority: [[../../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]].
 - Split payments display as deterministic `Multiple` without inventing a card mask.
 - Refund receipts use authoritative completion values; Flutter does not
   recalculate settlement. Print failure does not roll back a completed refund.

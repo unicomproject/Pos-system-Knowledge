@@ -1,7 +1,7 @@
 <!-- title: Developer Reading Guide -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-21 -->
+<!-- last_updated: 2026-09-01 -->
 
 
 # Developer Reading Guide
@@ -133,9 +133,10 @@ Before creating the Online Order HTML prototype, continue with [[../07_UI_UX_KNO
 2. For Tenant Admin Add Product, read the 7-step contract, then
    [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]],
    [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]],
+   [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]],
    and
-   [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
-   before changing Step 1, inventory identity, or Product Setup authorization.
+   [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
+   before changing Step 1, Step 2 identity collection, inventory identity, or Product Setup authorization.
 3. Read product, variant, inventory, order, reports, users, and permissions modules.
 4. Read entitlement and feature flag rules.
 5. Read database tables for product, inventory, user, outlet, till, order, and

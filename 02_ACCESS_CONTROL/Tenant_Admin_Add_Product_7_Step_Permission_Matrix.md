@@ -1,14 +1,14 @@
 <!-- title: Tenant Admin Add Product 7-Step Permission Matrix -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Tenant Admin Add Product 7-Step Permission Matrix
 
 ## 1. Purpose
 
 Canonical permission-first contract for the Tenant Admin **7-Step Add Product
-Wizard**, including Step 1 Initial Tracking Details.
+Wizard**, including Step 2 Initial Tracking Details (after Product Type is selected).
 
 Backend authorization is authoritative. Flutter checks are UX only.
 
@@ -77,10 +77,10 @@ Denied entitlement → `403` `product.entitlement_denied`. Draft is not destroye
 |---|---|---|---|---|---|---|
 | Add Product entry / create-options | `catalog.products.create` | `catalog.products.create` | n/a | See start eligibility | `product_catalog` | Hide Add Product; API 403 |
 | Step 1 master fields | view **or** create **or** update | create | update | — | `product_catalog` | 403; no silent wipe |
-| Step 1 Initial Tracking | same | create | update | none new; `inventory_tracking` if non-empty | `product_catalog` + `inventory_tracking` when values present | Empty allowed; non-empty 403 entitlement; no stock.adjust |
 | Step 1 images | view/create/update | create | update | `catalog.product_media.manage` | `product_catalog` | Hide/disable upload; stage API 403; product still savable without images |
 | Step 1 channels | view/create/update | create | update | `catalog.product_channels.manage` | `product_catalog` | Ignore payload channel mutations; keep defaults/existing; do not 403 whole Step 1 |
 | Step 2 structure + quantity track | create/update | create | update | — | `product_catalog` | 403 |
+| Step 2 Initial Tracking | same | create | update | none new; `inventory_tracking` if non-empty | `product_catalog` + `inventory_tracking` when values present | Empty allowed; non-empty 403 entitlement; no stock.adjust |
 | Step 2 Batch/Expiry/Serial toggles | create/update | create | update | — | `inventory_tracking` | Disable toggles; force OFF; 403 if payload enables them |
 | Step 2 confirm-clear flag | create/update | create | update | — | `product_catalog` | 403; do not silent-clear (BR-TRACK-020) |
 | Step 3 UOM | create/update | create | update | UOM lookup via create-options / products.create | `product_catalog` | 403; no stock.adjust |
@@ -113,7 +113,8 @@ select an existing active Category/Brand.
 
 ## 6. Initial Tracking Permissions
 
-Fields: `initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`.
+Fields: `initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`
+(collected on Step 2 after Product Type is selected; not on Step 1).
 
 These create **no quantity** and **no stock movement**.
 
@@ -182,11 +183,17 @@ product update.
 
 | Field | Read | Mutate |
 |---|---|---|
-| Standard Selling Price / Discount Price | pricing.manage holders; others see selling price as catalog data on setup if they can resume | `catalog.product_pricing.manage` + create/update |
+| Standard Selling Price / Discount Price (SIMPLE path) | pricing.manage holders; others see selling price as catalog data on setup if they can resume | `catalog.product_pricing.manage` + create/update |
+| Per-variant Selling Price (VARIANT path) | same | `catalog.product_pricing.manage` + create/update; each `productVariantId` must belong to the product + tenant |
+| Set Same Price for All Variants / Apply to All | UI helper only | Same as selling-price manage; does **not** create a parent authoritative sale price |
 | Cost Price | `catalog.product_cost.view` | `catalog.product_pricing.manage` **and** `catalog.product_cost.view` |
-| Tax Name (TaxClassId) | TARGET `pricing.tax_classes.view` (CURRENT `tax.classes.view`) | `catalog.product_pricing.manage` (assignment, not tax-admin create) |
-| Tax Rate display | derived; TARGET `pricing.tax_rates.view` if a dedicated rate lookup is used (CURRENT `tax.rates.view`) | read-only |
-| Tax Exclusive | display locked true | not client-mutable |
+| Tax Name (TaxSetupId / TaxClassId) | TARGET `pricing.tax_classes.view` (CURRENT `tax.classes.view`) | `catalog.product_pricing.manage` (assignment, not tax-admin create) |
+| Tax Rate display | derived from Tax Setup current effective rate; TARGET `pricing.tax_rates.view` if dedicated rate lookup used (CURRENT `tax.rates.view`) | read-only |
+| TaxPriceMode Inclusive/Exclusive | product-owned | `catalog.product_pricing.manage` |
+
+Tax Management admin surfaces (list/create/schedule/status) use `pricing.tax_classes.*` / `pricing.tax_rates.schedule.manage` per [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]. Do **not** invent `catalog.tax.*`.
+
+Backend must reject pricing of another tenant’s product/variant/tax class, stale/deleted variant IDs, and variants belonging to another product. Frontend filtering is UX only.
 
 **Tax namespace (LOCKED):**
 

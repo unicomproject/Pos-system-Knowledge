@@ -1,22 +1,23 @@
 <!-- title: Tenant Admin Product Management Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-04 -->
 
 # Tenant Admin Product Management Flow
 
 ## Purpose
 
 Defines the manual product management flows for the Tenant Admin, including the
-canonical 7-Step wizard (Reference UI 2 alignment), optional Step 1 Initial
-Tracking Details, draft saving, details overview, editing, duplicating,
+canonical 7-Step wizard (Reference UI 2 alignment), optional Step 2 Initial
+Tracking Details after Product Type is selected, draft saving, details overview, editing, duplicating,
 archiving, and manual popular product curation. Product import workflows are
 removed from this active interface scope.
 
 ## Source Basis
 
-Confirmed 7-step Product Setup contract, tracking-policy specification, and
-2026-08-24 Initial Tracking Details decision.
+Confirmed 7-step Product Setup contract, tracking-policy specification,
+2026-08-24 Initial Tracking identity decision, and 2026-09-01 collection-surface
+move to Step 2.
 
 ## Actors
 
@@ -40,13 +41,13 @@ Tenant Admin opens product management navigation menu.
 
 | Step | Wizard Step Name | System & User Behavior |
 |---:|---|---|
-| 1 | **Step 1 — Basic Details** | User inputs Product Name (mandatory), Category (mandatory), Brand (optional), Short Name / Internal Code, Short Description, Long Description, Product Images, Channel Visibility (POS, Online), and optional Initial Tracking Details (Batch Number, Expiry Date, Serial Number). Tracking values are provisional and optional. |
-| 2 | **Step 2 — Product Type & Tracking** | User selects Product Type (`SIMPLE`, `VARIANT`, `BUNDLE`) and Inventory Tracking rules. Standard Quantity, Batch/Lot, Expiry, and Serial tracking combinations are validated. Step 1 initial values are reconciled: preserve compatible values; warn and confirm before clearing incompatible values. |
+| 1 | **Step 1 — Basic Details** | User inputs Product Name (mandatory), Category (mandatory), Brand (optional), Short Name / Internal Code, Short Description, Long Description, Product Images, and Channel Visibility (POS, Online). Initial Tracking Details are **not** collected here. |
+| 2 | **Step 2 — Product Type & Tracking** | User selects Product Type (`SIMPLE`, `VARIANT`, `BUNDLE`). After type is selected, SIMPLE / VARIANT first collect optional Initial Tracking Details (Batch Number, Expiry Date, Serial Number), then Tracking & Stock Rules. Bundle does not show the identity card. Compatible identity values are preserved; TARGET warns and confirms before clearing incompatible values. |
 | 3 | **Step 3 — Units & Pack Conversion** | Applicable when Track Inventory = ON. Configures Single Unit Only or Multiple Units & Pack Conversion. Auto-bypassed when Track Inventory = OFF. SIMPLE + Track Inventory ON navigates to Step 5; VARIANT navigates to Step 4. BUNDLE products strictly skip this step (`NOT_APPLICABLE`). |
 | 4 | **Step 4 — Product Configuration** | Simple Product auto-skips (`NOT_APPLICABLE`). Variant Product renders Variant Matrix, Options, Values, Display Labels, Include Variant toggles, and Image Overrides. Bundle/Kit renders Component candidate search and assembly. |
 | 5 | **Step 5 — Barcode & SKU** | Configures SKU and Barcodes (Global / UOM-specific). Enforces tenant-wide uniqueness. |
-| 6 | **Step 6 — Pricing & Tax** | Inputs Cost Price, Standard Selling Price, Discount Price, and assigns Tax configuration. Enforces pricing validation rules. |
-| 7 | **Step 7 — Review & Create** | Displays full review summary across all 6 preceding sections using persisted draft data, including applicable Initial Tracking Details. User clicks Create Product to complete server validation, publish the product, and persist applicable initial Batch/Serial identity without inventing stock quantity. |
+| 6 | **Step 6 — Pricing & Tax** | **SIMPLE:** one sellable identity → Standard Selling Price + Tax Class + Inclusive/Exclusive (+ Tax Preview). **VARIANT:** independent Selling Price per included `ProductVariant` (**Set Same Price for All Variants** / Apply to All = bulk helper only) + common Product Tax Assignment. Cost is product-level architecture (not SIMPLE UI; not VARIANT matrix R1). Persist via existing price list / tax assignment — see 7-Step contract §6.1–6.5. |
+| 7 | **Step 7 — Review & Create** | Displays full review summary across all 6 preceding sections using persisted draft data, including applicable Initial Tracking Details. User clicks Create Product to complete server validation, publish the product, and persist applicable initial Batch/Serial identity without inventing stock quantity. On success the wizard shows the **Product Created Successfully** screen (not a toast). **View Product** opens product detail; **Add Another Product** starts a fresh wizard; **Back to Products** opens Product List. |
 
 ---
 
@@ -59,10 +60,11 @@ Tenant Admin opens product management navigation menu.
 
 ### Main Screen Actions & Matrix Generation
 1. User defines attributes by selecting attribute name (e.g. Size, Colour) and picking active values (e.g. S, M, L / Red, Blue).
-2. User clicks `Generate Variants`. Backend/Flutter computes Cartesian product ($3 \times 2 = 6$ combinations).
-3. Summary card updates: `6 Variants Generated`, `2 Attributes Defined`, `6 Included`.
-4. Generated Variants table displays `Variant` (e.g. `Red / S`), and actions (`Edit`, `Delete`).
-5. SKU, Barcode, Selling Price, Cost Price, Tax, and Channel Visibility are NOT displayed in Step 4.
+2. **Estimated Variant Count** updates live in Flutter as values are added/removed (e.g. Colour 3 × Capacity 2 = 6). No Save or backend call is required for the estimate to refresh.
+3. User clicks `Generate Variants` / `Apply`. Flutter and backend compute the actual Cartesian product ($3 \times 2 = 6$ combinations).
+4. Configuration summary card updates: `6 Variants Generated`, `2 Attributes Defined`, `6 Included`.
+5. Generated Variants table displays `Variant` (e.g. `Red / S`), and actions (`Edit`, `Delete`).
+6. SKU, Barcode, Selling Price, Cost Price, Tax, and Channel Visibility are NOT displayed in Step 4.
 
 ### Edit Variant Right-Side Drawer
 1. Clicking `Edit` opens right-side drawer.
@@ -98,17 +100,17 @@ Step 1 Basic Details
     ↓
 Enter Product Information
     ↓
-Optional Initial Batch / Expiry / Serial
-    ↓
 Save & Continue
     ↓
 Step 2 Product Type & Tracking
     ↓
 Select Product Structure
     ↓
+Optional Initial Batch / Expiry / Serial (SIMPLE / VARIANT only)
+    ↓
 Select Tracking Policy
     ↓
-Validate Step 1 initial tracking values
+Validate identity values against tracking policy
     ↓
 Compatible?
    /        \
@@ -125,24 +127,31 @@ Persist Product + applicable tracking identity
 
 ```mermaid
 flowchart TD
-    A[Step 1 Basic Details] --> B[Optional Batch / Expiry / Serial]
-    B --> C[Save and Continue]
-    C --> D[Step 2 Structure and Tracking Policy]
-    D --> E{Step 1 values compatible?}
+    A[Step 1 Basic Details] --> C[Save and Continue]
+    C --> D[Step 2 Select Product Type]
+    D --> B[Optional Batch / Expiry / Serial]
+    D --> J[BUNDLE: no identity card]
+    B --> I[SIMPLE or VARIANT tracking policy]
+    I --> E{Values compatible with policy?}
     E -->|Yes| F[Preserve values]
     E -->|No| G[Warn then confirm clear]
     F --> H[Steps 3 to 6]
     G --> H
-    H --> I[Step 7 Review and Create]
-    I --> J[Publish Product]
-    J --> K[Persist applicable Batch / Serial identity]
+    J --> H
+    H --> R[Step 7 Review and Create]
+    R --> P[Publish Product]
+    P --> K[Persist applicable Batch / Serial identity]
     K --> L[No invented stock quantity]
+    L --> S[Product Created Successfully screen]
+    S --> VP[View Product detail]
+    S --> AA[Add Another Product]
+    S --> BL[Back to Products list]
 ```
 
 ## Business Rules
 
 - BR-TRACK-001 to BR-TRACK-015 in [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
-- Step 1 values never auto-enable Step 2 toggles.
+- Step 2 identity values never auto-enable tracking toggles.
 - VARIANT identity assigns at Step 7 to an included Variant, never the parent Product.
 - BUNDLE parent cannot receive physical tracking identities.
 
@@ -171,7 +180,7 @@ flowchart TD
 - Empty Initial Tracking Details is valid.
 - Track Inventory OFF with entered values requires confirmation then clear.
 - Expiry Tracking ON without Batch Number blocks finalization.
-- Back after confirmed clear shows normalized Step 1 values.
+- Back after confirmed clear shows normalized Step 2 values.
 
 ## Out Of Scope
 
@@ -185,6 +194,7 @@ flowchart TD
 - [[../../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]]
 - [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
 - [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
+- [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
 
 ### Bundle / Kit Flow
 

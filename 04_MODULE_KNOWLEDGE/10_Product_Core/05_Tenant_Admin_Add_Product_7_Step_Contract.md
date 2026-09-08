@@ -2,7 +2,7 @@
 <!-- title: Tenant Admin Add Product 7-Step Implementation Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-27 -->
+<!-- last_updated: 2026-09-04 -->
 
 # Tenant Admin Add Product 7-Step Implementation Contract
 
@@ -18,12 +18,12 @@ This document serves as the single source of truth for Frontend (Flutter), Backe
 
 The Add Product experience is structured into exactly 7 sequential steps:
 
-1. **Step 1 — Basic Details** (General info, mandatory Category, optional Brand, Product Image upload, Channel Availability toggles, optional Initial Tracking Details)
-2. **Step 2 — Product Type & Tracking** (`SIMPLE`, `VARIANT`, `BUNDLE` selection and tracking combinations)
+1. **Step 1 — Basic Details** (General info, mandatory Category, optional Brand, Product Image upload, Channel Availability toggles)
+2. **Step 2 — Product Type & Tracking** (`SIMPLE`, `VARIANT`, `BUNDLE` selection, tracking combinations, and optional Initial Tracking Details after type is selected)
 3. **Step 3 — Units & Pack Conversion** (Base UOM, purchase/sales UOM, and conversion factors)
 4. **Step 4 — Product Configuration** (Simple: Not Applicable auto-skip; Variant: Variant Matrix & Options; Bundle: Component search & assembly)
 5. **Step 5 — Barcode & SKU** (SKU, barcode type, UOM mapping, uniqueness rules)
-6. **Step 6 — Pricing & Tax** (Cost Price, Standard Selling Price, Discount Price, Tax Name, Tax Rate, Tax Exclusive)
+6. **Step 6 — Pricing & Tax** (SIMPLE: single selling + tax + preview; VARIANT: per-variant selling prices + common tax — see §6.1–6.5)
 7. **Step 7 — Review & Create** (Verification summary across all sections, inline edit links, final atomic publish)
 
 ### Step 4 Canonical Naming Rule
@@ -50,12 +50,9 @@ The Add Product experience is structured into exactly 7 sequential steps:
 | Product Image | NO | File/URL | Max 10 images, ≤5MB each, PNG/JPG | Compact Card / Overlay | `mediaAssetId` / `stagedMediaAssets` | `ProductImage.MediaAssetId` | `product_images.media_asset_id` | Compact upload card opens Product Images Manager panel |
 | In-Store POS | NO | Boolean | - | True | `posSellable` | `Product.IsSellable` | `products.is_sellable` | Channel Availability toggle |
 | Online Store | NO | Boolean | - | False | `allowOnlineSale` | `Product.AllowOnlineSale` | - | Channel Availability toggle |
-| Batch Number | NO | String | Max 100 chars; trim; optional | NULL | `initialBatchNumber` | Draft only — not Product master | TARGET `product_setup_initial_tracking.initial_batch_number` | INITIAL TRACKING INPUT. Does not enable Step 2 Batch Tracking. Final owner `product_batches.batch_number` at publish. |
-| Expiry Date | NO | Date | Valid date picker value; optional | NULL | `initialExpiryDate` | Draft only — not Product master | TARGET `product_setup_initial_tracking.initial_expiry_date` | INITIAL TRACKING INPUT. Domain owner remains `product_batches.expiry_date`. |
-| Serial Number | NO | String | Max 150 chars; trim; optional | NULL | `initialSerialNumber` | Draft only — not Product master | TARGET `product_setup_initial_tracking.initial_serial_number` | INITIAL TRACKING INPUT. Does not enable Step 2 Serial Tracking. Final owner `serial_numbers.serial_number` at publish. |
 
 > [!IMPORTANT]
-> SKU, Barcode, Unit Type, and Variant Templates DO NOT belong to Step 1. They are collected in Steps 3 and 5.
+> SKU, Barcode, Unit Type, Variant Templates, and Initial Tracking Details DO NOT belong to Step 1. Identity inputs are collected on Step 2 after Product Type is selected.
 > Do **not** persist Initial Tracking Details as `products.batch_number`, `products.expiry_date`, or `products.serial_number`.
 > Canonical TARGET contract: [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
 
@@ -170,6 +167,7 @@ Step 2 configures the product structure classification and inventory tracking ru
   1. **Simple Product**: Single item with one SKU. No variants or components.
   2. **Variant Product**: Items with multiple variants such as size, color, material.
   3. **Bundle / Kit**: Pre-packaged items sold together as a bundle.
+- **Initial Tracking Details** (after Product Type is selected, **before** Tracking & Stock Rules; SIMPLE / VARIANT only): optional Batch Number, Expiry Date, Serial Number. Hidden for BUNDLE. Does not auto-enable the toggles below.
 - **Tracking & Stock Rules (4 Toggles)**:
   1. **Track Inventory** (Master stock toggle)
   2. **Batch / Lot Tracking**
@@ -202,7 +200,7 @@ The 3 UI options ("Simple Product", "Variant Product", "Bundle / Kit") map canon
 | UI Field / Control | Flutter State / DTO | API Property | Backend Request DTO | Domain Entity & Property | Database Table | Database Column | Validation Rules | Permission Code | Audit Event Field |
 |---|---|---|---|---|---|---|---|---|---|
 | **Product Structure** | `productStructure` | `productStructure` | `UpdateProductDraftStepRequestDto.ProductStructure` | `Product.ProductStructure` | `products` | `product_structure` | Required; Enum `SIMPLE`, `VARIANT`, `BUNDLE` | Initial Draft: `catalog.products.create`<br>Edit: `catalog.products.update` | `newProductStructure` |
-| **Track Inventory** | `trackInventory` | `trackInventory` | `UpdateProductDraftStepRequestDto.TrackInventory` | `ProductInventorySetting.IsStockTracked` | `product_inventory_settings` | `is_stock_tracked` | Boolean; Default `true` (`ON`) | Same as above | `newTrackInventory` |
+| **Track Inventory** | `trackInventory` | `trackInventory` | `UpdateProductDraftStepRequestDto.TrackInventory` | `ProductInventorySetting.IsStockTracked` | `product_inventory_settings` | `is_stock_tracked` | Boolean; Wizard default `false` (`OFF`) | Same as above | `newTrackInventory` |
 | **Batch / Lot Tracking** | `batchTracking` | `batchTracking` | `UpdateProductDraftStepRequestDto.BatchTracking` | `ProductInventorySetting.RequiresBatchTracking` | `product_inventory_settings` | `requires_batch_tracking` | Requires `TrackInventory = true`; Mutually exclusive with Serial | Same as above | `newBatchTracking` |
 | **Expiry Tracking** | `expiryTracking` | `expiryTracking` | `UpdateProductDraftStepRequestDto.ExpiryTracking` | `ProductInventorySetting.RequiresExpiryTracking` | `product_inventory_settings` | `requires_expiry_tracking` | Requires `TrackInventory = true` AND `BatchTracking = true`; Mutually exclusive with Serial | Same as above | `newExpiryTracking` |
 | **Serial Number Tracking** | `serialTracking` | `serialTracking` | `UpdateProductDraftStepRequestDto.SerialTracking` | `ProductInventorySetting.RequiresSerialTracking` | `product_inventory_settings` | `requires_serial_tracking` | Requires `TrackInventory = true`; Mutually exclusive with Batch and Expiry | Same as above | `newSerialTracking` |
@@ -217,8 +215,8 @@ The 3 UI options ("Simple Product", "Variant Product", "Bundle / Kit") map canon
 ### 8.4 Canonical Default State & Step 1 Synchronization
 
 **Step 2 Canonical Default State**:
-- `Product Structure`: `SIMPLE`
-- `Track Inventory`: `true` (`ON`)
+- `Product Structure`: `SIMPLE` (unconfirmed until the user selects a type)
+- `Track Inventory`: `false` (`OFF`)
 - `Batch / Lot Tracking`: `false` (`OFF`)
 - `Expiry Tracking`: `false` (`OFF`)
 - `Serial Number Tracking`: `false` (`OFF`)
@@ -226,9 +224,9 @@ The 3 UI options ("Simple Product", "Variant Product", "Bundle / Kit") map canon
 **Synchronization with Step 1**:
 - The `Track Inventory` toggle has been completely removed from Step 1.
 - Step 2 is now the sole source of truth for the inventory tracking toggle during setup.
-- Step 1 optional Initial Tracking Details are **not** policy. Entering Batch/Expiry/Serial in Step 1 must not auto-enable Step 2 toggles.
-- When Step 2 is saved, reconcile Step 1 values using the matrix in [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Incompatible values require confirmation before clearing (`confirmClearIncompatibleInitialTracking`).
-- Step 2 UI SHOULD show found Step 1 values and the destructive-clear warning when the selected policy cannot keep them.
+- Optional Initial Tracking Details are collected on Step 2 **after Product Type is selected**. They are **not** policy. Entering Batch/Expiry/Serial must not auto-enable tracking toggles.
+- When Step 2 is saved, reconcile identity values using the matrix in [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Incompatible values require confirmation before clearing (`confirmClearIncompatibleInitialTracking`).
+- Step 2 UI shows the identity card **above** SIMPLE / VARIANT tracking toggles. Hide for BUNDLE. Hide tracking tiles until Product Type is selected.
 
 ---
 
@@ -534,7 +532,7 @@ Initial Tracking TARGET events (existing `audit_logs` family; GAP until implemen
 | **403** | `product.entitlement_denied` | Missing `product_catalog` or `inventory_tracking`. | Entitlement failure. |
 | **404** | `product.not_found` | Product was not found or inaccessible. | Tenant isolation / invalid ID. |
 | **409** | `product.concurrency_conflict` | Product was modified by another user. Refresh and try again. | Concurrency check failure. |
-| **400** | `product.initial_tracking.incompatible_values_require_confirmation` | Incompatible Step 1 values and confirm flag false. | Initial Tracking reconciliation. |
+| **400** | `product.initial_tracking.incompatible_values_require_confirmation` | Incompatible identity values and confirm flag false. | Initial Tracking reconciliation. |
 | **400** | `product.initial_tracking.batch_required_for_expiry` | Identity finalization with expiry and no Batch. | Distinct from toggle `BATCH_REQUIRED_FOR_EXPIRY`. |
 | **400** | `product.initial_tracking.invalid_expiry_date` | Malformed expiry. | Initial Tracking. |
 | **400** | `product.initial_tracking.variant_assignment_required` | VARIANT identity without assigned variant. | Option 2. |
@@ -610,26 +608,128 @@ Initial Tracking TARGET events (existing `audit_logs` family; GAP until implemen
 
 ### Step 4 — Configuration
 - `SIMPLE`: Auto-skips to Step 5.
-- `VARIANT`: Generates Cartesian product of selected option values.
+- `VARIANT`: Generates Cartesian product of selected option values. Displays **Estimated Variant Count** live preview during attribute/value configuration (frontend-only; not authoritative). See [[../12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification#3.4 Estimated Variant Count (Live UX Preview)]].
 - `BUNDLE`: Selects component variants and fixed component quantities.
 
 ### Step 5 — Identifiers
-- SKU & Barcode uniqueness enforced tenant-wide.
-- Every sellable product must have at least one `product_variants` row. Therefore, the Base SKU for `SIMPLE` and `BUNDLE` products is stored in `product_variants.sku` on their single default variant row.
+- Canonical detail: [[Tenant_Admin_Product_Barcode_SKU_Specification]].
+- SKU & Barcode uniqueness enforced tenant-wide (case-sensitive SKU after trim; barcode as string with leading zeros preserved).
+- Every sellable product must have at least one `product_variants` row. Base SKU for `SIMPLE` / `BUNDLE` is stored on the default variant row.
+- **VARIANT**: table-first Step 5 listing all Step 4 included/sellable variants. Manual SKU only — **no Auto-generate SKUs**. Row checkbox selection is UI-only and must not change sellability.
+- **SIMPLE / BUNDLE**: compact editors + one-row assignment table (green selected dot, Scan column, pencil). Apply commits then clears SKU/barcode inputs. Edit drawer hides Barcode Type in UI but still persists `barcodeType`.
+- Assignments must carry `barcodeType` end-to-end; never hard-code `EAN13` on persist.
+- Save & Continue validates **authoritative** Step 4 coverage (not only client-submitted subset). SKU mandatory per included sellable variant; barcode optional when blank.
+- `product_barcodes.barcode_type` already exists → **EF migration not required** for barcodeType DTO alignment.
 
 ### Step 6 — Pricing & Tax
-- **Simplified UI**: Contains ONLY `Cost Price`, `Standard Selling Price`, `Discount Price`, `Tax Name` (dropdown), `Tax Rate` (read-only), and `Tax Calculation` (Inclusive | Exclusive).
-- **Exclusions**: No Margin calculation, no Price List selector, no Outlet-specific overrides.
-- **Tax Calculation**: Uses `taxExclusive` flag. `taxExclusive = false` (Inclusive) implies selling price already contains tax. `taxExclusive = true` (Exclusive) implies tax will be added on top.
-- **Cost Price**: Standard/Reference acquisition cost.
-- **Selling Price**: `Standard Selling Price` maps to `selling_price` (no discount) or `compare_at_price` (when discounted). `Discount Price` maps to `selling_price` when active.
-- **Discount Calculation Rule**: 
-  Where `StandardSellingPrice > 0`, `DiscountPrice exists`, and `DiscountPrice < StandardSellingPrice`, calculate:
-  `DiscountAmount = StandardSellingPrice - DiscountPrice`
-  `DiscountPercentage = (DiscountAmount / StandardSellingPrice) * 100`
-  If Discount Price is absent, there is no active Product Setup discount price.
-- **Tax Integration**: `Tax Name` saves as `TaxClassId` via `product_tax_assignments`. Default Price List is resolved entirely by the backend.
-- **Atomic Navigation**: Navigates directly to Step 7 on successful `Save & Continue`.
+
+Canonical wizard step for commercial price + tax assignment. Structure-aware: SIMPLE/BUNDLE ≠ VARIANT.
+
+Authority: [[../14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]] (TA-UJ-069).  
+Inclusive/Exclusive ADR: [[../../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_PRODUCT_TAX_INCLUSIVE_EXCLUSIVE_DECISION_2026-08-27]].
+
+#### 6.1 Shared Pricing & Tax Rules
+
+- **7-step wizard only.** No parallel Pricing module. No Product Setup currency dropdown.
+- **Multi-country currency (LOCKED):** tenant-owned `tenants.base_currency_code` via `currencies` (ISO-4217). `GET create-options` returns `currencyCode`. UI uses it as prefix/label only — **do not hard-code `LKR`**. Backend may fall back to `LKR` only if tenant base currency is blank.
+- **Persistence architecture (existing — do not invent new tables):**
+  - Selling / compare prices → `price_list_items` on the tenant **default** price list (`selling_price`, `compare_at_price`, nullable `product_variant_id`).
+  - Cost → `products.reference_cost_price` (**product-level only**; no variant cost column).
+  - Tax mode → `products.is_tax_exclusive` (`taxExclusive` / TaxPriceMode; product-owned).
+  - Tax assignment → `product_tax_assignments` (`tax_class_id` alias TaxSetupId/TaxClassId; nullable `product_variant_id`).
+- **Tax Management owns** Tax Class, Tax Rate, Tax Treatment masters. Product Setup only **references** ACTIVE tax configuration. Product Setup must not create tax rates.
+- **Inactive tax already assigned:** DEC-TAX-012 Option B — retain; cannot newly assign INACTIVE.
+- **Exclusions:** No Margin %, no Price List picker on Step 6, no outlet price overrides, no Used For / Goods / Services on Product Setup tax UI.
+- **Permissions:** `catalog.product_pricing.manage`; cost redaction `catalog.product_cost.view`; tax lookup `pricing.tax_classes.view` / `pricing.tax_rates.view`. Backend is authoritative for tenant/product/variant/tax ownership.
+- **Draft vs Continue:** Save Draft may leave Step 6 incomplete. Save & Continue / publish require structure-specific completeness below. Wire uses existing draft/wizard-create pipeline (no new Step 6 endpoint required).
+
+#### 6.2 SIMPLE Product Pricing & Tax (CONFIRMED)
+
+Journey: Basic Details → Type & Tracking → Units → **skip Product Configuration** → Barcode & SKU → **Pricing & Tax** → Review.
+
+One sellable identity (default `product_variants` row for SKU/barcode). **No variant price matrix.**
+
+**UI (canonical):** Standard Selling Price *; Tax Class * (rate in dropdown label, e.g. `Standard Rate (15%)`); Tax Presentation Exclusive (default) / Inclusive; client Tax Preview. **No Cost Price, Discount Price, Effective Tax Rate field, or currency banner on this screen.**
+
+**Persist mapping:**
+| UI / DTO | Storage |
+|---|---|
+| `standardSellingPrice` (no discount) | `price_list_items.selling_price` (variant or product-null row for default identity) |
+| `discountPrice` when present and &lt; standard | `selling_price` = discount; `compare_at_price` = standard |
+| `costPrice` (optional; not on SIMPLE UI) | `products.reference_cost_price` when sent |
+| `taxClassId` / `taxId` | `product_tax_assignments` |
+| `taxExclusive` | `products.is_tax_exclusive` |
+
+**Continue / wizard-create:** `standardSellingPrice > 0`; TaxClassId required; Cost **not** required. Tax Preview is Flutter-only estimate; sale-time tax is server-authoritative.
+
+#### 6.3 VARIANT Product Pricing & Tax (CANONICAL TARGET)
+
+**Business rule:** A VARIANT product has multiple independently sellable `ProductVariant` identities. Attributes (size, capacity, colour, pack, …) **may** change commercial value. Different variants **MAY** have different selling prices. Do **not** force one final selling price for all variants.
+
+**Entry:** Step 4 produces included/sellable combinations; Step 5 assigns SKU/barcode. Step 6 **prices existing variants only** — must not generate variants, change combinations, or generate SKU/barcode.
+
+**Authoritative sell price** belongs to the sellable variant identity (`product_variants.id` / stable `clientCombinationKey` → `productVariantId`). Never use UI row index as identity.
+
+**Set Same Price for All Variants** on this screen is a **bulk-entry helper only**. It is **not** the parent product’s authoritative sale price and must **not** be persisted as a substitute for per-variant prices. Entering a bulk amount alone must **not** silently overwrite existing variant prices. **Apply to All** is an explicit action; afterwards each row owns its value independently; editing one row does not affect others. Do **not** use the label “Default Selling Price” for this helper (misleading parent-price implication).
+
+**UI contract — “Pricing & Tax — Variant Product”**  
+Subtitle: “Set pricing and tax details for each variant. Prices are managed at variant level.”
+
+| Section | Content |
+|---|---|
+| Product summary | Name, Variant Product badge, included variant count |
+| Pricing status | Priced / Pending counts; **Price Range** derived from valid priced included variants (single price if only one; empty/pending if none) — never from the bulk helper input alone |
+| Set Same Price for All Variants | Tenant currency prefix + amount + **Apply to All** only (no redundant toggle; no persisted `applyToAll` flag) |
+| Variant pricing table | Variant, SKU, Selling Price (edit), Status (Priced/Pending — **derived**, not a DB enum), Actions — **no** “Default Price” column |
+| Tax settings | Tax Class *; Effective Tax Rate (**read-only**, derived from selected Tax Class); note that tax applies with each variant’s selling price |
+| Note | Each variant can have its own selling price; Apply to All sets a starting price then rows may be overridden |
+| Footer | Back, Cancel, Save Draft, Save & Continue |
+
+**Field ownership (architecture-locked):**
+
+| Field | Ownership | Notes |
+|---|---|---|
+| Selling Price | **Per ProductVariant** → `price_list_items.selling_price` where `product_variant_id` set | Required for each **included/sellable** variant on Save & Continue |
+| Set Same Price for All Variants | UI helper only (`bulkSellingPrice` local state) | Not authoritative parent price; never serialize as product selling price |
+| Cost Price | **Product-level** `products.reference_cost_price` | Not on VARIANT matrix UI for this contract; optional on persist |
+| Discount Price | Not on VARIANT Step 6 R1 UI | Storage can use `compare_at_price` later; do not invent unsupported UI fields from screenshots alone |
+| Tax Class + TaxPriceMode | **Product-common** values | Persist tax mode on product; fan-out same `tax_class_id` onto per-variant `product_tax_assignments` (existing pattern). No per-row Tax Class unless Tax Management later requires variant override |
+
+**Status:** PRICED = included variant has selling price &gt; 0 and valid; PENDING = incomplete. Draft may save with mix of PRICED/PENDING. Save & Continue requires **all included/sellable** variants PRICED + Tax Class + TaxPriceMode.
+
+**Reconciliation with Step 4:** Stable ProductVariantId / combination key preserves prices; excluded/tombstoned variants do not leak prices; new included variants start PENDING unless Apply to All is used. Never remap by display label alone.
+
+**Conceptual wire shape (adapt to existing DTO names; extend — do not invent parallel APIs):**
+
+```text
+PricingTax {
+  taxClassId, taxExclusive,
+  costPrice?,                         // product-level optional
+  // SIMPLE:
+  standardSellingPrice?, discountPrice?,
+  // VARIANT:
+  // bulk helper is Flutter-only — do NOT send bulkSellingPrice / setSamePriceForAll
+  variantPrices: [
+    { productVariantId | clientCombinationKey, sellingPrice }
+  ]
+}
+```
+
+**CURRENT IMPLEMENTATION STATUS (2026-09-04):** Backend VARIANT per-variant pricing is implemented. Flutter VARIANT Step 6 UI is implemented; bulk helper wording is **Set Same Price for All Variants** (not Default Selling Price). Evidence: backend closure 2026-09-03; Flutter closure 2026-09-04; bulk UX refinement [[../../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_BULK_PRICE_UX_REFINEMENT_CLOSURE_2026-09-04]].
+
+#### 6.4 Tax Management Integration
+
+- Select Tax Class from ACTIVE create-options taxes.
+- Effective rate / Exempt / 0% is **derived** from Tax Setup (Tax Class + effective Tax Rate + Tax Treatment).
+- Inclusive (`taxExclusive = false`) / Exclusive (`taxExclusive = true`) is **product-owned**.
+- SIMPLE may show client Tax Preview; VARIANT tax panel shows class + effective rate (sale calc still server-side using each variant price).
+
+#### 6.5 Draft / Resume / Validation
+
+- Resume restores structure-aware pricing graph, tax assignment, `taxExclusive`, and `rowVersion`.
+- VARIANT resume restores per-variant selling prices keyed by ProductVariantId, derived Priced/Pending and price range.
+- Security: reject cross-tenant / cross-product / stale variant IDs and inactive tax on **new** assignment.
+- Monetary rules: valid decimals; tenant currency precision; if Discount used (SIMPLE path), Discount ≤ Standard Selling when both set.
 
 ### Step 7 — Review & Create
 - Performs full server-side validation graph. Atomically updates `status` to `ACTIVE` or `INACTIVE`, sets `published_at`, and returns final Product DTO.
@@ -637,6 +737,8 @@ Initial Tracking TARGET events (existing `audit_logs` family; GAP until implemen
 - TARGET: display applicable **Initial Tracking Details** from remaining draft values (Batch + Expiry, or Serial) according to Step 2 policy. Do not display cleared/incompatible fields.
 - VARIANT + remaining identities: require `initialTrackingAssignedVariantId` before publish (Option 2). SIMPLE identities use `product_variant_id` NULL. BUNDLE parent identities must already have been cleared.
 - Publish MAY create identity-only `product_batches` / `serial_numbers` rows. It MUST NOT invent on-hand quantity, `stock_movements`, or cost layers. Opening Stock remains quantity owner.
+- **Pricing on Review:** SIMPLE shows selling + tax presentation; VARIANT shows priced count / price range / tax class (per-variant detail as UI allows). Do not show a fake single parent selling price for VARIANT when variants differ.
+- **Post-create success (canonical):** On Create Product HTTP success, Flutter shows the Product Created Successfully screen. Do **not** toast-only and do **not** auto-navigate to Product List. View Product → product detail. Add Another Product → fresh Step 1. Back to Products → list. List providers still invalidate so FR-RC-015 holds.
 
 ---
 
@@ -644,7 +746,7 @@ Initial Tracking TARGET events (existing `audit_logs` family; GAP until implemen
 
 | Operation | Endpoint | Method | Permission | DTO / Contract |
 |---|---|---|---|---|
-| Create Options | `/api/v1/tenant-admin/products/create-options` | GET | `catalog.products.create` + `product_catalog` | `TenantProductCreateOptionsDto`. Canonical Product Setup Category source. **IMPLEMENTED:** single ACTIVE hierarchy-aware `categories[]` (levels 1–5). Apply **BR-CAT-PRODUCT-SELECT-001** for effective selectability. Do not call `/api/v1/categories/tree`. |
+| Create Options | `/api/v1/tenant-admin/products/create-options` | GET | `catalog.products.create` + `product_catalog` | `TenantProductCreateOptionsDto`. Canonical Product Setup Category source. Includes `taxes[]`, `barcodeTypes[]`, and **`currencyCode`** from `tenants.base_currency_code` (tenant ISO currency; blank tenant may backend-fallback `LKR`). **IMPLEMENTED:** single ACTIVE hierarchy-aware `categories[]` (levels 1–5). Apply **BR-CAT-PRODUCT-SELECT-001** for effective selectability. Do not call `/api/v1/categories/tree`. |
 | Save Draft (create) | `/api/v1/tenant-admin/products/draft` | POST | `catalog.products.create` + `product_catalog` | `SaveProductDraftRequestDto` -> `ProductDraftResponseDto` |
 | Resume Draft | `/api/v1/tenant-admin/products/{id}/setup` | GET | view **OR** create **OR** update + `product_catalog` | `ProductSetupWizardDto` (redact cost/stock) |
 | Update Draft Step | `/api/v1/tenant-admin/products/{id}/draft` | PUT | create (initial draft) **or** update + step specialized perms | `UpdateProductDraftStepRequestDto` |
@@ -664,7 +766,7 @@ Canonical Product Wizard permissions (`catalog.*` only — no dual `tenant.produ
 - `catalog.barcodes.manage`
 - `catalog.product_pricing.manage`
 - `catalog.product_cost.view`
-- Tax lookup TARGET: `pricing.tax_classes.view`, `pricing.tax_rates.view`
+- Tax lookup TARGET: `pricing.tax_classes.view`, `pricing.tax_rates.view` (Tax Setup domain; see Tax Management canonical permissions)
 - Bundle stock leak: `inventory.stock.view`
 
 Full matrix: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
@@ -694,9 +796,9 @@ Full matrix: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permissio
 | Trigger | Rules Enforced | Failure Result |
 |---|---|---|
 | **Save Draft (Step 1)** | Category optional; Brand optional; blank Product Name $\rightarrow$ persist `Untitled Product`; Batch/Expiry/Serial optional (syntax only) | HTTP 400 with field errors |
-| **Save & Continue (Step 1)** | Real Product Name required; Category required; Brand optional; Batch/Expiry/Serial optional; then `current_setup_step = 2` | UI stays on Step 1; step not advanced |
-| **Save Draft (Step 2)** | Structure valid enum; Tracking combination valid according to truth table; incompatible Step 1 identities require confirmation; `advanceStep = false` | Keeps on Step 2; returns updated `rowVersion` |
-| **Save & Continue (Step 2)** | Structure valid enum; Tracking matrix valid according to truth table; Step 1 reconciliation complete; `advanceStep = true` | Advances to next applicable Step upon HTTP 200 OK |
+| **Save & Continue (Step 1)** | Real Product Name required; Category required; Brand optional; then `current_setup_step = 2` | UI stays on Step 1; step not advanced |
+| **Save Draft (Step 2)** | Structure valid enum; Tracking combination valid according to truth table; incompatible identity values require confirmation; `advanceStep = false` | Keeps on Step 2; returns updated `rowVersion` |
+| **Save & Continue (Step 2)** | Structure valid enum; Product Type confirmed; Tracking matrix valid according to truth table; identity reconciliation complete; `advanceStep = true` | Advances to next applicable Step upon HTTP 200 OK |
 | **Publish (Step 7)** | All 7 steps valid; SKU/Barcode unique; Price >= 0; Channels configured; initial tracking ownership/uniqueness/variant assignment/Bundle restriction | HTTP 400/409 error envelope, transaction rolls back |
 
 ---
@@ -708,6 +810,7 @@ Full matrix: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permissio
 - [[../../06_DATABASE_KNOWLEDGE/Tables/10_Catalog_Master_Data_And_Product_Core_UPDATED]]
 - [[../../06_DATABASE_KNOWLEDGE/Tables/16_Inventory_Foundation_Product_Tracking_And_Stock_Availability]]
 - [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
+- [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
 - [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
 - [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
 - [[../../15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-08-24_Tenant_Admin_Product_Setup_Permission_NFR_API_DB_Contract_Closure_Audit]]

@@ -1,7 +1,7 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-27 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -366,9 +366,9 @@ Base route: `/api/v1/tenant-admin/products` · Controller: `TenantAdminProductsC
 | POST | `/api/v1/tenant-admin/products/imports/{importId}/commit` | `catalog.products.import` | Commit valid rows in batch to database | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/imports/{importId}/errors.csv` | `catalog.products.import` | Export validation failures CSV log | PARTIAL |
 
-### Step 1 Initial Tracking Details (TARGET / GAP)
+### Step 1 Initial Tracking Details (collection moved to Step 2)
 
-`PUT /api/v1/tenant-admin/products/{productId}/draft` and `GET .../setup` remain the only Product Setup draft routes. TARGET Step 1 fields: `initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`. Step 2 remains tracking policy (`productStructure`, `trackInventory`, `batchTracking`, `expiryTracking`, `serialTracking`) plus `confirmClearIncompatibleInitialTracking` when clearing incompatible Step 1 values. Step 7 VARIANT assignment: `initialTrackingAssignedVariantId`. CURRENT DTOs do not contain these fields. Authority: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Permission authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]. Entitlement: `product_catalog`; advanced tracking / non-empty identity: `inventory_tracking`.
+`PUT /api/v1/tenant-admin/products/{productId}/draft` and `GET .../setup` remain the only Product Setup draft routes. TARGET identity fields (collected on Step 2 after Product Type is selected): `initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`. Step 2 also remains tracking policy (`productStructure`, `trackInventory`, `batchTracking`, `expiryTracking`, `serialTracking`) plus `confirmClearIncompatibleInitialTracking` when clearing incompatible identity values. Step 7 VARIANT assignment: `initialTrackingAssignedVariantId`. Authority: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Collection decision: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]. Permission authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]. Entitlement: `product_catalog`; advanced tracking / non-empty identity: `inventory_tracking`.
 
 ### Step 5 Barcode & SKU Payload & Duplicate Projection
 `PUT /api/v1/tenant-admin/products/{productId}/draft` accepts `UpdateProductDraftStep5RequestDto`.
@@ -392,6 +392,19 @@ On duplicate detection, the endpoint returns a `409 Conflict` containing a struc
 ```
 
 Note: Legacy route `/api/v1/products` is maintained as compatibility alias pointing to the same application layer logic. Duplicate controller implementation must be retired.
+
+### Step 6 — Pricing & Tax (documentation contract)
+
+No new Step 6-only endpoint. Use existing `PUT .../draft`, wizard-create/`POST .../products`, `GET .../setup`, and `GET .../create-options` (`currencyCode`, ACTIVE taxes).
+
+Canonical semantics: [[../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]] §6.1–6.5.
+
+| Structure | Persist selling via | Tax |
+|---|---|---|
+| SIMPLE | One applicable `price_list_items` configuration for the sellable identity | `product_tax_assignments` + `products.is_tax_exclusive` |
+| VARIANT (TARGET) | Per included `product_variant_id` on `price_list_items.selling_price` | Common Tax Class / TaxPriceMode; fan-out assignments allowed |
+
+Do **not** invent parallel pricing routes or tables. Extend `PricingTax` DTO with `variantPrices[]` for VARIANT; stop scalar fan-out of one selling price to all variants. Cost remains `products.reference_cost_price` when authorized.
 
 ---
 

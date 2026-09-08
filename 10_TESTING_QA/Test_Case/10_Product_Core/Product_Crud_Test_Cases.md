@@ -1,7 +1,7 @@
 <!-- title: Product CRUD And Wizard Test Cases -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Product CRUD & Wizard Test Cases
 
@@ -32,25 +32,36 @@
 - **PROD-VAR-008 (UOM Inheritance)**: VARIANT + Track Inventory ON inherits parent base UOM as `stock_uom_id` and selling UOM as `sales_uom_id`. Track Inventory OFF resolves system default UOM (`PCS`).
 - **PROD-VAR-009 (Concurrency & Tenant Isolation)**: Stale `expectedRowVersion` returns HTTP 409 Conflict. Cross-tenant option/media IDs return HTTP 403.
 - **PROD-VAR-010 (Downstream Cleanup)**: Deleting a variant in Step 4 cleans up linked draft barcodes, variant price overrides, and channel visibility records atomically.
+- **PROD-VAR-011 (Estimated Count — Backend Authority)**: Backend recalculates Cartesian combination count from submitted `variantConfiguration.options[].values[]` graph. Client-supplied derived totals are ignored. Count > `MaxVariantCombinationsPerProduct (100)` returns validation error.
+- **PROD-VAR-012 (Estimated Count — No Estimate API)**: No dedicated estimate endpoint exists or is required for Step 4 UX.
 
 ### 1.2 Flutter Unit & Widget Test Cases
-- **FLUT-VAR-001**: Step 4 main screen rendering, configuration summary card counts, and Cartesian preview updates.
+- **FLUT-VAR-001**: Step 4 main screen rendering, **Estimated Variant Count card**, configuration summary card counts, and Cartesian preview updates.
+- **FLUT-VAR-001A (Live Estimate)**: Colour 3 values → shows 3; add Capacity 2 values → immediately 6; remove one Colour value → immediately 4; no API stub invoked for estimate refresh.
+- **FLUT-VAR-001B (Incomplete Config)**: Attribute with zero values → estimate 0 / incomplete state; Save & Continue blocked per existing validation.
+- **FLUT-VAR-001C (Draft Reopen)**: Persisted Colour 3 + Capacity 2 → reopen draft → frontend recalculates 6 without reading persisted estimate field.
+- **FLUT-VAR-001D (Limit Warning)**: Estimate > 100 shows UI validation before generation.
 - **FLUT-VAR-002**: Edit Variant Drawer sliding animation, pre-filled display label, `Include Variant` toggle interaction, and `Cancel` (discards local drawer edits).
 - **FLUT-VAR-003**: Delete Variant Modal dialog display, cancellation, and destructive delete confirmation.
 - **FLUT-VAR-004**: Field error placement on attribute rows and Save & Continue CTA button state.
 
 ---
 
-## 2. Step 1 Initial Tracking Details Test Knowledge (TARGET / GAP)
+## 2. Step 2 Initial Tracking Details Test Knowledge
 
 Canonical rules: [[../../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
+Collection surface: [[../../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]].
 
 | ID | Case | Expected |
 |---|---|---|
-| PROD-TRACK-001 | Step 1 accepts Batch Number | Syntax valid; optional; not required for Continue |
-| PROD-TRACK-002 | Step 1 accepts Expiry Date | Date picker; malformed date rejected |
-| PROD-TRACK-003 | Step 1 accepts Serial Number | Optional; trim; max 150 |
-| PROD-TRACK-004 | Step 1 accepts all three provisionally | Saved without enabling Step 2 toggles |
+| PROD-TRACK-001 | Step 2 accepts Batch Number after Product Type is selected | Syntax valid; optional; not required for Continue |
+| PROD-TRACK-002 | Step 2 accepts Expiry Date after Product Type is selected | Date picker; malformed date rejected |
+| PROD-TRACK-003 | Step 2 accepts Serial Number after Product Type is selected | Optional; trim; max 150 |
+| PROD-TRACK-004 | Step 2 accepts all three provisionally | Saved without auto-enabling tracking toggles |
+| PROD-TRACK-004A | Card hidden until Product Type is selected | No Initial Tracking Details and no Tracking & Stock Rules on unconfirmed Step 2 |
+| PROD-TRACK-004B | Card hidden on Step 1 | Basic Details has no Initial Tracking card |
+| PROD-TRACK-004C | Card hidden for BUNDLE | Bundle / Kit shows no identity inputs |
+| PROD-TRACK-004D | Identity card above tracking rules | After type select, Initial Tracking Details renders above Tracking & Stock Rules |
 | PROD-TRACK-005 | Save Draft preserves all values | Draft store returns same three fields |
 | PROD-TRACK-006 | Resume preserves all values | GET setup restores values |
 | PROD-TRACK-007 | Step 2 Batch ON preserves Batch | `initialBatchNumber` retained |
@@ -66,13 +77,13 @@ Canonical rules: [[../../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add
 | PROD-TRACK-017 | Duplicate Batch | Publish rejects per tenant/product/(variant) uniqueness |
 | PROD-TRACK-018 | Duplicate Serial | Publish rejects per `UNIQUE(tenant_id, product_id, serial_number)` |
 | PROD-TRACK-019 | Final Review display | Shows only applicable remaining tracking fields |
-| PROD-TRACK-020 | Back navigation preserves compatible values | Step 1 still shows them |
-| PROD-TRACK-021 | Explicit confirmation before clearing | No silent discard |
+| PROD-TRACK-020 | Back navigation preserves compatible values | Step 2 still shows them |
+| PROD-TRACK-021 | Explicit confirmation before clearing | No silent discard (TARGET; CURRENT Flutter continue may auto-confirm) |
 | PROD-TRACK-022 | No stock quantity from identity | `inventory_balances.on_hand_quantity` unchanged/not invented |
 | PROD-TRACK-023 | No fake inventory balance | No fabricated balance row with positive qty |
 | PROD-TRACK-024 | No fake stock movement | No `stock_movements` from Product Setup identity |
 
-CURRENT: these cases are not implemented. TARGET for the implementation phase.
+CURRENT: widget tests cover Step 1 hide + Step 2 show after type select. TARGET confirmation dialog and live E2E remain open.
 
 ---
 

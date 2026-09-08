@@ -5,7 +5,7 @@
 
 # Tenant Admin Canonical User Journey Index
 
-**62 journeys**.
+**69 journeys** (62 prior + TA-UJ-063…069 Tax Management).
 
 | Journey ID | Journey Name | Status | Completion % |
 |---|---|---|---:|
@@ -72,9 +72,24 @@
 | TA-UJ-060 | Manage C&C Order Status (Staff) | NOT_STARTED | 25 |
 | TA-UJ-061 | Manage Expiry / Offer Discounts | NOT_STARTED | 5 |
 | TA-UJ-062 | Monitor Device / Hardware Readiness | PARTIAL | 50 |
+| TA-UJ-063 | Browse Tax Setup | NOT_STARTED | 15 |
+| TA-UJ-064 | Create Tax Setup | NOT_STARTED | 10 |
+| TA-UJ-065 | Edit Tax Setup | NOT_STARTED | 10 |
+| TA-UJ-066 | Schedule Tax Rate Change | NOT_STARTED | 5 |
+| TA-UJ-067 | Activate / Deactivate Tax Setup | NOT_STARTED | 5 |
+| TA-UJ-068 | View Products Using Tax | NOT_STARTED | 5 |
+| TA-UJ-069 | Assign Tax in Product Setup (Step 6) | PARTIAL | 40 |
+
 
 ## Category Management journey status (2026-08-27)
 
 TA-UJ-035 … TA-UJ-039: **NOT_STARTED** (backend contract + implementation complete; **Flutter implementation pending**; end-to-end journey **NOT COMPLETE**). Canonical Category Management backend is IMPLEMENTED (ADR 010 — Category decoupled from Department). Do not mark these journeys COMPLETE because backend exists; Flutter Category Management is still Coming Soon.
 
 Authority: [[../../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_SECOND_BRAIN_GAP_CLOSURE_2026-08-27]]
+
+## Tax Management journey status (2026-09-03)
+
+TA-UJ-063 … TA-UJ-069: Second Brain **canonical contract READY**. Existing Flutter/backend Tax aggregate may partially support list/create/update but does **not** yet implement the full Tax Setup list/schedule/treatment/products-using contract. Do not mark COMPLETE.
+
+Authority: [[../../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]
+Decision register: [[../../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_TAX_MANAGEMENT_DECISION_REGISTER_2026-09-03]]

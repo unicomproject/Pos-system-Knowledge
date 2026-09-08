@@ -1,7 +1,7 @@
 ﻿<!-- title: Open Questions -->
 <!-- status: Draft -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-27 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Open Questions
 
@@ -81,8 +81,10 @@ and wider transport policy remain open.
 | PRODUCT-PERM-001 | Which Product Setup permission namespace is canonical? | Dual `catalog.*` vs `tenant.products.*` is unsafe | LOCKED: `catalog.*` only; one-way map from `tenant.products.*` during compatibility window | Access/Product — Resolved 2026-08-24 |
 | PRODUCT-PERM-002 | Which entitlement codes are runtime vs docs? | Docs mixed `product_catalog` / `product_management` / `inventory_tracking` / `inventory_management` | LOCKED: runtime `product_catalog` + `inventory_tracking`; `product_management` is module_code; `inventory_management` is docs group | Access/Product — Resolved 2026-08-24 |
 | PRODUCT-PERM-003 | Does Initial Tracking require stock.adjust? | Identity without quantity | LOCKED: Product Setup create/update + `inventory_tracking`; never `inventory.stock.adjust` | Access/Inventory — Resolved 2026-08-24 |
+| PRODUCT-TRACK-003 | Which wizard step collects Initial Tracking Details? | Step 1 collection hid Review values when policy stayed OFF | LOCKED: Step 2 after Product Type is selected (SIMPLE / VARIANT; hidden for BUNDLE) | Product/UI — Resolved 2026-09-01 |
 
-Authority: [[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]].
+Authority: [[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]],
+[[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]].
 
 ## Tenant Admin Category Management — 2026-08-27
 

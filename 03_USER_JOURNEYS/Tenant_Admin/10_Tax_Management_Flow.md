@@ -1,39 +1,94 @@
 <!-- title: Tenant Admin Tax Management Flow -->
-<!-- status: Active -->
+<!-- status: Canonical / Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-14 -->
+<!-- last_updated: 2026-09-03 -->
+<!-- authority: [[../../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]] -->
+<!-- supersedes: pre-2026-09-03 single-page Tax Type form flow -->
 
 # Tenant Admin Tax Management Flow
 
 ## Purpose
 
-Defines the flow for managing tax configurations (creating, updating, and viewing taxes). This page provides a simplified aggregate view over `TaxClass`, `TaxRate`, and `TaxClassRate`.
+Defines Tenant Admin journeys for **Tax Setup**: list, create, edit, schedule rates, activate/deactivate, and view products using a tax.
 
 ## Actor
 
-Tenant Admin
+Tenant Admin (with Tax Setup permissions)
 
 ## Trigger
 
-Tenant Admin navigates to `Product -> Tax`.
+Tenant Admin navigates to `Products → Tax Setup`.
 
 ## Preconditions
 
-- Tenant Admin has `pricing.tax_classes.*` and `pricing.tax_rates.*` permissions.
+- Tenant context valid
+- Entitlement for Pricing/Tax (or catalog plan feature as configured)
+- Permission: at minimum `pricing.tax_classes.view` (TARGET; runtime may map `tax.classes.view`)
 
-## Main Flow: Tax Management
+## Canonical journey IDs
 
-| Step | Action | System & User Behavior |
+| ID | Journey |
+|---|---|
+| TA-UJ-063 | Browse Tax Setup |
+| TA-UJ-064 | Create Tax Setup |
+| TA-UJ-065 | Edit Tax Setup |
+| TA-UJ-066 | Schedule Tax Rate Change |
+| TA-UJ-067 | Activate / Deactivate Tax Setup |
+| TA-UJ-068 | View Products Using Tax |
+| TA-UJ-069 | Assign Tax in Product Setup (Step 6) |
+
+## Main flows
+
+### TA-UJ-063 Browse Tax Setup
+
+| Step | Action | Behaviour |
 |---:|---|---|
-| 1 | **Navigate** | User opens `Product -> Tax`. System loads the Tax Management page containing a Create/Edit form at the top, and a data table of existing taxes below. |
-| 2 | **Create Tax** | User fills out Tax Name, Tax Code (e.g., VAT18), Tax Type, Tax Percentage (0-100), Description, and Status. User clicks `Create Tax`. |
-| 3 | **System Validation** | System ensures Tax Code is unique for the tenant. Tax Percentage is valid. System generates `TaxClassCode` and `TaxRateCode` deterministically. |
-| 4 | **Creation** | Backend atomically creates `TaxClass`, `TaxRate`, `TaxClassRate`. A default Jurisdiction (`DEFAULT-{COUNTRY_CODE}`) is resolved or created if it doesn't exist. |
-| 5 | **List Update** | The table at the bottom of the screen reloads, displaying the newly created Tax. |
-| 6 | **Edit Tax** | User clicks `Edit` on a table row. The top form populates with the authoritative backend record. Button changes to `Save Changes`. |
-| 7 | **Update Tax** | User alters percentage from 18% to 20%. System end-dates the current `TaxRate` (setting `ValidUntil = today`) and creates a new `TaxRate` (e.g. `VAT18-RATE-V2`) to preserve historical order snapshots. Status changes cascade synchronously. |
-| 8 | **Delete Tax** | User clicks `Delete`. Confirmation modal appears. System attempts soft-delete. If Tax is actively assigned to products, system returns `409 Conflict`. |
+| 1 | Open Tax Setup | List loads (or empty state). No breadcrumb. |
+| 2 | Search / filter | Name, Code; Status All/Active/Inactive; Reset Filter. |
+| 3 | Read columns | Tax Name (+ Code), Current Rate, Next Change, Products Using, Status, Actions. |
+| 4 | Open row | Navigate to Edit Tax Setup (TA-UJ-065). |
+
+Empty state: *No tax setups have been created yet.* + **+ Add Tax Setup**.
+
+### TA-UJ-064 Create Tax Setup
+
+| Step | Action | Behaviour |
+|---:|---|---|
+| 1 | + Add Tax Setup | Opens Add Tax Setup (no Summary & Preview, no Used For). |
+| 2 | Basic Details | Name *, Code *, Description. |
+| 3 | Treatment | TAXABLE / ZERO_RATED / EXEMPT. |
+| 4 | Initial rate + Effective From | Per treatment rules. |
+| 5 | Create | Backend creates Tax Setup + initial rate; list refreshes. |
+
+### TA-UJ-065 Edit Tax Setup
+
+View/edit permitted fields; see current rate, next change, history, status, products using. Treatment locked after usage (DEC-TAX-011).
+
+### TA-UJ-066 Schedule Tax Rate Change
+
+Edit → Schedule Rate Change → New Rate + Effective From + optional Notes → save SCHEDULED. Current rate unchanged until effective date (tenant TZ 00:00:00).
+
+### TA-UJ-067 Activate / Deactivate
+
+Show impact if products use tax. **Option B:** existing assignments continue; new assignments blocked when INACTIVE. Historical sales unchanged.
+
+### TA-UJ-068 Products Using Tax
+
+Paged list: Product Name, Code, Status, Tax Price Mode (Inclusive/Exclusive).
+
+### TA-UJ-069 Product Setup assign tax
+
+Step 6 Pricing & Tax: select ACTIVE Tax Setup + TaxPriceMode INCLUSIVE/EXCLUSIVE. See Product 7-Step contract.
+
+## Explicit removals
+
+- Used For / Applies To / Goods / Services / Both
+- Tax Type VAT/GST UI axis
+- Single-page top form as the only UX pattern
+- Hard delete as standard lifecycle for established taxes
 
 ## Related Specifications
 
-- [[../../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/02_Functional_Rules]]
+- [[../../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]
+- [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_Tax_Management]]
+- [[../../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_TAX_MANAGEMENT_DECISION_REGISTER_2026-09-03]]
