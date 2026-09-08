@@ -1,4 +1,4 @@
-﻿<!-- title: API Authorization Rules -->
+<!-- title: API Authorization Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-08-27 -->
@@ -105,7 +105,7 @@ Platform APIs require platform JWT authentication and explicit canonical `platfo
 | **Role/permission management** | Tenant active, `tenant.roles.management.manage` |
 | **Permission catalog read** | Tenant active, `tenant.roles.permissions.view` |
 | **Role permission update** | Tenant active, `tenant.roles.permissions.update` |
-| **Tax Management** | Catalog entitlement, `pricing.tax_classes.master.view`, `pricing.tax_rates.master.view` |
+| **Tax Management** | Catalog entitlement, `pricing.tax_classes.view` (+ create/update/status/products as required), `pricing.tax_rates.view`, `pricing.tax_rates.schedule.manage` | Authority: Tax Management Canonical Contract 2026-09-03 |
 | **Product management** | Catalog entitlement and `catalog.products.master.view`, `create`, `update`, `delete`, `publish`, `restore`, or `duplicate` |
 | **Catalog master data** | Catalog entitlement and respective `catalog.departments.master.*`, `catalog.categories.master.*`, `catalog.brands.master.*`, `catalog.collections.master.*`, `catalog.return_policies.master.*` |
 | **Inventory management** | Inventory entitlement, `inventory.stock.levels.view`, `inventory.stock.adjustments.adjust` |

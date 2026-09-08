@@ -1,9 +1,39 @@
 ﻿<!-- title: Scope Change Log -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-27 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Scope Change Log
+
+## 2026-09-03 — Tenant Admin Tax Management canonical contract
+
+- Tax Management Second Brain rewritten as canonical **Tax Setup** contract.
+- Removed Used For / Applies To / Goods / Services / Both from Tax Setup.
+- Tax Treatment: TAXABLE / ZERO_RATED / EXEMPT (distinct Zero Rated vs Exempt).
+- Product owns TaxPriceMode (Inclusive/Exclusive); Tax Setup owns rates/treatment.
+- Effective-dated rate schedule + history; refund uses original sale tax snapshot.
+- Journey IDs allocated: TA-UJ-063 … TA-UJ-069.
+- Documentation-only; no backend/Flutter implementation claimed.
+
+Authority: [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]  
+Decisions: [[TENANT_ADMIN_TAX_MANAGEMENT_DECISION_REGISTER_2026-09-03]]
+
+## 2026-09-01 — Initial Tracking collection moved to Step 2
+
+- Optional Initial Tracking Details (Batch Number, Expiry Date, Serial Number)
+  are collected on **Step 2 — Product Type & Tracking**, after Product Type is
+  explicitly selected (SIMPLE / VARIANT).
+- Step 1 Basic Details no longer shows that card.
+- Bundle / Kit does not show the card (parent cannot receive physical identities).
+- Tracking **policy** remains Step 2 (`product_inventory_settings`). Publish
+  identity remains Step 7 into `product_batches` / `serial_numbers`.
+- Flutter IMPLEMENTED on 2026-09-01. Helper:
+  `Optional. Turn on matching Batch, Expiry, or Serial tracking below to keep these values.`
+  Identity card renders **above** Tracking & Stock Rules.
+- Track Inventory wizard default is **OFF**. User must turn it on. Skip on Step 2
+  leaves Track Inventory / Batch / Expiry / Serial OFF.
+
+Decision: [[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]].
 
 ## 2026-08-27 — Category decoupled from Department
 

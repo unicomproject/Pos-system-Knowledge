@@ -1,7 +1,7 @@
 <!-- title: Product Core Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Product Core Functional Rules
 
@@ -23,22 +23,22 @@ These rules must be applied before creating backend APIs, Flutter screens, respo
 - Step 4 for VARIANT mode defines options, values, Cartesian matrix, display labels, variant inclusion toggles (`Include Variant`), and variant image overrides. It does NOT configure SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility (belonging to Step 1).
 - Inactive products cannot be sold through POS or online store.
 - POS may cache product reference data, but backend remains final authority.
-- Optional Step 1 Initial Tracking Details (Batch / Expiry / Serial) do not enable tracking policy. See BR-TRACK-001 to BR-TRACK-020 in [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Permission matrix: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
+- Optional Step 2 Initial Tracking Details (Batch / Expiry / Serial), shown after Product Type is selected, do not enable tracking policy. See BR-TRACK-001 to BR-TRACK-020 in [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Permission matrix: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
 
 | ID | Rule |
 |---|---|
-| BR-TRACK-001 | Step 1 may collect optional initial Batch Number. |
-| BR-TRACK-002 | Step 1 may collect optional initial Expiry Date. |
-| BR-TRACK-003 | Step 1 may collect optional initial Serial Number. |
-| BR-TRACK-004 | Step 1 tracking values do not determine tracking policy. |
+| BR-TRACK-001 | Step 2 may collect optional initial Batch Number after Product Type is selected. |
+| BR-TRACK-002 | Step 2 may collect optional initial Expiry Date after Product Type is selected. |
+| BR-TRACK-003 | Step 2 may collect optional initial Serial Number after Product Type is selected. |
+| BR-TRACK-004 | Step 2 identity values do not determine tracking policy. |
 | BR-TRACK-005 | Step 2 is authoritative for tracking enable/disable state. |
 | BR-TRACK-006 | Expiry Tracking requires Batch Tracking. |
 | BR-TRACK-007 | Serial Tracking is mutually exclusive with Batch/Expiry in Release 1. |
-| BR-TRACK-008 | Incompatible Step 1 values must never be silently discarded. |
+| BR-TRACK-008 | Incompatible identity values must never be silently discarded. |
 | BR-TRACK-009 | Expiry remains batch-owned domain data. |
 | BR-TRACK-010 | Serial remains physical-unit identity data. |
-| BR-TRACK-011 | Step 1 serial is an INITIAL serial, not a Product-wide reusable serial. |
-| BR-TRACK-012 | Step 1 batch is an INITIAL batch; later batches may be added. |
+| BR-TRACK-011 | Step 2 serial is an INITIAL serial, not a Product-wide reusable serial. |
+| BR-TRACK-012 | Step 2 batch is an INITIAL batch; later batches may be added. |
 | BR-TRACK-013 | No positive inventory quantity may be invented from Batch/Expiry/Serial input alone. |
 | BR-TRACK-014 | Variant tracking identity must resolve to an exact Variant before final physical ownership. |
 | BR-TRACK-015 | Bundle parent cannot receive direct physical tracking identities while Bundle inventory remains component-based. |

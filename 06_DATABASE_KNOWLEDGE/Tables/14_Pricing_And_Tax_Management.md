@@ -1,14 +1,33 @@
 <!-- title: Pricing & Tax Management -->
-<!-- status: ERD aligned -->
+<!-- status: ERD aligned + Tax Setup canonical overlay 2026-09-03 -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-04 -->
+<!-- last_updated: 2026-09-03 -->
 <!-- source: 14_Pricing & Tax Management(1).png -->
+<!-- tax_authority: [[../../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]] -->
 
 # 14. Pricing & Tax Management
 
 ## Purpose
 
-This module defines price lists, outlet/channel price list mapping, product/variant/UOM prices, tax jurisdictions, tax classes, tax rates, and product tax assignments.
+This module defines price lists, outlet/channel price list mapping, product/variant/UOM prices, tax jurisdictions, tax classes (domain: **Tax Setup**), tax rates (effective-dated), and product tax assignments.
+
+### Tax Setup domain overlay (canonical 2026-09-03)
+
+| Domain | Physical | Notes |
+|---|---|---|
+| Tax Setup | `tax_classes` | Owns Name, Code, Description, **Treatment**, Status |
+| Tax Rate schedule | `tax_rates` (+ `tax_class_rates`) | Effective-dated HISTORICAL/CURRENT/SCHEDULED |
+| Product assignment | `product_tax_assignments.tax_class_id` | TaxSetupId |
+| TaxPriceMode | `products.is_tax_exclusive` | Product-owned; not on Tax Setup |
+
+**Removed from Tax Setup business contract:** Used For / Applies To / Goods / Services / Both.
+
+**TARGET schema evolution (documentation only — no migration in this task):**
+
+- Prefer `tax_classes.tax_treatment` (`TAXABLE` | `ZERO_RATED` | `EXEMPT`) as canonical treatment.
+- Legacy `tax_type` (VAT/GST/…) is **not** Tenant Admin Tax Setup UX authority; may remain as unused/compat until backend alignment.
+- Rate schedule must enforce no duplicate `valid_from` / EffectiveFrom and no overlapping periods per Tax Setup.
+- Product count is **derived**, never a stored ProductCount truth column.
 
 ## Entity Tables
 
@@ -139,6 +158,8 @@ CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 | `updated_at` | timestamptz | NOT NULL | Last update timestamp. |
 | `updated_by_tenant_user_id` | uuid | FK NULL | References tenant_users(id). |
 
+**Product Setup Step 6 usage (LOCKED):** Selling prices persist here on the tenant default price list — do not invent `products.selling_price`. SIMPLE may use product-null or default-variant row; VARIANT canonical target uses **one row per included** `product_variant_id` with independent `selling_price`. Cost remains on `products.reference_cost_price`. Tax assignment remains on `product_tax_assignments`. Authority: [[../../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]] §6.1–6.5.
+
 Source constraints / rules from uploaded ERD image:
 
 ```text
@@ -195,22 +216,26 @@ CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 
 ## tax_classes
 
+> Domain name: **Tax Setup**. See Tax Management Canonical Contract.
+
 | Attribute | Type | Key / Constraint | Reference / Note |
 |---|---|---|---|
-| `id` | uuid | PK NOT NULL | Primary key. |
+| `id` | uuid | PK NOT NULL | Primary key. TaxSetupId. |
 | `tenant_id` | uuid | FK NOT NULL | References tenants(id). |
-| `tax_class_code` | varchar(80) | NOT NULL UNIQUE | Tenant-unique tax class code. Used as the deterministic base for TaxRate. |
-| `tax_class_name` | varchar(150) | NOT NULL | Display name. |
-| `tax_type` | varchar(40) | NOT NULL | Tax type categorization (VAT, GST, SALES_TAX, SERVICE_TAX, OTHER). Added in Phase 1. |
+| `tax_class_code` | varchar(80) | NOT NULL UNIQUE | Tenant-unique Tax Setup code. Normalize trim + uppercase. |
+| `tax_class_name` | varchar(150) | NOT NULL | Display name (Tax Name). |
+| `tax_treatment` | varchar(40) | TARGET NOT NULL | Canonical: `TAXABLE` \| `ZERO_RATED` \| `EXEMPT`. **TARGET column** — document for future migration; runtime may still use `tax_type` until aligned. |
+| `tax_type` | varchar(40) | LEGACY | Historical VAT/GST/… or PERCENTAGE axis. **Not** TA Tax Setup UX authority after 2026-09-03. |
 | `description` | text | NULL | Optional description. |
-| `is_default_tax_class` | boolean | NOT NULL DEFAULT false | Marks tenant default tax class. |
-| `status` | varchar(30) | NOT NULL CHECK | Logical ERD type: record_status. |
+| `is_default_tax_class` | boolean | NOT NULL DEFAULT false | Optional default marker; seeded taxes use IsSeeded/source when present. |
+| `is_seeded` | boolean | TARGET NULL/DEFAULT false | Informational seed indicator (DEC-TAX-013). |
+| `status` | varchar(30) | NOT NULL CHECK | ACTIVE / INACTIVE (DELETED soft-delete restricted). |
 | `created_at` | timestamptz | NOT NULL | Creation timestamp. |
 | `created_by_tenant_user_id` | uuid | FK NULL | References tenant_users(id). |
 | `updated_at` | timestamptz | NOT NULL | Last update timestamp. |
 | `updated_by_tenant_user_id` | uuid | FK NULL | References tenant_users(id). |
 
-Source constraints / rules from uploaded ERD image:
+Source constraints / rules from uploaded ERD image + canonical overlay:
 
 ```text
 PK(id)
@@ -221,28 +246,31 @@ UNIQUE(tenant_id, tax_class_code)
 UNIQUE(tenant_id, id)
 UNIQUE(tenant_id) WHERE is_default_tax_class = true AND status = 'ACTIVE'
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
+-- TARGET: CHECK(tax_treatment IN ('TAXABLE','ZERO_RATED','EXEMPT'))
 ```
-
 ## tax_rates
+
+> Effective-dated rate rows for a Tax Setup. Current rate is **derived** (EffectiveFrom ≤ business timestamp; latest applicable). Do not overwrite historical rows when scheduling a new rate.
 
 | Attribute | Type | Key / Constraint | Reference / Note |
 |---|---|---|---|
 | `id` | uuid | PK NOT NULL | Primary key. |
 | `tenant_id` | uuid | FK NOT NULL | References tenants(id). |
-| `tax_jurisdiction_id` | uuid | FK NOT NULL | References tax_jurisdictions(id). |
+| `tax_jurisdiction_id` | uuid | FK NOT NULL | References tax_jurisdictions(id). Technical default jurisdiction OK. |
 | `tax_rate_code` | varchar(80) | NOT NULL UNIQUE | Tenant-unique tax rate code. |
 | `tax_rate_name` | varchar(150) | NOT NULL | Display name. |
-| `rate_percent` | numeric(8,4) | NOT NULL CHECK | Tax rate percentage. |
+| `rate_percent` | numeric(8,4) | NOT NULL CHECK | Tax rate percentage 0–100. ZERO_RATED must be 0. |
 | `is_compound` | boolean | NOT NULL DEFAULT false | Compound tax flag. |
-| `valid_from` | date | NULL CHECK | Effective start date. |
-| `valid_until` | date | NULL CHECK | Effective end date. |
+| `valid_from` | date | NULL CHECK | **Effective From** (business: tenant TZ 00:00:00). |
+| `valid_until` | date | NULL CHECK | Optional Effective To; periods must not overlap. |
+| `notes` | text | TARGET NULL | Optional schedule notes. |
 | `status` | varchar(30) | NOT NULL CHECK | Logical ERD type: record_status. |
 | `created_at` | timestamptz | NOT NULL | Creation timestamp. |
 | `created_by_tenant_user_id` | uuid | FK NULL | References tenant_users(id). |
 | `updated_at` | timestamptz | NOT NULL | Last update timestamp. |
 | `updated_by_tenant_user_id` | uuid | FK NULL | References tenant_users(id). |
 
-Source constraints / rules from uploaded ERD image:
+Source constraints / rules from uploaded ERD image + canonical overlay:
 
 ```text
 PK(id)
@@ -256,8 +284,9 @@ CHECK(rate_percent >= 0)
 CHECK(rate_percent <= 100)
 CHECK(valid_until IS NULL OR valid_from IS NULL OR valid_until >= valid_from)
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
+-- TARGET: no duplicate valid_from for rates linked to the same Tax Setup
+-- TARGET: no overlapping [valid_from, valid_until) periods per Tax Setup
 ```
-
 ## tax_class_rates
 
 | Attribute | Type | Key / Constraint | Reference / Note |

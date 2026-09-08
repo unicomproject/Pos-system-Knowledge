@@ -1,15 +1,24 @@
 <!-- title: Product Setup Initial Tracking Details Step 1 Decision 2026-08-24 -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Product Setup Initial Tracking Details Step 1 Decision 2026-08-24
 
+## Collection surface update (2026-09-01)
+
+Identity, draft table, publish path, and tracking-policy ownership in this
+decision remain in force. **Collection UI** moved from Step 1 to Step 2 after
+Product Type is selected.
+
+Authority for the collection move:
+[[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]].
+
 ## Status And Purpose
 
-Approved and active from 2026-08-24. This is the Product Setup authority for
-optional initial Batch Number, Expiry Date, and Serial Number capture inside
-Tenant Admin Add Product **Step 1 — Basic Details**.
+Approved and active from 2026-08-24 for Product Setup identity rules. Original
+collection surface was Tenant Admin Add Product **Step 1 — Basic Details**.
+That collection surface is superseded on 2026-09-01 (Step 2 after type select).
 
 Canonical contract:
 [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].

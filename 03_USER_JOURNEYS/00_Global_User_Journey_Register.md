@@ -193,6 +193,13 @@ One row per journey. Implementation status reflects **production code**, not doc
 | TA-UJ-060 | - | TA | Tenant Admin | - | Manage C&C Order Status (Staff) | - | - | Y | NOT_STARTED | 25 | - | - | - | - | - |
 | TA-UJ-061 | - | TA | Tenant Admin | - | Manage Expiry / Offer Discounts | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
 | TA-UJ-062 | - | TA | Tenant Admin | - | Monitor Device / Hardware Readiness | - | - | Y | PARTIAL | 50 | - | - | - | - | - |
+| TA-UJ-063 | - | TA | Tenant Admin | Tax Mgmt | Browse Tax Setup | Products → Tax Setup | List or empty state | Y | NOT_STARTED | 15 | [[Tenant_Admin/10_Tax_Management_Flow]] | pricing.tax_classes.view | product_catalog | - | Canonical contract 2026-09-03 |
+| TA-UJ-064 | - | TA | Tenant Admin | Tax Mgmt | Create Tax Setup | + Add Tax Setup | Tax Setup created | Y | NOT_STARTED | 10 | [[Tenant_Admin/10_Tax_Management_Flow]] | pricing.tax_classes.create | product_catalog | - | Treatment + initial rate |
+| TA-UJ-065 | - | TA | Tenant Admin | Tax Mgmt | Edit Tax Setup | Edit action | Permitted fields updated | Y | NOT_STARTED | 10 | [[Tenant_Admin/10_Tax_Management_Flow]] | pricing.tax_classes.update | product_catalog | - | Treatment lock DEC-TAX-011 |
+| TA-UJ-066 | - | TA | Tenant Admin | Tax Mgmt | Schedule Tax Rate Change | Schedule Rate Change | Future rate scheduled | Y | NOT_STARTED | 5 | [[Tenant_Admin/10_Tax_Management_Flow]] | pricing.tax_rates.schedule.manage | product_catalog | - | Current rate unchanged |
+| TA-UJ-067 | - | TA | Tenant Admin | Tax Mgmt | Activate / Deactivate Tax Setup | Status action | Status changed Option B | Y | NOT_STARTED | 5 | [[Tenant_Admin/10_Tax_Management_Flow]] | pricing.tax_classes.status.manage | product_catalog | - | DEC-TAX-012 |
+| TA-UJ-068 | - | TA | Tenant Admin | Tax Mgmt | View Products Using Tax | Products Using | Paged product list | Y | NOT_STARTED | 5 | [[Tenant_Admin/10_Tax_Management_Flow]] | pricing.tax_classes.products.view | product_catalog | - | Derived count |
+| TA-UJ-069 | - | TA | Tenant Admin | Tax Mgmt | Assign Tax in Product Setup | Step 6 Pricing & Tax | TaxSetupId + TaxPriceMode saved | Y | PARTIAL | 40 | [[../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]] | catalog.product_pricing.manage | product_catalog | TA-UJ-024 | Active Tax Setups only |
 | POS-UJ-001 | - | POS | Cashier | - | Cashier Login | - | - | Y | COMPLETE | 95 | - | - | - | - | - |
 | POS-UJ-002 | - | POS | Cashier | - | Cashier Logout | - | - | Y | COMPLETE | 95 | - | - | - | - | - |
 | POS-UJ-003 | - | POS | Cashier | - | Activate/Trust Device | - | - | Y | COMPLETE | 90 | - | - | - | - | - |

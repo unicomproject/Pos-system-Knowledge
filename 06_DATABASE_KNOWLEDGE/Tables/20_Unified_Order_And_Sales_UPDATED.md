@@ -357,18 +357,21 @@ CHECK(discount_amount >= 0)
 | `sales_order_id` | uuid | FK | NOT NULL | References `sales_orders(id)`. |
 | `sales_order_line_id` | uuid | FK | NULL | References `sales_order_lines(id)`. |
 | `tax_jurisdiction_id` | uuid | FK | NULL | References `tax_jurisdictions(id)`. |
-| `tax_class_id` | uuid | FK | NULL | References `tax_classes(id)`. |
+| `tax_class_id` | uuid | FK | NULL | References `tax_classes(id)` (TaxSetupId). |
 | `tax_rate_id` | uuid | FK | NULL | References `tax_rates(id)`. |
-| `tax_class_code_snapshot` | varchar(80) |  | NULL | Tax class code snapshot. |
+| `tax_class_code_snapshot` | varchar(80) |  | NULL | Tax Setup code snapshot. |
 | `tax_rate_code_snapshot` | varchar(80) |  | NULL | Tax rate code snapshot. |
 | `tax_name_snapshot` | varchar(150) |  | NOT NULL | Tax name snapshot. |
+| `tax_treatment_snapshot` | varchar(40) | TARGET | NULL→NOT NULL | **TARGET:** `TAXABLE` \| `ZERO_RATED` \| `EXEMPT`. Required so Zero Rated vs Exempt survive when tax_amount=0. |
 | `jurisdiction_name_snapshot` | varchar(150) |  | NULL | Jurisdiction snapshot. |
-| `tax_rate_percent` | numeric(7,4) | CHECK | NOT NULL | Tax percent. |
-| `taxable_amount` | numeric(18,4) | CHECK | NOT NULL | Taxable amount. |
+| `tax_rate_percent` | numeric(7,4) | CHECK | NOT NULL | Tax percent applied at sale time. |
+| `taxable_amount` | numeric(18,4) | CHECK | NOT NULL | Taxable / net amount. |
 | `tax_amount` | numeric(18,4) | CHECK | NOT NULL | Tax amount. |
-| `is_tax_included` | boolean |  | NOT NULL DEFAULT false | Tax included flag. |
+| `is_tax_included` | boolean |  | NOT NULL DEFAULT false | Inclusive mode snapshot (`true` = Inclusive). Maps from product TaxPriceMode. |
 | `calculation_sequence` | int | CHECK | NOT NULL DEFAULT 1 | Tax calculation sequence. |
 | `created_at` | timestamptz |  | NOT NULL | Creation timestamp. |
+
+**Immutability:** Rows are written at sale finalization and must never be rewritten when Tax Setup rates change later. Refunds/returns reverse these snapshot values (DEC-TAX-009).
 
 Constraints:
 

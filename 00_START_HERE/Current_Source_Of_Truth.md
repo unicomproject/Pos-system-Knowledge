@@ -442,25 +442,89 @@ tables, screens, or flows.
 - [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
 - [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
 - [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
+- [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
 - [[../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_PRODUCT_TAX_INCLUSIVE_EXCLUSIVE_DECISION_2026-08-27]]
+- [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]
+- [[../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_TAX_MANAGEMENT_DECISION_REGISTER_2026-09-03]]
+
+## Tax Management Rule
+
+**Tenant Admin Tax Management (Tax Setup)** — Second Brain canonical contract **READY** (2026-09-03). Backend/Flutter full schedule/treatment/products-using implementation is **not** claimed complete.
+
+| Aspect | Status |
+|---|---|
+| Canonical contract | **READY** |
+| Domain | Tax Setup owns identity/treatment/rates/status; Product owns TaxPriceMode; Sale owns tax snapshot |
+| Treatments | TAXABLE / ZERO_RATED / EXEMPT |
+| Removed | Used For / Applies To / Goods / Services / Both |
+| Journey IDs | TA-UJ-063 … TA-UJ-069 |
+| API aggregate | `/api/v1/tax` (extend; do not invent parallel TA API) |
+| Permissions TARGET | `pricing.tax_classes.*`, `pricing.tax_rates.*` (not `catalog.tax.*`) |
+
+Authority: [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]
 
 ## Wizard Step Rule
 The Tenant Admin Add Product workflow is strictly a 7-step wizard. Step 7 is Review & Create. Legacy 8-step documentation and standalone Channel Visibility steps are obsolete.
 
-Step 1 Basic Details may collect optional **Initial Tracking Details** (Batch Number, Expiry Date, Serial Number). Those values are provisional wizard input. Step 2 remains tracking-policy authority (`product_inventory_settings`). Actual identity persists at Step 7 Publish into `product_batches` / `serial_numbers`, not into Product master columns. Opening Stock remains responsible for quantity. Authority: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]] and [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
+### Product Setup Step 6 — Pricing & Tax (LOCKED 2026-09-03)
+
+Authority: [[../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]] §6.1–6.5.
+
+| Structure | Selling price | Tax |
+|---|---|---|
+| SIMPLE | One sellable identity → one applicable price-list configuration | Product Tax Assignment + TaxPriceMode |
+| VARIANT | Independent selling price per `ProductVariantId` via `price_list_items` | Common Product Tax Class / TaxPriceMode for current scope |
+
+Default Selling Price wording on the VARIANT screen is **retired**. Canonical bulk helper label: **Set Same Price for All Variants** (Flutter-only; Apply to All). POS / Online Store use the selected sellable ProductVariant’s price. Cost = product-level `reference_cost_price`. Do not invent parallel pricing tables. Tax masters remain Tax Management. Closures: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_PRICING_TAX_SIMPLE_VARIANT_SECOND_BRAIN_CLOSURE_2026-09-03]], [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_BULK_PRICE_UX_REFINEMENT_CLOSURE_2026-09-04]].
+
+**Implementation note:** SIMPLE Step 6 UI/backend path is confirmed. VARIANT per-variant Step 6 **backend** is **IMPLEMENTED** (2026-09-03) — see [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_PRICING_TAX_BACKEND_IMPLEMENTATION_CLOSURE_2026-09-03]]. Flutter VARIANT Step 6 UI is **IMPLEMENTED** (2026-09-04) — see [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_PRICING_TAX_FLUTTER_IMPLEMENTATION_CLOSURE_2026-09-04]]. Product Setup Step 6 frontend is complete for SIMPLE + VARIANT.
+
+Step 2 Product Type & Tracking collects optional **Initial Tracking Details** (Batch Number, Expiry Date, Serial Number) **after Product Type is explicitly selected** (SIMPLE / VARIANT; hidden for BUNDLE). Step 1 is Product master + images + channels only. Those identity values remain provisional wizard input. Step 2 remains tracking-policy authority (`product_inventory_settings`). Actual identity persists at Step 7 Publish into `product_batches` / `serial_numbers`, not into Product master columns. Opening Stock remains responsible for quantity. Authority: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]], [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]], and [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
 
 Product Setup authorization authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]. Canonical permission namespace is `catalog.*`. Runtime Product Setup entitlement is `product_catalog`. Advanced tracking entitlement is `inventory_tracking`. Closure audit: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-08-24_Tenant_Admin_Product_Setup_Permission_NFR_API_DB_Contract_Closure_Audit]].
 
-Global POS frontend authority (2026-08-31): UI entry points and notifications
-are entitlement- and granular-permission-driven; permitted components are
-filtered before responsive composition so hidden items reserve no space.
-Frontend gating is UX/defence-in-depth and backend authorization remains final.
-Authenticated POS branding is backend-driven by `GET /api/v1/pos/theme` using
-`pos.theme.primary_color` / `pos.theme.secondary_color`, with defaults
-`#FF6A00` / `#000000`; semantic status colours remain independent. Canonical
-detail: [[../02_ACCESS_CONTROL/Access_Control_Overview]],
-[[../07_UI_UX_KNOWLEDGE/Permission_Based_UI_Rules]],
-[[../07_UI_UX_KNOWLEDGE/Design_System]], and
-[[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Engineering_Canonical_Standard]].
+Implementation status (2026-09-01): Flutter collection UI is on Step 2 after Product Type select. Permission-first + Initial Tracking draft table remain in Unified Commerce (`product_setup_initial_tracking` migration `20260824095742_AddProductSetupInitialTracking`). Live 7-scenario E2E, persona permission E2E, PostgreSQL integration, and 1024x768 tablet verification are not complete. Destructive-clear confirmation dialog remains a GAP versus BR-TRACK-008. Authority for remaining gaps: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/TENANT_ADMIN_PRODUCT_SETUP_INITIAL_TRACKING_PERMISSION_FIRST_IMPLEMENTATION_CLOSURE_2026-08-24]].
 
-Implementation status (2026-08-24): permission-first + Initial Tracking code is in Unified Commerce and Nytroz POS App, including `product_setup_initial_tracking` migration `20260824095742_AddProductSetupInitialTracking`. Live 7-scenario E2E, persona permission E2E, PostgreSQL integration, and 1024×768 tablet verification are not complete. Authority for remaining gaps: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/TENANT_ADMIN_PRODUCT_SETUP_INITIAL_TRACKING_PERMISSION_FIRST_IMPLEMENTATION_CLOSURE_2026-08-24]].
+## Category Management Rule
+
+**Tenant Admin Category Management**
+
+| Aspect | Status |
+|---|---|
+| Canonical contract | READY |
+| Backend | **IMPLEMENTED / VERIFIED** |
+| Flutter | **PENDING** |
+| E2E | **PENDING** |
+
+Category Management is a tenant-owned recursive hierarchy (max depth 5). There is no separate SubCategory entity. “Subcategory” is a UI label for a child Category.
+
+**Department:** decoupled from Category (ADR 010, migration `20260827140000_DecoupleCategoryFromDepartment` applied). No `department_id` on Category.
+
+**Hierarchy:** recursive Category, depth 5.
+
+**Permissions:** `catalog.categories.view|create|update|delete|manage`
+
+**Entitlement:** `product_catalog`
+
+**API:**
+
+```http
+GET    /api/v1/categories
+GET    /api/v1/categories/tree
+GET    /api/v1/categories/{id}
+POST   /api/v1/categories
+PUT    /api/v1/categories/{id}
+DELETE /api/v1/categories/{id}
+POST   /api/v1/tenant-admin/categories/{categoryId}/image
+DELETE /api/v1/tenant-admin/categories/{categoryId}/image
+```
+
+**Media:** upload/replace/remove via tenant-admin category image endpoints (not write `imageUrl` on Create/Update).
+
+**Product Setup:** recursive effectively-ACTIVE category hierarchy via `GET /api/v1/tenant-admin/products/create-options` (backend enforces **BR-CAT-PRODUCT-SELECT-001**); persist `CategoryId` only.
+
+**Management tree:** `GET /api/v1/categories/tree` — ACTIVE+INACTIVE, DELETED excluded, no `status` query parameter.
+
+Journeys **TA-UJ-035 … TA-UJ-039 remain NOT COMPLETE** (Flutter pending). Do not mark full journey COMPLETE.
+
+Authority: [[../13_DECISIONS_AND_CHANGES/ADR/ADR_010_Category_Decoupled_From_Department]], [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_PERMISSION_FIRST_BACKEND_IMPLEMENTATION_CLOSURE_2026-08-27]], [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_BACKEND_GAP_FIX_CLOSURE_2026-08-27]].

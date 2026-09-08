@@ -1,7 +1,7 @@
 <!-- title: Product Core Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Product Core Module Overview
 
@@ -31,7 +31,7 @@ merchandising, attractions, and temporary retail locations.
 | `products` | Stores parent product records, setup steps, status, and audit parameters. |
 | `product_variants` | Stores sellable variant details, SKU, and barcode links. |
 | `product_import_batches` | Stores metadata for CSV product import runs. |
-| `product_setup_initial_tracking` | TARGET 1:1 draft for Initial Tracking Details (GAP). |
+| `product_setup_initial_tracking` | 1:1 draft for Initial Tracking Details (collected on Step 2). |
 
 ## Core Business Rules
 
@@ -40,7 +40,7 @@ merchandising, attractions, and temporary retail locations.
 - Variants carry sellable identity; price and stock remain separate modules.
 - Inactive products cannot be sold through POS or online store.
 - POS may cache product reference data, but backend remains final authority.
-- Add Product Step 1 may collect optional Initial Tracking Details (Batch Number, Expiry Date, Serial Number). Those values are provisional wizard input. Tracking policy remains Step 2 (`product_inventory_settings`). Actual identity is created at Step 7 Publish into `product_batches` / `serial_numbers`. Product Setup must not invent stock quantity.
+- Add Product Step 2 may collect optional Initial Tracking Details (Batch Number, Expiry Date, Serial Number) after Product Type is selected. Those values are provisional wizard input. Tracking policy remains Step 2 (`product_inventory_settings`). Actual identity is created at Step 7 Publish into `product_batches` / `serial_numbers`. Product Setup must not invent stock quantity.
 
 ### Bundle / Kit Core Domain Rules
 - Bundle / Kit is defined as one sellable parent Product, one parent SKU, one parent Barcode, one Bundle selling price, and multiple existing Product / exact Variant components.
@@ -73,7 +73,7 @@ merchandising, attractions, and temporary retail locations.
 ## Out Of Scope
 
 - Price list calculation
-- Tax rule ownership
+- Tax rule ownership (see [[../14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]; Product owns TaxSetupId + TaxPriceMode only)
 - Stock movement ledger
 - Customer cart persistence
 
@@ -83,4 +83,5 @@ merchandising, attractions, and temporary retail locations.
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/03_Technical_Contract]]
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/04_Tenant_Admin_Product_List_And_Import_Contract]]
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
+- [[13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
 - [[02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]

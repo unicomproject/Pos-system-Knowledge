@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin Add Product Review And Create Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-04 -->
 
 # Tenant Admin Add Product Review & Create Specification
 
@@ -22,17 +22,21 @@ Displays fields from Step 1:
 - Descriptions
 - Product Images
 - Channel Visibility (POS, Online Store)
-- **Initial Tracking Details** (TARGET): only remaining applicable values after Step 2 reconciliation.
-  - Batch + Expiry example: Tracking Method, Initial Batch Number, Initial Expiry Date.
-  - Serial example: Tracking Method, Initial Serial Number.
-  - VARIANT: also show the assigned variant (`initialTrackingAssignedVariantId`) or block Create until selected.
-  - Do not display cleared/incompatible fields.
+
+Initial Tracking Details are **not** Step 1 fields. Show remaining applicable
+identity values with Product Type & Tracking (section B), after Step 2
+reconciliation.
 
 ### B. Product Type & Tracking
 Displays fields from Step 2:
 - Product Structure (Simple, Variant, Bundle)
 - Track Inventory (Yes/No)
 - Batch Tracking, Expiry Tracking, Serial Tracking
+- **Initial Tracking Details**: only remaining applicable values after Step 2 reconciliation.
+  - Batch + Expiry example: Tracking Method, Initial Batch Number, Initial Expiry Date.
+  - Serial example: Tracking Method, Initial Serial Number.
+  - VARIANT: also show the assigned variant (`initialTrackingAssignedVariantId`) or block Create until selected.
+  - Do not display cleared/incompatible fields.
 - POS Sellable
 - Desired Publish Status
 
@@ -51,9 +55,9 @@ Displays fields from Step 5:
 - Saved identifiers for the sellable variant(s).
 
 ### F. Pricing & Tax
-Displays fields from Step 6 (Simplified Pricing & Tax):
-- Cost Price, Standard Selling Price, Discount Price
-- Tax Name, Tax Rate, Tax Exclusive
+Displays fields from Step 6 (structure-aware; see 7-Step contract §6.1–6.5):
+- **SIMPLE / BUNDLE:** Standard Selling Price, Tax Class (rate in label), Tax Presentation (Exclusive/Inclusive). Tax Preview is wizard-only (not required on Review). Cost/Discount omitted unless present in state. Currency from tenant `create-options` (no currency banner/dropdown).
+- **VARIANT:** Do **not** show a single fake parent selling price when variants differ. Show Tax Class, Tax Presentation / Effective Tax Rate, priced/pending counts, and **Price Range** (or per-variant price list when space allows). Bulk helper (**Set Same Price for All Variants**) is not Review authority.
 
 ## 4. Edit Flow
 Each Review section can trigger an `Edit` action:
@@ -61,6 +65,13 @@ Each Review section can trigger an `Edit` action:
 2. Frontend opens corresponding wizard step.
 3. User edits and saves changes.
 4. Backend persists data and frontend reloads authoritative Review snapshot.
+
+## 4.1 Post-create success screen
+After Create Product succeeds, the wizard is replaced by the Product Created Successfully card (not a toast).
+- Summary is structure-aware (SIMPLE vs VARIANT) and uses the created product — no sample values.
+- **View Product** opens product detail view.
+- **Add Another Product** starts a new wizard at Step 1.
+- **Back to Products** opens Product List (list data refreshed).
 
 ## 5. Functional Requirements
 - **FR-RC-001:** Review page loads persisted wizard data.
@@ -76,7 +87,10 @@ Each Review section can trigger an `Edit` action:
 - **FR-RC-011:** Publish is transactional.
 - **FR-RC-012:** Publish applies configured ACTIVE/INACTIVE final status.
 - **FR-RC-013:** Publish records publication/audit metadata.
-- **FR-RC-014:** Success redirects to Product List.
+- **FR-RC-014:** Success shows the **Product Created Successfully** screen (not a toast, and not an automatic redirect to Product List).
+- **FR-RC-014a:** **View Product** opens the product detail view (`/tenant-admin/products/{productId}`).
+- **FR-RC-014b:** **Add Another Product** starts a fresh Add Product wizard at Step 1.
+- **FR-RC-014c:** **Back to Products** opens Product List.
 - **FR-RC-015:** Product List refreshes from backend.
 - **FR-RC-016:** Failure preserves draft and user data.
 - **FR-RC-017:** Concurrency conflict does not overwrite newer state.
@@ -114,7 +128,7 @@ Each Review section can trigger an `Edit` action:
 UI -> Controller/Notifier -> Repository -> API Service -> Backend
 ```
 - **States:** `ProductReviewState`, `ProductReviewSnapshot`, `ProductReviewSection`, `ProductReviewValidationItem`, `ProductPublishState`.
-- **Responsibilities:** `loadReview`, `refreshReview`, `openSectionForEdit`, `returnFromEdit`, `publishProduct`, `handleValidationFailure`, `handleConcurrencyConflict`, `handlePermissionFailure`, `handlePublishSuccess`.
+- **Responsibilities:** `loadReview`, `refreshReview`, `openSectionForEdit`, `returnFromEdit`, `publishProduct`, `handleValidationFailure`, `handleConcurrencyConflict`, `handlePermissionFailure`, `handlePublishSuccess` (show Product Created Successfully screen; do not toast-only).
 - **Rule:** Review widget must not calculate validation status or inject sample values.
 
 ## 9. API Contract
@@ -153,12 +167,13 @@ UI -> Controller/Notifier -> Repository -> API Service -> Backend
 | Variant/Bundle Info | 4 | VariantConfiguration | SaveProductDraftRequest | ProductVariant | product_variants.* | VariantConfiguration | Variant Count |
 | SKU | 5 | BarcodeSkuConfiguration | SaveProductDraftRequest | ProductVariant | product_variants.sku | Sku | SKU Search |
 | Barcode | 5 | BarcodeSkuConfiguration | SaveProductDraftRequest | ProductBarcode | product_barcodes.barcode | Barcode | Barcode Scan |
-| Cost Price | 6 | PricingTax.CostPrice | SaveProductDraftRequest | Product | products.reference_cost_price | PricingTax.CostPrice | Cost Calc |
-| Standard Selling Price | 6 | PricingTax.StandardSellingPrice | SaveProductDraftRequest | PriceListItem | price_list_items.compare_at_price | PricingTax.StandardSellingPrice | Price Display |
-| Discount Price | 6 | PricingTax.DiscountPrice | SaveProductDraftRequest | PriceListItem | price_list_items.selling_price | PricingTax.DiscountPrice | Active Price |
+| Cost Price | 6 | PricingTax.CostPrice (optional; product-level) | SaveProductDraftRequest | Product | products.reference_cost_price | PricingTax.CostPrice | Cost Calc (redacted without cost.view) |
+| Standard Selling Price (SIMPLE) | 6 | PricingTax.StandardSellingPrice | SaveProductDraftRequest | PriceListItem | price_list_items.selling_price (or compare_at when discounted) | PricingTax.StandardSellingPrice | Price Display |
+| Discount Price (SIMPLE path when used) | 6 | PricingTax.DiscountPrice | SaveProductDraftRequest | PriceListItem | price_list_items.selling_price (+ compare_at = standard) | PricingTax.DiscountPrice | Active Price |
+| Variant Selling Prices (VARIANT TARGET) | 6 | PricingTax.variantPrices[] keyed by ProductVariantId | SaveProductDraftRequest | PriceListItem | price_list_items.selling_price WHERE product_variant_id set | PricingTax.VariantPrices / PriceRange | List uses priceFrom–priceTo |
 | Tax Name | 6 | PricingTax.TaxClassId | SaveProductDraftRequest | TaxClass | tax_classes.tax_class_name | PricingTax.TaxName | Tax Details |
-| Tax Rate | 6 | PricingTax.TaxClassId | SaveProductDraftRequest | TaxRate | tax_rates.rate_percent | PricingTax.TaxRatePercentage | Tax Calc |
-| Tax Exclusive | 6 | PricingTax.TaxExclusive | SaveProductDraftRequest | N/A | Calculated | PricingTax.TaxExclusive | Price Type |
+| Tax Rate (derived) | 6 | PricingTax.TaxClassId | SaveProductDraftRequest | TaxRate | tax_rates.rate_percent (effective) | PricingTax.TaxRatePercentage | Tax Calc |
+| Tax Exclusive | 6 | PricingTax.TaxExclusive | SaveProductDraftRequest | Product | products.is_tax_exclusive | PricingTax.TaxExclusive | Price Type |
 | Desired Product Status | 2 | DesiredPublishActive | SaveProductDraftRequest | Product | products.desired_publish_status | DesiredPublishStatus | Publish State |
 | Initial Batch Number | 1 | InitialBatchNumber | SaveProductDraftRequest | Draft tracking | TARGET product_setup_initial_tracking.initial_batch_number | InitialBatchNumber | None (identity, not list qty) |
 | Initial Expiry Date | 1 | InitialExpiryDate | SaveProductDraftRequest | Draft tracking | TARGET product_setup_initial_tracking.initial_expiry_date | InitialExpiryDate | None |
@@ -166,6 +181,7 @@ UI -> Controller/Notifier -> Repository -> API Service -> Backend
 
 ## 12. Test Contract
 - **Review Rendering:** Asserts structure-specific rendering, no sample values leak, skipped steps hide.
+- **Create Success Screen:** Asserts post-create card (not toast), View Product → detail route, Add Another → Step 1, Back to Products → list. SIMPLE hides Total Variants; VARIANT shows included variant / SKU counts from wizard state.
 - **Review Edit:** Asserts edit/cancel behavior against `GetSetupAsync`.
 - **Publish Validation:** Asserts missing fields, duplicate identifiers, invalid graphs return 400/409.
 - **Publish Transaction:** Asserts single row update, no duplicate creation, `published_at` set.

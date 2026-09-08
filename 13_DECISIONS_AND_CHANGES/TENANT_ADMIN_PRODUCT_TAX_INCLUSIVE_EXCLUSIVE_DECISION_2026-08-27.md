@@ -24,7 +24,10 @@ Where applicable (API, Database, State):
 - `taxExclusive = true` → Exclusive
 
 ### Tax Management Linkage
-Tax Name and Tax Rate originate strictly from tenant Tax Management records. Hardcoding of "VAT 18%" rules is prohibited; the product must reference valid configured tax records.
+Tax Name and Tax Rate originate strictly from tenant **Tax Setup** records (Tax Management). Hardcoding of "VAT 18%" rules is prohibited; the product must reference a valid `TaxSetupId` / `TaxClassId`. Inclusive/Exclusive remains **product-owned** (`TaxPriceMode`), not Tax Setup identity.
+
+Canonical Tax Management contract (2026-09-03): [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]  
+Decision register: [[TENANT_ADMIN_TAX_MANAGEMENT_DECISION_REGISTER_2026-09-03]]
 
 ### Tax Inclusive Business Rule
 When **Tax Inclusive** is selected (`taxExclusive = false`), the entered selling price already includes tax.
