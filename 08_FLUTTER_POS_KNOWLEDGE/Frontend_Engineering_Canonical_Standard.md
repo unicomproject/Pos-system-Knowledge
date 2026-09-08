@@ -1,7 +1,7 @@
 <!-- title: Frontend Engineering Canonical Standard -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-19 -->
+<!-- last_updated: 2026-08-31 -->
 
 # Frontend Engineering Canonical Standard
 
@@ -71,6 +71,33 @@ names a concern.
    constants.
 9. Do not expose tokens, credentials, PINs, payment data, or PII in logs.
 10. Update Second Brain when implementation introduces new reusable knowledge.
+11. Filter navigation/actions/components by entitlement and granular permission
+    before responsive composition; hidden items consume no layout space.
+12. Notifications require their underlying feature permission and scope in
+    addition to notification-infrastructure access.
+13. POS brand styling consumes the backend-driven theme through `ThemeData`,
+    theme providers, and shared tokens; feature widgets do not hardcode tenant
+    brand colours.
+14. Typography, spacing, radius, elevation, control sizing, and icons use
+    canonical tokens/shared component styles rather than screenshot-derived
+    repeated literals.
+15. Production business values come from authoritative API/domain state and
+    production feature screens contain no mock business data. Mock values are
+    restricted to tests/prototypes. Tenant branding comes through canonical
+    theme state, not feature-screen hardcoding.
+
+## Separation of Concerns
+
+```text
+backend theme + permissions + entitlements + responsive breakpoint
+→ permitted component set
+→ responsive composition
+→ theme-driven rendering
+```
+
+Permissions determine what is visible. Responsive rules determine arrangement.
+Theme determines styling. Backend authorization independently determines real
+access and remains the security authority.
 
 ## When to Update Second Brain
 

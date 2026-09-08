@@ -1,7 +1,7 @@
 <!-- title: Frontend Reusable Component Governance -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-19 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Frontend Reusable Component Governance
 
@@ -21,10 +21,27 @@ Second Brain reusable component catalogue
 current Flutter source code
 ```
 
+The canonical implemented POS dimension/path registry is
+[[../07_UI_UX_KNOWLEDGE/POS_Reusable_Component_Specifications]]. A screen must
+reference the registry entry and variant; it must not re-measure an approved
+component from a prototype or screenshot.
+
 If an approved shared component exists: **REUSE IT**. Do not recreate it.
 
 Search by visual role, behaviour, class name, labels, tokens, and usage—not only
 by the proposed new name. Record the result in the screen Reuse Matrix.
+
+Every candidate is classified before implementation:
+
+| Classification | Meaning |
+|---|---|
+| `REUSE` | Existing component is used unchanged |
+| `EXTEND` | Existing owner is safely enhanced without duplicated ownership |
+| `SHARED/NEW` | A genuinely reusable cross-feature component is newly owned in the approved shared location |
+| `FEATURE-LOCAL` | New component is specific to one feature/screen and remains under that feature |
+
+Search shared widgets, current feature widgets, design-system components, and
+similar screen implementations before selecting a classification.
 
 ## Single Implementation Rule
 
@@ -102,6 +119,12 @@ Use this format in the relevant component catalogue:
 | Used By | Known screens/features |
 | Status | Proposed / Approved / Implemented / Deprecated |
 
+An implemented registry entry must also record, where source proves them:
+width/height behaviour, padding, internal and inter-component gaps, border,
+radius, elevation, icon/container sizes, typography, colour authority and
+responsive standard/compact rules. Unowned or contradictory values are marked
+`GAP`; they are never silently normalized.
+
 Registry entries must reflect actual source. Never mark a proposed class as
 implemented. Existing feature catalogues such as
 [[Tenant_Admin_Settings_Component_Catalogue]] remain valid specialised
@@ -113,8 +136,14 @@ catalogues and should link to this governance standard.
 - Reuse Matrix completed.
 - No equivalent class or copied widget tree exists.
 - Tokens, interactive states, semantics, and responsive behaviour align.
+- Permission-hidden children are filtered before collection layout and do not
+  preserve blank slots.
+- Shared components consume canonical theme/typography tokens and do not own an
+  independent feature colour system.
 - Shared change has focused regression tests for existing consumers.
 - Registry and relevant screen specification are updated.
+- Component dimensions, variant, colour authority, typography and spacing link
+  to the canonical component specification instead of screenshot literals.
 
 ## Related Files
 
@@ -122,4 +151,5 @@ catalogues and should link to this governance standard.
 - [[Frontend_Screen_Development_Second_Brain_Workflow]]
 - [[Frontend_Screen_Implementation_Specification_Template]]
 - [[../07_UI_UX_KNOWLEDGE/Design_System]]
+- [[../07_UI_UX_KNOWLEDGE/POS_Reusable_Component_Specifications]]
 - [[Flutter_Folder_Structure]]

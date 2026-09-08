@@ -5,6 +5,22 @@
 
 # API Authorization Rules
 
+## Payment Availability and Notification Filtering (2026-09-03)
+
+Checkout summary must advertise only methods allowed by `pos.sales.checkout.execute`, the
+method-specific existing accept permission, configuration and runtime capability.
+Start-payment revalidates the selected method. `pos.notifications.alerts.view` authorizes
+notification infrastructure only: the backend must additionally filter records
+by effective feature permissions before returning payloads and before calculating
+unread counts. Frontend hiding is not an authorization boundary.
+
+Implemented POS staff endpoint: `GET /api/v1/pos/notifications`. It requires
+`pos.notifications.alerts.view`, derives tenant/user from authenticated claims,
+and filters source modules before pagination and unread count. Sales requires
+`pos.sales.checkout.execute`, Online Orders requires
+`commerce.online_order.orders.access`, and Returns/Refunds require
+`pos.returns.search_sale.view`. Unknown sources fail closed.
+
 ## Purpose
 
 This file defines how Release 1 APIs must enforce authentication, authorization, tenant isolation, entitlement, permission, device, outlet, and till-session rules using the canonical **4-Tier Permission Taxonomy** (`domain.module.feature.action`).

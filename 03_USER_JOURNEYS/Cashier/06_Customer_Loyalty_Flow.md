@@ -84,6 +84,9 @@ presented as working filters.
 
 ## Attach Rules
 
+These rules belong to standalone Customer Management only. They do not govern
+the Payment Method checkout-customer workflow.
+
 Attach requires `pos.customers.management.view` plus `pos.sales.cart.manage` (legacy: `customers.view` + `sales.cart.manage`). Only an `ACTIVE`
 customer is eligible. Current rejection codes are:
 
@@ -94,6 +97,21 @@ customer is eligible. Current rejection codes are:
 
 Flutter permission state is UX only. Attach and checkout independently recheck
 tenant ownership and customer status on the backend.
+
+## Checkout Find Or Add Customer
+
+Current Sale **Proceed to Payment** launches the dedicated full-screen mobile-only workflow defined
+in [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Checkout_Customer_Selection_Implementation_Specification]].
+It does not reuse this management list, modal, generic search, pagination, or
+Attach-to-Sale action.
+
+A valid phone starts one deterministic exact normalized-phone search. A found
+customer is not selected until **ADD TO SALE & CONTINUE**. No result permits a
+phone-and-name-only quick create when `customers.create` is granted. Either
+success updates the active cart customer, revalidates checkout, and advances to
+Payment Method. **SKIP** clears/keeps the cart customer null, revalidates the
+walk-in checkout summary, and advances to Payment Method. Payment Method may
+re-enter this selector only to change the current choice.
 
 ## Deferred Functionality
 

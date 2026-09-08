@@ -192,6 +192,7 @@ Purpose: Stores fulfillment execution headers.
 | `cancellation_reason` | text |  | NULL | Cancellation reason. |
 | `assigned_to_tenant_user_id` | uuid | FK | NULL | Assigned tenant user. |
 | `fulfillment_note` | text |  | NULL | Fulfillment note. |
+| `row_version` | bigint | concurrency | NOT NULL | Shared fulfilment optimistic-concurrency version; default 1 and incremented by successful mutations. |
 | `created_at` | timestamptz |  | NOT NULL | Creation timestamp. |
 | `created_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id). |
 | `updated_at` | timestamptz |  | NOT NULL | Last update timestamp. |
@@ -211,7 +212,29 @@ FK(created_by_tenant_user_id) REFERENCES tenant_users(id)
 FK(updated_by_tenant_user_id) REFERENCES tenant_users(id)
 UNIQUE(tenant_id, fulfillment_number)
 CHECK(fulfillment_status IN ('PENDING', 'ALLOCATED', 'PICKING', 'PICKED', 'PACKED', 'READY', 'FULFILLED', 'CANCELLED'))
+CHECK(row_version >= 1)
 ```
+
+OO-03 adds no table, column or migration. It reuses this shared `row_version`,
+existing assignment/audit fields and `fulfillment_order_events`. Successful
+Start persists one `FULFILLMENT_STARTED` event with prior/current status,
+authenticated tenant-user actor and server timestamp in the same transaction.
+
+OO-04 adds no table, column or migration. It reuses
+`fulfillment_orders.row_version`, fulfilment-line requested/picked quantities,
+line status/picker, and append-only events. Location display may use existing
+`inventory_locations.location_code` and `location_name`; aisle/rack/bin,
+remaining/count/progress and Today/Tomorrow/overdue labels are not columns.
+Chunk 2 persists `FULFILLMENT_LINE_PICKED`,
+`FULFILLMENT_LINE_ISSUE_REPORTED` and `FULFILLMENT_PICKING_COMPLETED` in the
+existing event table. Line identity and safe operation facts use existing event
+payload JSON. Issue is audit-only and non-blocking. Picking Note reuses
+`fulfillment_order_events.event_note` with event type
+`FULFILLMENT_PICKING_NOTE_ADDED`, existing tenant/fulfilment association,
+`event_by_tenant_user_id`, `event_at` and sequence. It increments the aggregate
+row version atomically but changes no quantity/status/pack eligibility. No
+issue/note table, column or migration was added. Progress and `canPack` are
+derived from existing quantities.
 
 ## `fulfillment_order_lines`
 
@@ -388,7 +411,8 @@ Required conceptual columns: `id`, `tenant_id`, `fulfillment_package_id`, `fulfi
 ### Relationship and concurrency additions
 
 - Add nullable `fulfillment_order_lines.inventory_reservation_line_id` → canonical inventory reservation line. It provides exact allocation/pick traceability; it does not create another reservation table.
-- Add repository-standard optimistic concurrency to `fulfillment_orders` and `pickup_orders`; canonical target name/type is `row_version bigint NOT NULL` unless implementation confirms the repository standard differs.
+- `fulfillment_orders.row_version bigint NOT NULL DEFAULT 1` is implemented as shared fulfilment concurrency infrastructure by migration `20260831064535_AddSharedFulfillmentOrderConcurrency`; EF marks it as a concurrency token and every successful fulfilment mutation increments it. Stale expected/persisted versions fail without overwriting current state. This is not an OO-02 display-specific field.
+- Add repository-standard optimistic concurrency to `pickup_orders` before implementing independent concurrent pickup-header mutations; canonical target name/type remains `row_version bigint NOT NULL` unless a later provider-standard decision supersedes it.
 - Keep QR material on `pickup_orders` as hash/version/expiry. Raw QR token, separate QR table and client-authoritative used flag are rejected. Successful collection and append-only pickup events provide single-use finality.
 
 ### Explicitly rejected duplicate concepts

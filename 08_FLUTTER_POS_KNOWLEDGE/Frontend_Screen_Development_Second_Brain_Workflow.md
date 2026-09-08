@@ -1,7 +1,7 @@
 <!-- title: Frontend Screen Development Second Brain Workflow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Frontend Screen Development Second Brain Workflow
 
@@ -27,16 +27,19 @@ decision or implementation.
 7. Search current Flutter code
 8. Create Reuse Matrix
 9. Fill Screen Implementation Specification
-10. Confirm Design Tokens / Shared Components
-11. Define State / Data Flow
-12. Implement Screen
-13. Check Responsive Runtime
-14. Test loading / empty / errors / permission / validation / double-submit / network / hardware
-15. Run flutter analyze + focused tests + flutter test
-16. Update Second Brain if new reusable knowledge was introduced
+10. Audit screen/action/route/notification permissions and 0/1/many-item reflow
+11. Confirm backend theme, semantic, typography and layout token mappings
+12. Confirm Design Tokens / Shared Components against
+    [[../07_UI_UX_KNOWLEDGE/POS_Reusable_Component_Specifications]]
+13. Define State / Data Flow
+14. Implement Screen
+15. Check Responsive Runtime
+16. Test loading / empty / errors / permission / validation / double-submit / network / hardware
+17. Run flutter analyze + focused tests + flutter test
+18. Update Second Brain if new reusable knowledge was introduced
 ```
 
-No frontend implementation should start before steps 1–11 have been
+No frontend implementation should start before steps 1–13 have been
 considered. A target image does not replace journey, API, permission, responsive,
 state, accessibility, or reuse analysis.
 
@@ -60,6 +63,26 @@ Read
 Every `new` decision needs a reason. New shared components require a registry
 entry; reused components should be referenced rather than redocumented.
 
+Before implementation, record screen access, every business action, route/deep
+link, and notification feature/domain permission. Verify zero, one, and
+multiple visible-action layouts without empty reserved gaps. Record which
+elements use backend theme tokens versus semantic tokens, and map typography
+and repeated dimensions to canonical styles/tokens.
+
+For every card, button, field, chip, dialog, image, row and navigation element,
+record:
+
+```text
+Component → existing Flutter path → REUSE / EXTEND / SHARED/NEW / FEATURE-LOCAL
+→ implemented variant → canonical dimension reference → colour authority
+→ typography token → spacing token/rule
+```
+
+The workflow is search registry and source → REUSE → EXTEND when required →
+SHARED/NEW only with a genuine reusable owner → FEATURE-LOCAL only for genuine
+screen-specific composition. Screenshot/prototype pixels do not override the
+component specification.
+
 ## Data Flow Definition
 
 Record screen event → provider/controller → use case → repository → remote/local
@@ -81,3 +104,4 @@ runtime acceptance.
 - [[Frontend_Reusable_Component_Governance]]
 - [[Frontend_Screen_Implementation_Specification_Template]]
 - [[../07_UI_UX_KNOWLEDGE/Design_System]]
+- [[../07_UI_UX_KNOWLEDGE/POS_Reusable_Component_Specifications]]

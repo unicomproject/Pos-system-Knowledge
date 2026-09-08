@@ -4,8 +4,8 @@
 |---|---|
 | Journey | `POS-UJ-036` Online Order Fulfilment / Click & Collect |
 | Layer | Approved prototype flow and production journey mapping |
-| Status | **OO-01 APPROVED TARGET CANONICALIZED; CHUNK 2/3 IMPLEMENTATION PENDING** |
-| Updated | 2026-08-27 |
+| Status | **OO-01 ACCEPTED; OO-02/OO-03 IMPLEMENTED / RUNTIME ACCEPTANCE OPEN** |
+| Updated | 2026-09-01 |
 | Authority | Journey and module rules outrank this prototype specification |
 
 ## Authority chain
@@ -25,7 +25,7 @@ The HTML prototype is a visual validation artefact. It is not a business-rule, a
 |---|---|---|
 | OO-01 | Online Order Queue | Search and review eligible outlet orders; open detail without mutation. |
 | OO-02 | Online Order Detail | Review customer, collection, payment and item facts. |
-| OO-03 | Start Preparation | Confirm start and assign operational ownership. |
+| OO-03 | Start Fulfilment Confirmation | Confirm Start before invoking the existing atomic command. |
 | OO-04 | Picking Workspace | Display progress, sequence, locations and remaining units. |
 | OO-05 | Scan / Confirm Pick | Validate barcode or permitted manual entry per line. |
 | OO-06 | Review & Pack | Reconcile picked quantities and capture packing data. |
@@ -50,7 +50,7 @@ All IDs are sub-states of `POS-UJ-036`, not independent journeys.
 flowchart TD
   A[Online Order Received] --> O1[OO-01 Queue]
   O1 --> O2[OO-02 Detail]
-  O2 --> O3[OO-03 Start Preparation]
+  O2 --> O3[OO-03 Start Fulfilment Confirmation]
   O3 -->|outlet/reservation valid; assignment accepted| O4[OO-04 Picking]
   O3 -->|validation failure| O2
   O4 --> O5[OO-05 Scan / Confirm Pick]
@@ -92,6 +92,14 @@ flowchart TD
 - Loading, refreshing, empty, empty-search, retry/error, denied, not-entitled and network/server failure are distinct states.
 - The orange priority star is a visual requirement without verified business authority; it adds no priority API/persistence semantics.
 
+### OO-02 approved detail boundary
+
+- OO-02 is a read-only detail state. It composes order/customer, collection, payment and item-line facts from the staff detail response and keeps the shared POS shell.
+- Back returns to OO-01. View Details is disclosure/navigation only. Start Fulfilment opens OO-03; no start request is sent until OO-03 confirmation.
+- Customer classification, source, product image, options and line progress are optional authoritative facts. Missing fields are omitted or given a neutral unavailable treatment, never replaced by prototype content.
+- Each line uses its own ordered quantity. An order-level item/unit count is not repeated as per-line picking progress.
+- Desktop/tablet landscape may keep summary groups side by side. Tablet portrait/phone stack them and scroll vertically without horizontal overflow.
+
 - OO-05 invalid barcode stays on OO-05, does not increment picked quantity, and clearly identifies the mismatch.
 - “Can’t Find Item” opens the issue-entry path only; it never silently shorts, substitutes, cancels, or changes inventory.
 - OO-11 must distinguish `INVALID_QR`, `NOT_READY`, `ALREADY_COLLECTED`, `EXPIRED`, `CANCELLED`, and `WRONG_OUTLET`; recovery is QR retry or OO-14 where allowed.
@@ -105,8 +113,8 @@ flowchart TD
 | Current UI | Action | Backend command | Success next | Failure state | Permission |
 |---|---|---|---|---|---|
 | OO-01 | Tap card chevron | Read detail | OO-02 | Inline error / retry | `commerce.online_order.orders.access`, `commerce.online_order.orders.view` |
-| OO-02 | Start preparation | Start fulfilment | OO-03 then OO-04 | Remain OO-02 | `commerce.online_order.fulfilment.start` |
-| OO-03 | Confirm assignment | Start/assign | OO-04 | Validation message | `commerce.online_order.fulfilment.start` |
+| OO-02 | Select Start Fulfilment | No mutation; open confirmation | OO-03 | Remain OO-02 | `commerce.online_order.fulfilment.start` for enabled action |
+| OO-03 | Confirm assignment/start | Atomic start/assign | OO-04 | Return/remain on OO-02 with refreshed authority | `commerce.online_order.fulfilment.start` |
 | OO-04 | Open line | Read picking state | OO-05 | Inline error | `commerce.online_order.picking.view` |
 | OO-05 | Scan barcode | Confirm scanned pick | OO-04 or OO-06 | Remain OO-05 | `commerce.online_order.picking.pick`, `commerce.online_order.picking.scan` |
 | OO-05 | Manual confirm | Confirm manual pick | OO-04 or OO-06 | Remain OO-05 | `commerce.online_order.picking.pick`, `commerce.online_order.picking.manual_entry` |
@@ -131,4 +139,12 @@ Names, order numbers, amounts, times, SKUs, barcodes and QR values in a prototyp
 
 ## Exit criterion
 
-Flow coverage, recovery routes, authorization points, API ownership and persistence ownership are specified. The approved OO-01 target is documentation-complete only; backend is pending Chunk 2, Flutter is pending Chunk 3, and E2E is pending. Later states remain governed by this flow and their own implementation evidence.
+Flow coverage, recovery routes, authorization points, API ownership and persistence ownership are specified. OO-01 completion follows its acceptance tracker. OO-02 detail and OO-03 Start source implementation are complete; authenticated responsive UI-to-database E2E remains open. Later states remain governed by this flow and their own implementation evidence.
+
+## OO-03 confirmation contract
+
+- Open from OO-02 only after permission/state eligibility; opening performs no request or mutation and reuses current detail.
+- Show Order, Customer, Collection, Collect by with server-time-derived remaining/overdue text, and Items as item/unit counts.
+- Cancel closes only. Confirm sends the current `expectedVersion`, locks repeat input and invokes one Start request.
+- Success enters OO-04 only after authoritative backend success. A 409 refetches OO-02 detail/version, shows safe conflict feedback and never enters OO-04.
+- OO-03 owns confirmation only. Picking line work remains OO-04.

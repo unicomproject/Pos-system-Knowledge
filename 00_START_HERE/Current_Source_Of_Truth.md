@@ -6,6 +6,14 @@
 
 # Current Source Of Truth
 
+## POS Payment Method Selection (2026-09-03)
+
+The documentation-only selection contract is canonicalized in
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_POS_Payment_Method_Selection_Implementation_Specification]].
+It governs Sale -> Customer -> Payment Method -> separate execution, a
+backend-authorized Cash/Card/QR/Split list, explicit Continue and the 4/3/2/1/0
+responsive grid. Store Credit and Credit Sale/Pay Later are excluded.
+
 ## Purpose
 
 This file defines which project inputs control the OneVerz POS MVP Second Brain.
@@ -76,6 +84,7 @@ Authorities:
 - [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Reusable_Component_Governance]]
 - [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Screen_Development_Second_Brain_Workflow]]
 - [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Screen_Implementation_Specification_Template]]
+- [[../07_UI_UX_KNOWLEDGE/POS_Reusable_Component_Specifications]]
 
 ### Backend feature development
 
@@ -189,13 +198,43 @@ Overall hardware production readiness remains **BLOCKED** until mandatory physic
 
 Overall POS Hardware remains **BLOCKED** until physical PR/DR/SC gates pass.
 
+## POS Checkout Find Or Add Customer Authority (2026-09-03)
+
+The canonical checkout customer journey is governed by
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Checkout_Customer_Selection_Implementation_Specification]].
+The canonical route order is `Current Sale (Cart) -> Find/Add/Skip Customer (/pos/new-sale/customer) -> Payment Method (/pos/new-sale/payment) -> Payment Execution`.
+The old route order (`Cart -> Payment Method -> Customer -> Payment Method`) is explicitly superseded as the primary checkout flow.
+Customer is OPTIONAL: Cashier may press **SKIP** on initial phone entry to continue as Walk-in (`CustomerId = null`), explicitly press **ADD TO SALE & CONTINUE** for a found customer, or press **ADD CUSTOMER & CONTINUE** for quick-created customer.
+Dedicated full-screen mobile search/create workflow is distinct from Customer Management (`/pos/customers`).
+Payment Method Customer card provides re-entry to edit or clear the customer.
+Second Brain is READY/CANONICALIZED; existing backend APIs are reused with deterministic exact
+normalized-phone behaviour; no database change is required.
+
 ## Highest Priority Decision
 
-## Online Order Fulfilment / Click & Collect authority (updated 2026-08-27)
+## Online Order Fulfilment / Click & Collect authority (updated 2026-09-02)
 
-Cashier/store operational Click & Collect is governed by [[../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]], module contract [[../04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]], database contract [[../06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup_UPDATED]], and Flutter ownership [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Order_ClickCollect_Fulfilment]]. The approved 2026-08-27 OO-01 target supersedes the earlier table/tab/filter queue: its contract is canonicalized, the new staff list API is pending Chunk 2, Flutter under `lib/features/fulfilment_pickup/` is pending Chunk 3, and authenticated E2E remains pending. The 2026-08-24 implementation audit is historical evidence for the superseded implementation and is not target-screen completion proof. Public storefront fulfilment reads do not prove staff operational completion.
+Cashier/store operational Click & Collect is governed by [[../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]], module contract [[../04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]], database contract [[../06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup_UPDATED]], and Flutter ownership [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Order_ClickCollect_Fulfilment]]. The approved OO-01 queue supersedes the earlier table/tab/filter queue and is accepted by [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO01_Canonicalization_Status_2026-08-27]]; its sole active widget owner is `oo01_online_orders_widgets.dart`. OO-02 Order Detail is canonicalized by those same authorities and [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO02_Canonicalization_Status_2026-08-31]]. OO-03 Start Fulfilment Confirmation is governed by [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO03_Canonicalization_Status_2026-09-01]]: it is a side-effect-free shared-modal confirmation until Confirm invokes the existing Start POST with current `expectedVersion`. Online-order semantics and shared CTA/modal ownership are recorded in [[../07_UI_UX_KNOWLEDGE/POS_Reusable_Component_Specifications]]. The staff detail GET and atomic Start Fulfilment POST are implemented. Shared `FulfillmentOrder.row_version` optimistic concurrency rejects stale Start commands with HTTP 409 and protects future fulfilment mutations. Backend Chunk 2 for OO-03 is verification-only; no new controller/API/table/column/migration is expected. Authenticated UI-to-database Start/Picking, two-session runtime conflict evidence and actual-device confirmation comparison remain required, so production acceptance is still open. Public storefront reads and the generic status PATCH are not substitutes for these staff contracts.
 
 The approved prototype/UI layer is governed by [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Prototype_Flow]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Visual_Direction]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Component_Inventory]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_UI_API_Mapping]], and [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_UI_DB_Mapping]]. Prototype values remain display-only. Production Flutter composes the approved structure from staff API/provider data; the prototype never overrides journey, module, permission, API, or database authorities.
+
+OO-04 Picking is canonicalized by
+[[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
+Existing Flutter picking code is partial scaffolding only. Backend picking
+detail/pick/issue contracts, runtime permission catalogues/enforcement, atomic
+events, backend `canPack` and expected-version conflict handling are implemented
+under the existing `ClickCollectOrdersController`/Customer Orders ownership with
+no new table, column or migration. Implemented events are
+`FULFILLMENT_LINE_PICKED`, `FULFILLMENT_LINE_ISSUE_REPORTED` and
+`FULFILLMENT_PICKING_COMPLETED` and `FULFILLMENT_PICKING_NOTE_ADDED`. Picking
+Note reuses `fulfillment_order_events.event_note`: `POST
+.../orders/{orderId}/picking/notes?outletId=...` requires
+`commerce.online_order.picking.note`, a trimmed note of 1–500 characters and a
+positive current `expectedVersion`; it is PICKING-only, increments `row_version`,
+and is returned in the existing Picking Detail as the latest 50 notes in
+oldest-to-newest order. It never changes quantity, lifecycle or `canPack`. Chunk
+3 must add `expectedVersion` to Flutter mutations, consume backend
+eligibility/version/notes, refetch 409 and complete authenticated E2E.
 
 Cashier **Open Till** requirements are governed by
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]] and

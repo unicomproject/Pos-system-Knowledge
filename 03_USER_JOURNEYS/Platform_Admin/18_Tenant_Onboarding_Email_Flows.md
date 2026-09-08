@@ -13,7 +13,7 @@
 
 Approved Platform Admin–owned journeys for **paid** and **trial/demo** tenant onboarding emails.
 
-Parent: [[../../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]] · Catalog: [[../../12_INTEGRATIONS/Email_Event_And_Template_Catalog]]
+Parent: [[../../12_INTEGRATIONS/Email_Architecture_And_Provider_Decisions]] · Catalog: [[../../12_INTEGRATIONS/Email_Event_And_Template_Catalog]] · Canonical Architecture: [[../../01_RELEASE_SCOPE/ONEVERZ_TENANT_ADMIN_ONBOARDING_PHASE_A_PHASE_B]]
 
 ## Actor
 

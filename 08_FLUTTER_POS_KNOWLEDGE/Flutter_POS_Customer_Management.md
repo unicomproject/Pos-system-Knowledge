@@ -178,6 +178,16 @@ ACTIVE-only list drops the row, clear selection and restore full width.
 Only ACTIVE customers attach. Backend attach and final checkout revalidate
 tenant/status eligibility. UI permission handling never replaces backend checks.
 
+### Checkout Boundary
+
+Everything above describes standalone Customer Management. The Payment Method
+customer card must not open this list or its Add Customer modal and must not use
+Attach-to-Sale. Its separate full-screen mobile-only find/confirm or
+phone-and-name quick-create contract is
+[[Flutter_Checkout_Customer_Selection_Implementation_Specification]]. Shared
+customer domain/data/provider capabilities stay under `features/customers/`;
+sale/payment owns cart handoff, checkout revalidation, and return.
+
 ## Runtime States And Responsive Rules
 
 Support initial loading, loaded list, empty database, no result, list error,

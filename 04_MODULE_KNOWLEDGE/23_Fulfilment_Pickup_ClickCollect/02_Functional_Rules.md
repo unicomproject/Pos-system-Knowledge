@@ -1,7 +1,7 @@
 <!-- title: Fulfilment & Pickup / Click & Collect Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-27 -->
+<!-- last_updated: 2026-08-31 -->
 
 # Fulfilment & Pickup / Click & Collect Functional Rules
 
@@ -55,6 +55,40 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Loading, refresh, empty, empty-search, retry/error, denied, not-entitled and network/server failure states are explicit. Phone stacks cards; tablet/desktop use horizontal cards; no viewport may overflow or clip.
 - The approved orange priority star has no verified business authority and therefore has no persisted/API business field in this chunk.
 
+### OO-02 Order detail and start boundary
+
+- Detail is authoritative and read-only. Its GET must not allocate inventory, assign staff, change statuses or append operational events.
+- Required read authorization is `commerce.online_order.orders.access` plus `commerce.online_order.orders.view`; the start command separately requires `commerce.online_order.fulfilment.start`. Entitlement, tenant and outlet/resource checks are mandatory on both operations.
+- Display order/customer/collection/payment/line facts only from authoritative response fields. Remaining time and overdue styling are derived from the collection window and authoritative server time; neither becomes persisted state.
+- Guest is not inferred from a missing customer name/id. Show a customer classification only when the authoritative model provides it.
+- Ordered quantity is line-specific. Do not repeat an order-level count as line picking progress; unresolved picking progress belongs to OO-04.
+- The Start control opens OO-03 confirmation. Mutation begins only after confirmation.
+- A start request is atomic and retry-safe: revalidate order, fulfilment, pickup/reservation, quantities, outlet, assignment and concurrency; transition only an eligible fulfilment to `PICKING`; assign the current authorized tenant user; append event/audit evidence.
+- Success refreshes queue/detail authority before navigation to OO-04. A 409 conflict does not navigate; refresh and show the new authoritative state. Duplicate/replayed requests must not duplicate fulfilment state or events.
+- `View Details` is non-mutating. Back returns to OO-01 without changing operational state.
+- Start requires online backend validation; cached/offline detail may be readable under the offline authority but cannot produce local success.
+
+| Authoritative fulfilment/order condition | OO-02 action |
+|---|---|
+| Eligible pre-start state | Show/enable Start only with permission; confirmation is mandatory |
+| `PICKING` | No Start; offer Continue Picking only when the journey and picking permission allow it |
+| `PICKED`, `PACKED`, `READY` | No Start; present current authoritative state/next permitted journey action |
+| `FULFILLED`, collected/completed equivalent | No Start |
+| `CANCELLED` or other terminal state | No Start |
+| Start permission missing | Hide the complete Start region; OO-02 reflows with no reserved space and OO-03 is unreachable through normal UI |
+| Entitlement/outlet access missing | Show the canonical denied/not-entitled state; backend remains authoritative |
+| Offline or stale/conflicting | Block Start; reconnect/refetch authority |
+
+### OO-03 confirmation and Start rules
+
+- Opening OO-03 is side-effect free and reuses the fresh OO-02 aggregate; it does not issue a redundant detail GET.
+- Required confirmation facts are order, customer, collection outlet, collect-by/remaining-or-overdue, item count and unit count. Remaining/overdue derives from collection time plus backend `serverTime`, never the device clock or a stored label.
+- Cancel closes only. Confirm submits the existing Start command with the current positive fulfilment version, disables duplicate input while pending and permits only one in-flight request.
+- Start accepts fulfilment `PENDING` or `ALLOCATED`, sales order `CONFIRMED` or `ACCEPTED`, confirmed pickup-slot reservation and confirmed unexpired same-order/same-outlet inventory reservation. It rejects already-started and terminal states.
+- One successful transaction assigns the authenticated tenant user, transitions to `PICKING`, increments `row_version` and appends exactly one `FULFILLMENT_STARTED` event. Any failed validation rolls back every mutation.
+- A 409 replaces stale UI authority by refetching detail and never navigates to OO-04. Frontend duplicate-submit locking complements, but never replaces, backend lifecycle/concurrency protection.
+- Without `commerce.online_order.fulfilment.start`, the Start CTA is absent, OO-03 cannot be reached through normal UI, and no empty action slot remains.
+
 ## Backend Rules
 
 - Resolve tenant context server-side for every tenant-owned mutation.
@@ -89,6 +123,31 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Kitchen display automation
 
 ## Related Files
+
+## OO-04 Picking canonical rule (2026-09-02)
+
+OO-04 is backend-authoritative and accepts line mutations only for an authorized
+same-tenant/outlet Click & Collect fulfilment in `PICKING`. Scan requires
+`.picking.pick` + `.picking.scan`; manual entry requires `.picking.pick` +
+`.picking.manual_entry`; issue reporting requires `.picking.report_issue`.
+Quantities cannot over-pick, barcode must belong to the current order line, and
+all successful mutations use `expectedVersion`/`fulfillment_orders.row_version`
+atomically with event/audit evidence. Review & Pack requires backend-confirmed
+zero remaining quantity on every required line and no blocking unresolved issue.
+Client counts, device time and generic status PATCH are not transition authority.
+Pick uses positive increment semantics. `SCAN` additionally validates the scoped
+sales-line barcode; `MANUAL` remains line-scoped. `ITEM_NOT_FOUND` issue reporting
+increments the aggregate version and writes audit only: it never changes quantity,
+substitutes, cancels or blocks packing. `canPack` is true only when at least one
+line exists and every requested quantity is covered by picked plus cancelled
+quantity. Picking Note is a PICKING-only, plain-text audit mutation. It requires
+`commerce.online_order.picking.note`, trims and validates 1–500 characters,
+increments `row_version`, and appends exactly one event without changing line
+quantities, lifecycle or `canPack`. Implemented events are
+`FULFILLMENT_LINE_PICKED`, `FULFILLMENT_LINE_ISSUE_REPORTED`,
+`FULFILLMENT_PICKING_COMPLETED` and `FULFILLMENT_PICKING_NOTE_ADDED`. Authority:
+[[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
+
 
 - [[04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]]

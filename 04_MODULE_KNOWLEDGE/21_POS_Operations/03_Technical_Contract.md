@@ -1,9 +1,26 @@
 <!-- title: POS Operations Technical Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-07 -->
+<!-- last_updated: 2026-09-03 -->
 
 # POS Operations Technical Contract
+
+## Payment Method Selection Contract (2026-09-03)
+
+Reuse checkout summary and start-payment. No selection-only endpoint, table,
+column, migration or permission is required. Backend filtering combines
+`pos.sales.checkout.execute`, the selected method's canonical accept permission, configuration and
+runtime capability. Flutter renders the returned list and revalidates before
+Continue. Rich availability metadata beyond currently returned method strings is
+an implementation-contract enhancement. See
+[[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_POS_Payment_Method_Selection_Implementation_Specification]].
+
+Payment-method availability is backend authoritative and requires all three
+conditions: an active tenant `payment_methods` row with `is_active_for_pos`, the
+method's canonical `pos.payments.*.accept` permission, and a registered
+`IPaymentMethodExecutionCapability` reporting executable. Unregistered
+capabilities fail closed. The repository no longer contains a Cash-only method
+code whitelist.
 
 ## Purpose
 
@@ -73,11 +90,16 @@ history/ledger behavior where applicable.
 - Cash Drawer/Cash In/Cash Drop routes and forms exist, but no backend
   cash-movement datasource is wired.
 - Use DTOs in data layer, domain/view models in UI layer.
-- Checkout customer selection is a separate full-screen route owned by the sale
-  flow. The Payment Method Customer card is its entry point; `/pos/customers`
-  remains Customer Management. Selection/create success must update the active
-  cart/checkout customer state and pop/return automatically.
-- Its complete field, permission, duplicate, search/pagination, revalidation,
+- **Checkout Customer Selection Routing**:
+  Checkout customer selection is a dedicated full-screen route (`/pos/new-sale/customer`)
+  owned by the customer feature and invoked as the primary intermediate step from
+  Current Sale "Proceed to Payment". Customer is optional:
+  - **SKIP** allows proceeding directly to `/pos/new-sale/payment` with `CustomerId = null` (Walk-in).
+  - **ADD TO SALE & CONTINUE** attaches the selected customer, revalidates checkout summary, and advances to Payment Method.
+  - **ADD CUSTOMER & CONTINUE** creates the customer via real backend API, attaches returned customer, revalidates checkout summary, and advances to Payment Method.
+  - Payment Method Customer card provides re-entry to edit or clear the customer.
+  - `/pos/customers` remains separate Customer Management.
+- Its complete field, permission, duplicate, exact-phone search, revalidation,
   state, privacy, and acceptance contract is
   [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Checkout_Customer_Selection_Implementation_Specification]].
 - Checkout summary/payment request models keep `customerId` nullable. A selected
@@ -88,7 +110,6 @@ history/ledger behavior where applicable.
 ## Backend Contract
 
 - Target product detail, Frequently Bought Together and cart-line contracts are defined in [[04_MODULE_KNOWLEDGE/21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]]. They remain pending unless code evidence proves otherwise.
-
 - Controllers stay thin.
 - Application services own use cases.
 - Domain entities/value objects hold stable business invariants.

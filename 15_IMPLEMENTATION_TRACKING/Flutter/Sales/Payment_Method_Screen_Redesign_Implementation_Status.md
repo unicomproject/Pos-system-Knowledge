@@ -1,7 +1,59 @@
 <!-- title: Payment Method Screen Redesign Implementation Status -->
-<!-- status: CHUNK 7 DEFERRED — PHYSICAL HARDWARE UNAVAILABLE; SOURCE AND AUTOMATED HARDWARE INTEGRATION VERIFIED -->
+<!-- status: IMPLEMENTED AND AUTOMATED-VERIFIED — RUNTIME VISUAL AND NOTIFICATION API PENDING -->
 
 # Payment Method Screen Redesign Implementation Status
+
+## Cash final-closure update (2026-09-04)
+
+- Current analyzer is clean; combined Cash, Payment Method and customer/checkout
+  focused regression passed 90 tests; full Flutter passed 1520 with 1 skip.
+- Authenticated Cash happy path and read-only database persistence are verified.
+- An isolated Back-to-Payment-Methods runtime round-trip was not captured, so it
+  remains pending and is not inferred from ordinary navigation.
+- No Payment Method production code, API or persistence contract changed.
+
+## Runtime regression update (2026-09-04)
+
+- Authenticated Pixel Tablet flow reached Payment Method with the real backend,
+  authoritative LKR 4,875 total and Walk-in customer.
+- Cash appeared as the sole executable method, selected normally, and Continue
+  opened the redesigned Cash Payment screen without duplicate navigation or
+  shell replacement.
+- Runtime visual acceptance for this Cash path is **PASS**. Card/QR/Split provider
+  execution remains outside this Cash acceptance and physical hardware remains
+  blocked.
+
+## Canonicalization Status (2026-09-04)
+
+| Area | Status |
+| --- | --- |
+| Second Brain | **READY / CANONICALIZED** |
+| Flutter selection UI against target UI | **IMPLEMENTED / AUTOMATED-VERIFIED** (38/38 tests pass, 0 analyzer issues) |
+| Current Top & Bottom Shell Preservation | **VERIFIED** (`PosTopBar` & `PosCashierBottomNavigation` preserved) |
+| Dynamic Payment Grid (4/3/2/1/0) | **VERIFIED** (equal sizing, checkmark selection, capability gating) |
+| Authoritative Sale Summary & Financial Totals | **VERIFIED** (Dynamic currency, SKU, variant, tax info, customer initials) |
+| Cash execution | Existing; runtime/hardware acceptance separately tracked |
+| Card execution | Safe provider-neutral boundary; real provider unverified |
+| QR execution | Non-executable safe message boundary verified |
+| Split execution | Non-executable safe message boundary verified |
+| Backend authorized-method availability | **IMPLEMENTED**; permission/configuration filtered (Cash, Card, QR, Split only) |
+| Store Credit / Credit Sale / Pay Later | **STRICTLY EXCLUDED** (not rendered) |
+
+## Shared summary consumer verification (2026-09-04)
+
+Cash Payment now imports and renders the exact same
+`LeftPaymentSummaryColumn` plus `PaymentMethodWorkspaceCard` composition used by
+this screen. No Cash-specific item/totals/customer summary remains. Payment
+Method responsive regression tests passed as part of the Cash Chunk 2 run.
+
+Current scope is strictly Cash, Card, QR Payment, and Split Payment. Store Credit,
+Credit Sale, and Pay Later are strictly excluded and not rendered. No new permission,
+API, table, column, or migration is required for selection. See
+[[../../../08_FLUTTER_POS_KNOWLEDGE/Flutter_POS_Payment_Method_Selection_Implementation_Specification]].
+
+Permission migration uses canonical `pos.sales.checkout.execute`,
+`pos.payments.{cash|card|qr|split}.accept`,
+`pos.notifications.alerts.view`, and `pos.customers.management.{view|create|update}`.
 
 ## Decision (2026-08-02)
 
@@ -15,9 +67,11 @@ status must not become fully implemented until a new runtime screenshot is
 captured and compared without overflow.
 
 The current POS Payment Method screen contains only Cash, Card, QR Pay and Split
-Payment. Pay Later is excluded. Cash remains the only executable method in this
-implementation; Card requires a proven real provider, while QR Pay and Split
-Payment remain unavailable. An incomplete method must never fake success, fall
+Payment. Pay Later is excluded. Availability now resolves dynamically from
+tenant-enabled configuration, canonical permission, and registered backend
+execution capability. Cash has a registered executable capability; Card's
+default provider is unavailable, while QR Pay and Split Payment have no complete
+execution capability registered. An incomplete method must never fake success, fall
 back to Cash, create a completed sale or receipt, or trigger the Cash drawer.
 
 The existing `POST /api/v1/pos/checkout/summary` and
@@ -30,16 +84,17 @@ and drawer acceptance remain separate runtime verification.
 
 Every visible method card has equal width, height, padding, icon size, radius,
 border thickness and typography, with equal horizontal and vertical gaps. Layout
-is derived from visible-card count: one is full width; two share one row; three
-share one row; four use a 2 x 2 grid; five use three cards followed by two
-same-size centred cards. The final two never stretch. Release scope uses four
-methods, so it renders a 2 x 2 grid and Split Payment is not full width.
+is derived from the authorized available-card count: one is full-width or
+appropriately centred; two share one row; three use two cards followed by one
+clean full-width or approved centred card; four use a 2 x 2 grid; zero renders the
+unavailable state. Current scope contains no fifth method.
 
 ## Contract And Data Decision
 
-No backend schema change or database migration is required. Backend payment
-method strings remain authoritative. Flutter owns presentation-only mappings
-such as icon, colour and description.
+No payment-business schema change is required. A corrective permission-code
+migration is required and updates rows in place so assignment UUID references
+survive. Backend payment method strings remain authoritative. Flutter owns
+presentation-only mappings such as icon, colour and description.
 
 ## Verified Implementation Result
 
@@ -47,10 +102,12 @@ such as icon, colour and description.
 > not runtime visual acceptance. The current status remains partially implemented
 > until an authenticated target-route screenshot is captured and compared.
 
-- Four visible methods: Cash, Card, QR Pay and Split Payment; no Pay Later.
+- The UI renders exactly the backend-authorized and backend-executable method
+  list; the current production-ready result is Cash only.
 - Cash is selectable and Continue Payment opens the existing Cash route once.
 - Card, QR Pay and Split Payment are visible but non-executable with safe reasons.
-- The reusable count-derived grid supports 1 through 5 equal cards.
+- The reusable count-derived grid supports zero through four cards; three uses
+  two cards followed by one centered card.
 - Existing checkout summary, Cash start-payment, success, receipt, print and
 drawer business logic was not replaced.
 

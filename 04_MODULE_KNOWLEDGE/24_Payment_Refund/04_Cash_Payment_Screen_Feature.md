@@ -1,7 +1,7 @@
 <!-- title: Cash Payment Screen Feature -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-04 -->
+<!-- last_updated: 2026-09-04 -->
 
 # Cash Payment Screen Feature
 
@@ -17,16 +17,16 @@ Covers the user interface, interaction, Quick Amount calculation, manual amount 
 - Cart/sale exists with a positive payable total.
 - Open till session exists.
 - Cash payment method is enabled.
-- User has `sales.checkout` and `payments.cash.accept` permissions.
+- User has `pos.sales.checkout.execute` and `pos.payments.cash.accept` permissions.
 
 ## Screen Structure
-Based on the approved Cash Payment visual (2026-08-14):
+Canonical redesign decision (2026-09-04):
 - **Shared POS Header:** Existing shell.
-- **Main Content Width Ratio:**
-  - **Order Summary Section:** Exactly 2/5 of available width.
-  - **Cash Payment Section:** Exactly 3/5 of available width.
-- **Order Summary Card (2/5):** Independent card with cart rows, subtotal/discount/tax, and light-orange Total Due footer (navy label + orange amount).
-- **Cash Payment Card (3/5):** Single independent card containing:
+- **Sale Summary:** Reuse the same shared `SALE SUMMARY` component and checkout
+  state used by Payment Method. Do not build an independent Cash `ORDER SUMMARY`.
+- **Responsive width:** Follow the shared Payment Method summary layout contract;
+  the old fixed Cash-specific `2/5 + 3/5` rule is superseded.
+- **Cash Payment Card:** Cash-specific right-side interaction containing:
   - Amount Received display with Due hint
   - Quick Amount chips (EXACT + rounded suggestions) aligned beside Amount Received
   - Numeric keypad (0–9, 00, disabled `.`, tall backspace, clear)
@@ -122,12 +122,14 @@ Quick Amounts are dynamically generated based on the backend Total Due, and are 
 - printReceiptRequested persistence required: No
 
 ## Permissions
-- `pos.new_sale.view`
-- `sales.checkout`
-- `payments.cash.accept`
-- `sales.view`
-- `receipts.view`
-- `receipts.print`
+- `pos.sales.checkout.execute`
+- `pos.payments.cash.accept`
+- Customer and receipt permissions apply only when their separate capabilities
+  are invoked.
+
+The active catalog defines no approved granular Cash view/manual-entry/Quick/
+Exact/Change/Complete permissions. This is a separately governed permission gap;
+do not restore legacy codes or invent runtime codes in this redesign.
 
 *Context Rules:* Requires authenticated tenant user, active tenant/entitlement, trusted POS device, valid outlet access, assigned active till, open till session, enabled Cash payment method, and tenant isolation. No new roles or permissions created.
 
@@ -154,7 +156,8 @@ Quick Amounts are dynamically generated based on the backend Total Due, and are 
 - Backend success correctly transitions to success layout/drawer kick.
 
 ## Current Status
-- Documentation Ready (Implementation pending).
+- Chunk 1 Second Brain canonicalization: **Ready**.
+- Approved target redesign and shared-summary reuse: **Implementation pending**.
 
 ## Related Files
 - [[../../03_USER_JOURNEYS/Cashier/07_Payment_Flow]]

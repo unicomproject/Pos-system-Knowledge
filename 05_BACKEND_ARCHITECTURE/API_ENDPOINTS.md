@@ -5,6 +5,15 @@
 
 # Platform Subscription Plan API Endpoints
 
+## POS Payment Method Selection Clarification (2026-09-03)
+
+`POST /api/v1/pos/checkout/summary` supplies authoritative checkout data and
+currently supported backend payment-method information.
+`POST /api/v1/pos/checkout/start-payment` is the execution transition and must
+revalidate the selected method. No selection-only endpoint is required. Rich
+`paymentMethods[]` metadata (display/type/availability/reason/sort order) remains
+an enhancement until implemented and verified.
+
 ## POS Cashier Discount
 
 | Method | Route | Current Release use |
@@ -31,16 +40,18 @@ implementation's trusted-device, assigned-till, open-session resolution.
 
 | Method and route | Purpose | Query/body | Permission |
 |---|---|---|---|---|
-| `GET /summary` | Customer summary | `deviceId` | `customers.view` |
-| `GET /` | Search/filter/page | `deviceId`, `search`, `status`, `source`, `page`, `pageSize` | `customers.view` |
-| `GET /{customerId}` | Profile and completed-order aggregates | `deviceId` | `customers.view` |
-| `GET /{customerId}/orders` | Existing paginated purchase history | `deviceId`, `page`, `pageSize`, `fromDate`, `toDate`, `status` | `customers.view` |
-| `POST /` | Create POS customer | `deviceId`; full name, phone, optional email | `customers.create` |
+| `GET /summary` | Customer summary | `deviceId` | `pos.customers.management.view` |
+| `GET /` | Search/filter/page | `deviceId`, `search`, `status`, `source`, `page`, `pageSize` | `pos.customers.management.view` |
+| `GET /{customerId}` | Profile and completed-order aggregates | `deviceId` | `pos.customers.management.view` |
+| `GET /{customerId}/orders` | Existing paginated purchase history | `deviceId`, `page`, `pageSize`, `fromDate`, `toDate`, `status` | `pos.customers.management.view` |
+| `POST /` | Create POS customer | `deviceId`; full name, phone, optional email | `pos.customers.management.create` |
 | `PUT /{customerId}` | Edit profile/status; also supports deactivate-to-INACTIVE | `deviceId`; full name, phone, optional email, status | `customers.update` |
-| `POST /{customerId}/attach-to-sale` | Validate ACTIVE customer and attach to cart/editable sale | `deviceId`; optional `saleId` | `customers.view` + `sales.cart.manage` |
+| `POST /{customerId}/attach-to-sale` | Validate ACTIVE customer and attach to cart/editable sale | `deviceId`; optional `saleId` | `pos.customers.management.view` + `pos.sales.cart.manage` |
 
 List search covers name, phone/normalized phone, email/normalized email, and
-customer code. Status excludes `DELETED`; source is an exact current
+customer code. A phone-shaped search containing at least seven digits is
+normalized and matched by exact `normalized_phone` equality; other search terms
+retain partial matching. Status excludes `DELETED`; source is an exact current
 `source_type` filter. Order history already returns `outletDisplayName`, not
 till name. No new Recent Purchases endpoint is required.
 
@@ -60,8 +71,17 @@ Consuming-screen contract:
   and stored on the completed `sales_orders` record.
 - `POST /api/v1/customers/{customerId}/attach-to-sale` remains a supported
   backend/Customer Management capability where implemented. It is not a
-  required cashier checkout UX step: the approved full-screen checkout selector
-  auto-associates on select/create and auto-returns to Payment Method.
+  cashier checkout API. The full-screen workflow commits a found customer only
+  after **ADD TO SALE & CONTINUE**, or a created customer after successful
+  **ADD CUSTOMER & CONTINUE**, through active cart state; it then revalidates
+  checkout and returns to Payment Method.
+- Checkout discovery is mobile-only. `GET /api/v1/customers` now guarantees
+  deterministic exact normalized-phone resolution when `search` is phone-shaped
+  and contains at least seven digits; checkout also supplies `status=ACTIVE`.
+- Quick-create uses `POST /api/v1/customers` with `FullName`, `Phone`, and Email
+  omitted/null. Revalidation uses `POST /api/v1/pos/checkout/summary` with the
+  selected `CustomerId`; final mutation uses
+  `POST /api/v1/pos/checkout/start-payment` with nullable `CustomerId`.
 
 ## POS Park / Recall Sale
 
@@ -1348,13 +1368,14 @@ Base routes: `/api/v1/pos/cart`, `/api/v1/pos/checkout`,
 
 | Method | Route | Permission | Purpose | Status |
 |---|---|---|---|---|
-| POST | `/api/v1/pos/cart/calculate` | `sales.cart.update_item` in the direct controller; `sales.checkout` when called through checkout summary/start-payment | Backend cart totals without saving a sale |
-| POST | `/api/v1/pos/checkout/summary` | `sales.checkout` | Payment screen billing summary and permitted methods |
-| POST | `/api/v1/pos/checkout/start-payment` | `sales.checkout` + selected payment permission | Existing Flutter cash checkout entry point; creates sale/payment/receipt for cash |
-| POST | `/api/v1/pos/sales` | `sales.checkout` | Create draft POS sale |
-| POST | `/api/v1/pos/sales/checkout` | `sales.checkout` | Alias for draft sale creation; does not complete payment by itself |
+| POST | `/api/v1/pos/cart/calculate` | `pos.sales.cart.update_item` in the direct controller; `pos.sales.checkout.execute` through checkout summary/start-payment | Backend cart totals without saving a sale |
+| POST | `/api/v1/pos/checkout/summary` | `pos.sales.checkout.execute` | Payment screen billing summary and permitted methods |
+| POST | `/api/v1/pos/checkout/start-payment` | `pos.sales.checkout.execute` + selected canonical payment permission | Existing Flutter cash checkout entry point; creates sale/payment/receipt for cash |
+| POST | `/api/v1/pos/sales` | `pos.sales.checkout.execute` | Create draft POS sale |
+| POST | `/api/v1/pos/sales/checkout` | `pos.sales.checkout.execute` | Alias for draft sale creation; does not complete payment by itself |
+| GET | `/api/v1/pos/notifications?page={page}&pageSize={pageSize}` | `pos.notifications.alerts.view` plus source feature permission | Tenant-user inbox; records and unread count are filtered before DTO projection |
 | GET | `/api/v1/pos/sales/{saleId}` | `sales.view` | Completed sale details |
-| POST | `/api/v1/pos/payments` | Payment method permission such as `payments.cash.accept` | Record payment against an existing draft sale |
+| POST | `/api/v1/pos/payments` | Payment method permission such as `pos.payments.cash.accept` | Record payment against an existing draft sale |
 | GET | `/api/v1/pos/receipts/{saleId}` | `receipts.view` or `receipts.print` | Receipt preview data with `barcodeValue` |
 | POST | `/api/v1/pos/receipts/{saleId}/print` | `receipts.print` | Receipt print audit row |
 
@@ -1610,18 +1631,19 @@ Same rule for `GET .../sales/search` and `GET .../sales/{saleId}/eligibility`:
 
 # POS Receipts API Endpoints (2026-08-05)
 
-# Tenant E-commerce Click & Collect Staff API (OO-01 target updated 2026-08-27)
+# Tenant E-commerce Click & Collect Staff API (OO-02 contract updated 2026-08-31)
 
-The single staff operational owner is `/api/v1/tenant/ecommerce/click-collect`. The operations below are **canonical / implementation pending**. Existing public storefront `GET /api/v1/ecommerce/storefront/fulfillment/...` reads are implemented customer APIs and remain separate. Older generic `/api/v1/fulfilment-orders`, `/api/v1/pickup-orders` and `/api/v1/pickup-events` descriptions are not competing public staff contracts.
+The single staff operational owner is `/api/v1/tenant/ecommerce/click-collect`. OO-01 list, OO-02 detail and OO-03 Start operations below are implemented; later operations remain governed by their own tracking. Existing public storefront `GET /api/v1/ecommerce/storefront/fulfillment/...` reads are customer APIs and remain separate. Older generic `/api/v1/fulfilment-orders`, `/api/v1/pickup-orders` and `/api/v1/pickup-events` descriptions are not competing public staff contracts.
 
 | Method | Route | Purpose |
 |---|---|---|
 | GET | `/api/v1/tenant/ecommerce/click-collect/orders` | Implemented bounded staff queue read with outlet/search/status/sort/paging, six full-scope aggregates, server time and card projections; approved UI exposes search only |
-| GET | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}` | Detail |
-| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/fulfilment/start` | Atomic fulfilment start |
+| GET | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}?outletId={outletId}` | Implemented side-effect-free OO-02 aggregate detail including nullable `fulfillmentVersion` |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/fulfilment/start?outletId={outletId}` | Implemented atomic OO-03 start; body requires `expectedVersion`; stale/state/reservation conflict returns 409 |
 | GET | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking` | Picking detail |
 | POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/lines/{lineId}/pick` | Barcode/quantity pick |
 | POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/lines/{lineId}/issues` | Record picking issue |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/notes` | Persist a PICKING-only operational note with optimistic concurrency |
 | POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/pack` | Validate/create packages |
 | POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/ready` | Mark ready and notify |
 | GET | `/api/v1/tenant/ecommerce/click-collect/collection/ready` | Outlet ready queue |
@@ -1642,6 +1664,33 @@ Command DTOs carry idempotency and repository-standard concurrency where require
 - Derivation: Delayed uses authoritative lifecycle + collection window + server time and cannot replace Ready, Collected, Cancelled or terminal states. Payment comes from existing payment/order authority.
 - Performance: use bounded efficient aggregate/joined or batched reads; no N+1 database queries or per-product image API calls.
 - Navigation: queue chevron reads `/orders/{orderId}` only; it invokes no mutation.
+
+## OO-02 detail / OO-03 start boundary
+
+- Detail query: `GET .../orders/{orderId}?outletId={outletId}`; requires `commerce.online_order.orders.access` and `commerce.online_order.orders.view`, entitlement and tenant/outlet/resource scope. It returns the aggregate order/customer/collection/payment/line contract and performs no mutation.
+- Start command: `POST .../orders/{orderId}/fulfilment/start?outletId={outletId}`; requires `commerce.online_order.fulfilment.start` and a positive `expectedVersion`. It validates active tenant/user/outlet, entitlement, outlet/resource scope, sales/fulfilment state, confirmed pickup-slot reservation and confirmed unexpired inventory reservation, then atomically sets `PENDING`/`ALLOCATED` fulfilment to `PICKING`, assigns the actor, increments `row_version` and appends one `FULFILLMENT_STARTED` event. Stale EF/client versions and invalid state/reservation return HTTP 409.
+
+OO-04 target routes are `GET .../orders/{orderId}/picking`, `POST
+.../orders/{orderId}/picking/lines/{lineId}/pick`, and `POST
+.../orders/{orderId}/picking/lines/{lineId}/issues`, and `POST
+.../orders/{orderId}/picking/notes`, all outlet-scoped. As of
+2026-09-02 they are implemented by `ClickCollectOrdersController`. Pick uses
+positive increment semantics with body
+`{ quantity, barcode?, inputMethod: SCAN|MANUAL, expectedVersion }`; permissions
+are `.picking.pick` plus the matching input permission, and SCAN validates the
+scoped line barcode. Issue uses `{ reason: ITEM_NOT_FOUND, note?, expectedVersion }`
+with `.picking.report_issue`; note is optional and at most 500 characters. Add
+Picking Note uses `{ note, expectedVersion }`, requires
+`commerce.online_order.picking.note`, trims and enforces 1–500 plain-text
+characters, and appends `FULFILLMENT_PICKING_NOTE_ADDED` to the existing event
+authority. Success returns the saved note, actor/server timestamp and incremented
+version. Picking Detail returns the latest 50 notes oldest-to-newest. Generic
+status PATCH is not a substitute. Responses expose current version/progress and backend-derived
+`canPack`; validation is 400, inaccessible scope is 403/404, and stale/lifecycle
+conflict is 409.
+- Success returns authoritative identifiers/status/assignment/timestamp/version. Conflict returns 409 and requires refetch; 401/403/404 remain non-disclosing and use the common error envelope.
+- Live-source status on 2026-09-01: the existing `ClickCollectOrdersController`, application services and repositories implement list, detail and Start. The retained generic status PATCH is not an OO-03 substitute.
+- Safe Start observability may record correlation/trace id, tenant/outlet/order/fulfilment/actor identifiers, operation, prior/target state, result and latency. QR hashes, auth/payment secrets and unnecessary customer PII are prohibited.
 
 Controller: `PosReceiptsController`
 Base: `/api/v1/pos/receipts`

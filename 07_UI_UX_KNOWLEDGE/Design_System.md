@@ -1,9 +1,18 @@
 <!-- title: Design System -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-14 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Design System
+
+## Implemented Flutter Component Registry
+
+Verified reusable POS component paths, dimensions, variants, typography,
+spacing, radius, icon/image, semantic colour and responsive rules are owned by
+[[POS_Reusable_Component_Specifications]]. This file owns design principles and
+theme intent; the registry owns implementation-proven component measurements.
+Prototype screenshots define hierarchy and visual intent, not reusable control
+pixels.
 
 ## Purpose
 
@@ -42,18 +51,19 @@ This is not a generic POS theme.
 | Warning | Use clear warning state for stock, expiry, payment, till variance |
 | Error | Strong red/error state with text explanation |
 
-**Open Till (2026-08-11):** The approved Open Till primary action / accent colour
-is OneVerz **orange**. Do not treat blue or purple/violet as the approved Open
-Till primary. Reuse existing orange theme tokens (for example
-`posHomeAccentOrange` / `posHomeOrangeStart` / `posHomeOrangeEnd`). Screen
-contract:
+**Open Till (updated 2026-08-31):** The approved visual baseline uses the
+default OneVerz orange primary. Production resolves that primary through the
+backend-driven POS theme; blue/purple is not an independent Open Till override.
+Reuse the resolved theme tokens rather than feature-local orange constants.
+Screen contract:
 [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Till_Screen_Implementation_Specification]].
 
 Do not create a colorful consumer app style.
 
-Tenant-configurable POS Login Branding does not change the product primary
-action colour or enable arbitrary application theming. The Sign In action stays
-OneVerz orange even when the tenant configures login background media or colour.
+POS Login background branding and authenticated POS application theming are
+separate contracts. Login-background media/colour does not itself redefine
+application tokens. Authenticated POS theme tokens are backend-driven through
+`GET /api/v1/pos/theme` and may be tenant-customized as defined below.
 
 Login and Device Activation use one shared POS branding panel. Activation uses
 the same heading, subtitle, field, radius and orange primary-action visual
@@ -61,6 +71,42 @@ language as Login. Feature widgets must not define direct colour literals or
 duplicate orange/theme constants; use canonical theme/design tokens and shared
 input/button components. A missing semantic colour is added once to the
 canonical theme token file.
+
+## Backend-Driven POS Theme
+
+Authenticated POS surfaces resolve brand tokens from the existing backend
+theme authority:
+
+```text
+GET /api/v1/pos/theme
+TenantSetting override
+→ SettingDefinition default
+→ safe application fallback
+```
+
+| Token | Setting key | Default |
+|---|---|---|
+| Primary brand | `pos.theme.primary_color` | `#FF6A00` |
+| Secondary brand | `pos.theme.secondary_color` | `#000000` |
+
+Defaults are fallbacks, not permanent screen colour literals. When a tenant
+changes primary from `#FF6A00` to `#FF1493`, theme-driven primary buttons,
+active navigation, selected tabs/indicators, primary icons, highlights,
+focus/selected states, card accents, progress indicators, and design-system
+primary links/actions become pink after canonical theme refresh. No
+feature-screen source change is required.
+
+Feature screens consume `ThemeData`, the theme provider, and shared design
+tokens. Direct branding literals such as `Color(0xFFFF6A00)` or
+`Color(0xFF000000)` are forbidden in feature widgets; one centralized safe
+fallback is acceptable.
+
+## Brand Tokens Versus Semantic Tokens
+
+Tenant theme colours style brand/primary intent. Success, warning, error, info,
+and disabled states remain canonical semantic tokens unless a future approved
+semantic-token contract makes them configurable. Changing primary orange to
+pink must not turn success green or error red into pink.
 
 ## Layout Principles
 
@@ -82,6 +128,15 @@ canonical theme token file.
 | Warning/error text | Human-readable and action-focused |
 | Amounts | Use clear numeric alignment |
 | Product name | Prioritize scannability over decoration |
+
+Screens use canonical `TextTheme`/shared typography tokens for font family,
+size, weight, and line height. Prototype screenshots define hierarchy, not
+production numeric literals. Repeated feature-local font sizes and weights are
+forbidden when a canonical style exists.
+
+Spacing, padding, gaps, radii, elevation, button/input heights, and icon sizes
+likewise come from established tokens or shared components; repeated
+screen-specific magic values do not become a second design system.
 
 ## Component Rules
 
@@ -108,7 +163,7 @@ The Flutter POS canonical primary action is
 | Token | Value |
 |---|---|
 | Gradient start | `#0E2748` (`TenantAdminColors.navySoft`) |
-| Gradient end | `#3F2BFF` (`TenantAdminColors.primary`) |
+| Gradient end | `#FF6A00` (`TenantAdminColors.primary`) |
 | Direction | Horizontal, center-left to center-right |
 | Foreground | White |
 | Radius | 12 logical pixels |
@@ -126,12 +181,11 @@ The Flutter POS canonical primary action is
   shared component.
 - Back, Cancel, and Close remain outlined/neutral. Delete, Void, Reject, and
   other destructive actions retain semantic red styling.
-- Feature code must not duplicate the navy-to-violet primary gradient.
+- Feature code must not duplicate the navy-to-orange primary gradient.
 
-**Open Till exception to violet shared CTA:** Open Till’s approved primary is
-**orange**, not the navy→violet `PosPrimaryActionButton` gradient. Prefer
-shared/orange tokenized CTA styling for that screen; do not introduce blue or
-purple Open Till primary actions.
+**Open Till shared CTA rule:** Open Till does not use the navy→orange gradient.
+Its primary CTA consumes the resolved POS primary theme token (orange by
+default) and therefore follows an approved tenant primary override.
 
 **Cashier POS Cash Drawer / cash-control exception (2026-08-13):** Cash Drawer
 and related Cash In / Cash Out·Drop / Close Till Cashier surfaces use the
@@ -139,8 +193,8 @@ approved Cashier POS visual direction:
 
 | Purpose | Hex (docs only) | Shared token — never hard-code hex in feature widgets |
 |---|---|---|
-| Primary orange | `#FF6A00` | `TenantAdminColors.posHomeAccentOrange` |
-| Shell / workspace black | `#000000` / `#030303` | `TenantAdminColors.posHomeDarkBackground` / `background` |
+| Primary brand | Default `#FF6A00`; tenant override supported | Resolved POS primary theme token |
+| Shell / workspace secondary | Default `#000000` / `#030303`; tenant override where mapped | Resolved POS secondary/surface tokens |
 | Success / error / info | semantic | `TenantAdminColors.success`, `danger`, and existing info tokens |
 
 White content surface; semantic green/red/(info)blue for movement styling.

@@ -1,7 +1,7 @@
 ﻿<!-- title: Flutter Permission Based UI Rendering -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-27 -->
+<!-- last_updated: 2026-08-31 -->
 
 # Flutter Permission Based UI Rendering
 
@@ -17,6 +17,8 @@ Permissions are backend-driven and must not be hardcoded by role name.
 
 - The Flutter UI may hide or disable actions based on effective permissions loaded from the backend auth session.
 - The Backend API remains the final authorization authority.
+- Role-name checks never determine UI visibility; use canonical permission
+  constants/helpers plus feature entitlement.
 
 ---
 
@@ -43,6 +45,36 @@ Flutter must load and evaluate:
 | Device not trusted | Redirect to `/pos/device-activation` |
 | Offline blocked action | Disable and show "Online connection required" |
 | Sync conflict | Show sync warning indicator |
+
+## Filter Before Layout
+
+Navigation destinations, dashboard actions, cards, tabs, shortcuts, menu items,
+and contextual actions are filtered before layout composition:
+
+```text
+allActions
+→ entitlement/permission filter
+→ visibleActions
+→ responsive composition
+```
+
+Do not use `Visibility(maintainSize: true)`, transparent widgets, or fixed grid
+slots for unauthorized items. Zero, one, and multiple permitted-item states
+must reflow without empty gaps at phone, tablet portrait, tablet landscape, and
+desktop breakpoints. Reuse current responsive/layout utilities rather than
+hardcoding each permission combination.
+
+## Permission-Scoped Notifications
+
+Classify incoming notifications by feature/domain, then filter by tenant
+entitlement, underlying feature permission, and outlet/resource scope.
+`notifications.view` allows notification infrastructure access but never
+overrides the protected feature's permission. Backend filtering is
+authoritative; Flutter filtering is defence-in-depth/UX. A hidden notification
+cannot be used as a deep link, and route guards independently enforce access.
+
+Example: New Sale permitted + Online Orders denied means New Sale is visible,
+Online Orders is absent, and Online Order notifications are absent.
 
 ---
 
@@ -82,6 +114,8 @@ Flutter must load and evaluate:
 - Using static frontend-only permission arrays without backend authority.
 - Evaluating 2-tier or 3-tier codes without canonical translation.
 - Permitting offline actions that the backend cannot validate during sync.
+- Rendering unauthorized widgets invisibly while preserving their layout slot.
+- Treating `notifications.view` as permission to see all feature notifications.
 
 ---
 

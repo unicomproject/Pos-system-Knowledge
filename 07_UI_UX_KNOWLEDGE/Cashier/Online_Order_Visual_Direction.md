@@ -1,6 +1,6 @@
 # Online Order Visual Direction
 
-Status: **APPROVED OO-01 TARGET; IMPLEMENTATION PENDING** · Journey: `POS-UJ-036` · Updated: 2026-08-27
+Status: **APPROVED OO-01; OO-02/OO-03 VISUAL CONTRACT CANONICALIZED** · Journey: `POS-UJ-036` · Updated: 2026-09-01
 
 ## Authorities
 
@@ -9,8 +9,8 @@ Read [[Online_Order_Prototype_Flow]], [[../../07_UI_UX_KNOWLEDGE/Design_System]]
 ## Product character and shell
 
 - Use the established cashier POS shell, header and bottom navigation. Do not create a second shell for online orders.
-- Primary brand action color is OneVerz orange `#FF6A00`; black anchors shell chrome and high-contrast text.
-- Orange identifies the primary safe action, never an unverified success state. Destructive actions use semantic danger styling.
+- Primary brand actions consume the backend-driven POS `ThemeData.colorScheme.primary`; `#FF6A00` is the default fallback, not a feature-local literal. Black anchors shell chrome and high-contrast text.
+- The resolved theme primary identifies the primary safe action, never an unverified success state. Destructive actions use semantic danger styling.
 - Preserve a calm operational hierarchy: context/header, progress/status, task workspace, supporting facts, then action rail.
 
 ## Hierarchy, type and spacing
@@ -41,7 +41,7 @@ Read [[Online_Order_Prototype_Flow]], [[../../07_UI_UX_KNOWLEDGE/Design_System]]
 
 - One dominant primary CTA per state: Start, Confirm Pick, Save Package, Mark Ready, Validate, Confirm Cash, Handover.
 - Secondary actions are outlined or text actions. “Can’t Find Item” is an issue action, not a substitute completion action.
-- Disabled CTAs include a visible explanation when permission, entitlement, till, validation or readiness blocks progress.
+- Permission-hidden CTAs are absent and consume no layout space. State-disabled visible actions include a readable explanation when the action remains part of the permitted state.
 - Pending command states lock repeat submission and show in-button progress.
 
 ## Loading, empty, error and denied states
@@ -71,12 +71,29 @@ Read [[Online_Order_Prototype_Flow]], [[../../07_UI_UX_KNOWLEDGE/Design_System]]
 - Loading keeps shell geometry stable; refresh preserves valid loaded content where safe; empty and empty-search have distinct copy; error, denied and not-entitled remain distinct.
 - The orange priority star is visual-only pending business authority. It must not be interpreted as a stored priority or functional action.
 
+### Approved OO-02 detail contract
+
+- Preserve the shared cashier header and bottom navigation. The white detail workspace owns only its content and does not create another app bar or navigation rail.
+- Establish hierarchy as order number + text status, customer/context, then three fact groups: collection, payment and item totals. The order-line area follows; Back/View Details/Start actions come last or in a stable action rail.
+- Wide layouts may present the three fact groups in one row and keep a bounded item-list workspace. Narrow layouts stack the same groups and lines in semantic reading order with vertical scrolling. No text-size reduction is allowed solely to avoid overflow.
+- Each order line prioritizes product identity, optional variant/options/SKU, ordered quantity and optional image/fallback. Do not render a fake/repeated order-level picking count on line cards.
+- Start Fulfilment is the one theme-primary action when eligible and permitted. It opens OO-03; missing permission removes the complete action region and the header reflows. Loading locks resubmission.
+- Remaining/overdue presentation includes readable text and uses authoritative collection/server time. Status, payment and warning information never rely on colour alone.
+- Loading uses stable geometry; detail error/not-found/denied/not-entitled/conflict states retain shell/context and a bounded Back/Retry/Refresh recovery.
+
 ## Accessibility
 
 - Minimum touch target and contrast follow the canonical design system.
 - Maintain logical focus order, visible focus indicators, semantic labels and announced validation results.
 - Status, progress, scan result and payment outcome require readable text equivalents.
 - Motion is subtle and non-essential; respect reduced-motion preferences.
+
+### OO-03 confirmation direction
+
+- Wider viewports use the shared blurred dialog helper; phone uses the shared scroll-safe modal sheet. Confirm and Cancel remain visible/reachable without clipping.
+- Reading/focus order is title → confirmation summary → Cancel → Confirm. The title and both actions have semantics; Escape/barrier dismissal follows the shared modal contract.
+- Confirm uses `PosPrimaryActionButton` with the resolved tenant primary. Cancel uses the shared outlined secondary action. No hardcoded orange or duplicated modal shell is permitted.
+- Summary meaning uses labels plus text, not colour alone, and remains readable under supported text scaling.
 
 ## Prototype boundary
 

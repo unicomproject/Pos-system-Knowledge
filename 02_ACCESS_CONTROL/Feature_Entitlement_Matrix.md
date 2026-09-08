@@ -124,3 +124,23 @@ Product Wizard permission matrix:
 | `device_hardware` | POS device and peripheral integration surfaces |
 
 A disabled `till_management` entitlement must block till management APIs even if the user has till permissions.
+
+## R1 Commercial Plan Baseline (`ONEVERZ_R1_STD`) Reconciliation (OS-R1-4)
+
+The canonical commercial plan `ONEVERZ_R1_STD` contains exactly **7 Physical Technical Features** in the runtime database (`subscription_plan_features`):
+1. `outlet_management`
+2. `till_management`
+3. `pos_checkout`
+4. `product_catalog`
+5. `sales_orders`
+6. `click_collect`
+7. `online_store`
+
+Commercial Model Alignment:
+- **Conceptual Commercial Count:** 15 capabilities (reconciled from 14 baseline with the full inclusion of `online_store`).
+- **Physical Plan Features:** 7 features.
+- **Excluded Feature:** `offline_operation_sync` (physical feature exists in catalog, but excluded from `ONEVERZ_R1_STD` per BM-18 deferral).
+- **Platform Scope:** `user_accounts` is PLATFORM-scoped per migration `20260831163000_ReconcileSubscriptionPlanTenantFeatureScope` (not tenant-plan selectable).
+- **Core Entitlement-Independent:** `tenant_profile` and `tenant_settings` are built-in platform capabilities, not persisted plan rows.
+- **Logical Groupings / Unseeded Constants:** `role_management`, `permission_management`, `hardware_device_management`, `inventory_tracking`, and `sales_reports` are code/grouping concepts, not persisted plan rows.
+

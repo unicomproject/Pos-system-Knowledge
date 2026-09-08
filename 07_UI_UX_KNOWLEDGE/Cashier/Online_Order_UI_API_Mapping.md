@@ -1,13 +1,13 @@
 # Online Order UI ↔ API Mapping
 
-Status: **OO-01 TARGET CONTRACT CANONICALIZED; API IMPLEMENTATION PENDING** · Journey: `POS-UJ-036` · Updated: 2026-08-27
+Status: **OO-01 ACCEPTED; OO-02/OO-03 IMPLEMENTED / RUNTIME ACCEPTANCE OPEN** · Journey: `POS-UJ-036` · Updated: 2026-09-01
 
 ## Authorities and status language
 
 Canonical endpoints and permissions come from [[../../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]], [[../../04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]], and [[../../02_ACCESS_CONTROL/Permission_Code_List]]. Screen sequencing comes from [[Online_Order_Prototype_Flow]].
 
 - Canonical staff family: `/api/v1/tenant/ecommerce/click-collect/...`
-- The approved OO-01 list read is required but not implemented in Chunk 1. Downstream routes retain their separate implementation evidence.
+- OO-01 completion follows its accepted tracker. OO-02 detail and OO-03 Start are implemented on the canonical Flutter/backend owners; authenticated runtime acceptance remains separately tracked.
 - Public storefront fulfilment reads: **IMPLEMENTED/TESTING, SEPARATE SURFACE**; they are not cashier command endpoints.
 - A generic status `PATCH`, where present, is **LEGACY / NON-PRIMARY** and must not drive the prototype.
 
@@ -15,9 +15,10 @@ Canonical endpoints and permissions come from [[../../05_BACKEND_ARCHITECTURE/AP
 
 | UI | Request / command | Canonical route family | Response facts consumed | Permission | Status / failure handling |
 |---|---|---|---|---|---|
-| OO-01 | Search/list queue; internal bounded query | `GET .../orders` | card items, six authoritative aggregates, paging metadata, server time | `commerce.online_order.orders.access`, `commerce.online_order.orders.view` | Required, not implemented; loading/refresh/empty/empty-search/error/denied/not-entitled separated |
-| OO-02 | Read order detail | `GET .../orders/{orderId}` | customer, collection, payment, items, reservation/fulfilment facts | `.view` | Pending; stale/resource-scope error blocks commands |
-| OO-03 | Start preparation / assign | `POST .../orders/{orderId}/fulfilment/start` | updated state, assignee, version | `commerce.online_order.fulfilment.start` | Pending; outlet/reservation/conflict remain on detail |
+| OO-01 | Search/list queue; internal bounded query | `GET .../orders` | card items, six authoritative aggregates, paging metadata, server time | `commerce.online_order.orders.access`, `commerce.online_order.orders.view` | Implemented; loading/refresh/empty/empty-search/error/denied/not-entitled separated |
+| OO-02 | Read order detail | `GET .../orders/{orderId}?outletId=...` | order/display status, customer, collection window, payment/currency/totals, line/unit counts, lines and `fulfillmentVersion` | `commerce.online_order.orders.access`, `commerce.online_order.orders.view` | Implemented; GET is side-effect free |
+| OO-02 → OO-03 | Open confirmation | No request | already-loaded authoritative detail summary | `.fulfilment.start` gates visible action | No mutation; missing permission removes the action region |
+| OO-03 | Confirm start / assign | `POST .../orders/{orderId}/fulfilment/start?outletId=...` with `{expectedVersion}` | order/fulfilment IDs, resulting status, assignee, startedAt, updated version | `commerce.online_order.fulfilment.start` | Implemented; one in-flight request; 409 refetches detail and blocks OO-04 |
 | OO-04 | Read picking workspace | `GET .../orders/{orderId}/picking` | progress, lines, locations, version | `.picking.view` | Pending; server values authoritative |
 | OO-05 | Confirm scan/manual pick | `POST .../orders/{orderId}/picking/lines/{lineId}/pick` | accepted line/qty, progress, completion eligibility | `commerce.online_order.picking.pick` + `commerce.online_order.picking.scan` or `commerce.online_order.picking.manual_entry` | Pending; invalid barcode no increment |
 | OO-05 | Report item issue | `POST .../orders/{orderId}/picking/lines/{lineId}/issues` | issue result and current state | `commerce.online_order.picking.report_issue` | Pending; no implied substitution/cancel |
@@ -51,3 +52,7 @@ Canonical endpoints and permissions come from [[../../05_BACKEND_ARCHITECTURE/AP
 ## Prototype boundary
 
 The prototype may mock response shapes for visual review only, clearly labelled **DISPLAY-ONLY EXAMPLE**. It must not be used as API or runtime evidence. Route-specific completion claims follow the implementation audit.
+
+## OO-02 no-fan-out rule
+
+The detail response is one bounded aggregate read. Flutter must not call separate customer, product-image, payment, pickup or line APIs per rendered row. Optional media/options/classification remain absent when the aggregate cannot authoritatively provide them. The start response is followed by controlled detail/list invalidation, not speculative local lifecycle mutation.
