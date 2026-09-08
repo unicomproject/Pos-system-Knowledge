@@ -810,15 +810,32 @@ TENANT OPERATIONS & ADMINISTRATION (Tenant / Outlet / Till Scope)
 
 ---
 
-## 7. Commercial Entitlement â†’ Permission Mapping Matrix
+## 7. Commercial Entitlement → Permission Mapping Matrix
+
+> [!IMPORTANT]
+> **Conceptual Commercial Capabilities (15) vs. Physical Subscription Plan Features (7)**  
+> This matrix documents the **15 Conceptual Commercial Capabilities** available to an R1 tenant (plus the commercially excluded `offline_operation_sync`).  
+> In the runtime database, subscription plans associate strictly with physical technical feature rows via `subscription_plan_features`. The canonical commercial plan **`ONEVERZ_R1_STD`** contains exactly **7 Physical Technical Features**:
+> 1. `outlet_management`
+> 2. `till_management`
+> 3. `pos_checkout`
+> 4. `product_catalog`
+> 5. `sales_orders`
+> 6. `click_collect`
+> 7. `online_store`
+> 
+> The remaining rows in this table represent:
+> - **PLATFORM-scoped feature:** `user_accounts` (enforced as PLATFORM scope by migration `20260831163000_ReconcileSubscriptionPlanTenantFeatureScope`; not tenant-plan selectable).
+> - **Core entitlement-independent capabilities:** `tenant_profile`, `tenant_settings` (built-in platform capabilities, not persisted plan rows).
+> - **Conceptual / Grouping concepts:** `role_management`, `permission_management`, `hardware_device_management`, `inventory_tracking`, `sales_reports` (code constants / logical taxonomy, not persisted plan rows).
+> - **Commercially excluded feature:** `offline_operation_sync` (physical feature exists in catalog, but excluded from `ONEVERZ_R1_STD` per BM-18 deferral).
 
 | Commercial Entitlement Key | Included Feature | Primary Permission Codes Granted | Domain Scope |
 |---|---|---|---|
 | tenant_profile | Tenant Profile | tenant.dashboard.view | Tenant Wide |
 | tenant_settings | Tenant Settings | tenant.settings.manage | Tenant Wide |
 | user_accounts | User Accounts | tenant.users.view, tenant.users.create, tenant.users.invite, tenant.users.update, tenant.users.delete, tenant.users.disable, tenant.users.details.view, tenant.users.manage | Tenant Wide |
-| 
-ole_management | Role Setup | tenant.roles.view, tenant.roles.create, tenant.roles.update, tenant.roles.delete, tenant.roles.permissions.view, tenant.roles.permissions.update, tenant.roles.assignments.view, tenant.roles.assignments.update, tenant.roles.manage | Tenant Wide |
+| role_management | Role Setup | tenant.roles.view, tenant.roles.create, tenant.roles.update, tenant.roles.delete, tenant.roles.permissions.view, tenant.roles.permissions.update, tenant.roles.assignments.view, tenant.roles.assignments.update, tenant.roles.manage | Tenant Wide |
 | permission_management | Permission Assignment | tenant.roles.manage, tenant.permissions.view | Tenant Wide |
 | outlet_management | Physical Outlets | tenant.outlets.view, tenant.outlets.details.view, tenant.outlets.revenue.view, tenant.outlets.users.view, tenant.outlets.tills.view, tenant.outlets.update, tenant.outlets.manage | Tenant Wide |
 | till_management | Till Registers | tenant.tills.view, tenant.tills.create, tenant.tills.update, tenant.tills.delete, tenant.tills.manage, tenant.tills.assign_outlet, tenant.tills.details.view, tenant.hardware.view, tenant.hardware.manage | Outlet Scoped |
