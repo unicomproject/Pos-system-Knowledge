@@ -170,8 +170,20 @@ The following commercial capabilities are EXCLUDED from Release 1 baseline:
 
 ---
 
-## 11. REVISION LOG
+## 11. COMMERCIAL SUBSCRIPTION PLAN RECONCILIATION (OS-R1-4)
+
+- **Conceptual Commercial Capabilities (15):** High-level commercial taxonomy encompassing the 15 capabilities available to an R1 tenant (reconciled from historical 14 baseline with the full inclusion of `online_store`).
+- **Physical Subscription Plan Features (7):** The concrete database rows in `subscription_plan_features` associated with `ONEVERZ_R1_STD` (`outlet_management`, `till_management`, `pos_checkout`, `product_catalog`, `sales_orders`, `click_collect`, `online_store`).
+- **Excluded Feature (1):** `offline_operation_sync` (BM-18 Offline & Synchronization deferred).
+- **Platform & Core Capabilities:** `user_accounts` is PLATFORM-scoped per migration `20260831163000`; `tenant_profile` and `tenant_settings` are core entitlement-independent capabilities; `role_management`, `permission_management`, `hardware_device_management`, `inventory_tracking`, and `sales_reports` are conceptual groupings/code constants rather than persisted plan rows.
+- **Architectural Invariant:** Total Business Modules = 19; Canonical Use Cases = 291.
+
+---
+
+## 12. REVISION LOG
 
 | Revision | Date | Author | Description |
 | --- | --- | --- | --- |
 | **R1.0** | 2026-09-02 | BCM-2 Reconciliation | Initial publication of canonical 19-module capability master |
+| **R1.1** | 2026-09-08 | OS-R1-4 Reconciliation | Commercial model reconciliation: 15 conceptual capabilities vs 7 physical ONEVERZ_R1_STD features |
+
