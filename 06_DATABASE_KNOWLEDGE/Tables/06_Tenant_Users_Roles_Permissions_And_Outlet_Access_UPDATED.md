@@ -1,7 +1,7 @@
 ﻿<!-- title: Tenant Users, Roles, Permissions & Outlet Access -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-06 -->
+<!-- last_updated: 2026-08-26 -->
 <!-- source: Updated from uploaded ERD image: 06_Tenant Users, Roles, Permissions & Outlet Access.png -->
 
 # 06. Tenant Users, Roles, Permissions & Outlet Access
@@ -427,3 +427,39 @@ Canonical resolver requirement:
 Schema support exists, but auth/context resolvers and Tenant Admin role APIs remain implementation gaps.
 <!-- RBAC_HARDENING_2026_08_15_END -->
 
+<!-- RBAC_RUNTIME_RECONCILIATION_2026_08_21_START -->
+## RBAC Runtime Reconciliation Addendum - 2026-08-21
+
+The canonical role, role-permission, user-role, and outlet-role tables support
+the role setup aggregate. No duplicate RBAC table or schema change is justified
+by the current runtime finding alone.
+
+The data/configuration invariant is currently broken: authenticated validation
+found 44 active Cashier `tenant_role_permissions` grants with no matching
+permission-catalog entries. Reconcile seeds, entitlement evaluation, and
+delegation projection without inserting duplicate historical grants or losing
+soft-revoke history.
+
+Status: `BLOCKED — seed/catalog alignment required before production role
+editing.` This section supersedes the stale claim that Tenant Admin role APIs
+are absent.
+<!-- RBAC_RUNTIME_RECONCILIATION_2026_08_21_END -->
+
+## Tenant Admin User Creation Persistence Mapping — 2026-08-25
+
+| Wizard intent | Current table mapping | Status |
+|---|---|---|
+| Tenant user identity | `tenant_users` | Supported |
+| Tenant-wide selected role | `tenant_user_roles` | Supported |
+| Selected-outlet selected role | `outlet_user_roles` | Supported |
+| Additive direct user grants | `tenant_user_permissions` | Supported |
+| Outlet-context direct grant | `outlet_user_permissions` | Existing capability; not exposed by user-create DTO |
+| Invite/setup token | `user_invites` plus protected delivery/outbox infrastructure | Supported |
+| Profile image reference | Current tenant user media reference field | Supported attachment; upload contract differs |
+| User-specific selected tills | No canonical assignment relation | Gap |
+| User default till | No canonical user field/relation | Gap |
+| Access start date | No current user-create persistence mapping | Gap |
+
+Step 3 may write additive `tenant_user_permissions`; it must never update `tenant_role_permissions`. Empty outlet IDs map to tenant-wide role assignment, so a separate `No Outlet Access` state has no current persistence representation. Review counts are projections, not stored access-level classifications.
+
+`tills.default_cashier_tenant_user_id` is till-owned and is not a general user-to-till access list. `outlets.is_default_outlet` is not a per-user default outlet. Soft-revoked role/permission rows must be reactivated rather than duplicated.

@@ -561,3 +561,21 @@ catalog.product_cost.view
 Any historical example mentioning this endpoint must be read as target contract until backend implementation and tests exist.
 <!-- RBAC_HARDENING_2026_08_15_END -->
 
+## Tenant Admin Native Online Store Permissions — 2026-08-27
+
+All codes require an active tenant, effective `online_store` entitlement, and tenant-owned resources. Click & Collect mutations additionally require effective `click_collect` entitlement. Role names are never authorization inputs.
+
+| Permission | Canonical use |
+|---|---|
+| `tenant.online_store.view` | Steps 1–9 read projections, readiness, domains, branding, support, catalogue and policies |
+| `tenant.online_store.manage` | Step 2 activation, Step 3 identity and Step 4 hosted URL |
+| `tenant.online_store.publish` | Step 9 final idempotent publish |
+| `tenant.online_store.domains.manage` | Step 4 custom-domain lifecycle |
+| `tenant.online_store.branding.manage` | Step 5 media, branding and banners |
+| `tenant.online_store.support.manage` | Step 6 support/contact configuration |
+| `tenant.online_store.fulfillment.manage` | Step 7 Click & Collect configuration and outlet mappings |
+| `tenant.online_store.catalog.manage` | Step 8 product/variant channel visibility |
+| `tenant.online_store.policies.manage` | Step 8 policy draft, publish, version and archive |
+
+Canonical journey: [[../03_USER_JOURNEYS/Tenant_Admin/22_Online_Store_Setup_And_Publish_Flow]].
+

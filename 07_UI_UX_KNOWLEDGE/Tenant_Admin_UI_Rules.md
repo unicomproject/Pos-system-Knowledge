@@ -1,13 +1,15 @@
 <!-- title: Tenant Admin UI Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-06 -->
+<!-- last_updated: 2026-08-25 -->
 
 # Tenant Admin UI Rules
 
 ## Purpose
 
 This document defines UI guidelines and layout behaviors for the Tenant Admin area of the OneVerz POS system.
+
+The canonical Add New User experience is defined in [[Tenant_Admin_User_Creation_5_Step_Wizard]]. Its five-step presentation must remain tablet-first, backend-driven, touch-friendly, and honest about unsupported till/default-till controls.
 
 ---
 

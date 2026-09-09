@@ -104,3 +104,12 @@ engine, AI modules, and full accounting are not active MVP entitlements.
 | `device_hardware` | POS device and peripheral integration surfaces |
 
 A disabled `till_management` entitlement must block till management APIs even if the user has till permissions.
+
+## Tenant Admin Native Online Store Entitlements — 2026-08-27
+
+| Feature code | Required for |
+|---|---|
+| `online_store` | Tenant Admin Online Store menu, setup Steps 1–6 and 8–9, storefront channel configuration and publish |
+| `click_collect` | Step 7 Click & Collect reads/mutations and eligible collection-outlet configuration |
+
+Activation of setup does not publish the store and does not activate the public sales channel. Missing entitlement must return a denied/feature-not-enabled state even when a matching permission exists.

@@ -1,7 +1,7 @@
 ﻿<!-- title: Permission Based UI Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-26 -->
 
 
 # Permission Based UI Rules
@@ -142,3 +142,6 @@ Role setup must use the approved five-step flow:
 Do not expose or imply a sixth wizard step. Confirmation is a post-save result state.
 <!-- RBAC_HARDENING_2026_08_15_END -->
 
+## Add New User Permission UI Correction — 2026-08-26
+
+In Tenant Admin Add New User, Step 3 configures only the selected user's additive direct grants. It never edits the Base Role. Render `Inherited`, `User Override`, and `Locked / Not Assignable` states and show a clear user-only information message. Use [[Tenant_Admin_User_Creation_5_Step_Wizard]] as the canonical screen contract.

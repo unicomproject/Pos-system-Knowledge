@@ -77,3 +77,15 @@ merchandising, attractions, and temporary retail locations.
 
 - [[04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout/02_Functional_Rules]]
 - [[04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout/03_Technical_Contract]]
+
+## Tenant Admin Native Online Store Ownership — 2026-08-27
+
+The module owns three separate surfaces:
+
+1. Platform Admin bootstrap (`SA-ST-UJ-011`) — initial tenant readiness only.
+2. Tenant Admin setup/publish (`EC-TA-UJ-02` / `TA-UJ-063`) — the canonical nine-step configuration and live-management journey.
+3. Customer storefront — browse, account, cart, checkout and collection experience.
+
+The Tenant Admin flow configures OneVerz's native Online Store sales channel. It is not Shopify/WooCommerce integration. Release 1 is registered-customer Click & Collect with Pay at Pickup; delivery, online gateway scope and guest checkout are excluded.
+
+Journey: [[../../03_USER_JOURNEYS/Tenant_Admin/22_Online_Store_Setup_And_Publish_Flow]].

@@ -1,7 +1,7 @@
 ﻿<!-- title: Tenant Users, Roles, Permissions & Outlet Access Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-26 -->
 
 # Tenant Users, Roles, Permissions & Outlet Access Module Overview
 
@@ -41,6 +41,14 @@ merchandising, attractions, and temporary retail locations.
 | `outlet_user_permissions` | Used by this module |
 
 ## Core Business Rules
+
+## Canonical User Creation Journey — 2026-08-25
+
+Tenant Admin Add New User follows [[../../03_USER_JOURNEYS/Tenant_Admin/07_User_Management_Add_New_User_Flow]]: Basic Information, Assign Role, Configure Permissions, Outlet/Till/Access Scope, and Security & Review. Current persistence supports tenant-wide or selected-outlet role assignment and additive direct tenant-user grants. General user-to-till assignment/default-till is not part of the current model.
+
+Role selection belongs only to Step 2. Step 3 changes only this user's additive direct grants and never changes the Base Role. `No Outlet Access`, Access Level, Save Draft, and till/default controls are not active capabilities.
+
+The user assignment role list is backend-driven and may include active delegable system/custom tenant roles. It must not be confused with Role Setup Options, which exposes only the `TENANT_ADMIN` and `CASHIER` setup templates.
 
 - No hardcoded cashier, manager, or administrator behavior.
 - Permission definitions are database-driven and module-scoped.

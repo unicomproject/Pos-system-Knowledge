@@ -1,7 +1,7 @@
 ﻿<!-- title: Tenant Admin Role Permission Management Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-15 -->
+<!-- last_updated: 2026-08-26 -->
 
 # Tenant Admin Role Permission Management Flow
 
@@ -61,9 +61,9 @@ Confirmation is a result state after Step 5. It is not Step 6.
 |---|---|---|
 | Database RBAC tables | Tenant roles, role permissions, tenant user roles/direct permissions, outlet roles/direct permissions, templates, template versions exist. | Implemented |
 | Flutter route | `/tenant-admin/roles-permissions` exists as canonical frontend route. | Partial |
-| Flutter datasource | Calls `/api/v1/tenant-admin/roles` and `/api/v1/tenant-admin/permission-catalog`. | Ahead of backend |
-| Backend Tenant Admin role APIs | No implemented tenant role/permission-catalog controllers verified. | Missing |
-| Effective permission resolver | Current auth/context resolvers are partial and need revoked-row/outlet-source hardening. | Gap |
+| Flutter datasource | Calls `/api/v1/tenant-admin/roles` and `/api/v1/tenant-admin/permission-catalog`. | Source-aligned |
+| Backend Tenant Admin role APIs | Lifecycle, catalog, permission, assignment, setup-options, and atomic setup contracts exist. | Implemented in source |
+| Effective permission resolver | Canonical resolver exists; runtime environment verification remains separate. | Implemented in source |
 
 ## Related Files
 
@@ -72,3 +72,23 @@ Confirmation is a result state after Step 5. It is not Step 6.
 - `02_ACCESS_CONTROL/Feature_Entitlement_Matrix.md`
 - `04_MODULE_KNOWLEDGE/05_Tenant_User_Permission_Access/03_Technical_Contract.md`
 - `13_DECISIONS_AND_CHANGES/ADR/ADR_009_Tenant_Effective_Permission_Resolution.md`
+
+## Runtime Reconciliation Addendum - 2026-08-21
+
+This is a five-step tenant-scoped journey. Step 1 offers only the
+`TENANT_ADMIN` and `CASHIER` templates. `SUPER_ADMIN` and platform roles must
+not appear in Tenant Admin Role Access setup.
+
+Steps 2 and 3 are driven by `GET /api/v1/tenant-admin/permission-catalog`.
+During an edit, active role grants must be assignable or explicitly locked and
+preserved; they must never be silently omitted and then revoked on save.
+
+Authenticated validation on 2026-08-21 found 44 active Cashier grants with no
+matching catalog entries. Current source includes later reconciliation
+migrations. Each environment must apply current migrations and rerun catalog,
+seed, entitlement, delegation, and role-edit checks before production PASS.
+
+The Add New User journey consumes active delegable roles and this permission
+catalog through [[07_User_Management_Add_New_User_Flow]].
+
+Roles & Access is the only journey that changes global role permissions. Add New User Step 3 may create additive user-specific grants but must never mutate the selected Base Role.

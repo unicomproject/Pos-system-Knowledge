@@ -50,3 +50,18 @@ Tests required before Tenant Admin Roles & Access can be marked production-ready
 - Unauthorized API request returns safe problem details.
 - Audit log is persisted for create/update/disable/assignment changes.
 - No restricted permission values leak through UI semantics/tooltips/logs.
+
+## Catalog Reconciliation Regression Cases - 2026-08-21
+
+| ID | Scenario | Expected result |
+|---|---|---|
+| TARPM-CAT-01 | Load an editable system role with active persisted grants. | Each active grant is assignable or explicitly locked and preserved in the catalog/edit projection. |
+| TARPM-CAT-02 | Submit permissions/setup after the catalog omits an active persisted grant. | Server rejects without changing the active permission set; no silent revoke occurs. |
+| TARPM-CAT-03 | Load the seeded Cashier role as an authenticated Tenant Admin. | Persisted Cashier grants map to selected modules and permissions before save. |
+| TARPM-CAT-04 | Actor lacks delegation for a currently active grant. | The grant is clearly non-assignable/locked or save is safely rejected; it is not silently removed. |
+| TARPM-CAT-05 | Reconcile Cashier seeds, entitlement, and catalog projection. | The authenticated catalog contains a safe representation for every active Cashier grant. |
+
+Historical 2026-08-21 runtime evidence found 44 active Cashier grants with no
+matching catalog entries. Current source includes later reconciliation
+migrations. Apply them in each environment and rerun these API/PostgreSQL and
+authenticated UI regressions before reporting runtime PASS.

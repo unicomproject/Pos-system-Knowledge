@@ -1,131 +1,56 @@
-﻿<!-- title: Tenant Users, Roles, Permissions & Outlet Access Technical Contract -->
+<!-- title: Tenant Users, Roles, Permissions & Outlet Access Technical Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-15 -->
+<!-- last_updated: 2026-08-26 -->
 
 # Tenant Users, Roles, Permissions & Outlet Access Technical Contract
 
-## Purpose
+## User Creation Command
 
-Defines the implementation contract for tenant users, tenant roles, direct permissions, outlet roles, outlet permissions, role templates, and permission catalog integration.
+`POST /api/v1/tenant-admin/users` is the single atomic create command and requires `Idempotency-Key`. `GET /api/v1/tenant-admin/users/create-options` supplies assignable roles, active outlets, permission groups, and supported statuses.
 
-## Verification Status
+Current create fields include full name, email, nullable phone, one `roleId`, outlet IDs, permission override flag/IDs, invite choice, employee ID, `INACTIVE`/`INVITED` create status, and optional profile media asset ID. Tenant and actor IDs are server-derived.
 
-This document was corrected on 2026-08-15 after source inspection. Items marked `MISSING` or `PARTIAL` must not be treated as implemented.
+## Corrected Step Mapping
 
-## Database Contract
-
-| Table | Verified Purpose | Status |
+| Step | API/persistence mapping | Status |
 |---|---|---|
-| `tenant_users` | Tenant staff account. | Implemented |
-| `tenant_roles` | Tenant-scoped role, optionally sourced from a role template/version. | Implemented |
-| `tenant_role_permissions` | Additive tenant role permission grant with revocation timestamp. | Implemented |
-| `tenant_user_roles` | Tenant user role assignment with revocation timestamp. | Implemented |
-| `tenant_user_permissions` | Direct tenant user permission grant with revocation timestamp. | Implemented |
-| `outlet_user_roles` | Outlet-scoped role assignment with revocation timestamp and primary manager flag. | Implemented |
-| `outlet_user_permissions` | Direct outlet-scoped permission grant with revocation timestamp. | Implemented |
-| `permission_definitions` | Backend-owned permission code catalog. | Implemented |
-| `role_templates` | Reusable role template definition. | Implemented |
-| `role_template_versions` | Versioned role template snapshot. | Implemented |
-| `role_template_version_permissions` | Template version permission membership. | Implemented |
-| `audit_logs` | Persistent audit trail. | Implemented table; role mutation event coverage missing until APIs exist. |
+| 1 Basic Information | Identity/profile/account mode; no role selection | Supported; phone-required backend validation gap |
+| 2 Assign Base Role | One `roleId` from delegable create options | Supported |
+| 3 Configure Permissions | Additive direct `tenant_user_permissions` only | Supported with permission-override authority |
+| 4 All Outlets | Empty outlet IDs → `tenant_user_roles` | Supported |
+| 4 Selected Outlets | Non-empty IDs → `outlet_user_roles` | Supported |
+| 4 No Outlet Access | Empty IDs conflict with tenant-wide meaning | Not supported; omit |
+| Default Outlet / Till IDs / Default Till | No current create DTO/service mapping | Implementation gap |
+| 5 Security & Review | `INVITED` or `INACTIVE`, atomic final save | Supported |
 
-## Effective Permission Contract
+## Permission Invariant
 
-The canonical resolver is documented in `02_ACCESS_CONTROL/Tenant_Effective_Permission_Resolution.md`.
+`BR-UCR-PERM-001`: Add New User must never mutate `tenant_role_permissions`. The selected role remains immutable in this flow. Direct user overrides are additive grants; inherited permissions cannot be denied here. Unknown, inactive, unentitled, platform, or non-delegable grant IDs are rejected server-side.
 
-Effective permissions are additive:
+Conceptually: `Base Role Permissions + Accepted Additive User Grants = User Effective Permissions`, followed by canonical tenant, entitlement, active-definition, revocation, and context filtering.
 
-```text
-tenant direct permissions
-UNION tenant role permissions
-UNION outlet direct permissions where outlet context applies
-UNION outlet role permissions where outlet context applies
-```
+## Review Derivation
 
-Every resolver must filter inactive and revoked rows.
+Module and permission counts are distinct counts from final effective permissions. Outlet count derives from final scope. No Till Count or defaults are authoritative until supported. No Low/Medium/High Access Level formula exists, so Access Level is not part of the contract.
 
-## Required Runtime Filters
+## Account and Invitation
 
-- Tenant ID must match authenticated tenant context.
-- User must belong to tenant.
-- Role must belong to tenant and be active.
-- Permission definition must be active.
-- User-role assignment must have `revoked_at IS NULL`.
-- Direct permission assignment must have `revoked_at IS NULL`.
-- Role-permission grant must have `revoked_at IS NULL`.
-- Outlet grants must match the target outlet context and active outlet status.
-- Feature entitlement must allow plan-controlled features.
+Create supports `INVITED` and `INACTIVE`; direct `ACTIVE` create is rejected. Invited users receive a one-time expiring setup flow and set their own password. Inactive users cannot sign in and must not be described as awaiting invitation unless invite state actually exists.
 
-## Backend API Contract
+## Security Feature Classification
 
-### Verified Implemented
-
-| Endpoint Group | Status |
+| Feature | Classification |
 |---|---|
-| `/api/v1/tenant-admin/users` | Implemented for Tenant Admin user management. |
+| Temporary Password | Out of scope/prohibited by token onboarding |
+| Force Password Change | Supported differently in the domain model; not exposed by create contract |
+| Two-Factor Authentication | Implementation gap |
+| Access Start Date | Implementation gap |
+| Save Draft | Implementation gap / out of current scope |
+| Dedicated user photo upload | Implementation gap; media attachment ID is supported |
+| Notes during create | Implementation gap; entity capability exists |
+| Outlet-specific role override | Implementation gap in create DTO/service |
 
-### Canonical Target - Missing Until Implemented
+## Atomicity and Security
 
-| Endpoint | Status |
-|---|---|
-| `GET /api/v1/tenant-admin/permission-catalog` | MISSING |
-| `GET /api/v1/tenant-admin/roles` | MISSING |
-| `POST /api/v1/tenant-admin/roles` | MISSING |
-| `GET /api/v1/tenant-admin/roles/{roleId}` | MISSING |
-| `PUT /api/v1/tenant-admin/roles/{roleId}` | MISSING |
-| `GET /api/v1/tenant-admin/roles/{roleId}/permissions` | MISSING |
-| `PUT /api/v1/tenant-admin/roles/{roleId}/permissions` | MISSING |
-| `GET /api/v1/tenant-admin/roles/{roleId}/users` | MISSING |
-| `PUT /api/v1/tenant-admin/roles/{roleId}/users` | MISSING |
-| `POST /api/v1/tenant-admin/roles/{roleId}/activate` | MISSING |
-| `POST /api/v1/tenant-admin/roles/{roleId}/disable` | MISSING |
-
-## Frontend Contract
-
-- Canonical Flutter route: `/tenant-admin/roles-permissions`.
-- Compatibility routes may redirect from `/tenant-admin/roles-access` and `/tenant-admin/roles`.
-- Flutter must consume typed DTOs/repositories/providers and must not expose raw JSON directly to widgets.
-- Flutter permission checks are visibility helpers only.
-- Flutter currently calls missing backend role/permission-catalog endpoints; this is a backend contract gap, not proof that those APIs exist.
-
-## Canonical Role Setup Flow
-
-| Step | Name |
-|---:|---|
-| 1 | Role Details & Template |
-| 2 | Select Modules |
-| 3 | Configure Permissions |
-| 4 | Assign Users & Access Scope |
-| 5 | Review & Create |
-
-No sixth wizard step is canonical.
-
-## Open Implementation Gaps
-
-- Tenant role management API controllers/services/repositories.
-- Permission catalog API filtered by tenant entitlements.
-- Effective permission resolver hardening for revoked rows.
-- Outlet-scoped permission inclusion in runtime authorization.
-- Last-admin/super-admin safety guard.
-- Explicit role mutation audit events persisted in `audit_logs`.
-- Concurrency/idempotency policy for role permission replacement.
-- Tests for multiple role union, direct grants, outlet scope, template snapshot, revocation, audit, and authorization denial.
-
-## Test Contract
-
-Test coverage must include:
-
-- Tenant isolation for every endpoint.
-- Permission denied for missing role management permission.
-- Feature entitlement disabled.
-- Duplicate role name/code conflicts.
-- Multiple roles union and duplicate collapse.
-- Direct permission additive behaviour.
-- Revoked tenant role/user/direct/role-permission rows excluded.
-- Outlet role/direct permissions included only in correct outlet context.
-- Role template version snapshot behaviour.
-- Disable does not delete.
-- Last-admin protection.
-- Audit log persistence.
-- Friendly problem details and no internal data leaks.
+Final create revalidates role, outlets, media, direct grants, delegation ceiling, entitlements, tenant isolation, and account mode. User, assignments, direct grants, invite/outbox state, and audit are committed as one logical mutation. Soft-revoked assignment rows are reactivated instead of duplicated.

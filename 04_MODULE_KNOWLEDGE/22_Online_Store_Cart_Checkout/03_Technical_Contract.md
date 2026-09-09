@@ -1,7 +1,7 @@
 <!-- title: Online Storefront, Cart & Checkout Technical Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-31 -->
 
 # Online Storefront, Cart & Checkout Technical Contract
 
@@ -112,3 +112,21 @@ Test coverage must include:
 
 - [[04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout/02_Functional_Rules]]
+
+## Tenant Admin Nine-Step Technical Contract — 2026-08-27
+
+Base API: `/api/v1/tenant-admin/online-store`. Controller → `ITenantAdminOnlineStoreService` → `TenantAdminOnlineStoreService` → EF Core/PostgreSQL. The current service enforces tenant context, permission, feature entitlement, media ownership, readiness, audit events and idempotent publish.
+
+Persistence owners are `tenant_settings` (`online_store.defaults` JSON), `sales_channels`, `platform_sales_channels`, `tenant_domains`, `media_assets`, `storefront_banners`, `storefront_policies`, `product_channel_visibilities`, `products`, `product_variants`, `fulfillment_methods`, `fulfillment_method_outlets`, `outlet_business_hours`, `outlets`, `tenant_users`, `audit_logs`, and `idempotency_requests`.
+
+The source service exposes readiness steps only as `PASS` or `BLOCKED`. Desired `NOT_STARTED / IN_PROGRESS / COMPLETE / BLOCKED` progress is not persisted and must not be independently inferred as business truth by Flutter.
+
+Full matrix and gap register: [[../../03_USER_JOURNEYS/Tenant_Admin/22_Online_Store_Setup_And_Publish_Flow]].
+
+## Tenant Admin Step 5 Branding Integration — 2026-08-31
+
+Flutter reads and writes `/api/v1/tenant-admin/online-store/branding` with typed DTO/entity/provider layers. The persisted contract is limited to logo media ID, favicon media ID, primary colour and secondary colour; response image URLs are preserved for rendering.
+
+Logo and favicon uploads use `/media/ONLINE_STORE_LOGO` and `/media/ONLINE_STORE_FAVICON`. A successful upload is attached with `PUT /branding`; replaced media is deleted only after attachment succeeds. Removal first persists a null branding reference, then deletes the media asset, with rollback attempted if deletion fails. Flutter prevents concurrent branding media operations and preserves the previous asset on attach failure.
+
+Client validation mirrors the backend's 5 MB and supported MIME contract, while backend tenant ownership, permission, entitlement, signature and raster-dimension validation remain authoritative. Step readiness is always reloaded from backend projections.

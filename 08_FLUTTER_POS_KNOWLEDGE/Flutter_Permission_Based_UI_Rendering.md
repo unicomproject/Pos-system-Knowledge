@@ -1,7 +1,7 @@
 ﻿<!-- title: Flutter Permission Based UI Rendering -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-08-26 -->
 
 
 # Flutter Permission Based UI Rendering
@@ -9,6 +9,10 @@
 ## Purpose
 
 This file defines permission-based UI rendering rules for OneVerz POS Flutter apps.
+
+For Tenant Admin Add New User, use [[Tenant_Admin_User_Creation_5_Step_Flutter_Contract]]. The selected role supplies inherited access; optional direct user overrides are additive catalog grants. UI role labels, module cards, and hidden actions never replace backend delegation and entitlement checks.
+
+Role selection exists only in Step 2. Step 3 must not invoke role permission replacement. Review counts are selectors over final wizard state, and invitation widgets render only for the selected account mode.
 
 Permissions are backend-driven and must not be hardcoded by role name.
 

@@ -1,7 +1,7 @@
 <!-- title: 07. Invitations, Authentication, Tokens & Security Audit -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-06 -->
+<!-- last_updated: 2026-08-26 -->
 <!-- source: Updated from uploaded ERD image -->
 
 # 07. Invitations, Authentication, Tokens & Security Audit
@@ -308,3 +308,10 @@ Blank Reference / Note cells: 0
 - [[../Database_Overview]]
 - [[../Status_And_Type_Check_Rules]]
 - [[../Migration_Rules]]
+## Tenant Admin Add User Invitation Contract — 2026-08-25
+
+For an `INVITED` user, final save creates tenant user and invitation state atomically. The raw setup token is never stored as an ordinary plaintext password. The invite is expiring and one-time; acceptance lets the invited user set a password and activates the account according to onboarding policy.
+
+The five-step wizard must not request an administrator-entered temporary password. Resend rotates/replaces the usable invitation secret, revoke invalidates it, and audit/outbox delivery state remains separately traceable. `INACTIVE` creation produces no immediately usable login credential.
+
+`INVITED` review shows invitation destination and setup behavior. `INACTIVE` review shows login disabled and must not display `Will be invited`. Direct `ACTIVE` creation is not part of the current create-status policy.

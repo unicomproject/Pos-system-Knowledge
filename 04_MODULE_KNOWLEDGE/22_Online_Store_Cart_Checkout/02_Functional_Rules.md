@@ -74,3 +74,16 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 
 - [[04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/22_Online_Store_Cart_Checkout/03_Technical_Contract]]
+
+## Tenant Admin Setup And Publish Rules — 2026-08-27
+
+1. The journey is exactly nine steps; Store Live is the Step 9 result state.
+2. `setupEnabled`, `storeStatus = PUBLISHED`, and sales-channel `ACTIVE` are distinct states.
+3. Every step save persists immediately through its feature endpoint; “Save & Continue” means persist current step then navigate. It is not a local-only draft.
+4. Final publish reruns backend readiness and requires an `Idempotency-Key`.
+5. Hosted slug is sufficient when no custom domain exists. Once a custom domain is primary, it must be verified and SSL active.
+6. Branding readiness currently requires branding settings plus at least one active banner.
+7. Support readiness currently requires support email and phone; Business Address and Support Hours are captured but not backend blockers.
+8. Click & Collect readiness requires an active mapped outlet with business hours; the query is tenant scoped and excludes deleted outlets.
+9. Catalogue visibility uses `product_channel_visibilities`; Product Master is not duplicated.
+10. Backend currently requires five published policy types, including `RETURN_REFUND`; approved UI shows four. Publish remains blocked until product ownership intentionally reconciles this mismatch.

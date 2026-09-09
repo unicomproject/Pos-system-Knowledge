@@ -1,7 +1,7 @@
 <!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-16 -->
+<!-- last_updated: 2026-09-09 -->
 
 > Park / Recall Sale update (2026-08-06): Flutter Chunk 2 data integration is code complete with typed backend create/list/recall/cancel, stable idempotency, canonical permissions, safe cart rules, and 791 passing Flutter tests. Authenticated Flutter-backend verification and final UI/E2E acceptance remain pending; the full feature is not Completed.
 
@@ -249,3 +249,22 @@ table file, architecture file, and PR/commit reference where available.
 ## Payment Success Chunk 3 Runtime Status (2026-08-06)
 
 **BLOCKED — CHUNK 3 REMAINS IN PROGRESS.** One authenticated Cash sale persisted and reset correctly, but runtime found corrected-yet-unrevalidated Payment Success mapping defects plus unresolved printer/drawer configuration. Physical print did not occur. See `15_IMPLEMENTATION_TRACKING/Flutter/Sales/Payment_Success_Receipt_Screen_Implementation_Status.md`.
+
+## September 9, 2026 - Local implementation evidence update
+
+The following notes supplement earlier Flow 4 and development records. They do not replace canonical flows or approve production release.
+
+- [[15_IMPLEMENTATION_TRACKING/Backend/Auth/Tenant_Admin_Phase_B_Local_Verification_2026-09-09|Phase B account setup and English invitation email]] - local activation/login evidence; dashboard authorization and production completion remain pending.
+- [[15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin/Phase_B_Android_Handoff_2026-09-09|Android handoff and unlocked-device launcher]] - local app opening verified; production installation/distribution remains pending.
+- [[15_IMPLEMENTATION_TRACKING/Backend/Backend_CI_And_Local_Database_Fixes_2026-09-09|Backend CI, contracts and local database recovery]] - 1,529 unit and 512 API tests passed in the isolated verified checkout; EF model check passed; final GitHub Actions green status was not independently observed.
+
+The existing TenantAdminBootstrapPermissionCatalog is already documented. Uncommitted Role/User/Outlet work is not declared complete by this update. No credentials, passwords or invitation tokens are included.
+## September 9, 2026 - Remaining local access changes
+
+The following Draft records document inspected local changes. They are not completion claims and do not change canonical authorization requirements.
+
+- [[15_IMPLEMENTATION_TRACKING/Backend/Tenant/Tenant_User_Role_Local_Access_Changes_2026-09-09|User/role granular access and permission presentation]] - option filtering, mutation checks, role scope and local regression sources.
+- [[15_IMPLEMENTATION_TRACKING/Backend/OutletTillDevice/Outlet_Till_Local_Access_Changes_2026-09-09|Outlet/till action permissions and outlet scope]] - dedicated actions, till reassignment and scope-based user selection.
+- [[15_IMPLEMENTATION_TRACKING/Backend/Tenant/Permission_Migration_Local_Inventory_2026-09-09|Local permission migration inventory]] - ten untracked migration source files; discovery/application and regression verification still require review.
+
+Earlier CI pass counts do not certify this entire uncommitted change set. The tax table diff inspected for this update was only a leading blank line. No source code, migrations or runtime permissions were changed by this documentation update.

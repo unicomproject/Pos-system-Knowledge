@@ -49,7 +49,7 @@ Confirmation is a post-save result, not a sixth wizard step.
 ## Required Before Marking Complete
 
 - Implement backend Tenant Admin role and permission catalog endpoints.
-- Add backend tests for the role APIs.
+- Maintain backend tests for implemented role APIs and rerun them after catalog migrations.
 - Verify Flutter can load real backend catalog/role data.
 - Verify create/edit/save/disable/user assignment flows against backend.
 - Verify no revoked permission/role assignment appears effective.

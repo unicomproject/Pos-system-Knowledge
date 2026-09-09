@@ -78,3 +78,15 @@ context, feature entitlement, sync permission, idempotency, and payload validati
 - [[Access_Control_Overview]]
 - [[API_Standards]]
 - [[Offline_Operation_Architecture]]
+
+## Tenant Role Editing Catalog Safety - 2026-08-21
+
+The catalog used to edit a role is part of the authorization boundary. Its
+response must not silently hide an active role permission and allow a replace
+request to remove it. Active persisted grants must be assignable to the actor
+or explicitly returned as locked and preserved with a safe reason. Otherwise,
+the backend must reject final save without changing the active grant set.
+
+Authenticated runtime validation currently found this invariant broken for a
+Cashier role (44 active grants, zero matching catalog entries). Status:
+`BLOCKED` pending catalog, seed, entitlement, and delegation reconciliation.

@@ -1,7 +1,7 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-14 -->
+<!-- last_updated: 2026-08-26 -->
 
 # Platform Subscription Plan API Endpoints
 
@@ -1666,3 +1666,57 @@ Response structure (Proposed):
 ```
 
 *Note*: `stockValue` reuses the canonical Inventory valuation logic (Sum of `remaining_quantity * unit_cost`). Open orders rely on canonical `SalesOrder` statuses (Not `COMPLETED` and not `CANCELLED`).
+
+## Tenant Admin Role Setup API Status - 2026-08-21
+
+Base route: `/api/v1/tenant-admin`
+
+| Endpoint | Status |
+|---|---|
+| `GET /roles` and `GET /roles/{roleId}` | Implemented |
+| `GET /roles/setup-options` | Implemented; exposes only `TENANT_ADMIN` and `CASHIER` |
+| `POST /roles`, `PUT /roles/{roleId}`, `PATCH /roles/{roleId}/status`, `DELETE /roles/{roleId}` | Implemented |
+| `GET /permission-catalog` | Implemented; reconciliation migrations exist, environment application must be verified |
+| `GET` / `PUT /roles/{roleId}/permissions` | Implemented |
+| `GET` / `PUT /roles/{roleId}/assignments` and `GET /roles/{roleId}/users` | Implemented |
+| `PUT /roles/{roleId}/setup` | Implemented atomic final-save contract |
+
+Release blocker: an authenticated Cashier role had 44 active persisted grants
+with no matching catalog permissions. Do not enable role-edit saves until the
+catalog safely represents or explicitly preserves every active grant.
+## Tenant Admin User Creation 5-Step Mapping — Corrected 2026-08-26
+
+The five-step Add New User UI maps to the following source-verified endpoints:
+
+| Method | Endpoint | Wizard use |
+|---|---|---|
+| GET | `/api/v1/tenant-admin/users/create-options` | Roles, outlets, permission groups, supported statuses |
+| POST | `/api/v1/tenant-admin/users` | One atomic, idempotent final save |
+| GET | `/api/v1/tenant-admin/users/{userId}` | Authoritative detail refresh |
+| PUT | `/api/v1/tenant-admin/users/{userId}` | Later identity/access update |
+| POST | `/api/v1/tenant-admin/users/{userId}/resend-invite` | Invite rotation/resend |
+| POST | `/api/v1/tenant-admin/users/{userId}/revoke-invite` | Invite revocation |
+| GET | `/api/v1/tenant-admin/permission-catalog` | Module/permission grouping |
+| GET | `/api/v1/tenant-admin/outlets/options` | Reusable outlet options |
+
+Step 1 collects identity/profile/account mode and does not own `roleId`. Step 2 is the only role-selection step. Step 3 supplies optional additive direct permission IDs and must never call role permission replacement. Empty outlet IDs mean tenant-wide; therefore `No Outlet Access` is not representable.
+
+The create request does not accept user-specific till IDs, per-user default outlet, default till, save-draft state, access start date, 2FA selection, force-change selection, or plaintext temporary password. `Idempotency-Key` is required. See [[../03_USER_JOURNEYS/Tenant_Admin/07_User_Management_Add_New_User_Flow]].
+
+## Tenant Admin Native Online Store API — Canonical 2026-08-27
+
+Base route: `/api/v1/tenant-admin/online-store`; all endpoints are source-verified in `TenantAdminOnlineStoreController`.
+
+| Step | Endpoint groups | Mutation permission | Primary persistence |
+|---:|---|---|---|
+| 1 | `GET /overview`, `GET /readiness` | read: `tenant.online_store.view` | projections across settings/channel/domain/banner/policy/catalog/fulfilment |
+| 2 | `GET/PUT /activation` | `tenant.online_store.manage` | `tenant_settings`, `sales_channels` |
+| 3 | `GET/PUT /identity` | `tenant.online_store.manage` | `sales_channels`, `tenant_settings` |
+| 4 | `GET /url-domain`, `PUT /url`, `GET/POST /domains`, domain verify/token/status/SSL/primary/delete | `tenant.online_store.domains.manage` | `tenant_settings`, `tenant_domains` |
+| 5 | `GET/PUT /branding`, `POST/DELETE /media`, banner CRUD/status/order | `tenant.online_store.branding.manage` | `tenant_settings`, `media_assets`, `storefront_banners` |
+| 6 | `GET/PUT /support` | `tenant.online_store.support.manage` | `tenant_settings` |
+| 7 | `GET/PUT /click-collect`, outlet list/add/update/delete/bulk | `tenant.online_store.fulfillment.manage` | `fulfillment_methods`, `fulfillment_method_outlets`, `outlet_business_hours` |
+| 8 | catalogue summary/list/visibility/bulk and policy CRUD/publish/versions/archive | catalog/policy-specific permissions | `product_channel_visibilities`, `storefront_policies` |
+| 9 | `POST /publish` | `tenant.online_store.publish` | `tenant_settings`, `sales_channels`, `audit_logs`, `idempotency_requests` |
+
+All reads use `tenant.online_store.view`. Final publish requires `Idempotency-Key`, reruns authoritative readiness, and returns `online_store.publish_blocked` when any blocker remains. See [[../03_USER_JOURNEYS/Tenant_Admin/22_Online_Store_Setup_And_Publish_Flow]].

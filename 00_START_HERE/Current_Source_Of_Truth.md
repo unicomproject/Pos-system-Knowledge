@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-17 -->
+<!-- last_updated: 2026-08-26 -->
 
 
 # Current Source Of Truth
@@ -293,3 +293,10 @@ tables, screens, or flows.
 
 ## Wizard Step Rule
 The Tenant Admin Add Product workflow is strictly a 7-step wizard. Step 7 is Review & Create. Legacy 8-step documentation and standalone Channel Visibility steps are obsolete.
+## Tenant Admin User Creation Authority — 2026-08-25
+
+The canonical Add New User journey is [[../03_USER_JOURNEYS/Tenant_Admin/07_User_Management_Add_New_User_Flow]]. It is a five-step UI target backed by the existing atomic user-create contract. Current Flutter remains three-step. Tenant-wide/selected-outlet role assignment and additive direct grants are supported; user-specific till/default-till, draft, access-start, and 2FA controls are not currently supported.
+
+### 2026-08-26 Correction
+
+Role selection is owned only by Step 2. Step 3 adds user-specific direct grants and never mutates the Base Role. `No Outlet Access`, Access Level, Save Draft, and till/default controls are absent from the active contract. Review counts and invitation content derive from final wizard state.

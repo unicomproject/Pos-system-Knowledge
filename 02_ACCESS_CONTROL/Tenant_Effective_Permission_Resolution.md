@@ -1,7 +1,7 @@
 ﻿<!-- title: Tenant Effective Permission Resolution -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-15 -->
+<!-- last_updated: 2026-08-26 -->
 <!-- verification: Backend and Flutter source inspected; documentation-only update -->
 
 # Tenant Effective Permission Resolution
@@ -116,21 +116,20 @@ Confirmation is an outcome of Step 5, not a sixth wizard step.
 
 ## Required Tenant Admin API Contract
 
-The following endpoints are canonical target contracts and must not be treated as implemented until backend controllers and tests exist.
+The following current source contracts support Tenant Admin role access. Runtime deployment/test evidence remains a separate release gate.
 
 | Endpoint | Status | Notes |
 |---|---|---|
-| `GET /api/v1/tenant-admin/permission-catalog` | MISSING | Required by Flutter role permission datasource. |
-| `GET /api/v1/tenant-admin/roles` | MISSING | Required for paged role list. |
-| `POST /api/v1/tenant-admin/roles` | MISSING | Required for five-step role creation. |
-| `GET /api/v1/tenant-admin/roles/{roleId}` | MISSING | Required for detail/edit. |
-| `PUT /api/v1/tenant-admin/roles/{roleId}` | MISSING | Required for metadata/status update. |
-| `GET /api/v1/tenant-admin/roles/{roleId}/permissions` | MISSING | Required for permission matrix. |
-| `PUT /api/v1/tenant-admin/roles/{roleId}/permissions` | MISSING | Required for permission replacement/update. |
-| `GET /api/v1/tenant-admin/roles/{roleId}/users` | MISSING | Required for assigned user summary. |
-| `PUT /api/v1/tenant-admin/roles/{roleId}/users` | MISSING | Required for assignment changes. |
-| `POST /api/v1/tenant-admin/roles/{roleId}/activate` | MISSING | Required lifecycle command. |
-| `POST /api/v1/tenant-admin/roles/{roleId}/disable` | MISSING | Disable must not delete role data. |
+| `GET /api/v1/tenant-admin/permission-catalog` | Implemented in source | Backend-driven catalog. |
+| `GET /api/v1/tenant-admin/roles` | Implemented in source | Paged role list. |
+| `POST /api/v1/tenant-admin/roles` | Implemented in source | Idempotent role creation. |
+| `GET /api/v1/tenant-admin/roles/{roleId}` | Implemented in source | Detail/edit projection. |
+| `PUT /api/v1/tenant-admin/roles/{roleId}` | Implemented in source | Metadata update. |
+| `PATCH /api/v1/tenant-admin/roles/{roleId}/status` | Implemented in source | Lifecycle status change. |
+| `GET/PUT /api/v1/tenant-admin/roles/{roleId}/permissions` | Implemented in source | Permission read/replace. |
+| `GET/PUT /api/v1/tenant-admin/roles/{roleId}/assignments` | Implemented in source | Tenant-wide/selected-outlet assignments. |
+| `GET /api/v1/tenant-admin/roles/{roleId}/users` | Implemented compatibility read | Assigned user projection. |
+| `PUT /api/v1/tenant-admin/roles/{roleId}/setup` | Implemented in source | Atomic setup replacement. |
 
 ## Security and Audit Requirements
 
@@ -149,6 +148,19 @@ The following endpoints are canonical target contracts and must not be treated a
 
 ## Readiness Verdict
 
-`PRODUCT DECISION RESOLVED - IMPLEMENTATION GAPS OPEN`
+`RUNTIME RECONCILIATION BLOCKED`
 
-The data model is capable of the target RBAC model, but backend tenant role management endpoints and the runtime resolver hardening are not yet complete.
+The Tenant Admin role aggregate routes, permission catalog, assignments, and
+atomic setup save are implemented. The current five-step setup exposes only
+`TENANT_ADMIN` and `CASHIER`; platform administration and `SUPER_ADMIN` are
+outside this tenant-scoped flow.
+
+Authenticated runtime validation found 44 active persisted Cashier permission
+grants with no matching catalog entries. The backend must reconcile that
+projection before production role editing, because a catalog omission must not
+be converted into a permission-removal replace operation.
+## User Creation Resolver Impact — 2026-08-25
+
+Creating a user may add one active tenant-level role or selected-outlet role assignments and optional additive direct tenant-user grants. There is no explicit deny in the current create contract. Outlet-scoped grants contribute only in matching outlet context. No user-to-till relation contributes to the canonical resolver today; till/device/POS runtime guards remain separate context checks.
+
+`BR-UCR-PERM-001`: Add New User never mutates Base Role grants. Effective access for the new user is the selected role baseline plus accepted additive direct user grants. Role changes invalidate all old role-derived state before recomputation. Distinct module/permission counts shown in review must come from this final recomputed set.

@@ -1,7 +1,7 @@
 ﻿<!-- title: Backend Driven Permission Catalog -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-25 -->
 
 
 # Backend Driven Permission Catalog
@@ -118,3 +118,26 @@ Backend source inspection found Platform Admin permission catalog endpoints, but
 Status: `MISSING BACKEND CONTRACT`.
 <!-- RBAC_HARDENING_2026_08_15_END -->
 
+<!-- RBAC_RUNTIME_RECONCILIATION_2026_08_21_START -->
+## Tenant Admin Catalog Runtime Reconciliation - 2026-08-21
+
+`GET /api/v1/tenant-admin/permission-catalog` is implemented and is the only
+catalog source for Tenant Admin role setup. It must remain tenant-isolated,
+entitlement-aware, permission-definition-driven, and constrained by the
+authenticated actor's delegation ceiling.
+
+When a role is edited, every active persisted role permission must be returned
+as an assignable catalog item or be explicitly locked and preserved. Silent
+catalog omission must never permit a replacement save to revoke a permission.
+
+Authenticated runtime validation found a Cashier role with 44 active persisted
+permission grants and no matching returned catalog permissions. No mutation was
+performed. Status: `BLOCKED — reconcile catalog, seed, entitlement, and
+delegation projections before production role editing.`
+
+This section supersedes the 2026-08-15 missing-endpoint conclusion above.
+<!-- RBAC_RUNTIME_RECONCILIATION_2026_08_21_END -->
+
+## User Creation Consumption — 2026-08-25
+
+Tenant Admin Add New User uses the backend catalog to group and preview inherited role permissions and optional additive direct user grants. Role choices come from user `create-options`, not a static UI list. The catalog must not present platform, inactive, unentitled, or non-delegable permissions as assignable. A role change requires the client to rebuild its module summary and the backend to revalidate every direct grant on final save.

@@ -1,7 +1,7 @@
 <!-- title: Tenant Users, Roles, Permissions & Outlet Access Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-26 -->
 
 # Tenant Users, Roles, Permissions & Outlet Access Functional Rules
 
@@ -38,6 +38,25 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - Mobile, tablet, iPad, laptop, and desktop layouts must keep the same business rules.
 
 ## Backend Rules
+
+## User Creation Rules — Corrected 2026-08-26
+
+- `UCR-001`: Five UI steps produce one idempotent atomic create command.
+- `UCR-002`: Step 1 contains identity/profile/account mode only; it never selects a role.
+- `UCR-003`: Step 2 is the only owner of the selected Base Role.
+- `BR-UCR-PERM-001`: Step 3 must never mutate the Base Role or `tenant_role_permissions`.
+- `UCR-004`: Direct user overrides are additive grants only and require actor override authority.
+- `UCR-005`: Inherited, User Override, and Locked/Not Assignable states are distinct.
+- `UCR-006`: Changing Base Role invalidates old role-derived state and recalculates access.
+- `UCR-007`: Empty outlet IDs mean tenant-wide; non-empty IDs mean selected outlets.
+- `UCR-008`: `No Outlet Access` is omitted because it conflicts with current empty-list semantics.
+- `UCR-009`: Till selection/default till/per-user default outlet remain unavailable until contracts exist.
+- `UCR-010`: Review counts derive from final wizard state and match prior-step summaries.
+- `UCR-011`: Access Level Low/Medium/High is prohibited until a deterministic formula exists.
+- `UCR-012`: Create supports `INACTIVE` or `INVITED`, not direct `ACTIVE`.
+- `UCR-013`: Invitation review appears only for invited mode.
+- `UCR-014`: Temporary passwords and partial Save Draft behavior are not canonical.
+- `UCR-015`: Role, outlet, permission, media, entitlement, and delegation validation remains server-side.
 
 - Resolve tenant context server-side for every tenant-owned mutation.
 - Validate foreign-key ownership within the same tenant before saving.

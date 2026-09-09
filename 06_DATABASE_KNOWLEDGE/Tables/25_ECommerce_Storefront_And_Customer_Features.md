@@ -68,3 +68,21 @@ Stores the specific products mapped to a wishlist.
 
 **Indexes & Constraints**:
 - Unique Index on `(wishlist_id, product_id, product_variant_id)` to prevent duplicate items in the same wishlist.
+
+---
+
+## Tenant Admin Native Online Store Persistence Map — 2026-08-27
+
+| Concern | Current table/entity truth | Ownership/invariant |
+|---|---|---|
+| Setup, identity, slug, branding, support, publish timestamp | `tenant_settings` + `setting_definitions` key `online_store.defaults` | JSON schema v1; tenant scoped; defaults orange `#FF6A00`, black `#000000` |
+| Native Online Store channel | `sales_channels` → `platform_sales_channels` | Composite tenant ownership; channel status is separate from setup and publish state |
+| Hosted/custom domains | `tenant_domains` | Tenant/channel scoped; soft delete; one active primary storefront domain enforced by unique index |
+| Logo/favicon/banner media | `media_assets` | Media must belong to current tenant; purpose and MIME/size rules enforced by upload service |
+| Banners | `storefront_banners` | Tenant/channel scoped; status and sort order; image FK includes tenant ownership |
+| Policies | `storefront_policies` | Tenant/channel/type/version unique; one current published row per type; DRAFT/PUBLISHED/ARCHIVED |
+| Product visibility | `product_channel_visibilities` | Tenant/product/channel/variant mapping; does not duplicate Product Master |
+| Collection eligibility | `fulfillment_methods`, `fulfillment_method_outlets`, `outlet_business_hours`, `outlets` | Tenant-owned active mapping and configured hours are readiness inputs |
+| Audit/idempotency | `audit_logs`, `idempotency_requests` | Important mutations audited; final publish replay protected |
+
+The current policy check constraint and service accept `TERMS`, `PRIVACY`, `CANCELLATION`, `COLLECTION`, and `RETURN_REFUND`. No fictional wizard-state table or `IN_PROGRESS` column exists.

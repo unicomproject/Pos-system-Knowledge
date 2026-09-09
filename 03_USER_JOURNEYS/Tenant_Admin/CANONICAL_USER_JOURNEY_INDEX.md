@@ -1,11 +1,11 @@
 ﻿<!-- title: Tenant Admin Canonical User Journey Index -->
 <!-- status: Canonical -->
-<!-- last_updated: 2026-08-12 -->
+<!-- last_updated: 2026-08-26 -->
 <!-- parent: [[../00_Global_User_Journey_Register]] -->
 
 # Tenant Admin Canonical User Journey Index
 
-**62 journeys**.
+**63 journeys**.
 
 | Journey ID | Journey Name | Status | Completion % |
 |---|---|---|---:|
@@ -26,7 +26,7 @@
 | TA-UJ-014 | View Till Details | COMPLETE | 85 |
 | TA-UJ-015 | Edit Till | COMPLETE | 85 |
 | TA-UJ-016 | Browse Users | COMPLETE | 90 |
-| TA-UJ-017 | Add User | COMPLETE | 90 |
+| TA-UJ-017 | Add User — Corrected 5-Step User Access | PARTIAL | 65 |
 | TA-UJ-018 | View User Details | COMPLETE | 85 |
 | TA-UJ-019 | Edit User | COMPLETE | 85 |
 | TA-UJ-020 | Browse Roles | COMPLETE | 85 |
@@ -72,3 +72,12 @@
 | TA-UJ-060 | Manage C&C Order Status (Staff) | NOT_STARTED | 25 |
 | TA-UJ-061 | Manage Expiry / Offer Discounts | NOT_STARTED | 5 |
 | TA-UJ-062 | Monitor Device / Hardware Readiness | PARTIAL | 50 |
+| TA-UJ-063 | Configure And Publish Native Online Store (`EC-TA-UJ-02`) | PARTIAL | 70 |
+
+## 2026-08-25 User Creation Correction
+
+TA-UJ-017 now points to [[07_User_Management_Add_New_User_Flow]]. The backend supports atomic user creation, role/outlet assignment, additive direct permission grants, invitation, and audit. Flutter remains a three-step implementation and user-specific till/default-till contracts are absent, so this journey cannot remain marked complete.
+
+## 2026-08-27 Online Store Journey Lock
+
+`EC-TA-UJ-02` maps to `TA-UJ-063` without renumbering existing journeys. The approved Tenant Admin native Online Store journey has exactly nine steps; the Store Live screen is the result state of Step 9, not Step 10. See [[22_Online_Store_Setup_And_Publish_Flow]].

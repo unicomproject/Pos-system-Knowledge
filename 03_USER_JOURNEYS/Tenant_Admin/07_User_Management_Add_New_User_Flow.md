@@ -1,84 +1,101 @@
-<!-- title: Tenant Admin User Management Add New User Flow -->
+<!-- title: Tenant Admin User Creation 5-Step Corrected Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-27 -->
+<!-- last_updated: 2026-08-26 -->
 
-# Tenant Admin User Management Add New User Flow
+# Tenant Admin User Creation 5-Step Corrected Flow
 
-## Purpose
+## Canonical Journey
 
-Defines how Tenant Admin creates users and sends invites for account activation.
+`Users → Add New User → Basic Information → Assign Base Role → Configure This User's Effective Permissions → Define Outlet & Till Scope → Security & Final Review → Create User`
 
-Invite email event: `tenant.user_invited` — **APPROVED / NOT IMPLEMENTED** (see [[../../12_INTEGRATIONS/Email_Event_And_Template_Catalog]]). Never email plaintext passwords.
+The five screens are one frontend workflow over the atomic `POST /api/v1/tenant-admin/users` command. No step performs an independent persistent draft save.
 
-## Actor
+## Step 1 — Basic Information
 
-Tenant Admin
+Step 1 owns identity/profile only. It must not contain a Role selector.
 
-## Source
+| Field | Contract |
+|---|---|
+| Full Name | Required |
+| Email | Required and tenant-unique after normalization |
+| Phone | Canonical UX requirement; current backend accepts null, so backend enforcement is a gap |
+| Employee ID | Optional and supported |
+| Staff Code | Backend-generated, read-only after generation |
+| Profile Photo | Optional media attachment; dedicated user upload endpoint remains a gap |
+| Account mode | `INVITED` or `INACTIVE` only |
 
-Derived from `Slide 7 - User Management Add New User Flow` in `tenant-full-journey.pptx` and aligned to OneVerz POS MVP Second Brain scope.
+Actions: `Cancel`, `Next`.
 
-## Trigger
+## Step 2 — Assign Base Role
 
-Tenant Admin opens user management.
+This is the only step that selects `roleId`. Roles come from `GET /api/v1/tenant-admin/users/create-options` and must pass tenant ownership and actor delegation policy. Show role name, description, module preview, and inherited permission preview. Role Setup Options (`TENANT_ADMIN`, `CASHIER`) are a different contract from assignable user roles.
 
-## Preconditions
+Changing the selected role reloads the new role baseline, removes stale Role A-derived state, revalidates additive user grants, and recalculates all summaries.
 
-- Tenant Admin has user management permission.
-- At least one role exists.
+Actions: `Back`, `Cancel`, `Next`.
 
-## Main Flow
+## Step 3 — Configure This User's Effective Permissions
 
-| Step | Action | System Behavior |
-|---:|---|---|
-| 1 | Open user management | System opens user list. |
-| 2 | Click add user | System opens new user form. |
-| 3 | Enter user details | Tenant Admin enters name, email, phone. |
-| 4 | Assign user role | Tenant Admin selects role. |
-| 5 | Assign outlet or tenant access | Tenant Admin selects outlet or tenant scope as needed. |
-| 6 | Set user status | Tenant Admin selects ready/pending invite state. |
-| 7 | Validate user details | System validates user record. |
-| 8 | Send invite | System sends invite email if valid. |
-| 9 | User created | System creates pending/ready user. |
-| 10 | User can later login | User follows setup link and login path. |
+Supporting text: `Configure this user's effective access based on the selected role.`
 
-## Data Used Or Captured
+Information message: `Changes made here apply only to this user and do not modify the selected base role.`
 
-- Name
-- Email
-- Phone
-- Role
-- Outlet access
-- User status
-- Invite email
+Current architecture supports additive direct user grants only:
 
-## Access And Security Rules
+| State | Meaning |
+|---|---|
+| Inherited | Granted by selected Base Role; not removed from this wizard |
+| User Override | Additional direct grant for this user through `tenant_user_permissions` |
+| Locked / Not Assignable | Blocked by actor authority, delegation ceiling, entitlement, system protection, or inactive catalog state |
 
-- Tenant Admin must be authenticated unless the flow is a setup/payment link flow before first login.
-- Tenant status, feature entitlement, permission, and outlet access must be enforced where applicable.
-- Tenant-owned data must be isolated by tenant context resolved server-side.
-- All create/update/status actions should be audit logged.
-- Tenant user is tenant-scoped.
-- Do not mix tenant user with platform user or customer account.
+`BR-UCR-PERM-001`: Add New User must never update `tenant_role_permissions` or the selected role's global permission set. Role-level changes belong only to Roles & Access.
 
-## Validation And Error Cases
+Effective permissions are the role baseline plus supported additive user grants, filtered by tenant, entitlement, active definitions, actor delegation, and context. Explicit deny/removal of inherited role grants is not supported.
 
-- Validation error
-- Email already exists
-- Invalid role
-- Invalid outlet access
-- Email send failure
+Actions: `Back`, `Next`. `Save Draft` is absent.
 
-## Outcome
+## Step 4 — Define Outlet & Till Scope
 
-Tenant user is created and invited according to status.
+Current supported access modes are:
 
-## Related Modules
+- **All Outlets / Tenant-wide**: send empty `outletIds`; persist active `tenant_user_roles`.
+- **Selected Outlets**: require at least one active tenant-owned outlet; persist active `outlet_user_roles`.
 
-- 05_Tenant_User_Permission_Access
-- 06_Auth_Tokens_Security_Audit
+`No Outlet Access` is not supported because empty `outletIds` already means tenant-wide. It must not appear as an active option.
 
-## Related Files
+User-specific selected tills, Default Till, and per-user Default Outlet are not supported by the current user-create DTO. These controls must be omitted or clearly unavailable; they must not create required-field validation. `tills.default_cashier_tenant_user_id` is not a general user-to-till assignment contract.
 
-- 06_DATABASE_KNOWLEDGE/Tables/06_Tenant_Users_Roles_Permissions_And_Outlet_Access.md
+Future till/default support must enforce outlet membership, clear tills when an outlet is removed, clear Default Till when invalid, and clear/reselect Default Outlet when invalid. These are implementation requirements, not current capabilities.
+
+Actions: `Back`, `Next`.
+
+## Step 5 — Security & Final Review
+
+Review is derived from final wizard state; no static example counts are authoritative.
+
+| Review area | Source |
+|---|---|
+| User Information | Final Step 1 state |
+| Base Role | Final Step 2 role |
+| Module Count | Distinct modules represented by final effective permissions |
+| Effective Permission Count | Final inherited plus accepted additive direct grants |
+| Outlet Count | Final effective outlet scope; selected count or authoritative active-outlet count for tenant-wide |
+| Till Count / defaults | Omit until supported; never invent zero or sample values |
+
+`Access Level` Low/Medium/High is removed because no deterministic canonical formula exists.
+
+For `INVITED`, show destination, invite/setup behavior, and invitation state. A one-time expiring setup token lets the user set a password; no administrator-selected temporary password is allowed. For `INACTIVE`, show that login is disabled and do not display `Will be invited` unless invite mode is actually selected. Direct `ACTIVE` creation is not supported.
+
+Final checklist: identity valid, Base Role selected, permissions reconciled, outlet scope valid, account/invitation state valid. Final CTA: `Create User`.
+
+## Final Validation
+
+Before create, validate identity, Base Role, effective permissions, outlet scope, account mode, tenant ownership, entitlement, delegation ceiling, and idempotency. Till/default validation is activated only after a canonical backend contract exists.
+
+## Related
+
+- [[../../07_UI_UX_KNOWLEDGE/Tenant_Admin_User_Creation_5_Step_Wizard]]
+- [[../../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_User_Creation_5_Step_Flutter_Contract]]
+- [[../../04_MODULE_KNOWLEDGE/05_Tenant_User_Permission_Access/03_Technical_Contract]]
+- [[../../10_TESTING_QA/Test_Case/05_Tenant_User_Permission_Access/Tenant_Admin_User_Creation_5_Step_Test_Cases]]

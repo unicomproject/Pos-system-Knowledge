@@ -345,3 +345,21 @@ Runtime gap found during source inspection:
 Backend implementation must be fixed before Roles & Access is marked complete.
 <!-- RBAC_HARDENING_2026_08_15_END -->
 
+## Tenant Admin Online Store Authorization — 2026-08-27
+
+Authorization order is `authentication → tenant context → active tenant → entitlement → permission → tenant/resource ownership → business validation → action`.
+
+| API group | Permission | Entitlement |
+|---|---|---|
+| Overview/readiness and all reads | `tenant.online_store.view` | `online_store` |
+| Activation, identity, hosted URL | `tenant.online_store.manage` | `online_store` |
+| Domain mutations | `tenant.online_store.domains.manage` | `online_store` |
+| Branding/media/banner mutations | `tenant.online_store.branding.manage` | `online_store` |
+| Support mutations | `tenant.online_store.support.manage` | `online_store` |
+| Click & Collect mutations | `tenant.online_store.fulfillment.manage` | `click_collect` |
+| Catalogue visibility mutations | `tenant.online_store.catalog.manage` | `online_store` |
+| Policy mutations | `tenant.online_store.policies.manage` | `online_store` |
+| Final publish | `tenant.online_store.publish` | `online_store` |
+
+Frontend visibility is UX only. Platform bootstrap permission `platform.tenants.bootstrap.online_store.manage` does not grant Tenant Admin Online Store authority.
+
