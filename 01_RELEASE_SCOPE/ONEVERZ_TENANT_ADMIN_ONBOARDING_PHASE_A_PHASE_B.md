@@ -221,14 +221,39 @@ PHASE B — STEP-BY-STEP SEQUENCE
 * **Phase B Implementation:** IMPLEMENTED
 * **Automated Verification:** COMPLETE
   - Backend API Tests: 12 PASS (`TenantAdminOnboardingInvitationControllerTests.cs`)
-  - Backend Unit Tests: 1602 PASS
-  - Backend API Tests: 524 PASS
-  - Backend Integration Tests: 7 PASS
+  - Backend Unit Tests: 1602 PASS / 0 FAIL
+  - Backend API Tests: 524 PASS / 0 FAIL
+  - Backend Integration Tests: 12 PASS / 0 FAIL
   - Flutter Widget Tests: 12 PASS (`tenant_admin_phase_b_widget_test.dart`)
-  - Flutter Relevant Auth Tests: 50 PASS
-  - Flutter Analyze: PASS
-* **Controlled Full End-to-End Verification:** PENDING TA-BOOT-B4
-* **Final Closure / Freeze:** PENDING TA-BOOT-B4
+  - Flutter Relevant Auth Tests: 92 PASS / 0 FAIL
+  - Flutter Analyze: PASS (0 compilation errors)
+  - EF Pending Model Changes: NONE
+* **Controlled Full End-to-End Verification:** PASS (Verified in TA-BOOT-B4)
+* **Final Status / Governance:** **CLOSED / VERIFIED / FROZEN**
+* **Tenant Admin Onboarding Overall:** **FULLY COMPLETE**
+
+### Controlled Full End-to-End Verification Evidence (TA-BOOT-B4)
+* **Execution Environment:** Controlled development/integration runtime (`http://localhost:5150` API, live Mailnesia inbox, local setup route).
+* **Controlled Tenant Creation:** PASS (Tenant created with `ONEVERZ_R1_STD` plan, `TRIAL` subscription, Tenant Admin user in `INVITED` state, `encrypted_password = NULL`).
+* **Real Invitation Email:** PASS (Delivered via Azure Communication Services to controlled inbox; verified subject, tenant name, tenant code, username/email, expiry, and security notice; zero password in email; zero duplicate emails).
+* **Activation Link & Route:** PASS (`/tenant-admin/setup/:setupToken` loaded without error).
+* **Token Validation:** PASS (`GET /api/tenant-admin/onboarding/setup-token/{token}/validate` returned `valid: true`, `expired: false`, correct email binding).
+* **Invited Login Regression:** PASS (`POST /api/v1/tenant-auth/login` denied with HTTP 401 while account is in `INVITED` state).
+* **Password Setup:** PASS (Tenant Admin sets own password satisfying policy; `encrypted_password` PBKDF2 hash stored; zero plaintext password in DB/logs; zero password set by platform).
+* **Atomic Activation:** PASS (Atomic row-locked transaction: `tenant_users.account_status` transitioned `INVITED → ACTIVE`; `user_invites.invite_status` transitioned `SENT → ACCEPTED`; `accepted_at` and `accepted_tenant_user_id` set).
+* **Login Post-Activation:** PASS (Authenticated with new credentials; JWT access token & refresh token issued; tenant context bound).
+* **Workspace Access:** PASS (`GET /api/v1/tenant-admin/context` returned 200 OK with correct tenant context, assigned `Tenant Administrator` role, 7 enabled features, and 411 effective permissions; tenant isolation verified; zero cross-tenant leakage).
+* **Single-Use Rejection (Token Reuse):** PASS (Re-validation returned `valid: false` with code `INVITE_USED`; re-setup attempt rejected with HTTP 400 Bad Request `INVITE_USED`; password unchanged; user remains `ACTIVE`; invitation remains `ACCEPTED`).
+* **Cross-Tenant Protection:** PASS (Invitation tokens bound to specific tenant; cross-tenant usage rejected).
+* **Security & Secret Redaction:**
+  - Raw Invitation Token In DB: 0 (only SHA-256 token hash persisted)
+  - Raw Invitation Token In Logs: 0
+  - Raw Invitation Token In API Responses: 0
+  - Raw Password In DB: 0
+  - Raw Password In Logs: 0
+  - Password In Email: 0
+* **Local Test URL Note:** Controlled E2E used local/development activation endpoints (`http://localhost:4200/tenant-admin/setup/{token}`). Production invitation links remain environment-configured and HTTPS when production deployment is undertaken.
+* **Production Status:** Controlled Runtime Verification: PASS. Production Deployment: NOT PERFORMED / DEFERRED.
 
 ### Tenant Admin Secondary Email OTP Architecture Decision
 ```text
@@ -346,7 +371,7 @@ PHASE A:
                                             │
 ════════════════════════════════════════════╪═════════════════════════════
                                             ▼
-PHASE B (IMPLEMENTED / CONTROLLED E2E PENDING):
+PHASE B (CLOSED / VERIFIED / FROZEN):
                                   [ INVITATION OPENED ]
                                             │
                                             ▼
@@ -457,14 +482,17 @@ PHASE B (IMPLEMENTED / CONTROLLED E2E PENDING):
 * **Supporting Module:** **Platform Administration (Tenant Onboarding / Lifecycle)**
 * No new business modules are created.
 
-### 10.3 Release 1 Governance & Audit Remediation Status
-* **Phase A Governance:** **CLOSED / VERIFIED / FROZEN** (Platform Admin responsibility terminates at invitation email dispatch).
-* **Phase B Governance:** **IMPLEMENTED / AUTOMATED VERIFICATION COMPLETE / CONTROLLED FULL E2E PENDING TA-BOOT-B4** (Final freeze reserved for TA-BOOT-B4).
-* **Audit Gaps Closed in TA-BOOT-B3:**
-  - `GAP-TA-BOOT-B1-003`: CLOSED (Second Brain reflects verified Backend + Flutter implementation).
-  - `GAP-TA-BOOT-B1-004`: CLOSED (Canonical email possession verification defined as secure single-use invitation token link; secondary email OTP is NOT REQUIRED).
-* **Historical Audit Gap Status:**
+### 10.3 Release 1 Governance & Final Verification Status
+* **Phase A Governance:** **CLOSED / VERIFIED / FROZEN** (Platform Admin provisioning terminates at invitation email dispatch).
+* **Phase B Governance:** **CLOSED / VERIFIED / FROZEN** (Controlled Full E2E runtime verified in TA-BOOT-B4; zero defects found; zero source changes required).
+* **Tenant Admin Onboarding Overall:** **FULLY COMPLETE**
+* **Audit Gaps Closed:**
   - `GAP-TA-BOOT-B1-001`: CLOSED (Backend HTTP/API controller tests merged).
   - `GAP-TA-BOOT-B1-002`: CLOSED (Flutter widget tests merged).
+  - `GAP-TA-BOOT-B1-003`: CLOSED (Second Brain reconciled to token-link self-activation architecture).
+  - `GAP-TA-BOOT-B1-004`: CLOSED (Secondary Tenant Admin Email OTP defined as NOT REQUIRED; canonical mechanism is secure single-use invitation token link).
+* **Known Open Gaps:** 0 (P0: 0, P1: 0, P2: 0, P3: 0).
+* **Freeze Rule:** Do not modify Tenant Admin onboarding flow further unless a new approved requirement, verified defect, or security requirement is introduced. Invitation architecture, token-link verification, password self-setup, and `INVITED → ACTIVE` lifecycle are FROZEN.
 * **Online Store (OS-R1-4):** **CLOSED / RECONCILED / RE-FROZEN** (Commercial baseline preserved).
 * **Commercial Scope (`ONEVERZ_R1_STD`):** Preserved and unchanged (7 physical features, 15 conceptual capabilities).
+* **Production Deployment:** NOT PERFORMED / DEFERRED (Runtime readiness certified; production deployment remains deferred until explicitly authorized).
