@@ -1,25 +1,25 @@
-# Tenant Admin Add Product — Product Type & Tracking Specification
-
 <!-- title: Tenant Admin Add Product — Product Type & Tracking Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-10 -->
+<!-- last_updated: 2026-09-01 -->
+
+# Tenant Admin Add Product — Product Type & Tracking Specification
 
 ## 1. Executive Summary & Core Architectural Principles
 
 This document defines the canonical Second Brain specification for **Stage 2: Product Type & Tracking** within the Tenant Admin **Add Product Wizard**.
 
 ### Canonical Architectural Principles
-1. **ONE Unified Add Product Wizard**: Add Product is ONE single 8-stage wizard pipeline (`ProductId`, `CurrentSetupStep`, `RowVersion`, shared footer, shared save endpoints). Stages are configuration steps owned by the wizard, NOT eight independent backend/frontend features.
+1. **ONE Unified Add Product Wizard**: Add Product is ONE single 7-step wizard pipeline (`ProductId`, `CurrentSetupStep`, `RowVersion`, shared footer, shared save endpoints). Steps are configuration steps owned by the wizard, NOT seven independent backend/frontend features. Legacy 8-stage / Stage 8 wording is obsolete.
 2. **Semantic Technical Naming Only**: Technical code symbols (Flutter widgets, controllers, DTOs, API endpoints, backend services, commands) MUST use semantic business terms (`ProductTypeTracking`, `product_type_tracking.dart`, `ValidateProductTypeTracking`, `ApplyProductTypeTracking`). Step-number names (e.g. `Step2ProductTypeTracking`, `SaveStep2DraftCommand`) are strictly forbidden in code.
 3. **Product Type UI vs Product Structure Domain Mapping**:
    - UI Section Label: `Select Product Type` (Options: `Simple Product`, `Variant Product`, `Bundle / Kit`).
    - Domain & Database Mapping: `productStructure` (`SIMPLE`, `VARIANT`, `BUNDLE`).
    - `products.product_type`: Reserved for merchandise classification (`STANDARD`, `SERVICE`, `DIGITAL`). Default: `STANDARD`.
 4. **Structure-Aware Stage Rendering**: The Product Type selection card is common at the top. The tracking content below renders dynamically based on the selected `productStructure`:
-   - `SIMPLE`: Simple Inventory Tracking toggles (Track Inventory, Batch, Expiry, Serial).
-   - `VARIANT`: Variant Inventory Tracking policy toggles + right-side contextual explanatory card.
-   - `BUNDLE`: Read-only Bundle Inventory Behaviour informational cards (Component-based inventory, Component stock deduction, Component tracking rules).
+   - `SIMPLE`: optional Initial Tracking Details after type is confirmed, then Simple Inventory Tracking toggles (Track Inventory, Batch, Expiry, Serial).
+   - `VARIANT`: same optional Initial Tracking Details card, then Variant Inventory Tracking policy toggles + right-side contextual explanatory card.
+   - `BUNDLE`: Read-only Bundle Inventory Behaviour informational cards (Component-based inventory, Component stock deduction, Component tracking rules). Do **not** show Initial Tracking Details.
 5. **Stage Applicability & Navigation**:
    - `SIMPLE` + Track Inventory ON: Stage 3 (`Units & Pack Conversion`) is `REQUIRED`. Stage 4 (`Product Configuration`) is `NOT_APPLICABLE`. Save & Continue from Stage 3 navigates directly to Stage 5 (`Barcode & SKU`).
    - `VARIANT` + Track Inventory ON: Stage 3 (`Units & Pack Conversion`) is `REQUIRED`. Stage 4 (`Product Configuration`) is `REQUIRED`. Save & Continue from Stage 3 navigates to Stage 4.
@@ -36,7 +36,7 @@ This document defines the canonical Second Brain specification for **Stage 2: Pr
 - **Identity & Sales**: 1 Product, 1 SKU, 1 Barcode, 1 Base Selling Price. No variant matrix, no bundle components.
 - **Inventory Balances**: `inventory_balances.product_id = ProductId`, `product_variant_id = NULL`.
 - **Tracking Scopes**:
-  - `Track Inventory`: Master toggle. Default `ON`.
+  - `Track Inventory`: Master toggle. Default `OFF`.
   - `Batch Tracking`: Belongs to base product (`product_batches.product_id = ProductId`, `product_variant_id = NULL`).
   - `Expiry Tracking`: Belongs to product batch (`product_batches.expiry_date`).
   - `Serial Tracking`: Belongs to physical product items (`serial_numbers.product_id = ProductId`, `product_variant_id = NULL`).
@@ -80,7 +80,7 @@ This document defines the canonical Second Brain specification for **Stage 2: Pr
 
 #### A. SIMPLE UI LAYOUT
 - **Left/Main Card**: Tracking & Stock Rules
-  - `Track Inventory` (Toggle, Default ON)
+  - `Track Inventory` (Toggle, Default OFF)
   - `Batch / Lot Tracking` (Toggle, Default OFF, disabled if Track Inventory OFF)
   - `Expiry Tracking` (Toggle, Default OFF, disabled if Batch OFF or Serial ON)
   - `Serial Number Tracking` (Toggle, Default OFF, disabled if Batch/Expiry ON or Track Inventory OFF)
@@ -120,7 +120,7 @@ This document defines the canonical Second Brain specification for **Stage 2: Pr
 
 ### 4.3 Stage Applicability Matrix
 
-| Product Structure | Stage 3 (Units) | Stage 4 (Product Config) | Stage 5 (Barcode/SKU) | Stage 8 (Review/Create) |
+| Product Structure | Step 3 (Units) | Step 4 (Product Config) | Step 5 (Barcode/SKU) | Step 7 (Review/Create) |
 |---|---|---|---|---|
 | `SIMPLE` (Tracked) | Required | **NOT_APPLICABLE** (Auto-skip 3 $\rightarrow$ 5) | Required | Displays "Product Configuration: Not Applicable" |
 | `VARIANT` (Tracked) | Required | **REQUIRED** (Variant Matrix) | Required | Validates Variant Matrix completion |
@@ -169,11 +169,11 @@ Status (`DRAFT`/`ACTIVE`), Primary Image Thumbnail, Product Name, Internal Code 
 | Concept | UI Label / Widget | Flutter State | API Property | Domain Entity Property | Database Table | Database Column | Constraints & Rules |
 |---|---|---|---|---|---|---|---|
 | Product Structure | Select Product Type Cards | `productStructure` | `productStructure` | `Product.ProductStructure` | `products` | `product_structure` | NOT NULL; Enum `'SIMPLE'`,`'VARIANT'`,`'BUNDLE'` |
-| Stock Tracked | Track Inventory Toggle | `trackInventory` | `trackInventory` | `ProductInventorySetting.IsStockTracked` | `product_inventory_settings` | `is_stock_tracked` | NOT NULL; Default `true` |
+| Stock Tracked | Track Inventory Toggle | `trackInventory` | `trackInventory` | `ProductInventorySetting.IsStockTracked` | `product_inventory_settings` | `is_stock_tracked` | NOT NULL; Wizard default `false` (`OFF`) |
 | Batch Tracking | Batch / Lot Tracking Toggle | `batchTracking` | `batchTracking` | `ProductInventorySetting.RequiresBatchTracking` | `product_inventory_settings` | `requires_batch_tracking` | NOT NULL; Default `false` |
 | Expiry Tracking | Expiry Tracking Toggle | `expiryTracking` | `expiryTracking` | `ProductInventorySetting.RequiresExpiryTracking` | `product_inventory_settings` | `requires_expiry_tracking` | NOT NULL; Default `false` |
 | Serial Tracking | Serial Number Tracking Toggle | `serialTracking` | `serialTracking` | `ProductInventorySetting.RequiresSerialTracking` | `product_inventory_settings` | `requires_serial_tracking` | NOT NULL; Default `false` |
-| Setup Stage | Wizard Stepper Header | `currentSetupStep` | `currentSetupStep` | `Product.CurrentSetupStep` | `products` | `current_setup_step` | INT 1–8 |
+| Setup Stage | Wizard Stepper Header | `currentSetupStep` | `currentSetupStep` | `Product.CurrentSetupStep` | `products` | `current_setup_step` | INT 1–7 |
 | Concurrency Token | Hidden State | `rowVersion` | `expectedRowVersion` | `Product.RowVersion` | `products` | `row_version` | BIGINT / Timestamp |
 
 ### Database Core Schema Alignment
@@ -195,8 +195,10 @@ Status (`DRAFT`/`ACTIVE`), Primary Image Thumbnail, Product Name, Internal Code 
 - Stage 4 Bundle Configuration: `catalog.combo_components.manage`
 
 ### 8.2 Feature Entitlements
-- Runtime Feature Entitlement Code: `product_catalog` (Module Code: `product_management`).
-- Inventory Tracking Controls: Enforces `inventory_tracking` entitlement where advanced stock tracking (batch/expiry/serial) is enabled.
+- Runtime Feature Entitlement Code: `product_catalog` (Module Code: `product_management` is grouping only, not a runtime check).
+- Inventory Tracking Controls: Enforces `inventory_tracking` entitlement where advanced stock tracking (batch/expiry/serial) is enabled. Quantity Track Inventory remains `product_catalog`.
+- VARIANT card requires `catalog.variants.manage`; BUNDLE card requires `catalog.combo_components.manage`. Missing permission: disable the card with explanation; API 403; never silent-downgrade structure.
+- Canonical matrix: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
 
 ### 8.3 Unified API Contract
 
@@ -256,7 +258,6 @@ lib/features/tenant_admin/products/
 │   │   ├── product_configuration.dart
 │   │   ├── barcode_sku.dart
 │   │   ├── pricing_tax.dart
-│   │   ├── channel_visibility.dart
 │   │   ├── review_create.dart
 │   │   ├── product_wizard_stepper.dart
 │   │   ├── product_wizard_actions_footer.dart
@@ -284,4 +285,21 @@ Helper texts:
 - `Add and manage bundle components in Step 4 — Product Configuration.`
 
 Do NOT expose Bundle parent controls for: Track Inventory, Batch Tracking, Expiry Tracking, Serial Tracking, Unit & Pack Conversion, Bundle Pricing, SKU Prefix, Barcode, Component substitution, Sell when component unavailable.
+
+## Initial Tracking Details Collection (CURRENT 2026-09-01)
+
+Step 2 is both tracking **policy** and the **collection surface** for optional
+`initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`.
+
+- Show the identity card only after Product Type is explicitly selected.
+- SIMPLE / VARIANT: card **above** the tracking toggles.
+- BUNDLE: hide the card; parent cannot receive physical identities.
+- Preserve compatible values. TARGET requires confirmation before clearing
+  incompatible values. Do not silently discard (BR-TRACK-008). CURRENT Flutter
+  continue may still apply the clear plan with `confirmed: true`.
+- VARIANT: keep values provisional; do not create parent Product batch/serial rows.
+- Canonical matrix and BR-TRACK rules:
+  [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
+- Collection-move decision:
+  [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
 

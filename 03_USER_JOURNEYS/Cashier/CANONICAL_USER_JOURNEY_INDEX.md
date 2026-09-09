@@ -45,4 +45,4 @@
 | POS-UJ-033 | Hardware Testing | NOT_STARTED | 5 |
 | POS-UJ-034 | Offline Cash Sale Capture | NOT_STARTED | 5 |
 | POS-UJ-035 | Sync Offline Transactions | NOT_STARTED | 5 |
-| POS-UJ-036 | Manage Online/Pickup Orders | NOT_STARTED | 10 |
+| POS-UJ-036 | [[POS-UJ-036_Online_Order_Fulfilment_Collection|Online Order Fulfilment / Click & Collect]] | CANONICALIZED / IMPLEMENTATION PENDING | 10 |

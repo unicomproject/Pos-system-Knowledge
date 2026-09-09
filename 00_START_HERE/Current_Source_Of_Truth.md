@@ -1,10 +1,18 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-26 -->
+<!-- last_updated: 2026-09-09 -->
 
 
 # Current Source Of Truth
+
+## POS Payment Method Selection (2026-09-03)
+
+The documentation-only selection contract is canonicalized in
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_POS_Payment_Method_Selection_Implementation_Specification]].
+It governs Sale -> Customer -> Payment Method -> separate execution, a
+backend-authorized Cash/Card/QR/Split list, explicit Continue and the 4/3/2/1/0
+responsive grid. Store Credit and Credit Sale/Pay Later are excluded.
 
 ## Purpose
 
@@ -13,6 +21,101 @@ It prevents developers and AI assistants from mixing old POS-first scope, future
 ideas, and current MVP delivery work.
 Use this file before writing, implementing, reviewing, or generating any module
 documentation.
+
+## Canonical Engineering Entry Points
+
+All feature development must read Second Brain, search the current source, and
+reuse approved implementations before adding code.
+
+## AI / Developer Canonical Read Contract
+
+This file is the single mandatory starting point for frontend or backend feature
+analysis, specification, implementation, review, bug fixing, gap audits, and
+canonicalization.
+
+1. **Start here.** Open and read this file before using a lower-level workflow,
+   prompt, feature document, or source file as the task authority.
+2. **A link is a reading instruction, not read content.** Every document marked
+   `Required Read`, `Mandatory`, `Canonical authority`, or required for the
+   current feature by a canonical workflow must be opened and read. Merely
+   seeing its title or path in another Markdown file does not satisfy the read.
+3. **Use controlled recursive traversal.** If a mandatory authority explicitly
+   requires another authority for the current task, open and read it too.
+   Continue until the task's required authority set is resolved. Do not traverse
+   informational, optional, historical, evidence-only, or unrelated links unless
+   a canonical rule makes them mandatory.
+4. **Resolve task-relevant authorities only.** After the frontend or backend core
+   reads, load the applicable journey, module, screen/feature specification, API,
+   permission/RBAC, database, state/workflow, offline/sync, integration/hardware,
+   design/reuse, testing/readiness, and decision/change authorities. Do not load
+   unrelated modules merely because they exist.
+5. **Inspect current source.** Second Brain does not replace repository search.
+   Where the applicable canonical workflow requires it, inspect the current
+   implementation before deciding `Reuse`, `Extend`, or `New`.
+6. **Resolve conflicts by authority.** The order is: this Current Source of Truth
+   → canonical engineering standard → canonical reusable governance → canonical
+   development workflow → task-specific canonical authority. If an active AI
+   prompt or lower-level file conflicts, the higher/current authority wins; do
+   not silently follow the older instruction.
+7. **Preserve history.** Archives, superseded implementation evidence, old
+   prompts, and historical notes are context/evidence only unless a current
+   canonical authority explicitly promotes them.
+
+This contract is a router. Detailed engineering rules remain owned by the
+linked canonical standards and workflows below.
+
+### Frontend feature development
+
+```text
+Read Frontend Canonical Standard
+→ Reusable Component Governance
+→ relevant design/module/journey/API/permission documents
+→ search current Flutter code
+→ reuse first
+→ specification
+→ implementation
+→ tests
+→ update Second Brain
+```
+
+Authorities:
+
+- [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Engineering_Canonical_Standard]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Reusable_Component_Governance]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Screen_Development_Second_Brain_Workflow]]
+- [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Screen_Implementation_Specification_Template]]
+- [[../07_UI_UX_KNOWLEDGE/POS_Reusable_Component_Specifications]]
+
+### Backend feature development
+
+```text
+Read Backend Canonical Standard
+→ Reusable Service Logic Governance
+→ architecture/module/journey/API/permission/database documents
+→ search current backend code
+→ reuse first
+→ specification
+→ implementation
+→ tests
+→ update Second Brain
+```
+
+Authorities:
+
+- [[../05_BACKEND_ARCHITECTURE/Backend_Engineering_Canonical_Standard]]
+- [[../05_BACKEND_ARCHITECTURE/Backend_Reusable_Service_Logic_Governance]]
+- [[../05_BACKEND_ARCHITECTURE/Backend_Feature_Development_Second_Brain_Workflow]]
+- [[../05_BACKEND_ARCHITECTURE/Backend_Feature_Implementation_Specification_Template]]
+
+### Global Second Brain update rule
+
+Update the relevant canonical knowledge when implementation introduces a new
+reusable UI component, reusable backend service, domain/business rule, API
+contract, permission, state/workflow, database rule, integration contract,
+design token, architecture decision, or important operational rule.
+
+When an existing reusable component, service, or rule is simply reused,
+reference its canonical entry. Do not duplicate its full documentation.
 
 ## Flow 4 Tenant Onboarding Authority
 
@@ -95,7 +198,43 @@ Overall hardware production readiness remains **BLOCKED** until mandatory physic
 
 Overall POS Hardware remains **BLOCKED** until physical PR/DR/SC gates pass.
 
+## POS Checkout Find Or Add Customer Authority (2026-09-03)
+
+The canonical checkout customer journey is governed by
+[[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Checkout_Customer_Selection_Implementation_Specification]].
+The canonical route order is `Current Sale (Cart) -> Find/Add/Skip Customer (/pos/new-sale/customer) -> Payment Method (/pos/new-sale/payment) -> Payment Execution`.
+The old route order (`Cart -> Payment Method -> Customer -> Payment Method`) is explicitly superseded as the primary checkout flow.
+Customer is OPTIONAL: Cashier may press **SKIP** on initial phone entry to continue as Walk-in (`CustomerId = null`), explicitly press **ADD TO SALE & CONTINUE** for a found customer, or press **ADD CUSTOMER & CONTINUE** for quick-created customer.
+Dedicated full-screen mobile search/create workflow is distinct from Customer Management (`/pos/customers`).
+Payment Method Customer card provides re-entry to edit or clear the customer.
+Second Brain is READY/CANONICALIZED; existing backend APIs are reused with deterministic exact
+normalized-phone behaviour; no database change is required.
+
 ## Highest Priority Decision
+
+## Online Order Fulfilment / Click & Collect authority (updated 2026-09-02)
+
+Cashier/store operational Click & Collect is governed by [[../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]], module contract [[../04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]], database contract [[../06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup_UPDATED]], and Flutter ownership [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Order_ClickCollect_Fulfilment]]. The approved OO-01 queue supersedes the earlier table/tab/filter queue and is accepted by [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO01_Canonicalization_Status_2026-08-27]]; its sole active widget owner is `oo01_online_orders_widgets.dart`. OO-02 Order Detail is canonicalized by those same authorities and [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO02_Canonicalization_Status_2026-08-31]]. OO-03 Start Fulfilment Confirmation is governed by [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO03_Canonicalization_Status_2026-09-01]]: it is a side-effect-free shared-modal confirmation until Confirm invokes the existing Start POST with current `expectedVersion`. Online-order semantics and shared CTA/modal ownership are recorded in [[../07_UI_UX_KNOWLEDGE/POS_Reusable_Component_Specifications]]. The staff detail GET and atomic Start Fulfilment POST are implemented. Shared `FulfillmentOrder.row_version` optimistic concurrency rejects stale Start commands with HTTP 409 and protects future fulfilment mutations. Backend Chunk 2 for OO-03 is verification-only; no new controller/API/table/column/migration is expected. Authenticated UI-to-database Start/Picking, two-session runtime conflict evidence and actual-device confirmation comparison remain required, so production acceptance is still open. Public storefront reads and the generic status PATCH are not substitutes for these staff contracts.
+
+The approved prototype/UI layer is governed by [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Prototype_Flow]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Visual_Direction]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_Component_Inventory]], [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_UI_API_Mapping]], and [[../07_UI_UX_KNOWLEDGE/Cashier/Online_Order_UI_DB_Mapping]]. Prototype values remain display-only. Production Flutter composes the approved structure from staff API/provider data; the prototype never overrides journey, module, permission, API, or database authorities.
+
+OO-04 Picking is canonicalized by
+[[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
+Existing Flutter picking code is partial scaffolding only. Backend picking
+detail/pick/issue contracts, runtime permission catalogues/enforcement, atomic
+events, backend `canPack` and expected-version conflict handling are implemented
+under the existing `ClickCollectOrdersController`/Customer Orders ownership with
+no new table, column or migration. Implemented events are
+`FULFILLMENT_LINE_PICKED`, `FULFILLMENT_LINE_ISSUE_REPORTED` and
+`FULFILLMENT_PICKING_COMPLETED` and `FULFILLMENT_PICKING_NOTE_ADDED`. Picking
+Note reuses `fulfillment_order_events.event_note`: `POST
+.../orders/{orderId}/picking/notes?outletId=...` requires
+`commerce.online_order.picking.note`, a trimmed note of 1–500 characters and a
+positive current `expectedVersion`; it is PICKING-only, increments `row_version`,
+and is returned in the existing Picking Detail as the latest 50 notes in
+oldest-to-newest order. It never changes quantity, lifecycle or `canPack`. Chunk
+3 must add `expectedVersion` to Flutter mutations, consume backend
+eligibility/version/notes, refetch 409 and complete authenticated E2E.
 
 Cashier **Open Till** requirements are governed by
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]] and
@@ -182,6 +321,16 @@ The current scope is OneVerz POS MVP.
 The MVP includes mobile and desktop EPOS, online store, click and collect,
 offline operation, product and variant management, inventory management, order
 management, reporting, users and permissions, and device/peripheral integration.
+
+Tenant Admin Users List profile image support is implemented in backend and
+Flutter code as of 2026-08-18. The Users List API returns nullable resolved
+`profileImageUrl` from the tenant user's media asset reference; Flutter renders
+that image when available and retains initials fallback for missing or invalid
+values. Evidence:
+[[../15_IMPLEMENTATION_TRACKING/Flutter/Tenant_Admin/Tenant_Admin_Users_Profile_Image_List_Resolution_2026-08-18]].
+Status remains `IMPLEMENTED — RUNTIME VERIFICATION PENDING` until an
+authenticated Flutter Users screen visual run confirms the seeded cashier image
+is visible in-app.
 
 Older Second Brain files that say online store, click and collect, or offline
 sync are excluded must be updated or treated as superseded.
@@ -290,6 +439,29 @@ tables, screens, or flows.
 - [[Project_Glossary]]
 - [[../01_RELEASE_SCOPE/Release_1_Scope]]
 - [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Review_Create_Specification.md]]
+- [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
+- [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
+- [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
+- [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
+- [[../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_PRODUCT_TAX_INCLUSIVE_EXCLUSIVE_DECISION_2026-08-27]]
+- [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]
+- [[../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_TAX_MANAGEMENT_DECISION_REGISTER_2026-09-03]]
+
+## Tax Management Rule
+
+**Tenant Admin Tax Management (Tax Setup)** — Second Brain canonical contract **READY** (2026-09-03). Backend/Flutter full schedule/treatment/products-using implementation is **not** claimed complete.
+
+| Aspect | Status |
+|---|---|
+| Canonical contract | **READY** |
+| Domain | Tax Setup owns identity/treatment/rates/status; Product owns TaxPriceMode; Sale owns tax snapshot |
+| Treatments | TAXABLE / ZERO_RATED / EXEMPT |
+| Removed | Used For / Applies To / Goods / Services / Both |
+| Journey IDs | TA-UJ-063 … TA-UJ-069 |
+| API aggregate | `/api/v1/tax` (extend; do not invent parallel TA API) |
+| Permissions TARGET | `pricing.tax_classes.*`, `pricing.tax_rates.*` (not `catalog.tax.*`) |
+
+Authority: [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]
 
 ## Wizard Step Rule
 The Tenant Admin Add Product workflow is strictly a 7-step wizard. Step 7 is Review & Create. Legacy 8-step documentation and standalone Channel Visibility steps are obsolete.
@@ -300,3 +472,66 @@ The canonical Add New User journey is [[../03_USER_JOURNEYS/Tenant_Admin/07_User
 ### 2026-08-26 Correction
 
 Role selection is owned only by Step 2. Step 3 adds user-specific direct grants and never mutates the Base Role. `No Outlet Access`, Access Level, Save Draft, and till/default controls are absent from the active contract. Review counts and invitation content derive from final wizard state.
+
+### Product Setup Step 6 — Pricing & Tax (LOCKED 2026-09-03)
+
+Authority: [[../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]] §6.1–6.5.
+
+| Structure | Selling price | Tax |
+|---|---|---|
+| SIMPLE | One sellable identity → one applicable price-list configuration | Product Tax Assignment + TaxPriceMode |
+| VARIANT | Independent selling price per `ProductVariantId` via `price_list_items` | Common Product Tax Class / TaxPriceMode for current scope |
+
+Default Selling Price wording on the VARIANT screen is **retired**. Canonical bulk helper label: **Set Same Price for All Variants** (Flutter-only; Apply to All). POS / Online Store use the selected sellable ProductVariant’s price. Cost = product-level `reference_cost_price`. Do not invent parallel pricing tables. Tax masters remain Tax Management. Closures: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_PRICING_TAX_SIMPLE_VARIANT_SECOND_BRAIN_CLOSURE_2026-09-03]], [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_BULK_PRICE_UX_REFINEMENT_CLOSURE_2026-09-04]].
+
+**Implementation note:** SIMPLE Step 6 UI/backend path is confirmed. VARIANT per-variant Step 6 **backend** is **IMPLEMENTED** (2026-09-03) — see [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_PRICING_TAX_BACKEND_IMPLEMENTATION_CLOSURE_2026-09-03]]. Flutter VARIANT Step 6 UI is **IMPLEMENTED** (2026-09-04) — see [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_PRICING_TAX_FLUTTER_IMPLEMENTATION_CLOSURE_2026-09-04]]. Product Setup Step 6 frontend is complete for SIMPLE + VARIANT.
+
+Step 2 Product Type & Tracking collects optional **Initial Tracking Details** (Batch Number, Expiry Date, Serial Number) **after Product Type is explicitly selected** (SIMPLE / VARIANT; hidden for BUNDLE). Step 1 is Product master + images + channels only. Those identity values remain provisional wizard input. Step 2 remains tracking-policy authority (`product_inventory_settings`). Actual identity persists at Step 7 Publish into `product_batches` / `serial_numbers`, not into Product master columns. Opening Stock remains responsible for quantity. Authority: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]], [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]], and [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
+
+Product Setup authorization authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]. Canonical permission namespace is `catalog.*`. Runtime Product Setup entitlement is `product_catalog`. Advanced tracking entitlement is `inventory_tracking`. Closure audit: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-08-24_Tenant_Admin_Product_Setup_Permission_NFR_API_DB_Contract_Closure_Audit]].
+
+Implementation status (2026-09-01): Flutter collection UI is on Step 2 after Product Type select. Permission-first + Initial Tracking draft table remain in Unified Commerce (`product_setup_initial_tracking` migration `20260824095742_AddProductSetupInitialTracking`). Live 7-scenario E2E, persona permission E2E, PostgreSQL integration, and 1024x768 tablet verification are not complete. Destructive-clear confirmation dialog remains a GAP versus BR-TRACK-008. Authority for remaining gaps: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/TENANT_ADMIN_PRODUCT_SETUP_INITIAL_TRACKING_PERMISSION_FIRST_IMPLEMENTATION_CLOSURE_2026-08-24]].
+
+## Category Management Rule
+
+**Tenant Admin Category Management**
+
+| Aspect | Status |
+|---|---|
+| Canonical contract | READY |
+| Backend | **IMPLEMENTED / VERIFIED** |
+| Flutter | **PENDING** |
+| E2E | **PENDING** |
+
+Category Management is a tenant-owned recursive hierarchy (max depth 5). There is no separate SubCategory entity. “Subcategory” is a UI label for a child Category.
+
+**Department:** decoupled from Category (ADR 010, migration `20260827140000_DecoupleCategoryFromDepartment` applied). No `department_id` on Category.
+
+**Hierarchy:** recursive Category, depth 5.
+
+**Permissions:** `catalog.categories.view|create|update|delete|manage`
+
+**Entitlement:** `product_catalog`
+
+**API:**
+
+```http
+GET    /api/v1/categories
+GET    /api/v1/categories/tree
+GET    /api/v1/categories/{id}
+POST   /api/v1/categories
+PUT    /api/v1/categories/{id}
+DELETE /api/v1/categories/{id}
+POST   /api/v1/tenant-admin/categories/{categoryId}/image
+DELETE /api/v1/tenant-admin/categories/{categoryId}/image
+```
+
+**Media:** upload/replace/remove via tenant-admin category image endpoints (not write `imageUrl` on Create/Update).
+
+**Product Setup:** recursive effectively-ACTIVE category hierarchy via `GET /api/v1/tenant-admin/products/create-options` (backend enforces **BR-CAT-PRODUCT-SELECT-001**); persist `CategoryId` only.
+
+**Management tree:** `GET /api/v1/categories/tree` — ACTIVE+INACTIVE, DELETED excluded, no `status` query parameter.
+
+Journeys **TA-UJ-035 … TA-UJ-039 remain NOT COMPLETE** (Flutter pending). Do not mark full journey COMPLETE.
+
+Authority: [[../13_DECISIONS_AND_CHANGES/ADR/ADR_010_Category_Decoupled_From_Department]], [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_PERMISSION_FIRST_BACKEND_IMPLEMENTATION_CLOSURE_2026-08-27]], [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_BACKEND_GAP_FIX_CLOSURE_2026-08-27]].

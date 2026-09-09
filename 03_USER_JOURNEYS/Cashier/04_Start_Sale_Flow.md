@@ -75,7 +75,7 @@ flowchart TD
 |---|---|
 | Authentication | Required |
 | Feature entitlement | POS/catalog enabled |
-| Permission | Sale create permission |
+| Permission | `pos.sales.new_sale.create` (legacy alias: `sales.create`) |
 | Trusted device | Required |
 | Open till session | Required |
 

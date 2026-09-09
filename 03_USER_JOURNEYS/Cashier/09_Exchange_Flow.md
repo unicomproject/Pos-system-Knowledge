@@ -75,7 +75,7 @@ flowchart TD
 |---|---|
 | Authentication | Required |
 | Feature entitlement | POS/exchange enabled |
-| Permission | Exchange permission |
+| Permission | `pos.exchanges.processing.create` (legacy alias: `exchanges.create`) |
 | Trusted device/open till | Required |
 
 ## Data and API References

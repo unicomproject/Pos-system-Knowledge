@@ -1,0 +1,40 @@
+:root {
+  --brand-orange: #FF6A00;
+  --brand-black: #000000;
+
+  --navy-900: #102B66;
+  --text-900: #111827;
+  --text-700: #314467;
+  --text-500: #6B7B9D;
+
+  --surface: #FFFFFF;
+  --surface-soft: #F8FAFD;
+  --page-soft: #F5F7FB;
+
+  --border: #DCE4F0;
+  --border-soft: #E9EDF5;
+
+  --blue: #2563EB;
+  --blue-soft: #EAF1FF;
+  --green: #168A43;
+  --green-soft: #E7F8ED;
+  --red: #DC2626;
+  --red-soft: #FFE9EA;
+  --purple: #6D4BCC;
+  --purple-soft: #F0E8FF;
+  --grey: #526174;
+  --grey-soft: #EEF2F6;
+
+  --radius-sm: 9px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+
+  --shadow-workspace: 0 14px 34px rgba(20, 40, 80, 0.14);
+  --shadow-popover: 0 18px 38px rgba(15, 23, 42, 0.18);
+
+  --header-h: 84px;
+  --bottom-nav-h: 94px;
+
+  --desktop-min: 1200px;
+  --tablet-min: 768px;
+}

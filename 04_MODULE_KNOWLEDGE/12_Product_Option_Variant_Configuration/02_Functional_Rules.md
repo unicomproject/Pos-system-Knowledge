@@ -1,7 +1,7 @@
 <!-- title: Product Option Templates & Variant Configuration Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-13 -->
+<!-- last_updated: 2026-09-02 -->
 
 # Product Option Templates & Variant Configuration Functional Rules
 
@@ -19,6 +19,7 @@ These rules must be applied before creating backend APIs, Flutter screens, respo
   - Page Heading: `Variant Configuration`.
   - Toggle Label: **`Include Variant`** (CANONICAL MANDATE: NEVER use "Availability" for this toggle).
   - Step 4 defines options, option values, Cartesian matrix generation, display labels, variant inclusion toggles, and variant image overrides.
+  - **Estimated Variant Count** (VARIANT only): live frontend Cartesian-product preview during attribute/value configuration. Not shown for SIMPLE. Not authoritative. No dedicated estimate API. See [[Tenant_Admin_Product_Variant_Configuration_Specification#3.4 Estimated Variant Count (Live UX Preview)]].
   - Step 4 MUST NOT include SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility controls (belonging to Step 1).
   - Image fallback priority: Exact Variant Override $\rightarrow$ Colour Group Image (`product_option_values.image_media_asset_id`) $\rightarrow$ Step 1 Primary Product Image $\rightarrow$ Standard Placeholder.
   - Delete Variant Action: Archives combination tombstone (`status = 'ARCHIVED'`). Operational variants with history cannot be deleted. Tombstoned combinations NEVER automatically resurrect upon regeneration.
@@ -48,6 +49,7 @@ These rules must be applied before creating backend APIs, Flutter screens, respo
 - Resolve tenant context server-side for every tenant-owned mutation.
 - Validate foreign-key ownership within the same tenant before saving. Treat `clientCombinationKey` as an untrusted input.
 - Recompute Cartesian variant matrix server-side upon Save Draft / Save & Continue. Reconcile Stable ProductOption and ProductOptionValue identities.
+- Never trust client-supplied `estimatedVariantCount` or equivalent derived totals. Recalculate combination count from submitted attribute/value configuration.
 - Enforce `MaxVariantCombinationsPerProduct = 100` limit.
 - Return standard 400, 401, 403, 404, 409, and 500 responses. Atomic save is required.
 

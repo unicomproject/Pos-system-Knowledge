@@ -1,7 +1,7 @@
 <!-- title: Global Project Understanding Prompt -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-08-24 -->
 
 # Global Project Understanding Prompt
 
@@ -13,6 +13,13 @@ work.
 
 The goal is to make the AI understand OneVerz POS MVP from the Second Brain before
 it writes code or suggests changes.
+
+The mandatory entry point is
+`00_START_HERE/Current_Source_Of_Truth.md`. Open and read it first, then follow
+and actually open/read every mandatory authority required by the applicable
+frontend/backend workflow and current task. Link discovery alone is not a read.
+Do not implement until the workflow-required current source inspection and
+Reuse/Extend/New assessment are complete.
 
 This prompt is global. It is not backend-only.
 

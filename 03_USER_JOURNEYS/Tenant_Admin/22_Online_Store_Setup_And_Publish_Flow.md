@@ -105,3 +105,8 @@ Base path for every row is `/api/v1/tenant-admin/online-store`. Every action req
 `TENANT ADMIN ONLINE STORE SECOND BRAIN CONTRACT — BLOCKED BY RECONCILIATION`
 
 The nine-step journey is locked, but policy count and other mandatory-readiness product decisions prevent a non-contradictory implementation-ready claim.
+
+
+## September 9 synchronization note
+
+The historical `TA-UJ-063` mapping above collides with Tax Setup in the merged journey index. Refer to this Online Store flow as `EC-TA-UJ-02` pending explicit numeric-ID reconciliation. No business steps are changed by this note.

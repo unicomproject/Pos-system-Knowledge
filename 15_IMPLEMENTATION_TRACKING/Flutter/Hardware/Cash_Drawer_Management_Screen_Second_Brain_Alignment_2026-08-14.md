@@ -1,7 +1,7 @@
 <!-- title: Cash Drawer Management Screen Second Brain Alignment 2026-08-14 -->
-<!-- status: Historical evidence — superseded for Cash In/Drop ledger status -->
+<!-- status: Historical evidence — superseded for Cash In/Drop ledger status and automatic Cash Sale drawer acceptance -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-16 -->
+<!-- last_updated: 2026-08-18 -->
 
 # Cash Drawer Management Screen Second Brain Alignment — 2026-08-14
 
@@ -9,7 +9,10 @@
 > financial software acceptance are **COMPLETE** (see
 > [[Cash_In_Chunk_3_Final_Production_Acceptance]] and
 > [[POS_Cash_Drop_Chunk_2_Production_Acceptance_2026-08-16]]).
-> Physical Open Drawer remains **PARTIAL** / physical acceptance pending.
+> Physical Open Drawer remains **PARTIAL** overall. Automatic Cash Sale physical
+> acceptance passed on 2026-08-17 for POSPrinter POS80 / Cashbox #1 /
+> `drawerPin2`; untested drawer scenarios remain pending. See
+> [[Cash_Drawer_Runtime_Integration_Issue_Resolution_2026-08-17]].
 > Overall POS hardware remains **BLOCKED**.
 > Current hardware authority:
 > [[POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]],

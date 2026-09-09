@@ -1,18 +1,32 @@
 <!-- title: Pricing & Tax Management Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-07-04 -->
+<!-- last_updated: 2026-09-03 -->
 
 # Pricing & Tax Management Module Overview
 
 ## Purpose
 
-Manage price lists, outlet/channel price assignment, price list items, tax jurisdictions, tax classes, tax rates, tax class rates, and product tax assignments.
+Manage price lists, outlet/channel price assignment, price list items, and **Tenant Admin Tax Setup** (effective-dated rates, product tax assignment support, checkout/POS tax calculation inputs).
 
-This module is part of the new OneVerz POS MVP scope: mobile and desktop EPOS,
+This module is part of the OneVerz POS MVP scope: mobile and desktop EPOS,
 responsive online store, offline-capable operation, click and collect, multi-device
 support, and low-cost hardware usage for events, stalls, food and beverage,
 merchandising, attractions, and temporary retail locations.
+
+## Tax Setup authority
+
+**Canonical Tax Management contract (2026-09-03):**
+
+[[Tenant_Admin_Tax_Management_Canonical_Contract]]
+
+Domain separation:
+
+- **Tax Setup** owns identity, treatment (`TAXABLE` | `ZERO_RATED` | `EXEMPT`), effective-dated rates, status
+- **Product** owns `TaxSetupId` reference + `TaxPriceMode` (`INCLUSIVE` | `EXCLUSIVE`)
+- **Sale** stores immutable tax snapshot; **Refund** reverses original snapshot
+
+Removed from Tax Setup: Used For / Applies To / Goods / Services / Both.
 
 ## MVP Position
 
@@ -21,8 +35,8 @@ merchandising, attractions, and temporary retail locations.
 | Module | `Pricing_Tax_Management` |
 | Module number | 14 |
 | Primary users | Tenant Admin, Store Manager, Platform Support |
-| Frontend surfaces | Price list setup, Tax setup, Product pricing panel, Checkout calculation support |
-| API groups | `/api/v1/pricing/price-lists`, `/api/v1/pricing/price-list-items`, `/api/v1/tax/classes`, `/api/v1/tax/rates`, `/api/v1/products/{id}/tax` |
+| Frontend surfaces | Price list setup, **Tax Setup**, Product Setup Step 6 Pricing & Tax (SIMPLE single-identity + VARIANT per-`ProductVariantId` selling prices — see Product 7-Step §6.1–6.5), Checkout/POS calculation support |
+| API groups | `/api/v1/pricing/price-lists`, `/api/v1/pricing/price-list-items`, **`/api/v1/tax`** (Tax Setup aggregate), `/api/v1/products/{id}/tax` (compat), Product create-options |
 
 ## Main Tables
 
@@ -32,19 +46,19 @@ merchandising, attractions, and temporary retail locations.
 | `price_list_outlets` | Used by this module |
 | `price_list_channels` | Used by this module |
 | `price_list_items` | Used by this module |
-| `tax_jurisdictions` | Used by this module |
-| `tax_classes` | Used by this module |
-| `tax_rates` | Used by this module |
-| `tax_class_rates` | Used by this module |
-| `product_tax_assignments` | Used by this module |
+| `tax_jurisdictions` | System-managed technical jurisdiction (not Tax Setup UX) |
+| `tax_classes` | Persistence for **Tax Setup** |
+| `tax_rates` | Effective-dated rates |
+| `tax_class_rates` | Link Tax Setup ↔ rates (technical) |
+| `product_tax_assignments` | Product → Tax Setup assignment |
 
 ## Core Business Rules
 
 - Price can vary by outlet and sales channel through price list assignments.
 - Price list items support product-level, variant-level, UOM-level, and minimum-quantity pricing.
 - Price list validity windows and priority determine which active price can be selected when multiple price lists match.
-- Tax must be calculated from assigned tax class/rate rules.
-- Checkout snapshots price and tax on order lines.
+- Tax is calculated from assigned Tax Setup + effective rate + product TaxPriceMode.
+- Checkout/POS snapshots price and tax on order lines (`sales_order_taxes`).
 - Cached price/tax is only a reference; backend validates final totals.
 - Do not store gateway fees or accounting tax journals here.
 
@@ -55,7 +69,7 @@ merchandising, attractions, and temporary retail locations.
 | Authentication | Required for protected staff/customer/admin actions |
 | Tenant status | Tenant must be active or allowed for the requested operation |
 | Feature entitlement | Required when this module is plan or add-on controlled |
-| Permission | Required for staff/admin protected actions |
+| Permission | `pricing.tax_*` TARGET (see canonical Tax contract); Product assign via `catalog.product_pricing.manage` |
 | Tenant isolation | Tenant-owned records must never leak across tenants |
 | Audit/event history | Required for sensitive status, payment, inventory, auth, and access changes |
 
@@ -71,9 +85,12 @@ merchandising, attractions, and temporary retail locations.
 - Payment settlement
 - Discount policy approval
 - Inventory cost layers
+- Fixed-amount (non-percentage) Tax Setup in R1 Tenant Admin UX
 
 ## Related Files
 
-- [[04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/02_Functional_Rules]]
-- [[04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/03_Technical_Contract]]
-
+- [[Tenant_Admin_Tax_Management_Canonical_Contract]]
+- [[02_Functional_Rules]]
+- [[03_Technical_Contract]]
+- [[../../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_TAX_MANAGEMENT_DECISION_REGISTER_2026-09-03]]
+- [[../../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_PRODUCT_TAX_INCLUSIVE_EXCLUSIVE_DECISION_2026-08-27]]

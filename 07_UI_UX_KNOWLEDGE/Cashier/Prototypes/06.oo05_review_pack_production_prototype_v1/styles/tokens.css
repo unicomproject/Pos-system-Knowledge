@@ -1,0 +1,40 @@
+:root{
+  --brand-orange:#FF6A00;
+  --brand-orange-dark:#F45100;
+  --brand-black:#000000;
+
+  --text-900:#101828;
+  --text-700:#344054;
+  --text-500:#667085;
+  --text-400:#8692A6;
+
+  --surface:#FFFFFF;
+  --surface-soft:#F8FAFD;
+  --surface-subtle:#FBFCFE;
+  --border:#E3E8F0;
+  --divider:#EDF1F5;
+
+  --blue:#155EEF;
+  --blue-soft:#EEF4FF;
+  --green:#22A447;
+  --green-soft:#ECFDF3;
+  --orange:#F97316;
+  --orange-soft:#FFF3E8;
+  --purple:#7C3AED;
+  --purple-soft:#F6F0FF;
+  --red:#E11D48;
+  --red-soft:#FFF0F3;
+
+  --radius-sm:8px;
+  --radius-md:12px;
+  --radius-lg:16px;
+  --radius-xl:20px;
+
+  --shadow-md:0 16px 40px rgba(16,24,40,.10);
+  --shadow-lg:0 24px 70px rgba(16,24,40,.18);
+
+  --shell-header-h:78px;
+  --shell-footer-h:84px;
+
+  --content-max:1800px;
+}

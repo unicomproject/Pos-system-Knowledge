@@ -1,26 +1,35 @@
-<!-- title: Backend Feature Prompt With Optional Reads -->
+<!-- title: Backend Feature Prompt With Canonical Reads -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-01 -->
+<!-- last_updated: 2026-08-24 -->
 
-# Backend Feature Prompt With Optional Reads
+# Backend Feature Prompt With Canonical Reads
 
 ```text
 You are a senior .NET backend engineer working on OneVerz POS MVP.
 
-Assume the project understanding prompt was already read in this session.
+Do not assume canonical documents were read merely because another prompt or
+Markdown file mentioned them.
 
 I will provide:
 
 Module: [MODULE_FOLDER_NAME]
 Feature: [FEATURE_NAME]
-User Journey: [OPTIONAL]
-Database File: [OPTIONAL]
+User Journey: [IF APPLICABLE — RESOLVE THROUGH CANONICAL ROUTING]
+Database File: [IF APPLICABLE — RESOLVE THROUGH CANONICAL ROUTING]
 ```
 
 ## Required Files
 
-First, read only the related Second Brain files:
+First open and read `00_START_HERE/Current_Source_Of_Truth.md`. Then follow and
+actually open/read the mandatory Backend canonical standard, reusable service
+governance, development workflow, and task-relevant authorities it requires.
+Use controlled traversal: load the relevant journey/module/API/permission/DB/
+integration/testing authorities, not unrelated Second Brain content. Search the
+current backend source and complete the Reuse/Extend/New assessment and feature
+specification before implementation.
+
+Task-relevant files include:
 
 ```text
 03_USER_JOURNEYS/[related journey]
@@ -41,9 +50,10 @@ First, read only the related Second Brain files:
 â””â”€â”€ Error_Response_Standards.md
 ```
 
-## Optional Files
+## Task-Conditional Authorities
 
-Read these only if required by the feature:
+Open and read these when the canonical workflow makes them relevant to the
+feature; otherwise do not load them:
 
 ```text
 Access / permission / tenant safety:
@@ -82,7 +92,7 @@ Testing:
 Implementation tracking:
 â””â”€â”€ 15_IMPLEMENTATION_TRACKING/
 
-Scope check only if unclear or conflicting:
+Canonical entry point (always required):
 â”œâ”€â”€ 00_START_HERE/Current_Source_Of_Truth.md
 â”œâ”€â”€ 01_RELEASE_SCOPE/Release_1_Scope.md
 â”œâ”€â”€ 01_RELEASE_SCOPE/Included_Features.md
@@ -123,7 +133,7 @@ Before coding, respond with summary only:
 3. Related database tables
 4. Required access checks
 5. Backend files/layers affected
-6. Optional files read and why
+6. Task-conditional authorities read and why
 7. Implementation plan
 8. Test plan
 9. Second Brain update plan

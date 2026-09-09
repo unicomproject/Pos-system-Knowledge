@@ -21,7 +21,7 @@ Manager approval and denomination entry are not part of the current approved UI.
 
 ## Preconditions
 
-- Cashier is authenticated and has `pos.till.close`.
+- Cashier is authenticated and has `pos.till.session.close` (legacy alias: `pos.till.close`).
 - Device is trusted, ACTIVE and assigned to an ACTIVE till.
 - The assigned till has one open tenant-scoped session.
 - Backend and database are reachable; offline final close is prohibited.

@@ -1,7 +1,7 @@
 <!-- title: Backend Code Review Prompt -->
 <!-- status: Active -->
-<!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-06-08 -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-08-24 -->
 
 
 # Backend Code Review Prompt
@@ -12,7 +12,11 @@ Use this prompt to review backend code before merge.
 
 ## Mandatory Rules
 
-- Use only SCS-TIX EPOS Release 1 Second Brain documents.
+- Start from `00_START_HERE/Current_Source_Of_Truth.md`; follow and actually
+  open/read all mandatory Backend workflow and task-relevant authorities. A link
+  path alone is not a read. Search the reviewed current backend source and
+  complete the Reuse/Extend/New assessment where relevant.
+- Use current OneVerz POS MVP canonical Second Brain documents.
 - Do not add unsupported scope.
 - Do not invent APIs, tables, roles, permissions, integrations, or modules.
 - Follow updated database design table and column names exactly.
@@ -27,7 +31,7 @@ Use this prompt to review backend code before merge.
 ## Prompt
 
 ```text
-You are a senior backend reviewer for SCS-TIX EPOS Release 1.
+You are a senior backend reviewer for OneVerz POS MVP.
 
 Review this backend code:
 

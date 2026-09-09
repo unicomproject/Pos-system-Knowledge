@@ -66,13 +66,13 @@ presented as working filters.
 
 ## Add, Edit, And Deactivate Rules
 
-- Create: `customers.create`; full name and phone required; email optional.
+- Create: `pos.customers.management.create` (legacy alias: `customers.create`); full name and phone required; email optional.
 - Add Customer opens a create-only orange modal with exactly Full Name, Phone
   Number, and Email inputs; it does not search or render existing customers.
 - Customer Management shows one toolbar Add Customer action when
-  `customers.create` is granted; successful creation refreshes the paginated
+  `pos.customers.management.create` is granted; successful creation refreshes the paginated
   list and selects the backend-created customer.
-- Update/deactivate: `customers.update`.
+- Update/deactivate: `pos.customers.management.update` (legacy alias: `customers.update`).
 - Name maximum: 150 characters.
 - Phone maximum: 50 characters and at least 7 normalized digits.
 - Email maximum: 150 characters and valid address syntax when supplied.
@@ -84,7 +84,10 @@ presented as working filters.
 
 ## Attach Rules
 
-Attach requires `customers.view` plus `sales.cart.manage`. Only an `ACTIVE`
+These rules belong to standalone Customer Management only. They do not govern
+the Payment Method checkout-customer workflow.
+
+Attach requires `pos.customers.management.view` plus `pos.sales.cart.manage` (legacy: `customers.view` + `sales.cart.manage`). Only an `ACTIVE`
 customer is eligible. Current rejection codes are:
 
 - `pos_customers.customer_inactive`
@@ -94,6 +97,21 @@ customer is eligible. Current rejection codes are:
 
 Flutter permission state is UX only. Attach and checkout independently recheck
 tenant ownership and customer status on the backend.
+
+## Checkout Find Or Add Customer
+
+Current Sale **Proceed to Payment** launches the dedicated full-screen mobile-only workflow defined
+in [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Checkout_Customer_Selection_Implementation_Specification]].
+It does not reuse this management list, modal, generic search, pagination, or
+Attach-to-Sale action.
+
+A valid phone starts one deterministic exact normalized-phone search. A found
+customer is not selected until **ADD TO SALE & CONTINUE**. No result permits a
+phone-and-name-only quick create when `customers.create` is granted. Either
+success updates the active cart customer, revalidates checkout, and advances to
+Payment Method. **SKIP** clears/keeps the cart customer null, revalidates the
+walk-in checkout summary, and advances to Payment Method. Payment Method may
+re-enter this selector only to change the current choice.
 
 ## Deferred Functionality
 

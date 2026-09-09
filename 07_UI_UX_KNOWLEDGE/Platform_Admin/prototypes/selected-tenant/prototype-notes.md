@@ -21,16 +21,16 @@
 
 ### ST-02 Create Outlet
 
-| Attribute | Value |
-|---|---|
-| Journey | SA-ST-UJ-005 |
-| Permission | `platform.tenants.bootstrap.outlets.manage` |
-| Entitlement | Outlet module |
-| Primary | Save Outlet |
-| Validation | Required fields per UI/DB mapping |
-| Errors | duplicate code, suspended, not entitled |
-| Backend | `POST /bootstrap/outlets` |
-| Audit | `platform.tenant_bootstrap.outlet_created` |
+| Attribute   | Value                                       |
+| ----------- | ------------------------------------------- |
+| Journey     | SA-ST-UJ-005                                |
+| Permission  | `platform.tenants.bootstrap.outlets.manage` |
+| Entitlement | Outlet module                               |
+| Primary     | Save Outlet                                 |
+| Validation  | Required fields per UI/DB mapping           |
+| Errors      | duplicate code, suspended, not entitled     |
+| Backend     | `POST /bootstrap/outlets`                   |
+| Audit       | `platform.tenant_bootstrap.outlet_created`  |
 
 ### ST-03 Create Till
 

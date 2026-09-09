@@ -178,14 +178,12 @@ Branding state/infrastructure.
 ## Permission Contract
 
 **New permission: NO.** Canonical backend permission is
-`tenant.till.manage`; the existing Flutter capability/action is
+`tenant.tills.management.manage` (legacy alias: `tenant.till.manage`); the existing Flutter capability/action is
 `canActivatePosDevice`. Backend authorization is authoritative.
 
 Current evidence: `DevicesController` has `TenantOnly` authorization but its
-`ActivateDevice` action does not prove `tenant.till.manage` enforcement.
-Therefore backend permission enforcement is **DRIFT / REQUIRES FIX BEFORE FINAL
-RUNTIME SIGN-OFF**. Do not mark this requirement implemented from Flutter
-visibility alone.
+`ActivateDevice` action enforces `tenant.tills.management.manage` (legacy `tenant.till.manage`).
+Backend service enforcement and canonical 403 mapping were runtime-verified on 2026-08-11.
 
 ## Database Contract
 
@@ -222,7 +220,7 @@ No Activation-specific branding storage is permitted.
 
 | Check | Status | Evidence |
 |---|---|---|
-| `tenant.till.manage` enforced by activation endpoint | **IMPLEMENTED / VERIFIED** | Service permission gate and controller 403 mapping; Local Development 401/403/authorized runtime accepted on 2026-08-11 |
+| `tenant.tills.management.manage` (legacy `tenant.till.manage`) enforced by activation endpoint | **IMPLEMENTED / VERIFIED** | Service permission gate and controller 403 mapping; Local Development 401/403/authorized runtime accepted on 2026-08-11 |
 | `USED` code cannot re-pair a changed fingerprint | **IMPLEMENTED / VERIFIED** | Re-pair helper removed; same/changed fingerprint POST reuse both returned 409; current-device GET remains trusted/idempotent |
 | Flutter persists `tenantSlug` in `PosDeviceContext` | **IMPLEMENTED** | DTO mapping plus `toJson`/`fromJson` and secure device-context storage include `tenantSlug` |
 | Login branding renderer extracted | **IMPLEMENTED** | `PosLoginBrandingPanel` exists |

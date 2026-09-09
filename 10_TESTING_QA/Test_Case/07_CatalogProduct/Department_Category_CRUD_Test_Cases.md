@@ -1,9 +1,7 @@
 <!-- title: Department Category CRUD Test Cases -->
-<!-- status: Active -->
-<!-- system: OneVerz POS MVP -->
-<!-- module: CatalogProduct -->
-<!-- feature: Department CRUD / Category CRUD -->
-<!-- last_updated: 2026-07-03 -->
+<!-- status: Historical / Superseded -->
+<!-- superseded_by: Tenant_Admin_Category_Management_QA_Contract.md -->
+<!-- last_updated: 2026-08-30 -->
 
 # Department CRUD / Category CRUD Test Cases
 
@@ -94,3 +92,11 @@ dotnet test E_POS.sln -m:1 --no-restore
 | `dotnet ef migrations has-pending-model-changes --project src\E_POS.Infrastructure --startup-project src\E_POS.Api` | Passed; no pending model changes. |
 | `dotnet ef database update --project src\E_POS.Infrastructure --startup-project src\E_POS.Api` | Passed; Department/Category CRUD support migration applied. |
 | `dotnet test E_POS.sln -m:1 --no-restore` | Passed on 2026-07-03: Unit 135, Integration 54, API 99. |
+
+## Tenant Admin Category Management TARGET QA
+
+Do not treat the 2026-07-03 CRUD suite as journey completion.
+
+Full TARGET matrix (hierarchy depth, ACTIVE parent, name uniqueness, entitlement, tree, Flutter, Product Setup): [[Tenant_Admin_Category_Management_QA_Contract]]
+
+Coverage gaps versus the 2026-08-27 gap-closure audit: department cross-tenant FK, app vs DB code uniqueness, max depth, INACTIVE new parent, name uniqueness, tree API, `product_catalog` on CategoryService, Flutter Coming Soon.

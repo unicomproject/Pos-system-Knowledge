@@ -6,6 +6,14 @@
 
 # 24. Payment & Refund
 
+## Payment Method Selection Screen Decision (2026-09-03)
+
+The Cash/Card/QR/Split selection redesign reuses documented payment, sale,
+customer, till-session and device structures. New table: NO. New column: NO.
+Migration: NO. Store Credit and Credit Sale/Pay Later are out of scope and do not
+justify schema additions. Visibility comes from authorization plus existing
+configuration/capability, never a hardcoded Flutter catalogue.
+
 ## Purpose
 
 This file documents the database tables, attributes, keys, nullability, indexes, constraints, and external reference entities for this module.

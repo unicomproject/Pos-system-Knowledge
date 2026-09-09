@@ -1,0 +1,26 @@
+:root{
+  --orange:#FF6A00;
+  --orange-dark:#F34F00;
+  --black:#000000;
+  --navy:#102B66;
+
+  --text:#111827;
+  --muted:#66758F;
+  --surface:#FFFFFF;
+  --surface-soft:#F8FAFD;
+  --border:#DDE5F0;
+
+  --blue:#155EEF;
+  --blue-soft:#EAF1FF;
+  --green:#168A43;
+  --green-soft:#E7F8ED;
+  --red:#DC2626;
+  --red-soft:#FFE9EA;
+
+  --radius-sm:9px;
+  --radius-md:14px;
+  --radius-lg:22px;
+
+  --shadow:0 22px 60px rgba(0,0,0,.28);
+  --bottom-nav-h:82px;
+}

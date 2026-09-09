@@ -1,9 +1,61 @@
 ﻿<!-- title: Scope Change Log -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-09 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Scope Change Log
+
+## 2026-09-03 — Tenant Admin Tax Management canonical contract
+
+- Tax Management Second Brain rewritten as canonical **Tax Setup** contract.
+- Removed Used For / Applies To / Goods / Services / Both from Tax Setup.
+- Tax Treatment: TAXABLE / ZERO_RATED / EXEMPT (distinct Zero Rated vs Exempt).
+- Product owns TaxPriceMode (Inclusive/Exclusive); Tax Setup owns rates/treatment.
+- Effective-dated rate schedule + history; refund uses original sale tax snapshot.
+- Journey IDs allocated: TA-UJ-063 … TA-UJ-069.
+- Documentation-only; no backend/Flutter implementation claimed.
+
+Authority: [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]  
+Decisions: [[TENANT_ADMIN_TAX_MANAGEMENT_DECISION_REGISTER_2026-09-03]]
+
+## 2026-09-01 — Initial Tracking collection moved to Step 2
+
+- Optional Initial Tracking Details (Batch Number, Expiry Date, Serial Number)
+  are collected on **Step 2 — Product Type & Tracking**, after Product Type is
+  explicitly selected (SIMPLE / VARIANT).
+- Step 1 Basic Details no longer shows that card.
+- Bundle / Kit does not show the card (parent cannot receive physical identities).
+- Tracking **policy** remains Step 2 (`product_inventory_settings`). Publish
+  identity remains Step 7 into `product_batches` / `serial_numbers`.
+- Flutter IMPLEMENTED on 2026-09-01. Helper:
+  `Optional. Turn on matching Batch, Expiry, or Serial tracking below to keep these values.`
+  Identity card renders **above** Tracking & Stock Rules.
+- Track Inventory wizard default is **OFF**. User must turn it on. Skip on Step 2
+  leaves Track Inventory / Batch / Expiry / Serial OFF.
+
+Decision: [[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]].
+
+## 2026-08-27 — Category decoupled from Department
+
+- Tenant Admin Category Management no longer depends on Department (ADR 010).
+- Category model has no `department_id`. API/Flutter have no Department fields.
+- Category Code and Name uniqueness are tenant-wide.
+- Product Setup Category picker is recursive ACTIVE depth 1–5; persist `categoryId` only; **BR-CAT-PRODUCT-SELECT-001** for effective selectability.
+- **Backend IMPLEMENTED** (2026-08-27): migration `20260827140000_DecoupleCategoryFromDepartment` applied. Flutter Category Management pending.
+- Department feature remains for unrelated modules only.
+
+Decision: [[ADR/ADR_010_Category_Decoupled_From_Department]].
+
+## 2026-08-24 — Product Setup Initial Tracking Details
+
+- Step 1 Basic Details now targets optional initial Batch Number, Expiry Date, and Serial Number capture during Tenant Admin Add Product.
+- Step 2 remains tracking-policy authority (`product_inventory_settings`).
+- Wizard stays 7 steps. No extra tracking step. No Channel Visibility step.
+- Actual identity persists at Step 7 Publish into `product_batches` / `serial_numbers`. Product master identity columns are forbidden.
+- Draft storage TARGET is dedicated `product_setup_initial_tracking`. VARIANT uses Option 2 assignment at Review. Bundle parent cannot receive physical identities.
+- Documentation-only decision; Flutter/backend/database production implementation was not performed.
+
+Decision: [[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]].
 
 ## 2026-08-09 â€” Current Release cashier Discount scope lock
 

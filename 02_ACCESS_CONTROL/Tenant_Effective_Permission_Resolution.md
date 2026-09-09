@@ -1,7 +1,7 @@
-﻿<!-- title: Tenant Effective Permission Resolution -->
+<!-- title: Tenant Effective Permission Resolution -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-26 -->
+<!-- last_updated: 2026-09-09 -->
 <!-- verification: Backend and Flutter source inspected; documentation-only update -->
 
 # Tenant Effective Permission Resolution
@@ -164,3 +164,15 @@ be converted into a permission-removal replace operation.
 Creating a user may add one active tenant-level role or selected-outlet role assignments and optional additive direct tenant-user grants. There is no explicit deny in the current create contract. Outlet-scoped grants contribute only in matching outlet context. No user-to-till relation contributes to the canonical resolver today; till/device/POS runtime guards remain separate context checks.
 
 `BR-UCR-PERM-001`: Add New User never mutates Base Role grants. Effective access for the new user is the selected role baseline plus accepted additive direct user grants. Role changes invalidate all old role-derived state before recomputation. Distinct module/permission counts shown in review must come from this final recomputed set.
+
+Historical remote baseline: backend tenant role management endpoints and resolver hardening were not complete. The dated implementation evidence above supersedes the endpoint-absence statement; unresolved runtime gaps remain as recorded.
+
+## Product Wizard permission aliasing (LOCKED 2026-08-24)
+
+Effective-permission resolution MAY one-way map `tenant.products.view|create|update|delete` → `catalog.products.*` so historical grants satisfy the canonical check.
+
+Backend TARGET authorization for Product Setup evaluates **only** `catalog.products.*`. Do not keep two first-class authorities (`catalog` OR `tenant`) on the same decision.
+
+Tax lookup MAY one-way map `tax.classes.view` / `tax.rates.view` → `pricing.tax_classes.view` / `pricing.tax_rates.view`.
+
+See [[Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].

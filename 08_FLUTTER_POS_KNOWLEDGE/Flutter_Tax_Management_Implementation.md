@@ -1,42 +1,62 @@
 <!-- title: Flutter Tax Management Implementation -->
-<!-- status: Active -->
+<!-- status: Target Contract / Not yet re-implemented to canonical -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-14 -->
+<!-- last_updated: 2026-09-03 -->
+<!-- authority: [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]] -->
+<!-- supersedes: pre-2026-09-03 form-top + Tax Type PERCENTAGE/amount implementation notes as canonical UX -->
 
-# Flutter Tax Management Implementation
+# Flutter Tax Management Implementation (Target Specification)
 
-## Feature Ownership
+## Status
 
-The Tax Management feature belongs to the `pricing_tax` bounded context.
+This document is the **target Flutter implementation specification** aligned to the Tax Management Canonical Contract (2026-09-03).
+
+Current Flutter code under `lib/features/tenant_admin/pricing_tax/tax_management/` may still reflect the **legacy** single-page form (Tax Type PERCENTAGE/amount). That runtime is **implementation debt**, not Second Brain authority.
+
+**Do not** implement from the superseded 2026-08-14 form layout.
+
+## Feature ownership
+
+Bounded context: `pricing_tax`  
 Path: `lib/features/tenant_admin/pricing_tax/tax_management/`
 
-## Architecture Layers
+Navigation (visual): `Products → Tax Setup`  
+Code ownership remains `pricing_tax`.
 
-- **Data**: `tax_repository.dart`
-- **Domain**: `tax_aggregate.dart` (models the aggregate Tax entity based on `TaxClassId`), `tax_type.dart` (enum).
-- **Application**: `tax_providers.dart` (Riverpod providers for state management), `tax_management_controller.dart`.
-- **Presentation**: `tax_management_page.dart` (UI layout with Form top, Table bottom).
+## Screens to implement (later)
 
-## Navigation
+1. Tax Setup List (+ empty state)
+2. Add Tax Setup
+3. Edit Tax Setup
+4. Schedule Rate Change modal/sheet
+5. Activate/Deactivate confirmation
+6. Products Using Tax
 
-The page is accessed via the Tenant Admin sidebar:
-`Product -> Tax`
+No breadcrumb. No Used For. No Summary & Preview on Add.
 
-Despite being under the `Product` navigation visually, the code ownership remains in `pricing_tax` to match the backend module boundaries.
+## API integration (target)
 
-## State Management
+Prefer existing aggregate:
 
-- Use a `StateNotifier` or `AsyncNotifier` to manage the list of taxes and the current form state.
-- Form state includes: Tax Name, Tax Code, Tax Type, Tax Percentage, Description, Status.
-- Edit mode is toggled by setting an `editingTaxId`. When null, the form is in Create mode.
+- `GET/POST /api/v1/tax`
+- `GET/PUT /api/v1/tax/{id}`
+- Schedule/status/products-using extensions per canonical contract
 
-## API Integration
+Product Setup tax options: prefer `GET /api/v1/tenant-admin/products/create-options`.
 
-Endpoints:
-- `GET /api/v1/tax` (List)
-- `GET /api/v1/tax/{id}` (Details)
-- `POST /api/v1/tax` (Create)
-- `PUT /api/v1/tax/{id}` (Update)
-- `DELETE /api/v1/tax/{id}` (Delete)
+## Domain models (target)
 
-Errors (e.g., 409 Conflict, 400 Validation) should be handled natively using the standard error notification/toast component.
+- Tax Setup: id, name, code, description, treatment, status, currentRate, nextRate, productCount
+- Treatment: TAXABLE | ZERO_RATED | EXEMPT
+- TaxPriceMode on product: INCLUSIVE | EXCLUSIVE (`taxExclusive` bool alias)
+
+## Permissions (UI gating only)
+
+TARGET: `pricing.tax_classes.view|create|update|status.manage`, `pricing.tax_rates.view|schedule.manage`, `pricing.tax_classes.products.view`  
+Backend remains authority.
+
+## Related
+
+- [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]
+- [[../07_UI_UX_KNOWLEDGE/Tenant_Admin_Tax_Management]]
+- [[../03_USER_JOURNEYS/Tenant_Admin/10_Tax_Management_Flow]]

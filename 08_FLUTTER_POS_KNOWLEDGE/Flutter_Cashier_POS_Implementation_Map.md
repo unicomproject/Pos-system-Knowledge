@@ -6,6 +6,13 @@
 
 # Flutter Cashier POS Implementation Map
 
+## Payment Method Selection Ownership (2026-09-03)
+
+See [[Flutter_POS_Payment_Method_Selection_Implementation_Specification]].
+Ownership remains in `lib/features/sale/`, reusing checkout layers and
+componentized `presentation/widgets/payment/`. Selection orchestration remains
+separate from Cash/Card/QR/Split execution screens.
+
 > Checkout Customer Selection / Add: Second Brain is ready for implementation;
 > dedicated Flutter implementation, `customers.create` permission seed
 > restoration, and authenticated E2E verification remain pending. Normative

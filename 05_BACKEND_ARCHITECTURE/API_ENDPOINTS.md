@@ -1,9 +1,18 @@
 <!-- title: Platform Subscription Plan API Endpoints -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-26 -->
+<!-- last_updated: 2026-09-09 -->
 
 # Platform Subscription Plan API Endpoints
+
+## POS Payment Method Selection Clarification (2026-09-03)
+
+`POST /api/v1/pos/checkout/summary` supplies authoritative checkout data and
+currently supported backend payment-method information.
+`POST /api/v1/pos/checkout/start-payment` is the execution transition and must
+revalidate the selected method. No selection-only endpoint is required. Rich
+`paymentMethods[]` metadata (display/type/availability/reason/sort order) remains
+an enhancement until implemented and verified.
 
 ## POS Cashier Discount
 
@@ -31,16 +40,18 @@ implementation's trusted-device, assigned-till, open-session resolution.
 
 | Method and route | Purpose | Query/body | Permission |
 |---|---|---|---|---|
-| `GET /summary` | Customer summary | `deviceId` | `customers.view` |
-| `GET /` | Search/filter/page | `deviceId`, `search`, `status`, `source`, `page`, `pageSize` | `customers.view` |
-| `GET /{customerId}` | Profile and completed-order aggregates | `deviceId` | `customers.view` |
-| `GET /{customerId}/orders` | Existing paginated purchase history | `deviceId`, `page`, `pageSize`, `fromDate`, `toDate`, `status` | `customers.view` |
-| `POST /` | Create POS customer | `deviceId`; full name, phone, optional email | `customers.create` |
+| `GET /summary` | Customer summary | `deviceId` | `pos.customers.management.view` |
+| `GET /` | Search/filter/page | `deviceId`, `search`, `status`, `source`, `page`, `pageSize` | `pos.customers.management.view` |
+| `GET /{customerId}` | Profile and completed-order aggregates | `deviceId` | `pos.customers.management.view` |
+| `GET /{customerId}/orders` | Existing paginated purchase history | `deviceId`, `page`, `pageSize`, `fromDate`, `toDate`, `status` | `pos.customers.management.view` |
+| `POST /` | Create POS customer | `deviceId`; full name, phone, optional email | `pos.customers.management.create` |
 | `PUT /{customerId}` | Edit profile/status; also supports deactivate-to-INACTIVE | `deviceId`; full name, phone, optional email, status | `customers.update` |
-| `POST /{customerId}/attach-to-sale` | Validate ACTIVE customer and attach to cart/editable sale | `deviceId`; optional `saleId` | `customers.view` + `sales.cart.manage` |
+| `POST /{customerId}/attach-to-sale` | Validate ACTIVE customer and attach to cart/editable sale | `deviceId`; optional `saleId` | `pos.customers.management.view` + `pos.sales.cart.manage` |
 
 List search covers name, phone/normalized phone, email/normalized email, and
-customer code. Status excludes `DELETED`; source is an exact current
+customer code. A phone-shaped search containing at least seven digits is
+normalized and matched by exact `normalized_phone` equality; other search terms
+retain partial matching. Status excludes `DELETED`; source is an exact current
 `source_type` filter. Order history already returns `outletDisplayName`, not
 till name. No new Recent Purchases endpoint is required.
 
@@ -60,8 +71,17 @@ Consuming-screen contract:
   and stored on the completed `sales_orders` record.
 - `POST /api/v1/customers/{customerId}/attach-to-sale` remains a supported
   backend/Customer Management capability where implemented. It is not a
-  required cashier checkout UX step: the approved full-screen checkout selector
-  auto-associates on select/create and auto-returns to Payment Method.
+  cashier checkout API. The full-screen workflow commits a found customer only
+  after **ADD TO SALE & CONTINUE**, or a created customer after successful
+  **ADD CUSTOMER & CONTINUE**, through active cart state; it then revalidates
+  checkout and returns to Payment Method.
+- Checkout discovery is mobile-only. `GET /api/v1/customers` now guarantees
+  deterministic exact normalized-phone resolution when `search` is phone-shaped
+  and contains at least seven digits; checkout also supplies `status=ACTIVE`.
+- Quick-create uses `POST /api/v1/customers` with `FullName`, `Phone`, and Email
+  omitted/null. Revalidation uses `POST /api/v1/pos/checkout/summary` with the
+  selected `CustomerId`; final mutation uses
+  `POST /api/v1/pos/checkout/start-payment` with nullable `CustomerId`.
 
 ## POS Park / Recall Sale
 
@@ -351,12 +371,13 @@ Base route: `/api/v1/tenant-admin/products` · Controller: `TenantAdminProductsC
 | Method | Canonical Endpoint | Permission | Purpose |
 | :--- | :--- | :--- | :--- |
 | GET | `/api/v1/tenant-admin/products` | `catalog.products.view` | Paginated product list with search and filters | PARTIAL |
+| GET | `/api/v1/tenant-admin/products/create-options` | `catalog.products.create` + `product_catalog` | Product Setup lookup options. **IMPLEMENTED:** ACTIVE hierarchy-aware `categories[]` depth 1–5. Apply **BR-CAT-PRODUCT-SELECT-001** for effective selectability. Do **not** call `/api/v1/categories/tree` for this picker. | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/filter-options` | `catalog.products.view` | Dropdown values for category, brand, and status filters | PARTIAL |
 | POST | `/api/v1/tenant-admin/products` | `catalog.products.create` | Create a product wizard graph (DRAFT or published) | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/{id}` | `catalog.products.view` | Get complete details of a specific product | PARTIAL |
-| GET | `/api/v1/tenant-admin/products/{id}/setup` | `catalog.products.view` | Get ProductSetupWizardDto Review snapshot and validation checklist | DOCUMENTED CONTRACT |
+| GET | `/api/v1/tenant-admin/products/{id}/setup` | view **OR** create **OR** update | Get ProductSetupWizardDto Review snapshot and validation checklist | DOCUMENTED CONTRACT |
 | PUT | `/api/v1/tenant-admin/products/{id}` | `catalog.products.update` | Update product details | PARTIAL |
-| POST | `/api/v1/tenant-admin/products/{id}/publish` | `catalog.products.publish` | Finalize and publish the draft (transactional) | DOCUMENTED CONTRACT |
+| POST | `/api/v1/tenant-admin/products/{id}/publish` | `catalog.products.publish` + subgraph recheck | Finalize and publish the draft (transactional) | DOCUMENTED CONTRACT |
 | DELETE | `/api/v1/tenant-admin/products/{id}` | `catalog.products.delete` | Perform soft delete (ARCHIVE status mutation) | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/imports/template` | `catalog.products.import` | Download UTF-8 CSV import template | PARTIAL |
 | POST | `/api/v1/tenant-admin/products/imports` | `catalog.products.import` | Upload CSV and create batch row logs | PARTIAL |
@@ -364,6 +385,10 @@ Base route: `/api/v1/tenant-admin/products` · Controller: `TenantAdminProductsC
 | GET | `/api/v1/tenant-admin/products/imports/{importId}/rows` | `catalog.products.import` | Read paginated valid or invalid row validation errors | PARTIAL |
 | POST | `/api/v1/tenant-admin/products/imports/{importId}/commit` | `catalog.products.import` | Commit valid rows in batch to database | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/imports/{importId}/errors.csv` | `catalog.products.import` | Export validation failures CSV log | PARTIAL |
+
+### Step 1 Initial Tracking Details (collection moved to Step 2)
+
+`PUT /api/v1/tenant-admin/products/{productId}/draft` and `GET .../setup` remain the only Product Setup draft routes. TARGET identity fields (collected on Step 2 after Product Type is selected): `initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`. Step 2 also remains tracking policy (`productStructure`, `trackInventory`, `batchTracking`, `expiryTracking`, `serialTracking`) plus `confirmClearIncompatibleInitialTracking` when clearing incompatible identity values. Step 7 VARIANT assignment: `initialTrackingAssignedVariantId`. Authority: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Collection decision: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]. Permission authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]. Entitlement: `product_catalog`; advanced tracking / non-empty identity: `inventory_tracking`.
 
 ### Step 5 Barcode & SKU Payload & Duplicate Projection
 `PUT /api/v1/tenant-admin/products/{productId}/draft` accepts `UpdateProductDraftStep5RequestDto`.
@@ -387,6 +412,19 @@ On duplicate detection, the endpoint returns a `409 Conflict` containing a struc
 ```
 
 Note: Legacy route `/api/v1/products` is maintained as compatibility alias pointing to the same application layer logic. Duplicate controller implementation must be retired.
+
+### Step 6 — Pricing & Tax (documentation contract)
+
+No new Step 6-only endpoint. Use existing `PUT .../draft`, wizard-create/`POST .../products`, `GET .../setup`, and `GET .../create-options` (`currencyCode`, ACTIVE taxes).
+
+Canonical semantics: [[../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]] §6.1–6.5.
+
+| Structure | Persist selling via | Tax |
+|---|---|---|
+| SIMPLE | One applicable `price_list_items` configuration for the sellable identity | `product_tax_assignments` + `products.is_tax_exclusive` |
+| VARIANT (TARGET) | Per included `product_variant_id` on `price_list_items.selling_price` | Common Tax Class / TaxPriceMode; fan-out assignments allowed |
+
+Do **not** invent parallel pricing routes or tables. Extend `PricingTax` DTO with `variantPrices[]` for VARIANT; stop scalar fan-out of one selling price to all variants. Cost remains `products.reference_cost_price` when authorized.
 
 ---
 
@@ -966,6 +1004,26 @@ Base: `/api/v1/platform-admin/permission-catalog`
 | PUT | `/api/v1/tenant-admin/roles/{roleId}/permissions` | `roles.permissions.update` |
 | GET | `/api/v1/tenant-admin/context` | Authenticated; includes `effectivePermissions`, `enabledFeatures` |
 
+## Tenant Admin Users API
+
+Base: `/api/v1/tenant-admin/users`
+
+| Method | Route | Permission | Purpose | Status |
+|---|---|---|---|---|
+| GET | `/api/v1/tenant-admin/users` | `tenant.users.view` or `tenant.users.manage` | List tenant users with role/outlet summary and nullable resolved `profileImageUrl` | IMPLEMENTED; API runtime verified 2026-08-18 |
+| GET | `/api/v1/tenant-admin/users/create-options` | `tenant.users.create`, `tenant.users.invite`, or `tenant.users.manage` | Load assignable roles, outlets, permission groups and supported statuses | IMPLEMENTED |
+| GET | `/api/v1/tenant-admin/users/{userId}` | `tenant.users.details.view`, `tenant.users.view`, or `tenant.users.manage` | Load one tenant user detail with resolved `profileImageUrl` | IMPLEMENTED |
+| POST | `/api/v1/tenant-admin/users` | `tenant.users.create`, `tenant.users.invite`, or `tenant.users.manage` | Create/invite tenant user; optional profile media asset id | IMPLEMENTED |
+| PUT | `/api/v1/tenant-admin/users/{userId}` | `tenant.users.update` or `tenant.users.manage` | Update tenant user profile/access/status; optional profile media replace/remove | IMPLEMENTED |
+| POST | `/api/v1/tenant-admin/users/{userId}/resend-invite` | `tenant.users.invite` or `tenant.users.manage` | Resend invitation for eligible invited user | IMPLEMENTED |
+| POST | `/api/v1/tenant-admin/users/{userId}/revoke-invite` | `tenant.users.invite` or `tenant.users.manage` | Revoke invitation for eligible invited user | IMPLEMENTED |
+| DELETE | `/api/v1/tenant-admin/users/{userId}` | `tenant.users.delete` or `tenant.users.manage` | Disable/delete tenant user according to service rules | IMPLEMENTED |
+
+Users List profile image rule: the database stores a media asset id in
+`tenant_users.profile_image_url`; the API returns a nullable resolved URL as
+`profileImageUrl`. Missing, inactive, deleted, or invalid media remains `null`
+so clients can render initials fallback.
+
 ## Verification (2026-06-23)
 
 | Layer | Tests | Commit |
@@ -1310,13 +1368,14 @@ Base routes: `/api/v1/pos/cart`, `/api/v1/pos/checkout`,
 
 | Method | Route | Permission | Purpose | Status |
 |---|---|---|---|---|
-| POST | `/api/v1/pos/cart/calculate` | `sales.cart.update_item` in the direct controller; `sales.checkout` when called through checkout summary/start-payment | Backend cart totals without saving a sale |
-| POST | `/api/v1/pos/checkout/summary` | `sales.checkout` | Payment screen billing summary and permitted methods |
-| POST | `/api/v1/pos/checkout/start-payment` | `sales.checkout` + selected payment permission | Existing Flutter cash checkout entry point; creates sale/payment/receipt for cash |
-| POST | `/api/v1/pos/sales` | `sales.checkout` | Create draft POS sale |
-| POST | `/api/v1/pos/sales/checkout` | `sales.checkout` | Alias for draft sale creation; does not complete payment by itself |
+| POST | `/api/v1/pos/cart/calculate` | `pos.sales.cart.update_item` in the direct controller; `pos.sales.checkout.execute` through checkout summary/start-payment | Backend cart totals without saving a sale |
+| POST | `/api/v1/pos/checkout/summary` | `pos.sales.checkout.execute` | Payment screen billing summary and permitted methods |
+| POST | `/api/v1/pos/checkout/start-payment` | `pos.sales.checkout.execute` + selected canonical payment permission | Existing Flutter cash checkout entry point; creates sale/payment/receipt for cash |
+| POST | `/api/v1/pos/sales` | `pos.sales.checkout.execute` | Create draft POS sale |
+| POST | `/api/v1/pos/sales/checkout` | `pos.sales.checkout.execute` | Alias for draft sale creation; does not complete payment by itself |
+| GET | `/api/v1/pos/notifications?page={page}&pageSize={pageSize}` | `pos.notifications.alerts.view` plus source feature permission | Tenant-user inbox; records and unread count are filtered before DTO projection |
 | GET | `/api/v1/pos/sales/{saleId}` | `sales.view` | Completed sale details |
-| POST | `/api/v1/pos/payments` | Payment method permission such as `payments.cash.accept` | Record payment against an existing draft sale |
+| POST | `/api/v1/pos/payments` | Payment method permission such as `pos.payments.cash.accept` | Record payment against an existing draft sale |
 | GET | `/api/v1/pos/receipts/{saleId}` | `receipts.view` or `receipts.print` | Receipt preview data with `barcodeValue` |
 | POST | `/api/v1/pos/receipts/{saleId}/print` | `receipts.print` | Receipt print audit row |
 
@@ -1572,6 +1631,67 @@ Same rule for `GET .../sales/search` and `GET .../sales/{saleId}/eligibility`:
 
 # POS Receipts API Endpoints (2026-08-05)
 
+# Tenant E-commerce Click & Collect Staff API (OO-02 contract updated 2026-08-31)
+
+The single staff operational owner is `/api/v1/tenant/ecommerce/click-collect`. OO-01 list, OO-02 detail and OO-03 Start operations below are implemented; later operations remain governed by their own tracking. Existing public storefront `GET /api/v1/ecommerce/storefront/fulfillment/...` reads are customer APIs and remain separate. Older generic `/api/v1/fulfilment-orders`, `/api/v1/pickup-orders` and `/api/v1/pickup-events` descriptions are not competing public staff contracts.
+
+| Method | Route | Purpose |
+|---|---|---|
+| GET | `/api/v1/tenant/ecommerce/click-collect/orders` | Implemented bounded staff queue read with outlet/search/status/sort/paging, six full-scope aggregates, server time and card projections; approved UI exposes search only |
+| GET | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}?outletId={outletId}` | Implemented side-effect-free OO-02 aggregate detail including nullable `fulfillmentVersion` |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/fulfilment/start?outletId={outletId}` | Implemented atomic OO-03 start; body requires `expectedVersion`; stale/state/reservation conflict returns 409 |
+| GET | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking` | Picking detail |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/lines/{lineId}/pick` | Barcode/quantity pick |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/lines/{lineId}/issues` | Record picking issue |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking/notes` | Persist a PICKING-only operational note with optimistic concurrency |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/pack` | Validate/create packages |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/ready` | Mark ready and notify |
+| GET | `/api/v1/tenant/ecommerce/click-collect/collection/ready` | Outlet ready queue |
+| POST | `/api/v1/tenant/ecommerce/click-collect/collection/qr/validate` | Server QR validation |
+| GET | `/api/v1/tenant/ecommerce/click-collect/collection/lookup` | Manual fallback lookup |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/collection/payment/cash` | Existing unified payment orchestration |
+| POST | `/api/v1/tenant/ecommerce/click-collect/orders/{orderId}/collection/handover` | Idempotent finalization |
+
+Command DTOs carry idempotency and repository-standard concurrency where required. A generic `PATCH .../status`, if retained, is restricted/deprecated for cashier operations and cannot bypass command invariants.
+
+## OO-01 list-read details
+
+- Authorization: authenticated tenant staff + `click_collect` entitlement + `commerce.online_order.orders.access` + `commerce.online_order.orders.view` + tenant/outlet/resource scope. Role names do not authorize.
+- Outlet authorization requires an active same-tenant user and active same-tenant outlet. Only outlet assignments whose `revoked_at` is null are effective. Denial returns HTTP 403 with `online_orders.outlet_access_denied`; revoked history never grants access or disables the no-active-scope tenant-wide fallback.
+- Query capability: `outletId`, `search`, `status`, `sortBy`, `sortDirection`, `page`, `pageSize`. Only debounced `search` is visible in the approved queue; the remainder supports bounded server reads.
+- Response concepts: `items`, `summary`, `page`, `pageSize`, `totalCount`, `serverTime`. Summary provides New, Preparing, Ready, Delayed, Collected and Cancelled counts for the complete active scope, not the returned page.
+- Item projection: order ID/number, pickup or collection reference, customer name/phone, collection start/end/timezone snapshot, display/payment status, item/unit counts, product previews and remaining-preview count. Preview projections contain product/variant identity, product name, image URL and alt text.
+- Derivation: Delayed uses authoritative lifecycle + collection window + server time and cannot replace Ready, Collected, Cancelled or terminal states. Payment comes from existing payment/order authority.
+- Performance: use bounded efficient aggregate/joined or batched reads; no N+1 database queries or per-product image API calls.
+- Navigation: queue chevron reads `/orders/{orderId}` only; it invokes no mutation.
+
+## OO-02 detail / OO-03 start boundary
+
+- Detail query: `GET .../orders/{orderId}?outletId={outletId}`; requires `commerce.online_order.orders.access` and `commerce.online_order.orders.view`, entitlement and tenant/outlet/resource scope. It returns the aggregate order/customer/collection/payment/line contract and performs no mutation.
+- Start command: `POST .../orders/{orderId}/fulfilment/start?outletId={outletId}`; requires `commerce.online_order.fulfilment.start` and a positive `expectedVersion`. It validates active tenant/user/outlet, entitlement, outlet/resource scope, sales/fulfilment state, confirmed pickup-slot reservation and confirmed unexpired inventory reservation, then atomically sets `PENDING`/`ALLOCATED` fulfilment to `PICKING`, assigns the actor, increments `row_version` and appends one `FULFILLMENT_STARTED` event. Stale EF/client versions and invalid state/reservation return HTTP 409.
+
+OO-04 target routes are `GET .../orders/{orderId}/picking`, `POST
+.../orders/{orderId}/picking/lines/{lineId}/pick`, and `POST
+.../orders/{orderId}/picking/lines/{lineId}/issues`, and `POST
+.../orders/{orderId}/picking/notes`, all outlet-scoped. As of
+2026-09-02 they are implemented by `ClickCollectOrdersController`. Pick uses
+positive increment semantics with body
+`{ quantity, barcode?, inputMethod: SCAN|MANUAL, expectedVersion }`; permissions
+are `.picking.pick` plus the matching input permission, and SCAN validates the
+scoped line barcode. Issue uses `{ reason: ITEM_NOT_FOUND, note?, expectedVersion }`
+with `.picking.report_issue`; note is optional and at most 500 characters. Add
+Picking Note uses `{ note, expectedVersion }`, requires
+`commerce.online_order.picking.note`, trims and enforces 1–500 plain-text
+characters, and appends `FULFILLMENT_PICKING_NOTE_ADDED` to the existing event
+authority. Success returns the saved note, actor/server timestamp and incremented
+version. Picking Detail returns the latest 50 notes oldest-to-newest. Generic
+status PATCH is not a substitute. Responses expose current version/progress and backend-derived
+`canPack`; validation is 400, inaccessible scope is 403/404, and stale/lifecycle
+conflict is 409.
+- Success returns authoritative identifiers/status/assignment/timestamp/version. Conflict returns 409 and requires refetch; 401/403/404 remain non-disclosing and use the common error envelope.
+- Live-source status on 2026-09-01: the existing `ClickCollectOrdersController`, application services and repositories implement list, detail and Start. The retained generic status PATCH is not an OO-03 substitute.
+- Safe Start observability may record correlation/trace id, tenant/outlet/order/fulfilment/actor identifiers, operation, prior/target state, result and latency. QR hashes, auth/payment secrets and unnecessary customer PII are prohibited.
+
 Controller: `PosReceiptsController`
 Base: `/api/v1/pos/receipts`
 
@@ -1720,3 +1840,61 @@ Base route: `/api/v1/tenant-admin/online-store`; all endpoints are source-verifi
 | 9 | `POST /publish` | `tenant.online_store.publish` | `tenant_settings`, `sales_channels`, `audit_logs`, `idempotency_requests` |
 
 All reads use `tenant.online_store.view`. Final publish requires `Idempotency-Key`, reruns authoritative readiness, and returns `online_store.publish_blocked` when any blocker remains. See [[../03_USER_JOURNEYS/Tenant_Admin/22_Online_Store_Setup_And_Publish_Flow]].
+
+---
+
+# Tenant Admin Category Management APIs
+
+Base route: `/api/v1/categories` · Controller: `CategoriesController` · Auth Policy: `TenantOnly`.
+Entitlement: **`product_catalog`** (enforced at CategoryService).
+Manage fallback: `catalog.categories.manage` satisfies view/create/update/delete.
+
+## Category CRUD (IMPLEMENTED)
+
+| Method | Endpoint | Permission | Purpose |
+| :--- | :--- | :--- | :--- |
+| GET | `/api/v1/categories` | `catalog.categories.view` OR `manage` | Paginated list. Query: `pageNumber`, `pageSize`, `search` (name/code), `status`, `parentCategoryId`, `rootOnly`. Excludes DELETED. No Department filter. |
+| GET | `/api/v1/categories/tree` | `catalog.categories.view` OR `manage` | Management tree: ACTIVE+INACTIVE, DELETED excluded. Preserves real hierarchy (no fake-root promotion). **No `status` query parameter.** |
+| GET | `/api/v1/categories/{id}` | `catalog.categories.view` OR `manage` | Detail with parent code/name, description, slug, derived level/path/counts. No Department fields. |
+| POST | `/api/v1/categories` | `catalog.categories.create` OR `manage` | Create. Body: `categoryCode`, `name`, `parentCategoryId?`, `status`, `description?`, `sortOrder`. **No `departmentId`. No write `imageUrl`.** |
+| PUT | `/api/v1/categories/{id}` | `catalog.categories.update` OR `manage` | Update attributes, parent, and status. **No `departmentId`.** |
+| DELETE | `/api/v1/categories/{id}` | `catalog.categories.delete` OR `manage` | Soft delete → 204. 409 `category.delete_conflict` if children or product links. |
+
+## Category Media (IMPLEMENTED)
+
+| Method | Endpoint | Permission | Purpose |
+| :--- | :--- | :--- | :--- |
+| POST | `/api/v1/tenant-admin/categories/{categoryId}/image` | `catalog.categories.update` OR `manage` + `product_catalog` | Upload/replace category image. Same-tenant Category and media ownership. |
+| DELETE | `/api/v1/tenant-admin/categories/{categoryId}/image` | `catalog.categories.update` OR `manage` + `product_catalog` | Remove category image. |
+
+Category create flow: `POST /categories` first; if image selected, `POST .../image` second. Optional image failure does not rollback master create.
+
+## Redundant endpoints (do not add)
+
+| Method | Endpoint | Classification |
+| :--- | :--- | :--- |
+| GET | `/api/v1/categories/{id}/children` | REDUNDANT — use `GET /categories?parentCategoryId={id}` |
+| PATCH | `/api/v1/categories/{id}/status` | REDUNDANT — PUT owns status |
+
+## Product Setup Category Source
+
+**LOCKED:** `GET /api/v1/tenant-admin/products/create-options` (`product_catalog` + `catalog.products.create`).
+
+* ACTIVE effectively-selectable categories only in `categories[]`; **BR-CAT-PRODUCT-SELECT-001 enforced in backend**
+* Hierarchy-aware depth 1–5
+* Persist selected `categoryId` only
+* Product Setup must **not** call `/api/v1/categories/tree`
+
+**HISTORICAL:** prior `categories` + `subCategories` two-list response was LEGACY FLAT child-Category representation, not a SubCategory entity.
+
+## Entitlement and duplicate error mapping
+
+| Condition | HTTP / code |
+|---|---|
+| `product_catalog` disabled | 403 `category.entitlement_denied` |
+| Category permission missing | 403 `category.permission_denied` |
+| Entitlement infrastructure failure | 500 `category.unexpected_failure` |
+| `uq_categories_tenant_id_category_code` violation | 409 `category.duplicate_code` |
+| `uq_categories_tenant_id_normalized_category_name` violation | 409 `category.duplicate_name` |
+
+Authority: [[../13_DECISIONS_AND_CHANGES/ADR/ADR_010_Category_Decoupled_From_Department]], [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_BACKEND_GAP_FIX_CLOSURE_2026-08-27]]

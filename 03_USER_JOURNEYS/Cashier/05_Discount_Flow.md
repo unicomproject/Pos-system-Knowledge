@@ -66,7 +66,7 @@ flowchart TD
 |---|---|
 | Authentication | Required |
 | Feature entitlement | Discount/POS discount enabled |
-| Permission | `sales.discount.apply` |
+| Permission | `pos.sales.manual_discount.apply` (legacy alias: `sales.discount.apply`) |
 | Trusted device/open till | Required |
 
 ## Data and API References

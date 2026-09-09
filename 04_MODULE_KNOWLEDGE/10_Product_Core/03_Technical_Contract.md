@@ -1,7 +1,7 @@
 <!-- title: Product Core Technical Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-11 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Product Core Technical Contract
 
@@ -14,7 +14,7 @@ Defines the technical implementation contract for `Product_Core` in the OneVerz 
 | Area | Contract |
 |---|---|
 | API groups | `/api/v1/tenant-admin/products`, `/api/v1/tenant-admin/products/draft`, `/api/v1/tenant-admin/products/{id}/setup`, `/api/v1/pos/products`, `/api/v1/storefront/products` |
-| Draft API Pipeline | Single `PUT /api/v1/tenant-admin/products/{productId}/draft` endpoint supporting polymorphic step graph payloads (`currentSetupStep=1..8`). |
+| Draft API Pipeline | Single `PUT /api/v1/tenant-admin/products/{productId}/draft` endpoint supporting polymorphic step graph payloads (`currentSetupStep=1..7`). Step 2 carries `initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber` after Product Type is selected. |
 | Request format | Typed request DTOs (`SaveProductDraftRequest`); step-specific graphs passed via polymorphic payload structures. |
 | Response format | Typed `ProductDraftResponse` and `ProductSetupWizardDto` with full setup projections. |
 | Tenant context | Resolved server-side for tenant-owned records. |
@@ -74,16 +74,19 @@ The canonical Step 5 payload structure:
 | `product_options` | Stores product option headers owned by tenant. |
 | `product_option_values` | Stores product option values owned by tenant (`image_media_asset_id`). |
 | `product_variant_option_values` | Maps `product_variants` to `product_option_values`. |
+| `product_setup_initial_tracking` | 1:1 draft store for Step 2 `initialBatchNumber` / `initialExpiryDate` / `initialSerialNumber`. Not Product master identity. |
 
 > [!NOTE]
-> Database Migration Required: **NO**. All required tables and columns already exist in EF Core ModelSnapshot.
+> CURRENT wizard tables/columns for Steps 1–7, including `product_setup_initial_tracking`, exist in EF Core. Do not add `products.batch_number`, `products.expiry_date`, or `products.serial_number`. Identity collection is Step 2 after Product Type is selected.
 
 ## Related Specifications
 
 - [[../12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification]]
 - [[Tenant_Admin_Product_Type_Tracking_Specification]]
 - [[Tenant_Admin_Product_Units_Pack_Conversion_Specification]]
-- [[05_Tenant_Admin_Add_Product_8_Step_Contract]]
+- [[05_Tenant_Admin_Add_Product_7_Step_Contract]]
+- [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
+- [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
 
 ## Bundle Technical Contract
 
@@ -135,7 +138,7 @@ Persisted mutations must trigger exact audit event names:
 Metadata: `tenantId`, `ProductId`, `ComboDefinitionId`, `ComponentProductId`, `ComponentVariantId`, old quantity, new quantity, actor, timestamp, `rowVersion`. Unsaved drawer changes are not audited.
 
 ### NFR (Non-Functional Requirements)
-- **Security**: Strict tenant isolation, server-side permissions/entitlement, Outlet authorization, no stock/cost leakage. Never trust client available stock or tracking type; server re-resolves them.
+- **Security**: Strict tenant isolation, server-side permissions/entitlement, Outlet authorization, no stock/cost leakage. Never trust client available stock or tracking type; server re-resolves them. Product Setup permission authority: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
 - **Performance**: Server-side paginated search, debounce, request cancellation. Avoid N+1 queries; batched inventory lookups only.
 - **Reliability**: Failed API does not clear local components. Failed Save does not advance.
 - **Consistency**: Final POS sale must revalidate actual inventory transactionally.

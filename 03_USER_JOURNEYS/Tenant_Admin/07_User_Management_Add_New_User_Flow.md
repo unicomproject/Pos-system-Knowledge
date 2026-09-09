@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin User Creation 5-Step Corrected Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-26 -->
+<!-- last_updated: 2026-09-09 -->
 
 # Tenant Admin User Creation 5-Step Corrected Flow
 
@@ -50,6 +50,17 @@ Current architecture supports additive direct user grants only:
 | Locked / Not Assignable | Blocked by actor authority, delegation ceiling, entitlement, system protection, or inactive catalog state |
 
 `BR-UCR-PERM-001`: Add New User must never update `tenant_role_permissions` or the selected role's global permission set. Role-level changes belong only to Roles & Access.
+
+### Shared tenant and profile safeguards
+
+- Tenant Admin must be authenticated unless the flow is a setup/payment link flow before first login.
+- Tenant status, feature entitlement, permission, and outlet access must be enforced where applicable.
+- Tenant-owned data must be isolated by tenant context resolved server-side.
+- All create/update/status actions should be audit logged.
+- Tenant user is tenant-scoped.
+- Do not mix tenant user with platform user or customer account.
+- User profile photos are stored as tenant-scoped media assets; list and detail
+  APIs expose a nullable resolved URL so clients can fall back to initials.
 
 Effective permissions are the role baseline plus supported additive user grants, filtered by tenant, entitlement, active definitions, actor delegation, and context. Explicit deny/removal of inherited role grants is not supported.
 

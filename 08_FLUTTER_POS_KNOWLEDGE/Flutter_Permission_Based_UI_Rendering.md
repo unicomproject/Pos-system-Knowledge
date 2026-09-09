@@ -1,14 +1,13 @@
-﻿<!-- title: Flutter Permission Based UI Rendering -->
+<!-- title: Flutter Permission Based UI Rendering -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-26 -->
-
+<!-- last_updated: 2026-09-09 -->
 
 # Flutter Permission Based UI Rendering
 
 ## Purpose
 
-This file defines permission-based UI rendering rules for OneVerz POS Flutter apps.
+This file defines permission-based UI rendering rules for OneVerz POS Flutter apps based on the canonical **4-Tier Permission Taxonomy** (`domain.module.feature.action`).
 
 For Tenant Admin Add New User, use [[Tenant_Admin_User_Creation_5_Step_Flutter_Contract]]. The selected role supplies inherited access; optional direct user overrides are additive catalog grants. UI role labels, module cards, and hidden actions never replace backend delegation and entitlement checks.
 
@@ -16,61 +15,119 @@ Role selection exists only in Step 2. Step 3 must not invoke role permission rep
 
 Permissions are backend-driven and must not be hardcoded by role name.
 
-## Rule
+---
 
-UI may hide or disable actions based on permissions.
-Backend remains final authorization authority.
+## Core Rule
+
+- The Flutter UI may hide or disable actions based on effective permissions loaded from the backend auth session.
+- The Backend API remains the final authorization authority.
+- Role-name checks never determine UI visibility; use canonical permission
+  constants/helpers plus feature entitlement.
+
+---
 
 ## Context Sources
 
-Flutter must load:
+Flutter must load and evaluate:
 
-- Enabled features.
-- Effective permissions.
-- Tenant status.
-- Outlet access.
-- Till/device context.
-- Offline allowed actions.
+1. **Feature Entitlements:** Tenant-enabled platform features (e.g. `pos.sales`, `click_collect`).
+2. **Effective Permissions:** Canonical 4-tier permission codes in JWT claims.
+3. **Tenant Status:** Active tenant lifecycle.
+4. **Outlet Access:** Assigned outlet context.
+5. **Till & Device Context:** Trusted device ID and active till session state.
+6. **Offline Allowed Actions:** Permitted offline transaction boundaries.
+
+---
 
 ## Rendering Behavior
 
 | Condition | UI Behavior |
 |---|---|
-| Feature disabled | Hide menu or show feature unavailable |
-| Permission missing | Hide/disable action |
-| Till not open | Disable billing actions |
-| Device not trusted | Block POS/device routes |
-| Offline blocked action | Disable and explain online required |
-| Sync conflict | Show sync issue indicator |
+| Feature disabled | Hide menu entry or show feature unavailable message |
+| Permission missing | Hide card or disable button |
+| Till not open | Disable billing and payment actions; show "An open till is required" |
+| Device not trusted | Redirect to `/pos/device-activation` |
+| Offline blocked action | Disable and show "Online connection required" |
+| Sync conflict | Show sync warning indicator |
 
-## POS Examples
+## Filter Before Layout
 
-- Hide discount button without discount permission.
-- `sales.discount.apply` controls the current MANUAL Discount surface. Offline
-  visibility may use a cached snapshot, but sync backend revalidation is final.
-- Do not show manager approval/POLICY/Item Fixed controls in current cashier UI;
-  `sales.discount.approve` is deferred capability, not a normal Cashier grant.
-- Hide refund/exchange without permission.
-- Disable card/QR payment while offline.
-- Disable till close while offline.
-- Disable receipt reprint if permission missing.
+Navigation destinations, dashboard actions, cards, tabs, shortcuts, menu items,
+and contextual actions are filtered before layout composition:
 
-## Pickup Examples
+```text
+allActions
+→ entitlement/permission filter
+→ visibleActions
+→ responsive composition
+```
 
-- Show pickup order list only with pickup permission.
-- Show status update actions only with fulfilment/pickup permission.
-- Hide cancelled/completed actions when order state does not allow them.
+Do not use `Visibility(maintainSize: true)`, transparent widgets, or fixed grid
+slots for unauthorized items. Zero, one, and multiple permitted-item states
+must reflow without empty gaps at phone, tablet portrait, tablet landscape, and
+desktop breakpoints. Reuse current responsive/layout utilities rather than
+hardcoding each permission combination.
+
+## Permission-Scoped Notifications
+
+Classify incoming notifications by feature/domain, then filter by tenant
+entitlement, underlying feature permission, and outlet/resource scope.
+`notifications.view` allows notification infrastructure access but never
+overrides the protected feature's permission. Backend filtering is
+authoritative; Flutter filtering is defence-in-depth/UX. A hidden notification
+cannot be used as a deep link, and route guards independently enforce access.
+
+Example: New Sale permitted + Online Orders denied means New Sale is visible,
+Online Orders is absent, and Online Order notifications are absent.
+
+---
+
+## Canonical POS Permission Examples
+
+| UI Action / Control | Canonical 4-Tier Permission Code | Legacy / Deprecated Code | UI Behavior |
+|---|---|---|---|
+| **Start New Sale Button** | `pos.sales.new_sale.create` | `sales.create`, `pos.sale.start` | Hide if missing; disable if till session is closed |
+| **Product Grid & Scan** | `pos.sales.catalog.view`, `pos.sales.catalog.search` | `products.view`, `products.search` | Render products & enable barcode scanner |
+| **Cart Line Actions** | `pos.sales.cart.add_item`, `pos.sales.cart.update_item`, `pos.sales.cart.remove_item`, `pos.sales.cart.clear` | `sales.cart.manage`, `sales.cart.*` | Render quantity adjustments and line removal |
+| **Manual Discount Button** | `pos.sales.manual_discount.apply` | `sales.discount.apply`, `pos.discount.apply` | Hide discount button if missing |
+| **Manager Discount Override** | `pos.sales.discount.approve` | `sales.discount.approve` | Deferred capability; not shown in standard cashier UI |
+| **Park / Recall Sale** | `pos.sales.held_sales.create`, `pos.sales.held_sales.view`, `pos.sales.held_sales.recall` | `sales.park.create`, `sales.park.view`, `sales.park.recall` | Render Park / Recall buttons and list dialog |
+| **Checkout Proceed** | `pos.sales.checkout.execute` | `sales.checkout` | Enable "Proceed to Payment" |
+| **Cash Payment Sheet** | `pos.payments.cash.accept` | `payments.cash.accept` | Show Cash payment option in payment selector |
+| **Receipt Print / Reprint** | `pos.receipts.physical.print`, `pos.receipts.history.reprint` | `receipts.print`, `receipts.reprint` | Render Print Receipt button / Reprint action with audit |
+| **Returns & Exchanges** | `pos.returns.search_sale.view`, `pos.returns.workflow.create` | `returns.view`, `returns.create` | Show Returns & Exchanges card on Home Dashboard |
+| **Cash Drawer Actions** | `pos.cash_drawer.position.view`, `pos.cash_drawer.movements.create` | `cash_drawer.view`, `cash_drawer.movement.create` | Render Cash Drawer screen and Cash In / Cash Drop forms |
+| **Close Till / End Shift** | `pos.till.session.close` | `pos.till.close` | Render End Shift action; disable if till is already closed |
+
+---
+
+## Pickup & Click & Collect Examples
+
+| UI Action / Control | Canonical 4-Tier Permission Code | UI Behavior |
+|---|---|---|
+| **Online Orders Queue** | `commerce.online_order.orders.access`, `commerce.online_order.orders.view` | Show Online Orders tile on Home Dashboard |
+| **Order Picking Screen** | `commerce.online_order.picking.view`, `commerce.online_order.picking.pick` | Render item picking interface and scanner |
+| **Order Packing Screen** | `commerce.online_order.packing.view`, `commerce.online_order.packing.pack` | Render package builder |
+| **Customer Handover** | `commerce.online_order.collection.handover`, `commerce.online_order.collection.collect` | Enable Handover confirmation button |
+
+---
 
 ## Anti-Patterns
 
-- `if role == cashier`.
-- Static frontend-only permission list as source of truth.
-- UI permission check without backend validation.
-- Showing offline actions that backend cannot validate later.
+- `if (role == 'cashier')` (Hardcoding role names).
+- Using static frontend-only permission arrays without backend authority.
+- Evaluating 2-tier or 3-tier codes without canonical translation.
+- Permitting offline actions that the backend cannot validate during sync.
+- Rendering unauthorized widgets invisibly while preserving their layout slot.
+- Treating `notifications.view` as permission to see all feature notifications.
+
+---
 
 ## Related Files
 
 - [[Flutter_Routing_Guards]]
+- [[../02_ACCESS_CONTROL/Permission_Code_List]]
+- [[../13_DECISIONS_AND_CHANGES/ADR/ADR_007_Permission_Code_Strategy]]
 - [[Flutter_API_Integration]]
 - [[Flutter_Offline_Operation_Sync]]
 

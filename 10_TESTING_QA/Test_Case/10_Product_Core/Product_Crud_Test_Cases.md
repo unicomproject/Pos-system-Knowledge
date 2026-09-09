@@ -1,3 +1,8 @@
+<!-- title: Product CRUD And Wizard Test Cases -->
+<!-- status: Active -->
+<!-- system: OneVerz POS MVP -->
+<!-- last_updated: 2026-09-01 -->
+
 # Product CRUD & Wizard Test Cases
 
 ## Feature Summary
@@ -27,14 +32,95 @@
 - **PROD-VAR-008 (UOM Inheritance)**: VARIANT + Track Inventory ON inherits parent base UOM as `stock_uom_id` and selling UOM as `sales_uom_id`. Track Inventory OFF resolves system default UOM (`PCS`).
 - **PROD-VAR-009 (Concurrency & Tenant Isolation)**: Stale `expectedRowVersion` returns HTTP 409 Conflict. Cross-tenant option/media IDs return HTTP 403.
 - **PROD-VAR-010 (Downstream Cleanup)**: Deleting a variant in Step 4 cleans up linked draft barcodes, variant price overrides, and channel visibility records atomically.
+- **PROD-VAR-011 (Estimated Count — Backend Authority)**: Backend recalculates Cartesian combination count from submitted `variantConfiguration.options[].values[]` graph. Client-supplied derived totals are ignored. Count > `MaxVariantCombinationsPerProduct (100)` returns validation error.
+- **PROD-VAR-012 (Estimated Count — No Estimate API)**: No dedicated estimate endpoint exists or is required for Step 4 UX.
 
 ### 1.2 Flutter Unit & Widget Test Cases
-- **FLUT-VAR-001**: Step 4 main screen rendering, configuration summary card counts, and Cartesian preview updates.
+- **FLUT-VAR-001**: Step 4 main screen rendering, **Estimated Variant Count card**, configuration summary card counts, and Cartesian preview updates.
+- **FLUT-VAR-001A (Live Estimate)**: Colour 3 values → shows 3; add Capacity 2 values → immediately 6; remove one Colour value → immediately 4; no API stub invoked for estimate refresh.
+- **FLUT-VAR-001B (Incomplete Config)**: Attribute with zero values → estimate 0 / incomplete state; Save & Continue blocked per existing validation.
+- **FLUT-VAR-001C (Draft Reopen)**: Persisted Colour 3 + Capacity 2 → reopen draft → frontend recalculates 6 without reading persisted estimate field.
+- **FLUT-VAR-001D (Limit Warning)**: Estimate > 100 shows UI validation before generation.
 - **FLUT-VAR-002**: Edit Variant Drawer sliding animation, pre-filled display label, `Include Variant` toggle interaction, and `Cancel` (discards local drawer edits).
 - **FLUT-VAR-003**: Delete Variant Modal dialog display, cancellation, and destructive delete confirmation.
 - **FLUT-VAR-004**: Field error placement on attribute rows and Save & Continue CTA button state.
 
 ---
 
-## 2. Related Specifications
+## 2. Step 2 Initial Tracking Details Test Knowledge
+
+Canonical rules: [[../../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
+Collection surface: [[../../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]].
+
+| ID | Case | Expected |
+|---|---|---|
+| PROD-TRACK-001 | Step 2 accepts Batch Number after Product Type is selected | Syntax valid; optional; not required for Continue |
+| PROD-TRACK-002 | Step 2 accepts Expiry Date after Product Type is selected | Date picker; malformed date rejected |
+| PROD-TRACK-003 | Step 2 accepts Serial Number after Product Type is selected | Optional; trim; max 150 |
+| PROD-TRACK-004 | Step 2 accepts all three provisionally | Saved without auto-enabling tracking toggles |
+| PROD-TRACK-004A | Card hidden until Product Type is selected | No Initial Tracking Details and no Tracking & Stock Rules on unconfirmed Step 2 |
+| PROD-TRACK-004B | Card hidden on Step 1 | Basic Details has no Initial Tracking card |
+| PROD-TRACK-004C | Card hidden for BUNDLE | Bundle / Kit shows no identity inputs |
+| PROD-TRACK-004D | Identity card above tracking rules | After type select, Initial Tracking Details renders above Tracking & Stock Rules |
+| PROD-TRACK-005 | Save Draft preserves all values | Draft store returns same three fields |
+| PROD-TRACK-006 | Resume preserves all values | GET setup restores values |
+| PROD-TRACK-007 | Step 2 Batch ON preserves Batch | `initialBatchNumber` retained |
+| PROD-TRACK-008 | Step 2 Batch + Expiry preserves both | Batch and Expiry retained |
+| PROD-TRACK-009 | Step 2 Serial ON preserves Serial only | Serial retained when only serial entered |
+| PROD-TRACK-010 | Step 2 Serial conflicts with Batch | Confirmation required; Batch cleared only after confirm |
+| PROD-TRACK-011 | Step 2 Serial conflicts with Expiry | Confirmation required; Expiry cleared only after confirm |
+| PROD-TRACK-012 | Track Inventory OFF | Confirmation then clear tracking values |
+| PROD-TRACK-013 | Expiry ON without Batch identity | Finalization blocked until Batch Number supplied |
+| PROD-TRACK-014 | SIMPLE final ownership | `product_batches`/`serial_numbers` use `product_variant_id` NULL |
+| PROD-TRACK-015 | VARIANT ownership resolution | Publish blocked until assigned included Variant; parent rows forbidden |
+| PROD-TRACK-016 | Bundle restriction | Warning; confirm clear; no parent identity rows |
+| PROD-TRACK-017 | Duplicate Batch | Publish rejects per tenant/product/(variant) uniqueness |
+| PROD-TRACK-018 | Duplicate Serial | Publish rejects per `UNIQUE(tenant_id, product_id, serial_number)` |
+| PROD-TRACK-019 | Final Review display | Shows only applicable remaining tracking fields |
+| PROD-TRACK-020 | Back navigation preserves compatible values | Step 2 still shows them |
+| PROD-TRACK-021 | Explicit confirmation before clearing | No silent discard (TARGET; CURRENT Flutter continue may auto-confirm) |
+| PROD-TRACK-022 | No stock quantity from identity | `inventory_balances.on_hand_quantity` unchanged/not invented |
+| PROD-TRACK-023 | No fake inventory balance | No fabricated balance row with positive qty |
+| PROD-TRACK-024 | No fake stock movement | No `stock_movements` from Product Setup identity |
+
+CURRENT: widget tests cover Step 1 hide + Step 2 show after type select. TARGET confirmation dialog and live E2E remain open.
+
+---
+
+## 4. Product Wizard Permission Test Matrix (TARGET)
+
+Canonical matrix: [[../../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
+
+| ID | Case | Expected |
+|---|---|---|
+| PROD-PERM-001 | Create without `catalog.products.create` | 403 `product.permission_denied` |
+| PROD-PERM-002 | Resume without view/create/update | 403 |
+| PROD-PERM-003 | Edit published product without `catalog.products.update` | 403 (initial-draft PUT still allowed with create) |
+| PROD-PERM-004 | Publish without `catalog.products.publish` | 403; draft preserved |
+| PROD-PERM-005 | Non-empty Initial Tracking without `inventory_tracking` | 403 `product.entitlement_denied` |
+| PROD-PERM-006 | Initial Tracking with stock.adjust missing but create+inventory_tracking present | Allowed (identity, no quantity) |
+| PROD-PERM-007 | Image stage without `catalog.product_media.manage` | 403; product still savable without images |
+| PROD-PERM-008 | Channel fields without `catalog.product_channels.manage` | Ignored; defaults/existing preserved; Step 1 save 200 |
+| PROD-PERM-009 | VARIANT config without `catalog.variants.manage` | 403; no silent SIMPLE downgrade |
+| PROD-PERM-010 | BUNDLE config without `catalog.combo_components.manage` | 403 |
+| PROD-PERM-011 | Barcode mutation without `catalog.barcodes.manage` | 403 even with product update |
+| PROD-PERM-012 | Pricing mutation without `catalog.product_pricing.manage` | 403 |
+| PROD-PERM-013 | GET setup without `catalog.product_cost.view` | `costPrice` omitted/null; never authentic `0` |
+| PROD-PERM-014 | `costPrice` present without cost.view | 403; existing cost preserved |
+| PROD-PERM-015 | Tax lookup without TARGET `pricing.tax_classes.view` (compat: `tax.classes.view`) | 403 / empty lookup |
+| PROD-PERM-016 | Crafted draft payload with specialized fields the caller cannot mutate | Fields not persisted (BR-TRACK-017) |
+| PROD-PERM-017 | Publish with privileged subgraph and only publish permission | 403 subgraph recheck; draft intact |
+| PROD-PERM-018 | Permission revoked between Step 1 and Step 7 | Next mutation 403; draft not destroyed |
+| PROD-PERM-019 | Inactive permission definition | Denied immediately |
+| PROD-PERM-020 | Cross-tenant product / variant assignment | 404 `product.not_found` / invalid assignment |
+| PROD-PERM-021 | Tenant isolation on `product_setup_initial_tracking` | Other tenant 404 |
+| PROD-PERM-022 | Legacy `tenant.products.create` grant during compatibility window | Satisfies canonical `catalog.products.create` via one-way map |
+| PROD-PERM-023 | Dual-check ambiguity (catalog AND tenant as two authorities) | Forbidden; one canonical check only |
+| PROD-PERM-024 | Start wizard without barcodes.manage or pricing.manage | Flutter hides Add Product; create-options 403 if attempted |
+
+Flutter widget/unit: capability model derived before start; VARIANT/BUNDLE cards disabled with explanation; cost field never shows fake zero.
+
+## 5. Related Specifications
 - [[../../../04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification]]
+- [[../../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
+- [[../../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]

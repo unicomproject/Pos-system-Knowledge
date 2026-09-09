@@ -1,7 +1,7 @@
 <!-- title: Project Glossary -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-29 -->
+<!-- last_updated: 2026-09-01 -->
 
 
 # Project Glossary
@@ -77,6 +77,18 @@ them.
 | Fulfilment Order | Operational record for preparing/fulfilling an order |
 | Pickup Order | Click and collect pickup execution record |
 
+## Catalog and Category Terms
+
+| Term | Meaning |
+|---|---|
+| Category | A classification for products. Part of a recursive hierarchy. There is no separate SubCategory domain entity, table, API resource, or Flutter model. |
+| Root Category | A category with no parent (`parent_category_id = NULL`). Equivalent to level 1. |
+| Child Category | A category that has a parent. A category can simultaneously be a child and a parent. |
+| Subcategory | A business/UI label for a child Category (for example the sidebar label “Categories & Subcategories”). Not a separate domain entity, table, API resource, or Flutter domain model. |
+| Leaf Category | A category with zero children. |
+| Category Path / Hierarchy | The full tree path from a root category down to the current category. Derived; not a stored column. |
+| Department | A Catalog Master Data entity for **unrelated** modules. **Not** part of Tenant Admin Category Management (ADR 010). Category has **no** `department_id` — migration `20260827140000_DecoupleCategoryFromDepartment` applied. |
+
 ## Product And Inventory Terms
 
 | Term | Meaning |
@@ -86,9 +98,29 @@ them.
 | SKU | Stock keeping unit |
 | Barcode | Scannable identifier for product or variant |
 | Product Batch | Batch/lot record used where tracking or expiry applies |
+| Initial Tracking Details | Optional Step 2 Add Product inputs for initial Batch Number, Expiry Date, and Serial Number, shown after Product Type is selected. Provisional until tracking policy applies. Not tracking policy. Not collected on Step 1. |
+| Initial Batch Number | First batch/lot identity captured during Product Setup. Later receiving may add more batches. Final owner: `product_batches.batch_number`. |
+| Initial Expiry Date | Expiry associated with the initial Batch only. Domain owner remains `product_batches.expiry_date`, never `products.expiry_date`. |
+| Initial Serial Number | First physical-unit serial captured during Product Setup. Not a Product-wide reusable serial. Final owner: `serial_numbers.serial_number`. |
+| Tracking Policy | Step 2 enable/disable flags stored in `product_inventory_settings` (track inventory, batch, expiry, serial). Distinct from Initial Tracking Details. |
 | Inventory Balance | Current quantity state for product/variant/batch/location |
 | Stock Movement | Immutable record of stock quantity movement |
 | Pending Inventory Movement | Offline or pending stock movement waiting for backend processing |
+
+## Tax And Pricing Terms
+
+| Term | Meaning |
+|---|---|
+| Tax Setup | Tenant-owned master tax configuration (persistence alias: `tax_classes` / TaxClass). Owns name, code, treatment, status, and effective-dated rates. |
+| Tax Treatment | `TAXABLE` \| `ZERO_RATED` \| `EXEMPT`. Distinct from Inclusive/Exclusive pricing mode. |
+| ZERO_RATED | Treatment with exactly 0% tax; reporting remains Zero Rated (not Exempt). |
+| EXEMPT | Treatment with no tax calculation; reporting remains Exempt (not Zero Rated). |
+| TaxPriceMode | Product-owned `INCLUSIVE` \| `EXCLUSIVE` (storage: `taxExclusive` / `is_tax_exclusive`). |
+| Current Rate | Rate whose Effective From applies to the business timestamp (server-derived). |
+| Tax Snapshot | Immutable tax details stored on the sale/order at finalization (`sales_order_taxes`). |
+| Used For / Applies To | **Removed** concepts — not part of canonical Tax Setup. |
+
+Authority: [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]
 
 ## Payment, Return, And Till Terms
 
@@ -96,7 +128,7 @@ them.
 |---|---|
 | Payment Method | Cash, card, QR, bank transfer, manual, or other supported payment setup |
 | Card/QR Payment | Payment that requires online/backend/provider validation |
-| Refund | Money returned against a sale/return |
+| Refund | Money returned against a sale/return; **tax** on refund reverses the original sale tax snapshot (never today's live Tax Setup rate) |
 | Exchange | Return with replacement item/order and possible balance difference |
 | Till Session | Open/closed operational cash session for a till |
 | Till Final Close | Final till close requiring backend validation |

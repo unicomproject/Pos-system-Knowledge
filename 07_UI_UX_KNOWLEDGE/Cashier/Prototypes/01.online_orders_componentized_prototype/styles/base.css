@@ -1,0 +1,57 @@
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--brand-black);
+  color: var(--text-900);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.28);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  white-space: nowrap; border: 0;
+}
+
+.app-layout {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background: var(--brand-black);
+}
+
+main {
+  min-width: 0;
+  padding: 0 16px;
+}
+
+.workspace {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  padding: 24px 24px 18px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, #FFFFFF, #FBFDFF);
+  box-shadow: var(--shadow-workspace);
+}
+
+[data-hidden="true"] { display: none !important; }
+
+.wrap-anywhere { overflow-wrap: anywhere; word-break: break-word; min-width: 0; }
+.truncate {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

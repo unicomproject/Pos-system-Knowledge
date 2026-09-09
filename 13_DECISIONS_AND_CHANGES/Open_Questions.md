@@ -1,7 +1,7 @@
 ﻿<!-- title: Open Questions -->
 <!-- status: Draft -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-09-01 -->
 
 # Open Questions
 
@@ -71,4 +71,26 @@ and wider transport policy remain open.
 | RBAC-006 | Permission cache invalidation strategy after role/user/entitlement changes. | IMPLEMENTATION_GAP |
 | RBAC-007 | Tenant Admin `/roles` and `/permission-catalog` backend endpoints. | IMPLEMENTATION_GAP |
 <!-- RBAC_HARDENING_2026_08_15_END -->
+
+## Product Setup Initial Tracking — 2026-08-24
+
+| ID | Question | Why required | Current safe position | Owner/status |
+|---|---|---|---|---|
+| PRODUCT-TRACK-001 | Where is VARIANT initial identity assigned? | Parent Product must not own variant inventory | LOCKED: Option 2. Assign at Step 7 via `initialTrackingAssignedVariantId`. Step 4 remains matrix-only. | Product/Inventory — Resolved 2026-08-24 |
+| PRODUCT-TRACK-002 | Exact `serial_numbers.serial_status` / `product_batches.status` token for identity-without-stock | Publish must not imply received quantity | Do not invent Product-level serial semantics. Map to existing inventory constants; `current_inventory_balance_id` and `received_at` stay NULL until receiving. | Inventory implementation — OPEN mapping, not an ownership blocker |
+| PRODUCT-PERM-001 | Which Product Setup permission namespace is canonical? | Dual `catalog.*` vs `tenant.products.*` is unsafe | LOCKED: `catalog.*` only; one-way map from `tenant.products.*` during compatibility window | Access/Product — Resolved 2026-08-24 |
+| PRODUCT-PERM-002 | Which entitlement codes are runtime vs docs? | Docs mixed `product_catalog` / `product_management` / `inventory_tracking` / `inventory_management` | LOCKED: runtime `product_catalog` + `inventory_tracking`; `product_management` is module_code; `inventory_management` is docs group | Access/Product — Resolved 2026-08-24 |
+| PRODUCT-PERM-003 | Does Initial Tracking require stock.adjust? | Identity without quantity | LOCKED: Product Setup create/update + `inventory_tracking`; never `inventory.stock.adjust` | Access/Inventory — Resolved 2026-08-24 |
+| PRODUCT-TRACK-003 | Which wizard step collects Initial Tracking Details? | Step 1 collection hid Review values when policy stayed OFF | LOCKED: Step 2 after Product Type is selected (SIMPLE / VARIANT; hidden for BUNDLE) | Product/UI — Resolved 2026-09-01 |
+
+Authority: [[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]],
+[[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]].
+
+## Tenant Admin Category Management — 2026-08-27
+
+| ID | Question | Why required | Current safe position | Owner/status |
+|---|---|---|---|---|
+| CAT-DEPT-001 | Does Category remain bound to Department (Option A) or is Category decoupled (Option B)? | Runtime `department_id` NOT NULL vs approved UI | **RESOLVED 2026-08-27:** Category decoupled from Department (Option B). Department remains for unrelated modules. | Product/Architecture — Resolved ADR 010 |
+
+Authority: [[ADR/ADR_010_Category_Decoupled_From_Department]], [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_SECOND_BRAIN_FINAL_CONTRACT_CLOSURE_2026-08-27]].
 

@@ -1,7 +1,7 @@
-﻿<!-- title: Access Control Overview -->
+<!-- title: Access Control Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-08 -->
+<!-- last_updated: 2026-08-31 -->
 
 
 # Access Control Overview
@@ -55,12 +55,41 @@ A user still needs permission for protected actions.
 
 ## Permission Rule
 
-Permission codes represent actions.
+Permission codes represent actions and must strictly follow the **Canonical 4-Tier Taxonomy**: `domain.module.feature.action` (see [[../13_DECISIONS_AND_CHANGES/ADR/ADR_007_Permission_Code_Strategy]]).
 
 Do not hardcode role names such as owner, manager, cashier, or ecommerce staff in
 frontend or backend authorization logic.
 
-Roles are only groups of permissions.
+Roles are only groups of permissions. Single source of truth: [[Permission_Code_List]].
+
+## Permission-Driven Presentation Rule
+
+All frontend feature entry points and business actions are derived from the
+authenticated user's effective granular permissions plus tenant entitlement.
+This includes bottom/side navigation, dashboards, cards, menu items, tabs,
+shortcuts, contextual actions, and buttons. Role-name checks such as
+`role == Cashier` or `role == Manager` are forbidden.
+
+Unauthorized feature entries are hidden by default. The frontend decision is
+UX gating only: every backend API independently validates authentication,
+tenant, entitlement, permission, and applicable outlet/resource scope.
+
+## Permission-Scoped Notification Rule
+
+`notifications.view` grants access to notification infrastructure; it does not
+grant access to every feature described by a notification. A visible or
+deliverable notification requires authenticated user, tenant entitlement,
+notification feature/domain, underlying feature permission, and applicable
+outlet/resource scope.
+
+Backend/server filtering is authoritative wherever supported. Frontend
+presentation filtering is defence-in-depth. A notification and its deep link
+must be absent or non-actionable when the user cannot access the destination;
+route/API authorization still applies independently.
+
+Example: if New Sale is permitted and Online Orders is not, New Sale UI and
+allowed sale notifications may appear, while Online Orders UI and Online Order
+notifications do not.
 
 ## POS Access Rule
 
@@ -111,21 +140,7 @@ permission, tenant isolation, and audit.
 
 - [[Feature_Entitlement_Matrix]]
 - [[Permission_Code_List]]
+- [[../13_DECISIONS_AND_CHANGES/ADR/ADR_007_Permission_Code_Strategy]]
+- [[Backend_Driven_Permission_Catalog]]
 - [[API_Authorization_Rules]]
 - [[../01_RELEASE_SCOPE/Release_1_Scope]]
-
-<!-- RBAC_HARDENING_2026_08_15_START -->
-## Tenant RBAC Runtime Addendum - 2026-08-15
-
-Canonical effective permission resolution is now documented in `02_ACCESS_CONTROL/Tenant_Effective_Permission_Resolution.md`.
-
-Key rules:
-
-- Effective permissions are additive allow grants.
-- Sources are tenant direct permissions, tenant role permissions, outlet direct permissions, and outlet role permissions where outlet context applies.
-- Revoked assignments/grants must never contribute to effective permissions.
-- Feature entitlement must be checked before plan-controlled permissions are usable.
-- Explicit deny is not implemented in Release 1.
-- Tenant Admin role APIs remain an implementation gap until `/api/v1/tenant-admin/roles` and `/api/v1/tenant-admin/permission-catalog` exist in backend source.
-<!-- RBAC_HARDENING_2026_08_15_END -->
-

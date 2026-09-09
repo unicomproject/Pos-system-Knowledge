@@ -3,7 +3,7 @@
 <!-- title: Tenant Admin Add Product — Step 4: Variant Configuration Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-13 -->
+<!-- last_updated: 2026-09-02 -->
 
 ## 1. Executive Summary & Core Architectural Principles
 
@@ -64,9 +64,14 @@ Step 4 for Variant products consists of three distinct UI states:
   - Trash icon button (`Remove Attribute Row`): removes attribute row from configuration.
   - `+ Add Attribute` button: appends a new attribute row.
 - **Generate Variants Action**:
-  - Primary button `Generate Variants`.
-  - Calculates Cartesian product of all selected attribute values ($N_1 \times N_2 \times \dots \times N_k$).
-- **Configuration Summary Card**:
+  - Primary button `Generate Variants` (or equivalent `Apply` action in current Flutter UX).
+  - Triggers **Actual Variant Generation** in wizard state and backend persistence (see **Section 3.4** for distinction from Estimated Variant Count).
+- **Estimated Variant Count Card** (VARIANT only — see **Section 3.4**):
+  - Live UX preview card shown during attribute/value configuration.
+  - Updates immediately on every attribute/value add, remove, or edit.
+  - No network request required to refresh the displayed estimate.
+- **Configuration Summary Card** (post-generation state):
+  - Displayed after `Generate Variants` / when generated variants exist in wizard state.
   - Displays total generated variants count (e.g. `6 Variants Generated`), active attributes count (e.g. `3 Attributes Defined`), and included variants count (e.g. `5 Included`).
 - **Generated Variants Table**:
   - Columns: `Variant` (shows `combinationLabel` e.g. `Red / S`), `Image` (thumbnail preview), `Actions` (`Edit` icon, `Delete` icon).
@@ -122,6 +127,238 @@ Clicking `Delete` on a variant table row opens a centered modal dialog.
   - Marks combination hash as manually excluded (`ARCHIVED` tombstone).
   - Updates table and summary card (e.g. count drops from 6 to 5).
   - Triggers success toast notification: `Variant "Red / M" removed.`
+
+### 3.4 Estimated Variant Count (Live UX Preview)
+
+> [!IMPORTANT]
+> **Estimated Variant Count** applies **only** when `product_structure = VARIANT`. It MUST NOT be shown for SIMPLE products. It MUST NOT be shown for BUNDLE Step 4 (Kit Component Assembly).
+
+#### 3.4.1 Business Definition
+
+**Estimated Variant Count** represents the Cartesian product of all selected values across all selected variant attributes.
+
+$$\text{Estimated Variant Count} = N_1 \times N_2 \times \dots \times N_k$$
+
+Where $N_i$ = number of selected values for Variant Attribute $i$.
+
+**Examples**:
+- Colour = 3 values → **3**
+- Colour = 3, Capacity = 2 → **3 × 2 = 6**
+- Colour = 3, Size = 4, Material = 2 → **3 × 4 × 2 = 24**
+
+#### 3.4.2 Estimated Variant Count vs Actual Variant Generation
+
+| Aspect | Estimated Variant Count | Actual Variant Generation |
+|---|---|---|
+| Purpose | UX helper / live preview | Creates real variant combinations |
+| Owner | Flutter (frontend calculation) | Backend (authoritative on persist) |
+| When shown | During attribute/value configuration | After `Generate Variants` / Save Draft / Save & Continue |
+| Dedicated API | **NO** | Uses existing `PUT .../draft` + reconciliation |
+| Persisted as primary business data | **NO** | **YES** (`product_variants`, option/value graph) |
+| Authoritative for creation | **NO** | **YES** |
+
+#### 3.4.3 Frontend Responsibility (Locked Contract)
+
+The live Estimated Variant Count is a **frontend calculation**.
+
+Flutter MUST compute the count immediately from the currently selected variant attribute rows and their selected values.
+
+There is **NO** requirement for a separate backend API such as:
+- `GET /estimated-variant-count`
+- `POST /calculate-variant-count`
+
+The UI MUST update immediately whenever:
+- a variant attribute is added
+- a variant attribute is removed
+- a variant attribute value is selected
+- a variant attribute value is deselected
+- a variant attribute value is added
+- a variant attribute value is removed
+
+No Save action, `Generate Variants` action, or backend request is required merely to refresh the displayed estimate.
+
+**Canonical frontend logic**:
+
+```text
+For every active/selected variant attribute row with at least one selected value:
+  valueCount = number of selected values for that attribute
+
+If no valid attribute rows exist OR any selected attribute row has zero values:
+  estimatedVariantCount = 0
+  configurationStatus = INCOMPLETE
+Else:
+  estimatedVariantCount = product of all valueCount values
+  configurationStatus = COMPLETE (for estimate purposes only)
+```
+
+#### 3.4.4 Incomplete Configuration Rule
+
+If there are no valid selected variant attributes, the system MUST NOT claim that variants are ready to be created.
+
+If any selected variant attribute contains zero selected values, variant configuration is **incomplete**.
+
+**Recommended UI state**:
+
+```text
+Estimated Variant Count
+0 variants
+will be created
+```
+
+Helper text may indicate that attributes and values are required.
+
+The user MUST NOT proceed to final variant generation / `Save & Continue` while required variant configuration is incomplete. Reuse existing Step 4 validation:
+- `product.variant_options_required`
+- `product.option_values_required`
+- `product.included_variant_required`
+
+#### 3.4.5 UI Contract — Estimated Variant Count Card
+
+**Applies to**: VARIANT products only, inside Step 4 Variant Configuration (State A).
+
+**Suggested card structure**:
+
+| Element | Content |
+|---|---|
+| Title | `Estimated Variant Count` |
+| Primary value | `{count} variants` |
+| Secondary text | `will be created` |
+| Helper text | `Based on the selected attributes and values.` |
+| Calculation summary | `{AttributeName1} ({N1}) × {AttributeName2} ({N2}) × ... = {count} variants` |
+
+Attribute names in the summary MUST be dynamic (use currently selected attribute display names). Do NOT hard-code Colour, Capacity, Size, or Material — those are examples only.
+
+**Example display**:
+
+```text
+Estimated Variant Count
+6 variants
+will be created
+Based on the selected attributes and values.
+Colour (3) × Capacity (2) = 6 variants
+```
+
+#### 3.4.6 Live Update Behaviour (Acceptance Examples)
+
+| Scenario | Configuration | Expected Estimate |
+|---|---|---|
+| A | Colour = 3 values only | 3 variants |
+| B | Colour = 3, Capacity = 2 | 6 variants (`3 × 2 = 6`) |
+| C | Colour = 3, Size = 4, Material = 2 | 24 variants (`3 × 4 × 2 = 24`) |
+| D | Colour = 3, Capacity = 0 values | Incomplete → 0 variants / not ready |
+| E | Before: Colour 3 × Capacity 2 = 6; remove one Colour value | Immediately becomes Colour 2 × Capacity 2 = 4 |
+
+Additional interaction examples:
+- Tenant Admin adds Colour (Red, Blue, Black) → UI shows **3 variants**
+- Tenant Admin adds Capacity (128GB, 256GB) → UI immediately shows **6 variants**
+- Tenant Admin removes 256GB → UI immediately shows **3 variants**
+- Tenant Admin adds Green → UI immediately shows **4 variants**
+
+#### 3.4.7 Backend Responsibility (Non-Trust Rule)
+
+Although the estimated number is calculated in Flutter for live UX, the backend MUST NEVER trust the frontend-calculated number as authoritative.
+
+On Save Draft / Save & Continue / final product creation, backend MUST independently:
+1. Receive selected variant attributes and selected values.
+2. Validate attributes and values.
+3. Validate that submitted values belong to the correct attribute.
+4. Validate duplicates per existing product/variant contract.
+5. Recalculate the expected Cartesian combination count.
+6. Reject counts exceeding `MaxVariantCombinationsPerProduct = 100` (see Section 14).
+7. Generate actual variant combinations per Section 5.
+8. Persist only valid combinations.
+9. Never use a client-supplied `estimatedVariantCount` as the source of truth.
+
+**Security principle**: Frontend calculation = convenience / UX. Backend calculation = business authority.
+
+#### 3.4.8 API Contract — Derived Count Is Non-Authoritative
+
+Preferred request shape (conceptual):
+
+```json
+{
+  "variantConfiguration": {
+    "options": [
+      {
+        "sourceOptionTemplateId": "...",
+        "values": [
+          { "sourceOptionTemplateValueId": "..." },
+          { "sourceOptionTemplateValueId": "..." },
+          { "sourceOptionTemplateValueId": "..." }
+        ]
+      },
+      {
+        "sourceOptionTemplateId": "...",
+        "values": [
+          { "sourceOptionTemplateValueId": "..." },
+          { "sourceOptionTemplateValueId": "..." }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Backend derives: `3 × 2 = 6` combinations.
+
+Do **NOT** make `estimatedVariantCount` a required authoritative request field.
+
+If an existing DTO contains a derived count field, document and treat it as informational / non-authoritative unless a future ADR explicitly changes that contract.
+
+**Canonical source of truth for variant creation**:
+
+```text
+Selected Variant Attributes + Selected Attribute Values
+```
+
+NOT:
+
+```text
+EstimatedVariantCount
+```
+
+#### 3.4.9 Draft Reopen & Edit Behaviour
+
+When Variant Configuration is saved as part of the Product Setup draft:
+- Persist selected attributes and values per existing draft contract (Section 11).
+- Do **NOT** depend on a separately persisted estimated count to reconstruct the UI.
+
+On draft reopen (`GET .../setup`), Flutter recalculates Estimated Variant Count from restored configuration.
+
+**Example** — persisted Colour (Red, Blue, Black) + Capacity (128GB, 256GB) → reopen → frontend recalculates `3 × 2 = 6`.
+
+If the user edits configuration (e.g. Colour 3 → 2 with Capacity 2 unchanged), the UI MUST reflect the new estimate immediately (`2 × 2 = 4`). Backend uses the final submitted configuration when validating/generating combinations.
+
+#### 3.4.10 Variant Identity Boundary
+
+Estimated Variant Count only predicts the number of **Variant Combinations**.
+
+It MUST NOT be confused with:
+- Variant Attributes
+- SKU (Step 5)
+- Barcode (Step 5)
+- Product ID
+- Variant ID (`productVariantId`)
+
+SKU / Barcode allocation continues under the existing Step 5 Barcode & SKU contract.
+
+#### 3.4.11 Configuration Change After Variants Generated
+
+Changing attribute/value configuration may change the complete variant matrix.
+
+If variant data, SKU assignments, barcode assignments, pricing, or persisted variants already exist, apply the existing Step 4 downstream invalidation rules (Section 8): warning confirmation, draft cleanup, and step revalidation.
+
+Do not invent a separate destructive-edit policy here; Section 8 remains canonical.
+
+#### 3.4.12 Maximum Variant Limit (Existing Canonical Limit)
+
+A maximum variant limit **already exists**:
+
+- `MaxVariantCombinationsPerProduct = 100` (Section 14)
+
+When estimated count exceeds 100:
+- UI MUST show validation feedback before generation / Save & Continue.
+- Backend MUST independently enforce the same limit.
 
 ---
 
@@ -244,8 +481,17 @@ New included Step 4 Variants remain in a wizard **DRAFT** lifecycle status. Step
 When a user returns to Step 4 from Step 5, 6, or 7 and alters the variant matrix (deleting a variant or changing attribute values):
 
 1. **Warning Confirmation**: Prompt user with modal warning before applying destructive matrix changes.
-2. **Draft Cleanup**: Downstream draft records linked to deleted/archived variants (`product_barcodes`, variant price overrides, variant channel visibility rows) are automatically removed in the same atomic database transaction.
+2. **Draft Cleanup**: Downstream draft records linked to deleted/archived variants (`product_barcodes`, variant **price_list_items** / pricing rows, variant channel visibility rows) are automatically removed in the same atomic database transaction.
 3. **Step Revalidation**: If active variants are added or modified, downstream Steps 5, 6, and 7 are marked as requiring re-verification (`lastCompletedSetupStep = 4`).
+
+### Step 6 pricing reconciliation (LOCKED)
+
+Authority: [[../10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]] §6.3 / §6.5.
+
+- Retained variants keep selling prices via stable `product_variants.id` / `option_combination_hash` / `clientCombinationKey` — **never** remap by display label or UI row index.
+- Excluded / tombstoned variants must **not** leak prices into another variant.
+- Newly included variants start **PENDING** (unpriced) unless the user explicitly runs Apply to All / bulk default.
+- Priced/Pending and Price Range on Step 6 are derived from persisted variant prices; do not store those UI labels as duplicate business state.
 
 ---
 
@@ -393,6 +639,8 @@ Test specification must prove the following:
 5. **UOM Resolution**: Track Inventory ON correctly inherits from Step 3. Track Inventory OFF correctly resolves via canonical Product Wizard default UOM resolver. No manual Step 4 UOM field.
 6. **Permission**: Create+Variant Manage works for new product. Missing Product entitlement is Denied.
 7. **Idempotency**: Same request repeated -> no duplicates. Concurrent stale rowVersion request rejected.
+8. **Estimated Variant Count (Frontend)**: Live estimate updates immediately on attribute/value changes without API calls. Incomplete configuration shows 0 / not-ready state. Draft reopen recalculates from persisted configuration only. Estimate exceeding `MaxVariantCombinationsPerProduct = 100` shows validation feedback.
+9. **Estimated Variant Count (Backend Authority)**: Backend ignores client-supplied derived counts; recalculates Cartesian product from submitted attribute/value IDs; enforces 100-combination limit independently.
 
 ---
 

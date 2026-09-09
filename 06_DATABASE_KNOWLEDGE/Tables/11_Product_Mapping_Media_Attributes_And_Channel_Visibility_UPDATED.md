@@ -375,7 +375,7 @@ CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 | `tenant_users` | id uuid PK, tenant_id uuid FK, email varchar(255), full_name varchar(255), status varchar(20) | User/audit reference |
 | `products` | id uuid PK, tenant_id uuid FK, product_code varchar(80), product_name varchar(200), status varchar(20) | Product reference |
 | `product_variants` | id uuid PK, tenant_id uuid FK, product_id uuid FK, variant_code varchar(80), sku varchar(100), status varchar(20) | Variant reference |
-| `categories` | id uuid PK, tenant_id uuid FK, department_id uuid FK, category_code varchar(80), category_name varchar(150), status varchar(20) | Category reference |
+| `categories` | id uuid PK, tenant_id uuid FK, parent_category_id uuid FK nullable, category_code varchar(80), category_name varchar(150), status varchar(20) | Category reference. **No `department_id`** (ADR 010, migration applied). |
 | `collections` | id uuid PK, tenant_id uuid FK, collection_code varchar(80), collection_name varchar(150), status varchar(20) | Collection reference |
 | `unit_of_measures` | id uuid PK, uom_code varchar(30), uom_name varchar(100), uom_type varchar(40), status varchar(20) | UOM reference |
 | `sales_channels` | id uuid PK, channel_code varchar(50), channel_name varchar(100), status varchar(20) | Sales channel reference |

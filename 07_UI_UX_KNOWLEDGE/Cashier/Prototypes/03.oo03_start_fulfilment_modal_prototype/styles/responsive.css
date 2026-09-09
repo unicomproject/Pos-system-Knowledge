@@ -1,0 +1,99 @@
+/* TABLET */
+@media (min-width:768px) and (max-width:1199px){
+  .app-header{padding:10px 16px}
+  .brand-name{font-size:21px}
+  .header-right .context-chip:nth-child(2){display:none}
+
+  main{padding:0 10px}
+  .workspace{padding:17px 15px}
+
+  .hero{
+    grid-template-columns:minmax(0,1.45fr) minmax(220px,.8fr);
+    gap:15px
+  }
+  .hero .cta-wrap{grid-column:1 / -1}
+  .start-cta{min-height:82px}
+
+  .summary-grid{gap:10px}
+  .summary-card{grid-template-columns:50px minmax(0,1fr) 18px;padding:13px;gap:10px}
+  .summary-icon{width:48px;height:48px}
+  .summary-title{font-size:17px}
+
+  .item-row{grid-template-columns:72px minmax(0,1.4fr) 80px 125px 18px;padding:9px 12px}
+
+  .modal-card{width:min(520px,92vw)}
+  .bottom-nav{padding:0 10px}
+}
+
+/* PHONE */
+@media (max-width:767px){
+  :root{--bottom-nav-h:74px}
+
+  .app-header{min-height:60px;padding:8px 11px}
+  .brand-name{font-size:18px}
+  .brand-mark{width:27px;height:27px;font-size:16px}
+  .session-card,.header-right .context-chip{display:none}
+  .notification-button{width:39px;height:39px}
+  .mobile-context-strip{display:flex}
+
+  main{padding:0 6px}
+  .workspace{padding:13px 10px;border-radius:13px}
+
+  .hero{display:block}
+  .hero-left{grid-template-columns:52px minmax(0,1fr);gap:11px}
+  .order-icon{width:52px;height:52px}
+  .order-title{font-size:23px}
+  .collect-by{
+    min-height:auto;
+    margin-top:13px;padding:12px 0 0;
+    border-left:0;border-top:1px solid #E0E6EF
+  }
+  .cta-wrap{margin-top:13px}
+  .start-cta{min-height:72px}
+
+  .summary-grid{grid-template-columns:1fr;gap:9px;margin-top:14px}
+  .summary-card{min-height:95px}
+
+  .item-row{
+    grid-template-columns:68px minmax(0,1fr);
+    min-height:0;padding:11px
+  }
+  .thumb{width:64px;height:64px}
+  .qty-block{grid-column:1 / 2}
+  .pick-pill{grid-column:2 / 3;justify-self:start}
+  .item-row > :last-child{display:none}
+
+  .bottom-nav{min-height:var(--bottom-nav-h);padding:0 3px}
+  .nav-item svg{width:20px;height:20px}
+  .nav-item span{font-size:10px}
+  .nav-item.active::after{bottom:3px;width:52px}
+
+  .modal-backdrop{
+    align-items:flex-end;
+    padding:10px 8px calc(var(--bottom-nav-h) + 8px)
+  }
+  .modal-card{
+    width:100%;
+    max-height:calc(100dvh - 92px);
+    padding:20px 16px 16px;
+    border-radius:22px 22px 16px 16px
+  }
+  .modal-icon{width:72px;height:72px;margin-bottom:12px}
+  .modal-icon svg{width:39px;height:39px}
+  .modal-title{font-size:23px}
+  .modal-intro{font-size:13px;margin-bottom:14px}
+  .detail-row{
+    grid-template-columns:22px minmax(90px,.72fr) minmax(0,1.28fr);
+    gap:7px
+  }
+  .detail-label,.detail-value{font-size:12.5px}
+  .confirm-button,.cancel-button{min-height:50px}
+
+  .qa-toggle{right:8px;bottom:calc(var(--bottom-nav-h) + 8px)}
+  .qa-panel{right:8px;bottom:calc(var(--bottom-nav-h) + 51px);width:calc(100vw - 16px)}
+}
+
+@media (max-width:420px){
+  .detail-row{grid-template-columns:20px minmax(78px,.65fr) minmax(0,1.35fr)}
+  .modal-card{padding-left:13px;padding-right:13px}
+}

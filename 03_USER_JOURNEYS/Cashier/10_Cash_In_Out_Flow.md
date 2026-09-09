@@ -34,7 +34,7 @@ Physical drawer open is **not** a Cash Drop.
 | Cash In UI | **IMPLEMENTED** |
 | Cash In backend mutation (`POST .../movements` + `movementTypeId`) | **VERIFIED** |
 | Cash In persistence (`cash_movements`) | **VERIFIED** |
-| Cash In permission enforcement | **VERIFIED** |
+| Cash In permission (`pos.cash_drawer.movements.create`) enforcement | **VERIFIED** |
 | Cash In idempotency (`request_id`) | **VERIFIED** |
 | Cash In expected-cash effect | **VERIFIED** |
 | Cash In E2E / production acceptance | **VERIFIED** — [[../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Cash_In_Chunk_3_Final_Production_Acceptance]] |

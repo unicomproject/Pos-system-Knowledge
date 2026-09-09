@@ -165,11 +165,11 @@ One row per journey. Implementation status reflects **production code**, not doc
 | TA-UJ-032 | - | TA | Tenant Admin | - | Activate / Deactivate Product | - | - | Y | PARTIAL | 60 | - | - | - | - | - |
 | TA-UJ-033 | - | TA | Tenant Admin | - | View Product Dashboard | - | - | Y | COMPLETE | 80 | - | - | - | - | - |
 | TA-UJ-034 | - | TA | Tenant Admin | - | Curate Popular Products | - | - | Y | PARTIAL | 60 | - | - | - | - | - |
-| TA-UJ-035 | - | TA | Tenant Admin | - | Browse Categories | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
-| TA-UJ-036 | - | TA | Tenant Admin | - | Create Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
-| TA-UJ-037 | - | TA | Tenant Admin | - | View Category Details | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
-| TA-UJ-038 | - | TA | Tenant Admin | - | Edit Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
-| TA-UJ-039 | - | TA | Tenant Admin | - | Delete Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
+| TA-UJ-035 | - | TA | Tenant Admin | - | Browse Categories | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend contract + implementation complete. Flutter pending. E2E NOT COMPLETE. |
+| TA-UJ-036 | - | TA | Tenant Admin | - | Create Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend complete. Flutter pending. E2E NOT COMPLETE. |
+| TA-UJ-037 | - | TA | Tenant Admin | - | View Category Details | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend complete. Flutter pending. E2E NOT COMPLETE. |
+| TA-UJ-038 | - | TA | Tenant Admin | - | Edit Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend complete. Flutter pending. E2E NOT COMPLETE. |
+| TA-UJ-039 | - | TA | Tenant Admin | - | Delete Category | - | - | Y | NOT_STARTED | 10 | - | - | - | - | Backend complete. Flutter pending. E2E NOT COMPLETE. |
 | TA-UJ-040 | - | TA | Tenant Admin | - | Browse Brands | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | TA-UJ-041 | - | TA | Tenant Admin | - | Create Brand | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | TA-UJ-042 | - | TA | Tenant Admin | - | View Brand Details | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
@@ -193,6 +193,13 @@ One row per journey. Implementation status reflects **production code**, not doc
 | TA-UJ-060 | - | TA | Tenant Admin | - | Manage C&C Order Status (Staff) | - | - | Y | NOT_STARTED | 25 | - | - | - | - | - |
 | TA-UJ-061 | - | TA | Tenant Admin | - | Manage Expiry / Offer Discounts | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
 | TA-UJ-062 | - | TA | Tenant Admin | - | Monitor Device / Hardware Readiness | - | - | Y | PARTIAL | 50 | - | - | - | - | - |
+| TA-UJ-063 | - | TA | Tenant Admin | Tax Mgmt | Browse Tax Setup | Products → Tax Setup | List or empty state | Y | NOT_STARTED | 15 | [[Tenant_Admin/10_Tax_Management_Flow]] | pricing.tax_classes.view | product_catalog | - | Canonical contract 2026-09-03 |
+| TA-UJ-064 | - | TA | Tenant Admin | Tax Mgmt | Create Tax Setup | + Add Tax Setup | Tax Setup created | Y | NOT_STARTED | 10 | [[Tenant_Admin/10_Tax_Management_Flow]] | pricing.tax_classes.create | product_catalog | - | Treatment + initial rate |
+| TA-UJ-065 | - | TA | Tenant Admin | Tax Mgmt | Edit Tax Setup | Edit action | Permitted fields updated | Y | NOT_STARTED | 10 | [[Tenant_Admin/10_Tax_Management_Flow]] | pricing.tax_classes.update | product_catalog | - | Treatment lock DEC-TAX-011 |
+| TA-UJ-066 | - | TA | Tenant Admin | Tax Mgmt | Schedule Tax Rate Change | Schedule Rate Change | Future rate scheduled | Y | NOT_STARTED | 5 | [[Tenant_Admin/10_Tax_Management_Flow]] | pricing.tax_rates.schedule.manage | product_catalog | - | Current rate unchanged |
+| TA-UJ-067 | - | TA | Tenant Admin | Tax Mgmt | Activate / Deactivate Tax Setup | Status action | Status changed Option B | Y | NOT_STARTED | 5 | [[Tenant_Admin/10_Tax_Management_Flow]] | pricing.tax_classes.status.manage | product_catalog | - | DEC-TAX-012 |
+| TA-UJ-068 | - | TA | Tenant Admin | Tax Mgmt | View Products Using Tax | Products Using | Paged product list | Y | NOT_STARTED | 5 | [[Tenant_Admin/10_Tax_Management_Flow]] | pricing.tax_classes.products.view | product_catalog | - | Derived count |
+| TA-UJ-069 | - | TA | Tenant Admin | Tax Mgmt | Assign Tax in Product Setup | Step 6 Pricing & Tax | TaxSetupId + TaxPriceMode saved | Y | PARTIAL | 40 | [[../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]] | catalog.product_pricing.manage | product_catalog | TA-UJ-024 | Active Tax Setups only |
 | POS-UJ-001 | - | POS | Cashier | - | Cashier Login | - | - | Y | COMPLETE | 95 | - | - | - | - | - |
 | POS-UJ-002 | - | POS | Cashier | - | Cashier Logout | - | - | Y | COMPLETE | 95 | - | - | - | - | - |
 | POS-UJ-003 | - | POS | Cashier | - | Activate/Trust Device | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
@@ -228,7 +235,7 @@ One row per journey. Implementation status reflects **production code**, not doc
 | POS-UJ-033 | - | POS | Cashier | - | Hardware Testing | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
 | POS-UJ-034 | - | POS | Cashier | - | Offline Cash Sale Capture | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
 | POS-UJ-035 | - | POS | Cashier | - | Sync Offline Transactions | - | - | Y | NOT_STARTED | 5 | - | - | - | - | - |
-| POS-UJ-036 | - | POS | Cashier | - | Manage Online/Pickup Orders | - | - | Y | NOT_STARTED | 10 | - | - | - | - | - |
+| POS-UJ-036 | - | POS | Cashier | Click & Collect | Online Order Fulfilment / Collection | Online order queue | Pickup collected; sales order completed | Y | CANONICALIZED / IMPLEMENTATION PENDING | 10 | [[Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]] | commerce.online_order.orders.access | Fulfilment/Pickup | Outlet HARD | 15-screen specification complete; application/runtime pending |
 | EC-UJ-001 | - | EC | E-commerce Customer | - | Browse Home Catalog | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | EC-UJ-002 | - | EC | E-commerce Customer | - | Browse Category | - | - | Y | COMPLETE | 90 | - | - | - | - | - |
 | EC-UJ-003 | - | EC | E-commerce Customer | - | Search Products | - | - | Y | PARTIAL | 70 | - | - | - | - | - |
