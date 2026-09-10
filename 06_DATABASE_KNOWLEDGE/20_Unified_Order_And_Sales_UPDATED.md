@@ -174,6 +174,7 @@ For storefront click-and-collect, confirmation snapshots the requested collectio
 | `uom_id` | uuid | FK | NOT NULL | References `unit_of_measures(id)`. |
 | `price_list_item_id` | uuid | FK | NULL | References `price_list_items(id)`. |
 | `sku_snapshot` | varchar(100) |  | NULL | SKU snapshot. |
+| `barcode_snapshot` | varchar(100) |  | NULL | Immutable order-time primary barcode snapshot used by OO-04B pick verification. Captured at Click & Collect confirm from tenant-scoped `product_barcodes` (primary). Not updated when catalogue barcodes later change. |
 | `product_name_snapshot` | varchar(200) |  | NOT NULL | Product name snapshot. |
 | `variant_name_snapshot` | varchar(200) |  | NULL | Variant name snapshot. |
 | `uom_code_snapshot` | varchar(50) |  | NOT NULL | UOM code snapshot. |

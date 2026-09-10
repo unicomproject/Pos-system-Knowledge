@@ -6,6 +6,18 @@
 
 # Current Source Of Truth
 
+## Online Order realtime cashier refresh (2026-09-09)
+
+**Production invariant:** Cashier Online Orders and notification surfaces use realtime events only as refresh triggers. The authoritative Online Orders list API (`GET .../click-collect/orders`) and POS notification API (`GET /api/v1/pos/notifications`) remain the source of truth. Do not manufacture order cards or unread counts from WebSocket payloads.
+
+Chunk 1 implementation + automated validation: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Realtime_Cashier_Refresh_Chunk1_2026-09-09]]. Live Ecommerce→cashier runtime acceptance is deferred to Chunk 2.
+
+## OO-06 canonicalization update (2026-09-09)
+
+OO-06 Ready for Collection Chunk 2 backend/API/DB is complete: existing picking GET supports authoritative READY and the existing ClickCollectOrdersController owns POST notify-ready. OO05 still owns Pack/Ready; OO06 consumes Fulfillment READY + Pickup READY with ReadyAt populated and CollectedAt NULL. Optional customer IN_APP notification never changes tracking/lifecycle. Build and 125 focused tests passed, including local PostgreSQL concurrency; live authenticated HTTP/device acceptance is not claimed. Chunk 3 Flutter implementation remains pending. Evidence: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO06_Backend_Chunk2_2026-09-09]].
+
+Current OO06 authority: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO06_Canonicalization_Status_2026-09-09]]. This scoped update supersedes older conflicting Ready/notification wording, not unrelated history.
+
 ## POS Payment Method Selection (2026-09-03)
 
 The documentation-only selection contract is canonicalized in
@@ -220,21 +232,41 @@ The approved prototype/UI layer is governed by [[../07_UI_UX_KNOWLEDGE/Cashier/O
 
 OO-04 Picking is canonicalized by
 [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
-Existing Flutter picking code is partial scaffolding only. Backend picking
-detail/pick/issue contracts, runtime permission catalogues/enforcement, atomic
-events, backend `canPack` and expected-version conflict handling are implemented
-under the existing `ClickCollectOrdersController`/Customer Orders ownership with
-no new table, column or migration. Implemented events are
-`FULFILLMENT_LINE_PICKED`, `FULFILLMENT_LINE_ISSUE_REPORTED` and
-`FULFILLMENT_PICKING_COMPLETED` and `FULFILLMENT_PICKING_NOTE_ADDED`. Picking
-Note reuses `fulfillment_order_events.event_note`: `POST
+Its selected-line sub-flow is canonically named **OO-04B — Pick Item / Barcode
+Verification**. OO-04 remains the Pick Order overview; selecting one line opens
+OO-04B, where scan/manual input verifies only that line and an explicit Mark as
+Picked command performs the authoritative mutation. Barcode capture alone never
+picks. Backend picking detail/pick/issue/notes, `canPack`, and expected-version
+conflict handling are implemented under `ClickCollectOrdersController`.
+
+**Barcode-pickable SalesOrderLines capture the authoritative product/variant
+barcode into `sales_order_lines.barcode_snapshot` at order creation/ingestion
+time** (`StorefrontCheckoutConfirmationRepository` →
+`SalesOrderLine.CreateForClickAndCollect`). OO-04B verifies the immutable
+order-line snapshot and **must not** fall back to the current catalogue barcode.
+Missing unexpected NULL snapshots surface
+`online_orders.barcode_snapshot_unavailable` (not a false “wrong barcode”).
+Do not blindly backfill historical NULL snapshots from live catalogue state.
+
+**OO-05 — Review & Pack** is canonicalized by
+[[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO05_Canonicalization_Status_2026-09-08]].
+All-picked / `canPack` does **not** mean Ready. OO-05 reviews picked lines,
+optionally captures packing notes, then performs separate authoritative
+**Pack** (`POST .../pack`) and **Mark Ready** (`POST .../ready`) commands.
+Permissions: `commerce.online_order.packing.view`, `.packing.pack`,
+`.collection.mark_ready`. Review state **REUSE**s picking GET. Pack/Ready APIs,
+pack/ready events, and packing-note persistence are implemented in current source
+(see latest OO05 tracker evidence). Do not use legacy status PATCH as
+the cashier Ready path. OO-06 owns the post-Ready / Ready-for-Collection
+boundary. Prototype_flow IDs that numbered Review & Pack as OO-06 are
+superseded.
+
+Picking Note reuses `fulfillment_order_events.event_note`: `POST
 .../orders/{orderId}/picking/notes?outletId=...` requires
 `commerce.online_order.picking.note`, a trimmed note of 1–500 characters and a
 positive current `expectedVersion`; it is PICKING-only, increments `row_version`,
 and is returned in the existing Picking Detail as the latest 50 notes in
-oldest-to-newest order. It never changes quantity, lifecycle or `canPack`. Chunk
-3 must add `expectedVersion` to Flutter mutations, consume backend
-eligibility/version/notes, refetch 409 and complete authenticated E2E.
+oldest-to-newest order. It never changes quantity, lifecycle or `canPack`.
 
 Cashier **Open Till** requirements are governed by
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]] and

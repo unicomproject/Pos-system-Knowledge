@@ -41,7 +41,32 @@ Phone, Tablet, and Desktop share the same codes — no device prefixes.
 
 ## Machine catalog
 
-- Backend: `E_POS.Domain/.../Catalog/CashierPos/CashierPosCanonicalPermissionCatalog.cs`
+- Backend Architecture: Cashier POS canonical permissions are physically split by functional module, while `CashierPosCanonicalPermissionCatalog` remains the single canonical aggregation entry point.
+- Core Types:
+  - `CashierPosPermissionSemanticType.cs`
+  - `CashierPosPermissionDefinitionKind.cs`
+  - `CashierPosPermissionDefinition.cs`
+- Central Aggregation Entry Point: `E_POS.Domain/.../Catalog/CashierPos/CashierPosCanonicalPermissionCatalog.cs`
+- Module Files (`Catalog/CashierPos/Modules/`):
+  - `PreAuthPermissions.cs`
+  - `ShellPermissions.cs`
+  - `NotificationPermissions.cs`
+  - `HomePermissions.cs`
+  - `CatalogPermissions.cs`
+  - `CartPermissions.cs`
+  - `HeldSalesPermissions.cs`
+  - `CheckoutPermissions.cs`
+  - `DiscountPermissions.cs`
+  - `CashPaymentPermissions.cs`
+  - `SaleCompletePermissions.cs`
+  - `ReceiptPermissions.cs`
+  - `CustomerPermissions.cs`
+  - `CashDrawerPermissions.cs`
+  - `CashMovementPermissions.cs`
+  - `TillPermissions.cs`
+  - `ReturnPermissions.cs`
+  - `HardwarePermissions.cs`
+  - `OnlineOrderPermissions.cs`
 - JSON mirror: `cashier_pos_canonical_permissions.chunk2.json`
 - Flutter: `lib/core/access/cashier_pos/cashier_pos_canonical_permission_codes.dart`
 
