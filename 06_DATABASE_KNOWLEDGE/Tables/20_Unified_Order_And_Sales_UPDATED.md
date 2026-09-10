@@ -175,6 +175,7 @@ CHECK(refunded_amount >= 0)
 | `uom_id` | uuid | FK | NOT NULL | References `unit_of_measures(id)`. |
 | `price_list_item_id` | uuid | FK | NULL | References `price_list_items(id)`. |
 | `sku_snapshot` | varchar(100) |  | NULL | SKU snapshot. |
+| `barcode_snapshot` | varchar(100) |  | NULL | Immutable order-time primary barcode snapshot used by OO-04B pick verification. Captured at Click & Collect confirm from tenant-scoped `product_barcodes` (primary). Not updated when catalogue barcodes later change. NULL only when a primary barcode cannot be resolved; barcode-pickable C&C ingestion rejects that case. |
 | `product_name_snapshot` | varchar(200) |  | NOT NULL | Product name snapshot. |
 | `variant_name_snapshot` | varchar(200) |  | NULL | Variant name snapshot. |
 | `line_note` | varchar(500) |  | NULL | Target normalized product-line note; migration pending. |

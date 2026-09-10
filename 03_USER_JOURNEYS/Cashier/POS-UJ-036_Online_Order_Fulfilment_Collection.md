@@ -4,6 +4,12 @@
 
 # POS-UJ-036 — Online Order Fulfilment and Collection
 
+## OO-06 canonicalization update (2026-09-09)
+
+OO04 → OO04B → OO05 Pack then Ready → OO06 Ready for Collection → optional notification → later verification/handover → Collected. Ready tracking must not wait for notification. OO06 does not Pack, Ready, verify identity, collect or complete; What's Next is informational. Back navigation does not reverse state.
+
+Current OO06 authority: [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO06_Canonicalization_Status_2026-09-09]]. This scoped update supersedes older conflicting Ready/notification wording, not unrelated history.
+
 ## Authority and outcome
 
 Canonical cashier/store Click & Collect journey. OO-01 is accepted by its implementation tracker. OO-02 detail and OO-03 confirmed Start are implemented on the canonical Flutter/backend owners; authenticated UI-to-database acceptance remains governed by their trackers. OO-04–OO-15 retain their existing authority.
@@ -26,9 +32,9 @@ Canonical cashier/store Click & Collect journey. OO-01 is accepted by its implem
 | 2 | Order Detail / Start Fulfilment | Authoritative order, pickup, payment, reservation and item detail. |
 | 3 | Start Fulfilment Confirmation | Atomic conflict-safe start command. |
 | 4 | Pick Order | Fulfilment lines and progress. |
-| 5 | Pick Item / Barcode Scan | Scanner and manual barcode use the same command. |
-| 6 | Review & Pack | Eligible only when required quantities are resolved; creates packages. |
-| 7 | Ready for Collection | Backend validates pick/pack/package and sends notification. |
+| 5 | OO-04B — Pick Item / Barcode Verification | Selected-line sub-flow of OO-04: scanner/manual verifies the current line; explicit Mark as Picked submits the authoritative command. |
+| 6 | OO-05 — Review & Pack | Eligible only when backend `canPack`; review picked lines; optional packing notes; separate Pack then Mark Ready commands. |
+| 7 | OO-06 — Ready for Collection | Consumes authoritative Ready after OO05; optional notification is separate from lifecycle and customer tracking. |
 | 8 | Ready for Collection Queue | Outlet-scoped ready orders. |
 | 9 | Scan Collection QR | Sends opaque token for server validation. |
 | 10 | QR Validated / Retrieve Pack | Server-authorized package retrieval data. |
@@ -100,6 +106,26 @@ and event/audit. A 409 refetches instead of retaining local success. Review & Pa
 is eligible only when backend confirms all required lines resolved and no blocking
 issue. Wide screens bound scrolling to the arbitrary item list; narrow screens
 stack accessibly without changing business logic.
+
+OO-04 is the order-level overview; OO-04B is its selected-line screen. Selecting
+one product must open OO-04B for that exact fulfilment line. An overview scan may
+locate/select a pending current-order line but cannot pick it. Inside OO-04B a
+scan for any other line is rejected. A matching scan/manual value creates only
+transient verified UI state; quantity plus explicit Mark as Picked invokes the
+backend command. Success refetches authority and offers next pending item or Back
+to Pick Items. Full canonical contract:
+[[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
+
+### OO-05 Review & Pack boundary
+
+OO-05 opens only when backend `canPack` is true. All-picked does **not** mean
+Ready. The cashier reviews authoritative picked lines, may enter optional packing
+notes, then executes separate backend commands: Pack (`commerce.online_order.packing.pack`)
+then Mark Ready for Collection (`commerce.online_order.collection.mark_ready`).
+Review state reuses picking GET. Pack/Ready APIs and pack/ready events are implemented
+under `ClickCollectOrdersController`. Legacy status PATCH is
+not the cashier Ready path. Ready ≠ Collected. Full canonical contract:
+[[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO05_Canonicalization_Status_2026-09-08]].
 
 ## QR, payment and handover
 

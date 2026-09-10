@@ -109,6 +109,7 @@ All tests passed successfully with 0 warnings and 0 errors. EF pending-model che
 | `GET /api/v1/ecommerce/storefront/checkout/{sessionId}` | Read checkout session. |
 | `PATCH /api/v1/ecommerce/storefront/checkout/{sessionId}/collection` | Select/change collection outlet and requested collection time. |
 | `POST /api/v1/ecommerce/storefront/checkout/{sessionId}/confirm` | Confirm checkout into sales order. |
+| Confirm line snapshots | On confirm, each sales order line captures SKU + primary barcode (`product_barcodes`, tenant-scoped, variant-preferred) into `barcode_snapshot` in the same transaction. Missing/ambiguous primary barcode fails with `storefront_checkout.barcode_unavailable`. |
 | `GET /api/v1/ecommerce/storefront/fulfillment/stores/{outletId}/collection-options?days=5` | Generate available collection dates/times from outlet configuration. |
 
 ### Technical Notes

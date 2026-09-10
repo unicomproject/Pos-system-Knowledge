@@ -5,6 +5,12 @@
 
 # Fulfilment & Pickup / Click & Collect Functional Rules
 
+## OO-06 canonicalization update (2026-09-09)
+
+OO06 entry requires authoritative FulfillmentStatus READY, PickupStatus READY, ReadyAt present and CollectedAt NULL. Notify success/failure cannot change those lifecycle values. Catalog view_ready/notify_customer permissions require runtime verification; role names grant nothing. Print Collection Slip and Share Collection Info are excluded with no placeholders.
+
+Current OO06 authority: [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO06_Canonicalization_Status_2026-09-09]]. This scoped update supersedes older conflicting Ready/notification wording, not unrelated history.
+
 ## Purpose
 
 Defines business and UX rules for `Fulfilment_Pickup_ClickCollect` in the new OneVerz POS MVP scope.
@@ -147,6 +153,22 @@ quantities, lifecycle or `canPack`. Implemented events are
 `FULFILLMENT_LINE_PICKED`, `FULFILLMENT_LINE_ISSUE_REPORTED`,
 `FULFILLMENT_PICKING_COMPLETED` and `FULFILLMENT_PICKING_NOTE_ADDED`. Authority:
 [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
+
+OO-04B is the selected-line sub-flow of OO-04. A scan on the overview may only
+locate/select a pending current-order line. A scan/manual value inside OO-04B
+must verify the currently selected line and cannot permanently pick by itself;
+quantity plus explicit Mark as Picked invokes the existing authoritative
+versioned command. Another line's barcode is a mismatch and changes nothing.
+
+### OO-05 Review & Pack
+
+All-picked / `canPack` does not mean Ready. OO-05 requires `packing.view` to open,
+`packing.pack` to Pack, and `collection.mark_ready` to Mark Ready. Pack and Ready
+are separate versioned commands under the Click & Collect staff API. Optional
+packing notes are UI-capped at 200 characters pending Chunk 2 server confirmation;
+prefer persistence without a new column. Legacy status PATCH is not the cashier
+Ready path. Authority:
+[[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO05_Canonicalization_Status_2026-09-08]].
 
 
 - [[04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/01_Module_Overview]]

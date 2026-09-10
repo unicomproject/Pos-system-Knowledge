@@ -65,6 +65,24 @@ hardware/device operations.
 Development seed data may include test tenants, users, outlets, tills, devices,
 products, and orders only when clearly marked as development/test data.
 
+## Click & Collect Fixture Parity Rule
+
+Development Click & Collect fixture builders must populate the same mandatory
+order-line snapshots as the production order-ingestion path. A fixture must not
+bypass `BarcodeSnapshot` population for barcode-pickable lines. Prefer joining
+the authoritative primary `product_barcodes` row at seed time; Development-only
+data-repair migrations may backfill NULL fixture snapshots when the
+product/variant mapping is unambiguous. Do not hardcode a single order number
+as the permanent repair strategy.
+
+## Historical NULL Barcode Snapshot Repair Rule
+
+Do not blindly backfill historical production `sales_order_lines.barcode_snapshot`
+NULL values from current catalogue barcodes. That can fabricate order-time
+truth. Historical repair is allowed only when the original product/variant
+mapping is authoritative and unambiguous. Otherwise retain the NULL and surface
+barcode verification unavailable at pick time.
+
 ## Secret Rule
 
 Do not seed real API keys, card credentials, payment credentials, passwords,
