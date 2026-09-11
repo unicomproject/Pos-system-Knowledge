@@ -23,6 +23,8 @@ responsive online store screens, Angular/admin screens, tests, or database chang
   backend-authoritative.
 - Store credit must not be offered by the current Cashier flow.
 - Online return request is allowed only if the business policy enables it; supplier return is separate.
+- Return eligibility must be validated against the immutable sale-time snapshot (`sales_order_lines.return_policy_snapshot`), preventing historical sales from being corrupted by later policy updates.
+- Cashier return flow across 10 steps is existing and verified (~90% reusable with 185 passing tests). Stage D refines this flow rather than rewriting it.
 
 ## User Rules
 

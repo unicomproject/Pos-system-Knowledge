@@ -17,15 +17,15 @@ low-cost hardware integration.
 
 | Area                  | Stack                                                |
 | --------------------- | ---------------------------------------------------- |
-| Backend API           | ASP.NET Core Web API                                 |
-| Backend language      | C#                                                   |
+| Backend API           | ASP.NET Core Web API (.NET 10 / `net10.0`)           |
+| Backend language      | C# 13                                                |
 | Backend architecture  | Clean Architecture + Service/Repository Pattern      |
 | API style             | REST API                                             |
 | Database              | PostgreSQL                                           |
-| ORM                   | Entity Framework Core                                |
-| Platform Admin Web    | Angular Responsive web application                   |
+| ORM                   | Entity Framework Core 10                             |
+| Platform Admin Web    | Angular Responsive web application (Angular 21)      |
 | Business POS App      | Flutter                                              |
-| Customer Online Store | Angular Responsive web application                   |
+| Customer Online Store | Angular Responsive web application (Angular 21)      |
 | Mobile/Desktop POS    | Flutter single codebase                              |
 | State management      | Riverpod for Flutter, Angular services/state for web |
 | API client            | Dio for Flutter, Angular HttpClient for Angular      |
@@ -48,24 +48,24 @@ low-cost hardware integration.
 
 | Layer | Technology |
 |---|---|
-| API layer | ASP.NET Core Controllers |
+| API layer | ASP.NET Core Controllers (.NET 10 / `net10.0`) |
 | Application layer | Services, DTOs, validators, use cases |
 | Domain layer | Entities, value objects, business rules |
-| Infrastructure layer | EF Core, PostgreSQL repositories, Azure adapters |
+| Infrastructure layer | EF Core 10, PostgreSQL repositories, Azure adapters |
 | Persistence | PostgreSQL |
 | File storage adapter | Azure Blob Storage |
 | Authentication | JWT access token + refresh token flow |
 | Authorization | Feature entitlement + permission codes |
 
 ## Frontend Stack
-
-| Surface               | Technology                         |
-| --------------------- | ---------------------------------- |
-| Platform Admin        | Angular                            |
-| Tenant Admin          | Flutter business app layout        |
-| Cashier POS           | Flutter                            |
-| Mobile POS            | Flutter Android/iOS                |
-| Customer Online Store | Angular Responsive browser website |
+ 
+| Surface               | Technology                                       |
+| --------------------- | ------------------------------------------------ |
+| Platform Admin        | Angular 21 SPA                                   |
+| Tenant Admin          | Flutter business app layout                      |
+| Cashier POS           | Flutter                                          |
+| Mobile POS            | Flutter Android/iOS                              |
+| Customer Online Store | Angular 21 Responsive SPA (not Next.js or React) |
 
 ## Flutter Stack
 
