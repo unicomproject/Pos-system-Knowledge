@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin Device Hardware Management Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-06-30 -->
+<!-- last_updated: 2026-09-09 -->
 
 # Tenant Admin Device Hardware Management Flow
 
@@ -124,3 +124,8 @@ Do not mark physical hardware COMPLETED from reference images or API HTTP 200 al
 
 Canonical architecture: [[../../12_INTEGRATIONS/POS_Hardware_Integration]] ·
 [[../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]].
+
+
+## Hardware setup UI update — 2026-09-09
+
+Tenant Admin registry UI now provides dashboard, discovery guidance, conditional configuration, assignment/release and test readiness flow. Flutter hardware tests: 6 passed; analyze: clean; isolated backend tests: 21 passed. Physical/provider integration and full end-to-end acceptance remain pending. Implementation and limitations: [[../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Tenant_Admin_Hardware_Integration_2026-09-09]].

@@ -1,6 +1,6 @@
 <!-- title: Tenant Admin Online Store 9-Step Contract Status -->
 <!-- status: Active / Reconciliation Blocked -->
-<!-- last_updated: 2026-08-27 -->
+<!-- last_updated: 2026-09-09 -->
 
 # Tenant Admin Online Store 9-Step Contract Status
 
@@ -37,3 +37,8 @@ Documentation is updated; implementation completion is not claimed.
 - Create/rotate verification tokens are preserved as typed one-time responses and exposed with copy controls; existing tokens are not invented when the backend does not return them.
 - Verified evidence: Flutter analyze PASS; Online Store tests `38/38` PASS; full Flutter suite `1305` PASS with `1` intentional physical-device skip; backend controller surface tests `56/56` PASS.
 - This closes the Step 4 Flutter integration only. Existing cross-step reconciliation and authenticated E2E blockers above remain unchanged.
+
+
+## Imported execution evidence — 2026-09-09
+
+See [[Tenant_Admin_Online_Store_E2E_Evidence_2026-08-28]] for the historical nine-route E2E run and its publish blockers, and [[Customer_Storefront_Closure_Evidence_2026-09-02]] for downstream storefront results. The original NOT EXECUTED rows describe the original documentation task; the imported reports supply separate dated execution evidence. Existing 2026-08-31 Step 4 evidence remains valid within its stated scope. No new production acceptance is claimed.
