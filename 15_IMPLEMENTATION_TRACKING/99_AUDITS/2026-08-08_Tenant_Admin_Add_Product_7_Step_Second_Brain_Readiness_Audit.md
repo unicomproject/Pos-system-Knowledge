@@ -1,5 +1,9 @@
 # 2026-08-08 Tenant Admin Add Product 7-Step Second Brain Readiness Audit Report
 
+> **HISTORICAL IMPLEMENTATION EVIDENCE — PRE-SCANNER-FIRST NUMBERING.**  
+> Pre-dates scanner-first Step 1 Scan Barcode. Former Basic Details-first / early 7–8 step wording is **not** current authority.  
+> Current wizard: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]], [[../../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]].
+
 **Date**: 2026-08-08  
 **Audit Scope**: Tenant Admin Add Product / Product Setup (Reference UI 2 Alignment)  
 **Auditor**: Senior Solution Architect, Senior Backend Engineer, Senior Flutter Architect, Database Architect, Product Analyst, Second Brain Maintainer  

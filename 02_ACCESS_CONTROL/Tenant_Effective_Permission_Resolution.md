@@ -167,12 +167,27 @@ Creating a user may add one active tenant-level role or selected-outlet role ass
 
 Historical remote baseline: backend tenant role management endpoints and resolver hardening were not complete. The dated implementation evidence above supersedes the endpoint-absence statement; unresolved runtime gaps remain as recorded.
 
-## Product Wizard permission aliasing (LOCKED 2026-08-24)
+## Product Wizard permission aliasing (LOCKED 2026-08-24 · authority CLOSED 2026-09-12)
 
-Effective-permission resolution MAY one-way map `tenant.products.view|create|update|delete` → `catalog.products.*` so historical grants satisfy the canonical check.
+Backend authorization for Product Setup evaluates **only** the canonical R1_ACTIVE
+`catalog.*` code — one code per gate. Do not keep two first-class authorities
+(`catalog` OR `tenant`) on the same decision.
 
-Backend TARGET authorization for Product Setup evaluates **only** `catalog.products.*`. Do not keep two first-class authorities (`catalog` OR `tenant`) on the same decision.
+Effective-permission resolution MAY map **one way only** onto that canonical code:
 
-Tax lookup MAY one-way map `tax.classes.view` / `tax.rates.view` → `pricing.tax_classes.view` / `pricing.tax_rates.view`.
+| Source grant (accepted) | Canonical decision code |
+|---|---|
+| `tenant.products.view\|create\|update\|delete` | `catalog.products.view\|create\|update\|delete` |
+| `catalog.products.master.view\|create\|update\|delete\|publish` (4-tier form) | `catalog.products.*` |
+| `catalog.barcodes.sku.manage` (4-tier form) | `catalog.barcodes.manage` |
+| `tax.classes.view` / `tax.rates.view` | `pricing.tax_classes.view` / `pricing.tax_rates.view` |
+
+Reverse mapping is **forbidden**: a `catalog.*` grant is never translated back into a
+`tenant.products.*` authority. Aliases live strictly in the application translation layer —
+no duplicate `permission_definitions` rows.
+
+Basis: [[CANONICAL_MODULE_FEATURE_PERMISSION_CATALOG_R1]] is the authoritative CLOSED
+registry and marks the 3-tier `catalog.*` rows R1_ACTIVE; [[Permission_Code_List]] defers to
+it on conflict. Decision: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_TECHNICAL_CONTRACT_DECISION_2026-09-12]] TD-9.
 
 See [[Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].

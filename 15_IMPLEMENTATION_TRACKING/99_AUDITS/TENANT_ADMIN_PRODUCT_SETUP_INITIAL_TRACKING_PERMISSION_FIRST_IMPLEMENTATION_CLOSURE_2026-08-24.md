@@ -1,9 +1,12 @@
 <!-- title: Tenant Admin Product Setup Initial Tracking Permission-First Implementation Closure -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-12 -->
 
 # Tenant Admin Product Setup Initial Tracking + Permission-First Implementation Closure
+
+> **Numbering note (2026-09-12):** Historical implementation evidence. Pre-scanner-first step indexes may appear below (e.g. “Bundle Step 4” = CURRENT Step 5 Bundle Composition). Scanner-first authority: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].  
+> **Migration boundary:** `product_setup_initial_tracking` via `20260824095742_AddProductSetupInitialTracking` is **EXISTING** and **out of scanner-first B1**. Scanner-first B1 is only scan_context + identifier_standard + UNKNOWN. This audit governs Initial Tracking live DB/E2E status — do not infer production acceptance from documentation alone.
 
 ## Final Verdict
 

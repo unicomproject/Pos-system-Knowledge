@@ -4,6 +4,28 @@
 **Module**: 10 Product Core / Catalog & Inventory Management  
 **Status**: APPROVED & IMPLEMENTATION READY FOR FLUTTER STEP 2  
 
+> **HISTORICAL IMPLEMENTATION EVIDENCE — PRE-SCANNER-FIRST NUMBERING.**
+>
+> This audit used the wizard numbering that was current on 2026-08-09.
+> Product Type & Tracking was then global Step 2.
+>
+> **CURRENT** scanner-first numbering:
+> - Step 1 = Scan Barcode
+> - Step 2 = Basic Details
+> - Step 3 = Product Type & Tracking
+>
+> Therefore every “Step 2 Product Type & Tracking” implementation reference in this audit maps to **CURRENT Step 3**.
+>
+> Historical code symbols (e.g. `Step2WizardProcessor`) are preserved as written — historical code symbol ≠ current global wizard number.
+>
+> This audit does **NOT** prove the new scanner-first Step 1 is implemented.
+>
+> **Current authority:**
+> - [[../../00_START_HERE/Current_Source_Of_Truth]]
+> - [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]]
+> - [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_TECHNICAL_CONTRACT_DECISION_2026-09-12]]
+> - [[05_Tenant_Admin_Add_Product_7_Step_Contract]]
+
 ---
 
 ## Executive Summary

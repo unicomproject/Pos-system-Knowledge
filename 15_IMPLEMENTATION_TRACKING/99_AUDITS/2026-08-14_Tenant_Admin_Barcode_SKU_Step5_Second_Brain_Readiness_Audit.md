@@ -1,6 +1,8 @@
 # Tenant Admin Barcode & SKU Step 5 Second Brain Readiness Audit
 **Date:** 2026-08-14
 
+> **SUPERSEDED AS GLOBAL-STEP AUTHORITY (2026-09-11):** Standalone Step 5 Barcode & SKU is obsolete. Use [[PRODUCT_SETUP_SCANNER_FIRST_SECOND_BRAIN_CANONICALIZATION_2026-09-11]] and [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]]. Historical evidence only.
+
 ## 1. Canonical User Journey
 - Step 1 to Step 4 are completed depending on the product structure.
 - Step 5 (Barcode & SKU) requires users to define unique SKU and Barcodes.

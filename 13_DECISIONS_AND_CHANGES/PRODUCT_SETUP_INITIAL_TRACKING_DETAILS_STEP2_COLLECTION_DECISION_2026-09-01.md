@@ -1,16 +1,19 @@
 <!-- title: Product Setup Initial Tracking Details Step 2 Collection Decision 2026-09-01 -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-09-01 -->
+<!-- last_updated: 2026-09-11 -->
 
 # Product Setup Initial Tracking Details Step 2 Collection Decision 2026-09-01
+
+> **Numbering note (2026-09-11 / corrected 2026-09-12):** After scanner-first remumber, Product Type & Tracking / Initial Tracking collection is global **Step 3**. This decision correctly places collection on that surface; do not treat “Step 2” below as the current global step index. See [[PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]] and [[PRODUCT_SETUP_SCANNER_FIRST_TECHNICAL_CONTRACT_DECISION_2026-09-12]]. Originally locked as Step 2 on 2026-09-01; after scanner-first insertion this is global Step 3.
 
 ## Status And Purpose
 
 Approved and active from 2026-09-01. This decision **moves the collection UI**
-for optional Initial Tracking Details from Add Product **Step 1 — Basic Details**
-to **Step 2 — Product Type & Tracking**, shown only after Product Type is
-explicitly selected.
+for optional Initial Tracking Details from Add Product **Basic Details**
+to **Product Type & Tracking**, shown only after Product Type is
+explicitly selected. (Under then-current numbering that was Step 1 → Step 2;
+after 2026-09-11 scanner-first remumber, Product Type & Tracking is global **Step 3**.)
 
 It does **not** change:
 

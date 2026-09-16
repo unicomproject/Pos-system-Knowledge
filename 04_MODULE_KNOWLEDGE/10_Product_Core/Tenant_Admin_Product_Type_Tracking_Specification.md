@@ -1,17 +1,23 @@
 <!-- title: Tenant Admin Add Product — Product Type & Tracking Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-09-01 -->
+<!-- last_updated: 2026-09-11 -->
+<!-- supersedes: old_global_step2_numbering_pre_scanner_first -->
 
 # Tenant Admin Add Product — Product Type & Tracking Specification
 
+> **SUPERSEDED:** Formerly documented as global **Step / Stage 2**.  
+> **Canonical (LOCKED):** Global **Step 3 — Product Type & Tracking** after scanner-first remumber.  
+> Decision: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].  
+> Step 1 Scan: [[Tenant_Admin_Product_Setup_Scan_Barcode_Specification]].
+
 ## 1. Executive Summary & Core Architectural Principles
 
-This document defines the canonical Second Brain specification for **Stage 2: Product Type & Tracking** within the Tenant Admin **Add Product Wizard**.
+This document defines the canonical Second Brain specification for **Global Step 3: Product Type & Tracking** within the Tenant Admin **Add Product Wizard**.
 
 ### Canonical Architectural Principles
-1. **ONE Unified Add Product Wizard**: Add Product is ONE single 7-step wizard pipeline (`ProductId`, `CurrentSetupStep`, `RowVersion`, shared footer, shared save endpoints). Steps are configuration steps owned by the wizard, NOT seven independent backend/frontend features. Legacy 8-stage / Stage 8 wording is obsolete.
-2. **Semantic Technical Naming Only**: Technical code symbols (Flutter widgets, controllers, DTOs, API endpoints, backend services, commands) MUST use semantic business terms (`ProductTypeTracking`, `product_type_tracking.dart`, `ValidateProductTypeTracking`, `ApplyProductTypeTracking`). Step-number names (e.g. `Step2ProductTypeTracking`, `SaveStep2DraftCommand`) are strictly forbidden in code.
+1. **ONE Unified Add Product Wizard**: Add Product is ONE single 7-step wizard pipeline (`ProductId`, `CurrentSetupStep`, `RowVersion`, shared footer, shared save endpoints). Steps are configuration steps owned by the wizard, NOT seven independent backend/frontend features. Legacy 8-stage / Stage 8 wording is obsolete. Standalone global **Barcode & SKU** is superseded — final identifiers live inside **Step 5 Product Configuration**.
+2. **Semantic Technical Naming Only**: Technical code symbols (Flutter widgets, controllers, DTOs, API endpoints, backend services, commands) MUST use semantic business terms (`ProductTypeTracking`, `product_type_tracking.dart`, `ValidateProductTypeTracking`, `ApplyProductTypeTracking`). Step-number names (e.g. `Step3ProductTypeTracking`, `SaveStep3DraftCommand`) are strictly forbidden in code.
 3. **Product Type UI vs Product Structure Domain Mapping**:
    - UI Section Label: `Select Product Type` (Options: `Simple Product`, `Variant Product`, `Bundle / Kit`).
    - Domain & Database Mapping: `productStructure` (`SIMPLE`, `VARIANT`, `BUNDLE`).
@@ -21,10 +27,10 @@ This document defines the canonical Second Brain specification for **Stage 2: Pr
    - `VARIANT`: same optional Initial Tracking Details card, then Variant Inventory Tracking policy toggles + right-side contextual explanatory card.
    - `BUNDLE`: Read-only Bundle Inventory Behaviour informational cards (Component-based inventory, Component stock deduction, Component tracking rules). Do **not** show Initial Tracking Details.
 5. **Stage Applicability & Navigation**:
-   - `SIMPLE` + Track Inventory ON: Stage 3 (`Units & Pack Conversion`) is `REQUIRED`. Stage 4 (`Product Configuration`) is `NOT_APPLICABLE`. Save & Continue from Stage 3 navigates directly to Stage 5 (`Barcode & SKU`).
-   - `VARIANT` + Track Inventory ON: Stage 3 (`Units & Pack Conversion`) is `REQUIRED`. Stage 4 (`Product Configuration`) is `REQUIRED`. Save & Continue from Stage 3 navigates to Stage 4.
-   - `SIMPLE` / `VARIANT` + Track Inventory OFF: Stage 3 is `NOT_APPLICABLE` (bypassed).
-   - `BUNDLE`: Parent tracking is forced `false` / component-based. Stage 3 is `NOT_APPLICABLE` (bypassed). Save & Continue from Stage 2 navigates directly to Stage 4 (`Product Configuration` — Kit Composition).
+   - `SIMPLE` + Track Inventory ON: Step 4 (`Unit & Pack Conversion`) is `REQUIRED`. Step 5 variant/bundle matrix is `NOT_APPLICABLE`; Step 5 still owns final SKU/barcode via the **identifier section**. Save & Continue from Step 4 navigates to Step 5 (identifiers), then Step 6 (`Pricing & Tax`).
+   - `VARIANT` + Track Inventory ON: Step 4 (`Unit & Pack Conversion`) is `REQUIRED`. Step 5 (`Product Configuration` — variant matrix + identifier section) is `REQUIRED`. Save & Continue from Step 4 navigates to Step 5.
+   - `SIMPLE` / `VARIANT` + Track Inventory OFF: Step 4 is `NOT_APPLICABLE` (bypassed).
+   - `BUNDLE`: Parent tracking is forced `false` / component-based. Step 4 is `NOT_APPLICABLE` (bypassed). Save & Continue from Step 3 navigates directly to Step 5 (`Product Configuration` — Kit Composition + identifiers).
 
 
 ---
@@ -48,8 +54,8 @@ This document defines the canonical Second Brain specification for **Stage 2: Pr
 - **Identity & Sales**: Each Variant has its own SKU, Barcode, Selling Price override, Outlet stock, Batch records, Expiry records, Serial numbers, and active status.
 - **Inventory Method (Derived Summary)**: `VARIANT_BASED` (Derived from `productStructure = VARIANT`).
 - **Tracking Storage & Inheritance Policy**:
-  - Stage 2 stores canonical policy in `product_inventory_settings` (`product_id = ProductId`, `product_variant_id = NULL`).
-  - When variants are generated in Stage 4, each variant inherits this policy into variant-level inventory settings (`product_variant_id = VariantId`) where overrides apply.
+  - Step 3 stores canonical policy in `product_inventory_settings` (`product_id = ProductId`, `product_variant_id = NULL`).
+  - When variants are generated in Step 5, each variant inherits this policy into variant-level inventory settings (`product_variant_id = VariantId`) where overrides apply.
   - Actual stock records (`inventory_balances`, `product_batches`, `serial_numbers`, `stock_movements`) MUST reference exact `product_variant_id`.
 
 ### 2.3 Bundle / Kit Product (`productStructure = BUNDLE`)
@@ -91,7 +97,7 @@ This document defines the canonical Second Brain specification for **Stage 2: Pr
 #### B. VARIANT UI LAYOUT
 - **Left Column**: Tracking & Stock Rules Toggles (Same toggles as Simple).
 - **Right Column**: Contextual Explanatory Banner & Guidance Card:
-  - Banner: *"Variant options (e.g., size, color) will be configured in Stage 4: Product Configuration."*
+  - Banner: *"Variant options (e.g., size, color) will be configured in Step 5: Product Configuration."*
   - Contextual Explanations:
     - *Track Inventory*: Stock is tracked independently per Variant at Outlet level.
     - *Batch Tracking*: Policy is set at product level; actual batch ledgers belong to each generated Variant.
@@ -111,8 +117,8 @@ This document defines the canonical Second Brain specification for **Stage 2: Pr
 ### 4.1 Skip Decision Policy (Superseding Rule)
 - **Product Structure Selection is NON-SKIPPABLE**: User MUST explicitly select `SIMPLE`, `VARIANT`, or `BUNDLE`. If no structure is selected, `Skip` button is DISABLED and API rejects advance requests.
 - **Conditional Skip Allowed After Structure Selection**:
-  - `SIMPLE` / `VARIANT` Skip: Persists selected `productStructure`, sets `TrackInventory = true`, `Batch = false`, `Expiry = false`, `Serial = false`. If `SIMPLE`, advances to Stage 3 (`Units & Pack Conversion`).
-  - `BUNDLE` Skip: Persists `productStructure = BUNDLE`, parent tracking flags `false`, derived method `COMPONENT_BASED`, auto-bypasses Stage 3, and advances directly to Stage 4 (`Product Configuration` — Kit Composition).
+  - `SIMPLE` / `VARIANT` Skip: Persists selected `productStructure`, sets `TrackInventory = true`, `Batch = false`, `Expiry = false`, `Serial = false`. If `SIMPLE`, advances to Step 4 (`Unit & Pack Conversion`).
+  - `BUNDLE` Skip: Persists `productStructure = BUNDLE`, parent tracking flags `false`, derived method `COMPONENT_BASED`, auto-bypasses Step 4, and advances directly to Step 5 (`Product Configuration` — Kit Composition).
 
 ### 4.2 Save Pipeline & Actions
 - **Save Draft (`advanceStep: false`)**: Validates current stage inputs, persists draft atomically, updates `row_version` and `draft_saved_at`, refreshes persisted Product Summary, stays on current stage.
@@ -120,12 +126,14 @@ This document defines the canonical Second Brain specification for **Stage 2: Pr
 
 ### 4.3 Stage Applicability Matrix
 
-| Product Structure | Step 3 (Units) | Step 4 (Product Config) | Step 5 (Barcode/SKU) | Step 7 (Review/Create) |
+| Product Structure | Step 4 (Unit & Pack) | Step 5 (Product Config + identifiers) | Step 6 (Pricing/Tax) | Step 7 (Review/Create) |
 |---|---|---|---|---|
-| `SIMPLE` (Tracked) | Required | **NOT_APPLICABLE** (Auto-skip 3 $\rightarrow$ 5) | Required | Displays "Product Configuration: Not Applicable" |
-| `VARIANT` (Tracked) | Required | **REQUIRED** (Variant Matrix) | Required | Validates Variant Matrix completion |
-| `BUNDLE` | **NOT_APPLICABLE** (Auto-skip 2 $\rightarrow$ 4) | **REQUIRED** (Kit Composition) | Required | Validates Kit Composition ($\ge$ 2 valid components) |
-| `SIMPLE` / `VARIANT` (Untracked) | **NOT_APPLICABLE** | Simple: N/A; Variant: REQUIRED | Required | Standard validation |
+| `SIMPLE` (Tracked) | Required | Matrix **NOT_APPLICABLE**; identifier section **REQUIRED** (4 $\rightarrow$ 5) | Required | Shows identifiers; "Product Configuration matrix: Not Applicable" |
+| `VARIANT` (Tracked) | Required | **REQUIRED** (Variant Matrix + identifier section) | Required | Validates Variant Matrix + identifiers |
+| `BUNDLE` | **NOT_APPLICABLE** (Auto-skip 3 $\rightarrow$ 5) | **REQUIRED** (Kit Composition + identifiers) | Required | Validates Kit Composition ($\ge$ 2 valid components) |
+| `SIMPLE` / `VARIANT` (Untracked) | **NOT_APPLICABLE** | Simple: matrix N/A + identifiers; Variant: REQUIRED | Required | Standard validation |
+
+> Standalone global **Barcode & SKU** step is **SUPERSEDED**. Final SKU/barcode assignment is Step 5 Product Configuration identifier section ([[Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]]). Acquisition remains Step 1.
 
 
 ---
@@ -134,10 +142,10 @@ This document defines the canonical Second Brain specification for **Stage 2: Pr
 
 ### 5.1 Structure Transition Rules (Draft Phase)
 When user changes `productStructure` during Add Product draft setup:
-- `SIMPLE` $\rightarrow$ `VARIANT`: Show confirmation: *"Changing to Variant Product requires defining variant options and SKU/stock per variant. Continue?"* Upon confirm, clear simple stock mapping, set Stage 4 status to `PENDING`.
-- `SIMPLE` $\rightarrow$ `BUNDLE`: Show confirmation: *"Changing to Bundle / Kit replaces direct product stock with component-based availability. Continue?"* Upon confirm, clear simple stock mapping, set Stage 4 status to `PENDING`.
-- `VARIANT` $\rightarrow$ `SIMPLE` / `BUNDLE`: Show confirmation: *"Changing structure will remove all configured variant options, combinations, and variant SKUs. Continue?"* Upon confirm, delete draft `product_options`, `product_variants`, reset Stage 4.
-- `BUNDLE` $\rightarrow$ `SIMPLE` / `VARIANT`: Show confirmation: *"Changing structure will remove all configured bundle components (`combo_components`). Continue?"* Upon confirm, delete draft `combo_definitions` and `combo_components`, reset Stage 4.
+- `SIMPLE` $\rightarrow$ `VARIANT`: Show confirmation: *"Changing to Variant Product requires defining variant options and SKU/stock per variant. Continue?"* Upon confirm, clear simple stock mapping, set Step 5 status to `PENDING`.
+- `SIMPLE` $\rightarrow$ `BUNDLE`: Show confirmation: *"Changing to Bundle / Kit replaces direct product stock with component-based availability. Continue?"* Upon confirm, clear simple stock mapping, set Step 5 status to `PENDING`.
+- `VARIANT` $\rightarrow$ `SIMPLE` / `BUNDLE`: Show confirmation: *"Changing structure will remove all configured variant options, combinations, and variant SKUs. Continue?"* Upon confirm, delete draft `product_options`, `product_variants`, reset Step 5.
+- `BUNDLE` $\rightarrow$ `SIMPLE` / `VARIANT`: Show confirmation: *"Changing structure will remove all configured bundle components (`combo_components`). Continue?"* Upon confirm, delete draft `combo_definitions` and `combo_components`, reset Step 5.
 
 ### 5.2 Active Product Edit Safety (Post-Publish)
 For published products (`products.status = 'ACTIVE'`):
@@ -153,7 +161,7 @@ Product Summary visibility is driven strictly by persistence state:
 - **After First Successful Save Draft / Save & Continue**: Summary panel visible on responsive drawer/sidebar.
 
 ### Common Summary Fields
-Status (`DRAFT`/`ACTIVE`), Primary Image Thumbnail, Product Name, Internal Code (`product_code`), Category, Brand, Created By, Created On. (SKU displays `Pending (Stage 5)` prior to Stage 5).
+Status (`DRAFT`/`ACTIVE`), Primary Image Thumbnail, Product Name, Internal Code (`product_code`), Category, Brand, Created By, Created On. (SKU displays `Pending (Step 5)` prior to Step 5 identifier completion).
 
 ### Structure-Specific Summary Fields
 - `SIMPLE`: Product Structure = `Simple Product` | Inventory Method = `Product-level` | Track Inventory = `Yes` / `No`.
@@ -191,8 +199,10 @@ Status (`DRAFT`/`ACTIVE`), Primary Image Thumbnail, Product Name, Internal Code 
 - Initial Wizard Creation & Draft Save: `catalog.products.create`
 - Edit Mode Active Product: `catalog.products.update`
 - Resume / View Draft: `catalog.products.view`
-- Stage 4 Variant Configuration: `catalog.variants.manage`
-- Stage 4 Bundle Configuration: `catalog.combo_components.manage`
+- Step 5 Variant Configuration: `catalog.variants.manage`
+- Step 5 Bundle Configuration: `catalog.combo_components.manage`
+- Step 5 identifier mutation: `catalog.barcodes.manage`
+- Step 1 resolve / external-lookup: under `catalog.products.create` (see permission matrix)
 
 ### 8.2 Feature Entitlements
 - Runtime Feature Entitlement Code: `product_catalog` (Module Code: `product_management` is grouping only, not a runtime check).
@@ -207,11 +217,11 @@ Status (`DRAFT`/`ACTIVE`), Primary Image Thumbnail, Product Name, Internal Code 
 - `PUT /api/v1/tenant-admin/products/{productId}/draft`
 - `GET /api/v1/tenant-admin/products/{productId}/setup`
 
-#### Payload Schema (Stage 2 Focus)
+#### Payload Schema (Step 3 Focus)
 ```json
 {
   "productId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "currentSetupStep": 2,
+  "currentSetupStep": 3,
   "productStructure": "VARIANT",
   "trackInventory": true,
   "batchTracking": true,
@@ -226,7 +236,7 @@ Status (`DRAFT`/`ACTIVE`), Primary Image Thumbnail, Product Name, Internal Code 
 
 ## 9. Non-Functional Requirements (NFR)
 
-1. **Atomic Transactionality**: Saving Stage 2 draft updates `products` and `product_inventory_settings` within a single database transaction.
+1. **Atomic Transactionality**: Saving Step 3 draft updates `products` and `product_inventory_settings` within a single database transaction.
 2. **Optimistic Concurrency**: Enforced via `row_version` matching. Conflicting edits return HTTP 409.
 3. **Tenant Isolation**: Every backend query and mutation includes strict `tenant_id` filter from authenticated JWT claims.
 4. **Performance**: Setup query response time $< 150\text{ms}$ at 95th percentile. Bundle availability calculation batched per selected outlet.
@@ -236,9 +246,9 @@ Status (`DRAFT`/`ACTIVE`), Primary Image Thumbnail, Product Name, Internal Code 
 
 ## 10. Test Matrix
 
-1. **Simple Product Tests**: Structure saved as `SIMPLE`; stock balance owned by product; Stage 4 marked `NOT_APPLICABLE`; Stage 3 Save & Continue skips Stage 4 and navigates to Stage 5.
-2. **Variant Product Tests**: Structure saved as `VARIANT`; parent product has 0 physical stock balance; tracking policy saved to product level; Stage 4 marked `REQUIRED`.
-3. **Bundle Product Tests**: Structure saved as `BUNDLE`; parent tracking toggles set to `false`; informational behaviour cards rendered; Stage 4 marked `REQUIRED`; bundle availability derived from component MIN usable stock.
+1. **Simple Product Tests**: Structure saved as `SIMPLE`; stock balance owned by product; Step 5 matrix marked `NOT_APPLICABLE` with identifier section still required; Step 4 Save & Continue navigates to Step 5 identifiers.
+2. **Variant Product Tests**: Structure saved as `VARIANT`; parent product has 0 physical stock balance; tracking policy saved to product level; Step 5 marked `REQUIRED`.
+3. **Bundle Product Tests**: Structure saved as `BUNDLE`; parent tracking toggles set to `false`; informational behaviour cards rendered; Step 5 marked `REQUIRED`; bundle availability derived from component MIN usable stock.
 4. **Skip & Validation Tests**: Skip rejected if structure unselected; Skip with structure selected persists structure + default toggles; Batch/Expiry/Serial mutual exclusivity enforced.
 5. **Concurrency & Auth Tests**: Stale `rowVersion` returns HTTP 409; missing `product_catalog` entitlement returns HTTP 403.
 
@@ -252,11 +262,12 @@ File Structure:
 lib/features/tenant_admin/products/
 ├── presentation/
 │   ├── widgets/
+│   │   ├── scan_barcode.dart
 │   │   ├── basic_details.dart
 │   │   ├── product_type_tracking.dart
 │   │   ├── units_pack_conversion.dart
 │   │   ├── product_configuration.dart
-│   │   ├── barcode_sku.dart
+│   │   ├── identifiers/   # Step 5 identifier section (former standalone Barcode & SKU)
 │   │   ├── pricing_tax.dart
 │   │   ├── review_create.dart
 │   │   ├── product_wizard_stepper.dart
@@ -272,7 +283,7 @@ Single Unified Wizard Pipeline (`SaveProductWizardAsync`) with semantic stage he
 - `ApplyProductTypeTracking(Product product, SaveProductDraftCommand command)`
 - `ResolveNextApplicableStage(ProductStructure structure, int currentStage)`
 
-## Step 2 Bundle UI Contract
+## Step 3 Bundle UI Contract
 For `Product Structure = Bundle / Kit`, the following UI is displayed:
 ```text
 Product Structure: Bundle / Kit
@@ -282,14 +293,15 @@ Helper texts:
 - `Bundle availability is calculated from component stock.`
 - `Selling this bundle deducts the configured component quantities.`
 - `Batch, expiry and serial tracking follow component settings.`
-- `Add and manage bundle components in Step 4 — Product Configuration.`
+- `Add and manage bundle components in Step 5 — Product Configuration.`
 
 Do NOT expose Bundle parent controls for: Track Inventory, Batch Tracking, Expiry Tracking, Serial Tracking, Unit & Pack Conversion, Bundle Pricing, SKU Prefix, Barcode, Component substitution, Sell when component unavailable.
 
-## Initial Tracking Details Collection (CURRENT 2026-09-01)
+## Initial Tracking Details Collection (Step 3 ownership)
 
-Step 2 is both tracking **policy** and the **collection surface** for optional
+**Global Step 3** is both tracking **policy** and the **collection surface** for optional
 `initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`.
+(Filename `Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification` is historical; content owns Step 3.)
 
 - Show the identity card only after Product Type is explicitly selected.
 - SIMPLE / VARIANT: card **above** the tracking toggles.
@@ -300,6 +312,8 @@ Step 2 is both tracking **policy** and the **collection surface** for optional
 - VARIANT: keep values provisional; do not create parent Product batch/serial rows.
 - Canonical matrix and BR-TRACK rules:
   [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
-- Collection-move decision:
+- Collection-move decision (onto Type & Tracking):
   [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
+- Scanner-first remumber (Type & Tracking is now global Step 3):
+  [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]]
 

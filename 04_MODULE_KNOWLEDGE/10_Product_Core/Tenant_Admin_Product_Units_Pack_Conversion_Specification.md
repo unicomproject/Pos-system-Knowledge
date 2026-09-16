@@ -1,19 +1,25 @@
-<!-- title: Tenant Admin Add Product — Step 3: Units & Pack Conversion Specification -->
+<!-- title: Tenant Admin Add Product — Step 4: Unit & Pack Conversion Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-11 -->
+<!-- supersedes: old_global_step3_units_pack_numbering_pre_scanner_first -->
 
-# Tenant Admin Add Product — Step 3: Units & Pack Conversion Specification
+# Tenant Admin Add Product — Step 4: Unit & Pack Conversion Specification
+
+> **SUPERSEDED:** Formerly global **Step 3 — Units & Pack Conversion**.  
+> **Canonical (LOCKED):** Global **Step 4 — Unit & Pack Conversion**.  
+> Decision: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].  
+> Next applicable step is **Step 5 Product Configuration** (identifiers absorbed; standalone Barcode & SKU superseded).
 
 ## 1. Executive Summary & Core Architectural Principles
 
-This document defines the final canonical Second Brain specification for **Step 3: Units & Pack Conversion** within the Tenant Admin **Add Product Wizard**.
+This document defines the final canonical Second Brain specification for **Step 4: Unit & Pack Conversion** within the Tenant Admin **Add Product Wizard**.
 
 ### 1.1 Core Business Purpose
-Step 3 defines how a product is **purchased**, **sold**, and **counted** in inventory stock ledgers. It bridges supplier receiving (purchase units), internal warehouse counting (base stock units), POS cashier checkout (selling units), and online ordering.
+Step 4 defines how a product is **purchased**, **sold**, and **counted** in inventory stock ledgers. It bridges supplier receiving (purchase units), internal warehouse counting (base stock units), POS cashier checkout (selling units), and online ordering.
 
 ### 1.2 Supported Unit Models
-Step 3 supports two distinct Unit Models:
+Step 4 supports two distinct Unit Models:
 1. **Single Unit Only (`SINGLE_UNIT`)**: The product is bought, sold, and inventoried using one single Unit of Measure (UOM) (e.g. Piece, Each, Kilogram). No conversion multipliers are applied.
 2. **Multiple Units & Pack Conversion (`MULTIPLE_UNITS`)**: The product has a multi-tier package hierarchy (e.g. Base Unit = Piece, Purchase Unit = Pack of 6 Pieces, Outer Pack Unit = Carton of 12 Packs / 72 Pieces).
 
@@ -28,37 +34,37 @@ Step 3 supports two distinct Unit Models:
 
 ### 2.1 Applicability Rules
 1. **SIMPLE Product + Track Inventory ON (`is_stock_tracked = true`)**:
-   - Step 3 is **REQUIRED**.
-   - Step 4 (`Product Configuration`) is **NOT_APPLICABLE** (bypassed).
-   - Save & Continue from Step 3 targets **Step 5** (`Barcode & SKU`).
+   - Step 4 is **REQUIRED**.
+   - Step 5 matrix/config is **NOT_APPLICABLE**; Step 5 **identifier section** is still the sellable-identity home (standalone Barcode & SKU superseded).
+   - Save & Continue from Step 4 targets **Step 5** (`Product Configuration` — identifiers).
 2. **VARIANT Product + Track Inventory ON (`is_stock_tracked = true`)**:
-   - Step 3 is **REQUIRED** at Parent Product level. All variants inherit the parent unit configuration.
-   - Step 4 (`Product Configuration`) is **REQUIRED** (Variant options & matrix generation).
-   - Save & Continue from Step 3 targets **Step 4**.
+   - Step 4 is **REQUIRED** at Parent Product level. All variants inherit the parent unit configuration.
+   - Step 5 (`Product Configuration`) is **REQUIRED** (Variant options & matrix + identifier section).
+   - Save & Continue from Step 4 targets **Step 5**.
 3. **SIMPLE Product + Track Inventory OFF (`is_stock_tracked = false`)**:
-   - Step 3 is **NOT_APPLICABLE** (auto-bypassed).
    - Step 4 is **NOT_APPLICABLE** (auto-bypassed).
-   - Save & Continue from Step 2 targets **Step 5** (`Barcode & SKU`).
+   - Step 5 matrix is **NOT_APPLICABLE**; identifier section still applies.
+   - Save & Continue from Step 3 targets **Step 5** (`Product Configuration` — identifiers).
 4. **VARIANT Product + Track Inventory OFF (`is_stock_tracked = false`)**:
-   - Step 3 is **NOT_APPLICABLE** (auto-bypassed).
-   - Step 4 is **REQUIRED** (Variant options & matrix generation).
-   - Save & Continue from Step 2 targets **Step 4**.
+   - Step 4 is **NOT_APPLICABLE** (auto-bypassed).
+   - Step 5 is **REQUIRED** (Variant options & matrix + identifiers).
+   - Save & Continue from Step 3 targets **Step 5**.
 5. **BUNDLE / Kit Product (`product_structure = BUNDLE`)** — **RELEASE 1 CANONICAL RULE**:
    - Release 1 Bundle parents own **no physical stock**, use **component-based inventory**, and have **no parent stock UOM**.
    - Parent tracking flags are forced `false` (`is_stock_tracked = false`, `requires_batch_tracking = false`, `requires_expiry_tracking = false`, `requires_serial_tracking = false`).
-   - Step 3 is **NOT_APPLICABLE / AUTO_COMPLETED** for Bundle parents. No parent pack conversions exist in Release 1.
-   - Step 4 (`Product Configuration`) is **REQUIRED** (Kit component assembly).
-   - Save & Continue from Step 2 targets **Step 4**.
+   - Step 4 is **NOT_APPLICABLE / AUTO_COMPLETED** for Bundle parents. No parent pack conversions exist in Release 1.
+   - Step 5 (`Product Configuration`) is **REQUIRED** (Kit component assembly + identifiers).
+   - Save & Continue from Step 3 targets **Step 5**.
 
 ### 2.2 Canonical Applicability & Navigation Matrix Table
 
-| Product Structure (`product_structure`) | Track Inventory (`is_stock_tracked`) | Step 3 Status | Step 4 Status | Save & Continue Target from Step 2 | Save & Continue Target from Step 3 |
+| Product Structure (`product_structure`) | Track Inventory (`is_stock_tracked`) | Step 4 Status | Step 5 Status | Save & Continue Target from Step 3 | Save & Continue Target from Step 4 |
 |---|---|---|---|---|---|
-| `SIMPLE` | `true` (ON) | **REQUIRED** | `NOT_APPLICABLE` (Skipped) | **Step 3** | **Step 5** (Barcode & SKU) |
-| `VARIANT` | `true` (ON) | **REQUIRED** | `REQUIRED` | **Step 3** | **Step 4** (Product Configuration) |
-| `BUNDLE` | `false` (Forced) | **NOT_APPLICABLE** | `REQUIRED` | **Step 4** (Product Configuration) | N/A (Step 3 auto-bypassed) |
-| `SIMPLE` | `false` (OFF) | **NOT_APPLICABLE** | `NOT_APPLICABLE` (Skipped) | **Step 5** (Barcode & SKU) | N/A (Step 3 auto-bypassed) |
-| `VARIANT` | `false` (OFF) | **NOT_APPLICABLE** | `REQUIRED` | **Step 4** (Product Configuration) | N/A (Step 3 auto-bypassed) |
+| `SIMPLE` | `true` (ON) | **REQUIRED** | Matrix N/A; identifiers required | **Step 4** | **Step 5** (Product Configuration) |
+| `VARIANT` | `true` (ON) | **REQUIRED** | **REQUIRED** | **Step 4** | **Step 5** (Product Configuration) |
+| `BUNDLE` | `false` (Forced) | **NOT_APPLICABLE** | **REQUIRED** | **Step 5** (Product Configuration) | N/A (Step 4 auto-bypassed) |
+| `SIMPLE` | `false` (OFF) | **NOT_APPLICABLE** | Matrix N/A; identifiers required | **Step 5** (Product Configuration) | N/A (Step 4 auto-bypassed) |
+| `VARIANT` | `false` (OFF) | **NOT_APPLICABLE** | **REQUIRED** | **Step 5** (Product Configuration) | N/A (Step 4 auto-bypassed) |
 
 > [!IMPORTANT]
 > **Backend Navigation Resolver Authority**: Frontend MUST NOT determine step navigation or bypass logic independently using `currentStep + 1`. The backend API response from `Save & Continue` evaluates product structure and inventory tracking to return the authoritative `targetSetupStep`.
@@ -68,7 +74,7 @@ Step 3 supports two distinct Unit Models:
 ## 3. Variant Unit Inheritance Contract
 
 ### 3.1 Parent-Level Single Source of Truth
-- Unit configuration is defined **ONCE** at the Parent Product level in Step 3 (`product_unit_settings` where `product_id = ProductId`, `product_variant_id = NULL`).
+- Unit configuration is defined **ONCE** at the Parent Product level in Step 4 (`product_unit_settings` where `product_id = ProductId`, `product_variant_id = NULL`).
 - All generated variants inherit the exact same Unit Model (`SINGLE_UNIT` or `MULTIPLE_UNITS`) and conversion factors.
 - Physical inventory ledgers (`inventory_balances`, `stock_movements`, `product_batches`, `serial_numbers`) reference the exact `product_variant_id` and maintain stock in the shared **Base Unit** (`product_variants.stock_uom_id = base_uom_id`).
 - Default variant sales UOM maps to `product_variants.sales_uom_id = selling_uom_id`.
@@ -79,7 +85,7 @@ Step 3 supports two distinct Unit Models:
 ## 4. Selling Unit Conversion Rule (BLOCKER RESOLVED)
 
 ### 4.1 UI Input Surface Boundary
-Step 3 provides input fields for:
+Step 4 provides input fields for:
 - Base Unit
 - Selling Unit
 - Purchase Unit
@@ -87,7 +93,7 @@ Step 3 provides input fields for:
 - Outer Pack Unit (Optional)
 - Purchase Units per Outer Pack (Conditional)
 
-Step 3 does **NOT** expose a separate "Items per Selling Unit" text field.
+Step 4 does **NOT** expose a separate "Items per Selling Unit" text field.
 
 ### 4.2 Canonical Selling Unit Constraint
 To ensure deterministic conversion to Base Unit without guessing unconfigured multipliers:
@@ -256,11 +262,11 @@ CREATE INDEX idx_product_unit_conversions_tenant_product ON product_unit_convers
 - Server persistence clears inactive multi-unit fields: `outer_pack_uom_id`, `items_per_purchase_unit`, `purchase_units_per_outer_pack` are set to `NULL`.
 - `product_unit_conversions` non-base rows are marked `DELETED`.
 
-### 10.2 Track Inventory Toggle (`ON` $\rightarrow$ `OFF` in Step 2)
+### 10.2 Track Inventory Toggle (`ON` $\rightarrow$ `OFF` in Step 3)
 - `product_inventory_settings.is_stock_tracked` = `false`.
-- Step 3 status becomes `NOT_APPLICABLE` (auto-bypassed).
+- Step 4 status becomes `NOT_APPLICABLE` (auto-bypassed).
 - Existing `product_unit_settings` remains preserved in DB, but ignored by stock ledger calculations.
-- Re-enabling Track Inventory restores previously configured Step 3 settings.
+- Re-enabling Track Inventory restores previously configured Step 4 settings.
 
 ---
 
@@ -492,7 +498,7 @@ Top-level HTTP status codes and standardized error response envelope:
 
 ## 19. Non-Functional & Security Requirements
 
-1. **Transaction Atomicity**: Updating Step 3 executes inside a single PostgreSQL transaction covering `products`, `product_unit_settings`, `product_unit_conversions`, `product_inventory_settings`, and `audit_logs`.
+1. **Transaction Atomicity**: Updating Step 4 executes inside a single PostgreSQL transaction covering `products`, `product_unit_settings`, `product_unit_conversions`, `product_inventory_settings`, and `audit_logs`.
 2. **Decimal Math Safety**: C# `decimal` and PostgreSQL `numeric(18,4)` ONLY. IEEE `float`/`double` are forbidden.
 3. **Tenant Isolation**: All queries enforce `WHERE tenant_id = @CurrentTenantId`.
 4. **Idempotency**: Executing identical Save Draft or Save & Continue requests repeatedly produces deterministic results.
@@ -503,7 +509,7 @@ Top-level HTTP status codes and standardized error response envelope:
 ## 20. Backend Implementation Gap Analysis (READ ONLY FINDINGS)
 
 1. **Missing DB Tables**: `product_unit_settings` and `product_unit_conversions` missing in EF models and migrations.
-2. **Missing DTO Fields**: `SaveProductDraftRequest`, `SaveProductDraftCommand`, `ProductDraftResponse`, `ProductSetupWizardDto` lack Step 3 unit attributes and `unitConversions` array.
+2. **Missing DTO Fields**: `SaveProductDraftRequest`, `SaveProductDraftCommand`, `ProductDraftResponse`, `ProductSetupWizardDto` lack Step 4 unit attributes and `unitConversions` array.
 3. **Missing Validators**: `TenantAdminProductRequestValidator` lacks `ValidateUnitsPackConversionDraft` and `ValidateUnitsPackConversionContinue`.
 4. **Missing Processor**: `TenantAdminProductRepository` lacks `UnitsPackConversionWizardProcessor`.
 5. **Missing Projection**: `GetSetupAsync` does not project unit settings into wizard DTO.
@@ -522,7 +528,7 @@ Top-level HTTP status codes and standardized error response envelope:
 - `itemsPerPurchaseUnit = 0` $\rightarrow$ returns `400 unit.items_per_purchase_unit_invalid`.
 - `baseUnitId == purchaseUnitId` in `MULTIPLE_UNITS` $\rightarrow$ returns `400 unit.base_and_purchase_must_differ`.
 - `allowDecimalQuantity = false` with fractional multiplier (2.5) $\rightarrow$ returns `400 unit.fractional_conversion_requires_decimal_quantity`.
-- Target Step Resolution: `SIMPLE` + Track Inventory ON $\rightarrow$ `targetSetupStep = 5`. `VARIANT` + Track Inventory ON $\rightarrow$ `targetSetupStep = 4`.
+- Target Step Resolution (from Step 4 Save & Continue): `SIMPLE` + Track Inventory ON → `targetSetupStep = 5`. `VARIANT` + Track Inventory ON → `targetSetupStep = 5`.
 - Concurrency: Mismatched `expectedRowVersion` $\rightarrow$ returns `409 Conflict`.
 - Foreign tenant UOM selection $\rightarrow$ returns `404 unit.uom_not_found`.
 
@@ -547,7 +553,7 @@ The following active canonical documents have been fully synchronized with this 
 8. [[03_Technical_Contract]]
 9. [[Full_Feature_Status_Index]]
 
-## Step 3 SKIP Rule
+## Step 4 SKIP Rule
 For `productStructure = BUNDLE`:
-`Step 3 = NOT_APPLICABLE`.
-A Bundle parent does NOT own physical inventory, thus Step 3 conversions are not supported. Component UOM is derived directly from the selected components during Step 4.
+`Step 4 = NOT_APPLICABLE`.
+A Bundle parent does NOT own physical inventory, thus Step 4 conversions are not supported. Component UOM is derived directly from the selected components during Step 5 Product Configuration.
