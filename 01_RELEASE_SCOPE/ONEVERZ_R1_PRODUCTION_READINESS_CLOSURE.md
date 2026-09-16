@@ -138,10 +138,10 @@ The release audit identified 3 accepted, non-blocking operational limitations:
    - *Description:* 14-day trial periods and monthly subscription collection are administratively managed by Platform Administrators in R1. No automatic credit-card billing daemon or automated destructive tenant lockout is active.
    - *Handling:* Platform Admin operational runbook includes weekly subscription audit and manual status lifecycle management.
    - *Status:* Accepted operational procedure.
-3. **Tenant Admin Phase B Self-Activation Deferred:**
-   - *Description:* Tenant Admin Onboarding is bifurcated into Phase A (Platform Admin tenant provisioning & invitation issuance) and Phase B (Tenant Admin self-activation via token/OTP, password creation, and first login). In R1, Phase A is fully operational and verified (Tenant Admin user created in `INVITED` status, `encrypted_password` is NULL, raw token not stored in database). Phase B self-activation flows remain deferred.
-   - *Handling:* Platform Admin initiates tenant provisioning and issues invitation token; Tenant Admin self-activation is deferred until Phase B rollout.
-   - *Status:* Accepted architectural boundary.
+3. **Tenant Admin Phase B Self-Activation Runtime Verification Closed (TA-BOOT-B4):**
+   - *Description:* Tenant Admin Onboarding is bifurcated into Phase A (Platform Admin tenant provisioning & invitation issuance) and Phase B (Tenant Admin self-activation via token validation, password creation, and first login). Phase A is fully operational, verified, and frozen. Phase B backend API endpoints (`GET /api/tenant-admin/onboarding/setup-token/{token}/validate` and `POST /api/tenant-admin/onboarding/setup-password`) and Flutter activation screens/routes (`/tenant-admin/setup/:setupToken`) are fully implemented, automated-test-verified, and proven via controlled live end-to-end runtime verification (TA-BOOT-B4) covering real invitation email dispatch via Azure Communication Services, secure single-use token validation, password creation, atomic `INVITED → ACTIVE` / `SENT → ACCEPTED` database transition, login, and workspace context loading. Single-use reuse rejection (`INVITE_USED`) and cross-tenant protection are runtime verified.
+   - *Handling:* Platform Admin initiates tenant provisioning and issues invitation token; Tenant Admin completes self-activation independently via secure link.
+   - *Status:* Implementation: IMPLEMENTED; Automated Verification: COMPLETE; Controlled Full E2E: PASS; Phase B: CLOSED / VERIFIED / FROZEN; Tenant Admin Onboarding: FULLY COMPLETE.
 
 *(Note: Prior draft limitation "Customer Storefront Browsing (`online_store`) Excluded" is SUPERSEDED by OS-R1-3A/B/4 reconciliation. Customer Storefront Browsing and Ordering is INCLUDED, IMPLEMENTED, and VERIFIED in R1).*
 

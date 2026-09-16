@@ -1,9 +1,12 @@
 <!-- title: Tenant Admin Product Image Manager Readiness Audit -->
 <!-- status: Active -->
 <!-- system: OneVerz POS Unified Commerce Scope -->
-<!-- last_updated: 2026-08-08 -->
+<!-- last_updated: 2026-09-12 -->
 
 # Tenant Admin Product Image Manager Readiness Audit
+
+> **HISTORICAL IMPLEMENTATION EVIDENCE — PRE-SCANNER-FIRST NUMBERING.**  
+> Image Manager on Add Product “Step 1” below = **CURRENT Step 2 Basic Details**. Scanner-first Step 1 is Scan Barcode (PRE-DRAFT). Authority: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]], [[../../04_MODULE_KNOWLEDGE/11_Product_Media_Attributes_Channel_Visibility/Tenant_Admin_Product_Image_Manager_Specification]].
 
 ## 1. Source Files Inspected
 - Flutter Frontend:

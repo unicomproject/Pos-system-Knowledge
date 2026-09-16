@@ -1,8 +1,26 @@
 <!-- title: Flutter Online Order Click & Collect Fulfilment -->
 <!-- status: OO-01 accepted; OO-02 Flutter implemented / authenticated production acceptance pending -->
-<!-- last_updated: 2026-08-31 -->
+<!-- last_updated: 2026-09-08 -->
 
 # Flutter Online Order Click & Collect Fulfilment
+
+## Realtime cashier refresh (2026-09-09)
+
+Canonical staff place event `ecommerce.order_placed.staff` arrives on `/ws/notifications` via `NotificationSocketClient` → `NotificationInboxController`.
+
+Fan-out (debounced authoritative refetch only):
+
+1. Refresh tenant `notificationInboxProvider` (existing).
+2. Invalidate `posNotificationsProvider` so the POS bell unread/list refetches `GET /api/v1/pos/notifications`.
+3. When the event is Ecommerce order-related, call `posOnlineOrdersProvider.notifier.refreshFromRealtime()` preserving search/filter/page; list API remains outlet-scoped.
+
+Reconnect (`onConnected`) and app resume also call the same authoritative refresh. Manual refresh remains valid. Live device acceptance: Chunk 2 tracker.
+
+## OO-06 canonicalization update (2026-09-09)
+
+Extend existing lib/features/fulfilment_pickup/presentation/screens/ready_for_collection_screen.dart, currently hosted by the picking route. No new Ready feature root, header, footer or order-details screen. Reuse OO05 patterns, add informational What's Next and real Notify only after backend gap closure. Canonical 1280×800 target has no page/internal scroll; 1180×820 and 1100×700 plus orange/pink theme and accessibility remain pending runtime tests.
+
+Current OO06 authority: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO06_Canonicalization_Status_2026-09-09]]. This scoped update supersedes older conflicting Ready/notification wording, not unrelated history.
 
 ## Scope and authority
 
@@ -85,11 +103,28 @@ shared blurred modal helpers and shared primary/secondary action controls.
 The existing owner is `lib/features/fulfilment_pickup/`: picking route/screen,
 `presentation/widgets/picking/` widgets, `pos_online_orders_provider.dart`, the shared online-order
 entity/repository and remote datasource. Backend Chunk 2 now implements picking
-GET, scan/manual pick and issue routes. Flutter remains **PARTIAL scaffolding**
-because current mutation payloads omit `expectedVersion` and do not consume the
-backend-authoritative `canPack`/updated version contract.
+GET, scan/manual pick and issue routes. The OO-04 overview implementation now
+sends `expectedVersion`, consumes backend `canPack`/updated version and has the
+automated evidence recorded in its tracker.
 
-Chunk 3 must reuse POS shell, backend ThemeData, shared actions, status/state,
+**OO-04B â€” Pick Item / Barcode Verification** is the newly canonicalized
+selected-line screen inside this same feature, not a new feature root or journey
+stage. Current overview/dialog picking does not prove that dedicated screen is
+implemented. Selecting one product must route to OO-04B for that exact line;
+scanner/manual input verifies the selected line only, while explicit Mark as
+Picked performs the existing backend mutation. Barcode capture alone cannot
+persist a pick. OO-04B Chunk 2 is complete: the existing backend family is reused
+and scan/manual now enforce the same selected-line barcode contract. Its
+dedicated Flutter route/screen is implemented. Chunk 3 automated runner and
+authenticated Development runtime acceptance remain pending.
+
+**Frontend barcode authority:** Flutter never substitutes the live catalogue
+barcode for order-line `barcode_snapshot`. OO-04B maps
+`online_orders.invalid_barcode` and
+`online_orders.barcode_snapshot_unavailable` to safe cashier messages; it does
+not invent pick success or perform catalogue lookup during pick.
+
+OO-04B Chunk 3 must reuse POS shell, backend ThemeData, shared actions, status/state,
 image/progress/modal/scanner patterns and design tokens. Permission-filter scan,
 manual and issue controls before layout. Wide layout uses item-list left and
 progress/actions right with bounded item-list scrolling; portrait/phone stack
@@ -105,6 +140,28 @@ Detail. Pick, issue and note requests must send the latest positive `fulfillment
 Accessibility requires semantic actions, 44px targets, text-and-colour state,
 logical focus, text scaling and image fallbacks. Full contract:
 [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
+
+## OO-05 Review & Pack Flutter ownership (2026-09-08)
+
+Canonical screen: **OO-05 — Review & Pack**. Feature owner remains
+`lib/features/fulfilment_pickup/`. Existing evidence:
+`presentation/screens/review_pack_screen.dart` (hosted from picking route when
+`canPack` / packed statuses). Do not create `review_pack` or `online_orders`
+feature roots.
+
+| Concern | Contract |
+|---|---|
+| Entry | Backend `canPack` only; all-picked ≠ Ready |
+| Review GET | REUSE picking GET |
+| Mutations | Pack then Ready — separate CTAs and permissions |
+| Notes | Optional packing notes; 200-character validation implemented in current OO05 source |
+| Reuse | Prefer OO-04 metrics, progress ring, `PickingItemCard`, shared actions |
+| Tablet 1280×800 | Whole-page scroll NONE; internal target scroll NONE (Chunk 3 must fix current side `SingleChildScrollView`) |
+| Backend | Pack/Ready APIs implemented; OO06 READY GET and Notify wiring remain separate gaps |
+
+Full FR/BR/API/DB/chunk contract:
+[[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO05_Canonicalization_Status_2026-09-08]].
+
 - Opening reuses current `PosOnlineOrderDetail`; a fresh GET is required only for normal detail load or conflict refresh.
 - Shared owners: `showAppDialog`, `showAppModalBottomSheet`, `PosPrimaryActionButton`, `PosBottomOutlinedButton`, runtime `ThemeData` and canonical typography/spacing/radius. The summary composition remains FEATURE-LOCAL.
 - Required facts: order, customer, collection outlet, collect-by plus remaining/overdue derived from response `serverTime`, item count and unit count. No mock values, full picking lines or client-authoritative version are permitted.

@@ -1,9 +1,13 @@
 # Online Orders OO-01 — Canonicalization Status
 
-**Updated:** 2026-08-28  
+**Updated:** 2026-09-09  
 **Journey:** `POS-UJ-036`  
 **Scope:** Chunks 1–3 — Second Brain, backend contract and Flutter OO-01  
 **Status:** COMPLETE — implementation, static validation and authenticated runtime acceptance passed
+
+## Realtime list refresh (2026-09-09 Chunk 1)
+
+OO-01 list previously refreshed only on screen open / local fulfilment mutations. Chunk 1 wires `ecommerce.order_placed.staff` (and related Ecommerce order event types) through `NotificationInboxController` → `posOnlineOrdersProvider.refreshFromRealtime()` without resetting search/filter/page and without inserting raw socket DTOs. Bell ownership: `posNotificationsProvider`. Tracker: [[Online_Order_Realtime_Cashier_Refresh_Chunk1_2026-09-09]]. Live runtime proof deferred to Chunk 2.
 
 ## Layer status
 

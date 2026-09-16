@@ -1,18 +1,19 @@
 <!-- title: Tenant Admin Product Image Manager Implementation Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS Unified Commerce Scope -->
-<!-- last_updated: 2026-08-08 -->
+<!-- last_updated: 2026-09-12 -->
+<!-- note: Image manager owns Step 2 Basic Details after scanner-first renumbering; Step 1 is Scan Barcode -->
 
 # Tenant Admin Product Image Manager Implementation Specification
 
 ## 1. Overview & Architectural Purpose
 
-This specification defines the canonical UI/UX, state management, API lifecycle, authorization, database mapping, and technical contracts for the **Product Image Manager** in the **Tenant Admin Add Product Wizard (Step 1)**.
+This specification defines the canonical UI/UX, state management, API lifecycle, authorization, database mapping, and technical contracts for the **Product Image Manager** in the **Tenant Admin Add Product Wizard (Step 2 Basic Details)**.
 
 It replaces the legacy permanently expanded, large inline image drop-zone gallery (Reference Image 2 style) with the approved **Reference Image 1** compact interaction pattern:
 
-- **Step 1 View**: A compact **Product Image upload card** containing the primary action button `"Upload Product Image"`.
-- **Panel Overlay / Slide-out**: Clicking `"Upload Product Image"` opens a compact, floating/overlay **Product Images Manager** panel alongside the Step 1 form without navigating away from the wizard or resetting form state.
+- **Step 2 View**: A compact **Product Image upload card** containing the primary action button `"Upload Product Image"`.
+- **Panel Overlay / Slide-out**: Clicking `"Upload Product Image"` opens a compact, floating/overlay **Product Images Manager** panel alongside the Step 2 Basic Details form without navigating away from the wizard or resetting form state.
 - **Image Staging & Persistence**: Images uploaded during a fresh Add Product wizard session are safely staged or linked to a draft product transactionally.
 - **Canonical Terminology**: All UI and backend references use **Primary Image** (legacy term `Cover` is deprecated).
 
@@ -20,8 +21,8 @@ It replaces the legacy permanently expanded, large inline image drop-zone galler
 
 ## 2. Canonical Target UI & Interaction Flow
 
-### 2.1 Step 1 Normal View (Compact Card)
-The Add Product Step 1 main form displays:
+### 2.1 Step 2 Normal View (Compact Card)
+The Add Product Step 2 Basic Details main form displays:
 - Left Column: Product Name, Short Name / Internal Code, Category, Brand, Short Description, Long Description.
 - Right Column: Status & Options Card (Top) and **Product Image Upload Card** (Bottom).
 - Product Image Upload Card Details:
@@ -31,12 +32,12 @@ The Add Product Step 1 main form displays:
   - Thumbnail Preview Strip: If images exist, displays up to 3 compact 40x40px round-corner thumbnails with a small `Primary` indicator badge on the first image.
 
 > [!NOTE]
-> The main Step 1 form MUST NOT permanently render the legacy expanded black drop-zone gallery or empty grid tiles.
+> The main Step 2 form MUST NOT permanently render the legacy expanded black drop-zone gallery or empty grid tiles.
 
 ### 2.2 Upload Product Image Click Behaviour
 Clicking `Upload Product Image`:
 1. Opens the **Product Images Manager** overlay/slide-out panel.
-2. The main Step 1 form remains visible underneath/beside the panel.
+2. The main Step 2 form remains visible underneath/beside the panel.
 3. No route navigation occurs (`/tenant-admin/products/add` route is preserved).
 4. Unsaved wizard form fields (Product Name, Category, etc.) are strictly preserved in Riverpod state.
 
@@ -46,7 +47,7 @@ Clicking `Upload Product Image`:
 
 ### 3.1 Panel Layout & Header
 - **Title**: `Product Images`
-- **Close Button**: `X` icon on top-right. Clicking `X` closes only the panel overlay and returns focus to the Step 1 upload card.
+- **Close Button**: `X` icon on top-right. Clicking `X` closes only the panel overlay and returns focus to the Step 2 upload card.
 - **Image Counter**: Displays `N / 10` (e.g., `0 / 10`, `5 / 10`). Maximum allowed images: **10**.
 - **Helper Instruction**: `Drag & drop to reorder images`.
 
@@ -91,7 +92,7 @@ The panel renders a compact grid of image tiles (maximum 10 items):
 | **IMG-BR-008** | Primary Deletion Rule | If the Primary image is deleted, the system automatically designates the next remaining image (lowest `sort_order`) as the new Primary image. |
 | **IMG-BR-009** | Atomic Replacement Safety | Failed image replacements restore the previous valid image state without partial data loss or broken image URLs. |
 | **IMG-BR-010** | Staging Cleanup | Unlinked media assets staged during abandoned Add Product wizard sessions are soft-deleted or cleaned via background job after 24 hours. |
-| **IMG-BR-011** | Wizard State Isolation | Opening or closing the Product Images Manager panel MUST NOT mutate or discard unrelated Step 1 fields (Product Name, Category, etc.). |
+| **IMG-BR-011** | Wizard State Isolation | Opening or closing the Product Images Manager panel MUST NOT mutate or discard unrelated Step 2 Basic Details fields (Product Name, Category, etc.). |
 
 ---
 
@@ -236,14 +237,14 @@ When the merchant creates a **fresh product** (`productId` is NULL):
 ### 9.1 File Structure & Component Composition
 ```text
 lib/features/tenant_admin/products/presentation/widgets/
-├── product_image_upload_card.dart     [NEW] Step 1 compact upload card
+├── product_image_upload_card.dart     [NEW] Step 2 compact upload card
 ├── product_images_manager_panel.dart  [NEW] Overlay / slide-out panel
 ├── product_image_tile.dart            [NEW] Grid item thumbnail & actions
 └── product_image_guidelines_card.dart [NEW] Guideline info widget
 ```
 
 ### 9.2 State Machine States
-1. `IDLE`: Normal Step 1 compact card.
+1. `IDLE`: Normal Step 2 compact card.
 2. `MANAGER_OPEN`: Floating panel open; user interacting with grid.
 3. `UPLOADING`: Progress indicator on tile / upload button.
 4. `ERROR`: Validation error banner shown inside panel; previous state intact.

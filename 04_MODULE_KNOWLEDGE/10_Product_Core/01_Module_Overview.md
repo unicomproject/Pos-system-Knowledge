@@ -1,7 +1,8 @@
 <!-- title: Product Core Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-09-01 -->
+<!-- last_updated: 2026-09-11 -->
+<!-- supersedes: initial_tracking_step2_numbering_pre_scanner_first -->
 
 # Product Core Module Overview
 
@@ -31,7 +32,8 @@ merchandising, attractions, and temporary retail locations.
 | `products` | Stores parent product records, setup steps, status, and audit parameters. |
 | `product_variants` | Stores sellable variant details, SKU, and barcode links. |
 | `product_import_batches` | Stores metadata for CSV product import runs. |
-| `product_setup_initial_tracking` | 1:1 draft for Initial Tracking Details (collected on Step 2). |
+| `product_setup_initial_tracking` | **EXISTING** 1:1 draft for Initial Tracking Details (collected on CURRENT Step 3). Migration: `20260824095742_AddProductSetupInitialTracking`. Not scanner-first B1. |
+| `product_setup_scan_context` | **IMPLEMENTED IN BACKEND SOURCE** — 1:1 draft for Step 1 Scan Barcode acquisition/bootstrap context. Migration `20260912085454_AddProductSetupScannerIdentifierContext`; local test DB applied; prod/shared apply not claimed. ≠ B8 bootstrap. |
 
 ## Core Business Rules
 
@@ -40,7 +42,7 @@ merchandising, attractions, and temporary retail locations.
 - Variants carry sellable identity; price and stock remain separate modules.
 - Inactive products cannot be sold through POS or online store.
 - POS may cache product reference data, but backend remains final authority.
-- Add Product Step 2 may collect optional Initial Tracking Details (Batch Number, Expiry Date, Serial Number) after Product Type is selected. Those values are provisional wizard input. Tracking policy remains Step 2 (`product_inventory_settings`). Actual identity is created at Step 7 Publish into `product_batches` / `serial_numbers`. Product Setup must not invent stock quantity.
+- Add Product Step 3 may collect optional Initial Tracking Details (Batch Number, Expiry Date, Serial Number) after Product Type is selected. Those values are provisional wizard input. Tracking policy remains Step 3 (`product_inventory_settings`). Actual identity is created at Step 7 Publish into `product_batches` / `serial_numbers`. Product Setup must not invent stock quantity. Step 1 is Scan Barcode (acquisition); final SKU/barcode assignment is Step 5 Product Configuration identifier section (standalone Barcode & SKU superseded). See [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].
 
 ### Bundle / Kit Core Domain Rules
 - Bundle / Kit is defined as one sellable parent Product, one parent SKU, one parent Barcode, one Bundle selling price, and multiple existing Product / exact Variant components.

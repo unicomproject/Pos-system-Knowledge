@@ -1,9 +1,11 @@
 <!-- title: Tenant Admin Add Product Step 1 Initial Tracking Details Second Brain Alignment Audit -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-12 -->
 
 # Tenant Admin Add Product Step 1 Initial Tracking Details Second Brain Alignment Audit
+
+> **HISTORICAL EVIDENCE ONLY (2026-08-24).** After scanner-first remumber (2026-09-11), Basic Details is global Step 2 and Initial Tracking collection is global **Step 3**. Do not implement from the Step 1/Step 2 numbering below. Authority: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]], [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_TECHNICAL_CONTRACT_DECISION_2026-09-12]].
 
 ## 1. Executive Summary
 

@@ -1,8 +1,24 @@
 <!-- title: Fulfilment & Pickup / Click & Collect Technical Contract -->
 <!-- status: Canonicalized - OO-01/OO-02/OO-03 implemented; later operations tracked separately -->
-<!-- last_updated: 2026-09-01 -->
+<!-- last_updated: 2026-09-08 -->
 
 # Fulfilment & Pickup / Click & Collect Technical Contract
+
+## Ecommerce order → cashier realtime refresh (2026-09-09)
+
+After successful storefront confirm commit, `StorefrontCheckoutService` creates customer `ecommerce.order_placed` (IN_APP) and per-staff `ecommerce.order_placed.staff` via `NotificationService` / `ECommerceOrderNotificationFactory.OrderPlacedForStaff`. Realtime PUSH delivers to connected `TenantUser` sockets on `/ws/notifications` (tenant-user registry; staff fan-out is tenant-wide active TENANT_ADMIN/CASHIER). Payload carries event code, title, body, actionUrl, sourceReferenceId — not a full order DTO. POS clients must invalidate/refetch authoritative Online Orders and POS notification APIs; list outlet scoping remains on the GET orders query. See [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Realtime_Cashier_Refresh_Chunk1_2026-09-09]].
+
+## OO-06 canonicalization update (2026-09-09)
+
+Chunk 2 implemented: GET /api/v1/tenant/ecommerce/click-collect/orders/{orderId}/picking?outletId={outletId} accepts PICKING/PACKED/READY, with authoritative nonterminal lifecycle validation. READY requires orders.access + orders.view + collection.view_ready (commerce.online_order prefix); other accepted states retain picking.view. Projection exposes SalesOrderStatus, FulfillmentStatus, PickupStatus, ReadyAt, CollectedAt, collection window/timezone, ServerTime, canceled-adjusted units, pending/issue metrics and existing IN_APP notification status. No DB-derived duplicate fields.
+
+POST /api/v1/tenant/ecommerce/click-collect/orders/{orderId}/notify-ready?outletId={outletId} is owned by ClickCollectOrdersController. No body. Requires the READY read permissions plus commerce.online_order.collection.notify_customer, entitlement and tenant/outlet scope. PosOnlineOrderReadyService uses shared NotificationService / ECommerceOrderNotificationFactory, event ecommerce.order_ready_for_collection, customer IN_APP only. Authoritative active CustomerId comes from scoped SalesOrder, never the client. No template key is added; existing factory content is reused.
+
+Notification transaction serializes PostgreSQL order/fulfillment/pickup rows, reloads state and reuses uppercase ECOM-ORDER-READY-{orderId:N}. Existing event/message/inbox are returned for duplicates; 409 conflicts retry the same logical event. No resend or external exactly-once guarantee. Failures return safe 503, missing recipient 400, lifecycle conflict 409, retaining existing envelope and scope errors. Notify never changes READY, ReadyAt, quantities, row version or CollectedAt; customer tracking is notification-independent.
+
+Build and 125 focused test executions passed, including real local PostgreSQL concurrent notification and unchanged READY assertions. Authenticated live HTTP/device acceptance was not executed. No schema/migration or Flutter changes. See [Chunk 2 evidence](../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO06_Backend_Chunk2_2026-09-09.md).
+
+Current OO06 authority: [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO06_Canonicalization_Status_2026-09-09]]. This scoped update supersedes older conflicting Ready/notification wording, not unrelated history.
 
 ## Ownership
 
@@ -20,8 +36,8 @@ Base: `/api/v1/tenant/ecommerce/click-collect`. Every operation below is **canon
 | GET | `/orders/{orderId}/picking` | `.picking.view` | Picking detail |
 | POST | `/orders/{orderId}/picking/lines/{lineId}/pick` | `.picking.pick` plus scan/manual capability | Barcode/quantity pick |
 | POST | `/orders/{orderId}/picking/lines/{lineId}/issues` | `.picking.report_issue` | Cannot-find issue event only |
-| POST | `/orders/{orderId}/pack` | `.packing.pack` | Validate and create package(s) |
-| POST | `/orders/{orderId}/ready` | `.collection.mark_ready` | Validate ready and notify |
+| POST | `/orders/{orderId}/pack` | `.packing.pack` | Validate and create package(s) / finalize packed quantities |
+| POST | `/orders/{orderId}/ready` | `.collection.mark_ready` | Validate and commit Ready; notification is separate |
 | GET | `/collection/ready` | `.collection.view_ready` | Outlet ready queue |
 | POST | `/collection/qr/validate` | `.collection.scan_qr` + `.collection.validate_qr` | Server QR validation |
 | GET | `/collection/lookup` | `.collection.manual_lookup` | Manual fallback lookup |
@@ -29,6 +45,28 @@ Base: `/api/v1/tenant/ecommerce/click-collect`. Every operation below is **canon
 | POST | `/orders/{orderId}/collection/handover` | `.collection.handover` + `.collection.collect` | Idempotent finalization |
 
 All permission suffixes use the `commerce.online_order` prefix. `PATCH /orders/{orderId}/status` is not the primary cashier contract. If retained, restrict it to safe/internal compatibility and prevent transition bypass.
+
+## OO-05 Review & Pack API classification (2026-09-08)
+
+Tracker:
+[[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO05_Canonicalization_Status_2026-09-08]].
+
+| Capability | Route | Classification | Notes |
+|---|---|---|---|
+| Review state | `GET /orders/{orderId}/picking` | **REUSE** | Includes `canPack`, lines (`packedQuantity`), progress, version; readable while `PICKING` or `PACKED` |
+| Pack | `POST /orders/{orderId}/pack` | **IMPLEMENTED** | ClickCollect family; body `{ expectedVersion, packingNote? }`; FO → `PACKED` |
+| Ready | `POST /orders/{orderId}/ready` | **IMPLEMENTED** | ClickCollect family; body `{ expectedVersion }`; FO → `READY`, sales → `READY_FOR_COLLECTION`, pickup → `READY` |
+| Packing note | Optional on Pack body | **IMPLEMENTED** | Persisted on Pack event `event_note`; server max **200**; no dedicated column |
+| Packages tables | `fulfillment_packages*` | **DEFERRED** | Not required for OO-05 MVP; use line `packed_quantity` + header timestamps |
+
+Pack and Ready remain **separate** commands. `FULFILLMENT_PICKING_COMPLETED` /
+`canPack` keep lifecycle `PICKING` until Pack succeeds. Do not conflate Pack into
+a single Ready CTA.
+
+Event vocabulary (implemented): `FULFILLMENT_PACKED`, `FULFILLMENT_READY_FOR_COLLECTION`,
+`PICKUP_READY_FOR_COLLECTION`. Permissions: `packing.view` + `packing.pack` /
+`collection.mark_ready` (plus orders access/view). Concurrency: `FulfillmentOrder.RowVersion`.
+Schema for OO-05: **New table NO; New column NO; Migration NO.**
 
 ## Authorization and failures
 
@@ -142,6 +180,27 @@ code/name, media, server time, current fulfilment version, and at most the lates
 50 saved notes ordered oldest-to-newest. Notes never alter quantity, lifecycle or
 pack eligibility. Full decision matrix:
 [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
+
+### OO-04B selected-line capability boundary (2026-09-08)
+
+OO-04B is a Flutter selected-line composition, not a new backend resource. It
+reuses Picking Detail and the existing line pick command. Barcode capture never
+mutates by itself: `SCAN` or `MANUAL` input is verified for the route-selected
+line, then explicit submission sends the existing
+`PosOnlineOrderPickLineRequest { Quantity, Barcode, InputMethod,
+ExpectedVersion }`. `orderId`, `lineId` and `outletId` remain route/query scope;
+tenant and actor come from authentication. The complete screen contract and
+Chunk 2 verification boundary are owned by the linked OO-04 tracker. New
+controller, endpoint family, table, column, migration and permission are **NO**.
+
+**OO-04B barcode authority (2026-09-08):** verification compares the entered /
+scanned barcode only to `SalesOrderLine.BarcodeSnapshot` (immutable order-time
+primary barcode captured at Click & Collect confirm /
+`CreateForClickAndCollect`). Current catalogue `product_barcodes` is **not**
+pick-time authority. If a barcode-pickable line unexpectedly has NULL
+`barcode_snapshot`, the pick mutation returns
+`online_orders.barcode_snapshot_unavailable` with zero quantity / version /
+event mutation. A wrong barcode still returns `online_orders.invalid_barcode`.
 
 
 - [[../../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]]

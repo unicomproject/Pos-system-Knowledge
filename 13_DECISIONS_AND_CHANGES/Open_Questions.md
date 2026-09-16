@@ -76,12 +76,12 @@ and wider transport policy remain open.
 
 | ID | Question | Why required | Current safe position | Owner/status |
 |---|---|---|---|---|
-| PRODUCT-TRACK-001 | Where is VARIANT initial identity assigned? | Parent Product must not own variant inventory | LOCKED: Option 2. Assign at Step 7 via `initialTrackingAssignedVariantId`. Step 4 remains matrix-only. | Product/Inventory — Resolved 2026-08-24 |
+| PRODUCT-TRACK-001 | Where is VARIANT initial identity assigned? | Parent Product must not own variant inventory | LOCKED: Option 2. Assign at Step 7 via `initialTrackingAssignedVariantId`. Step 5 remains matrix + identifier section (FORMER Step 4 matrix-only wording). | Product/Inventory — Resolved 2026-08-24 |
 | PRODUCT-TRACK-002 | Exact `serial_numbers.serial_status` / `product_batches.status` token for identity-without-stock | Publish must not imply received quantity | Do not invent Product-level serial semantics. Map to existing inventory constants; `current_inventory_balance_id` and `received_at` stay NULL until receiving. | Inventory implementation — OPEN mapping, not an ownership blocker |
 | PRODUCT-PERM-001 | Which Product Setup permission namespace is canonical? | Dual `catalog.*` vs `tenant.products.*` is unsafe | LOCKED: `catalog.*` only; one-way map from `tenant.products.*` during compatibility window | Access/Product — Resolved 2026-08-24 |
 | PRODUCT-PERM-002 | Which entitlement codes are runtime vs docs? | Docs mixed `product_catalog` / `product_management` / `inventory_tracking` / `inventory_management` | LOCKED: runtime `product_catalog` + `inventory_tracking`; `product_management` is module_code; `inventory_management` is docs group | Access/Product — Resolved 2026-08-24 |
 | PRODUCT-PERM-003 | Does Initial Tracking require stock.adjust? | Identity without quantity | LOCKED: Product Setup create/update + `inventory_tracking`; never `inventory.stock.adjust` | Access/Inventory — Resolved 2026-08-24 |
-| PRODUCT-TRACK-003 | Which wizard step collects Initial Tracking Details? | Step 1 collection hid Review values when policy stayed OFF | LOCKED: Step 2 after Product Type is selected (SIMPLE / VARIANT; hidden for BUNDLE) | Product/UI — Resolved 2026-09-01 |
+| PRODUCT-TRACK-003 | Which wizard step collects Initial Tracking Details? | Step 1 collection hid Review values when policy stayed OFF | LOCKED 2026-09-01 as Step 2 after Product Type selected; **after scanner-first insertion this is global Step 3** (Product Type & Tracking). Do **not** implement as Step 2 tracking. See [[PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]] and [[PRODUCT_SETUP_SCANNER_FIRST_TECHNICAL_CONTRACT_DECISION_2026-09-12]]. | Product/UI — Resolved 2026-09-01; remapped 2026-09-11 |
 
 Authority: [[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]],
 [[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]].

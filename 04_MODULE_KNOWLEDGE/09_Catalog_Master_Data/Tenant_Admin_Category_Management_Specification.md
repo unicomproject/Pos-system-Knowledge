@@ -111,6 +111,10 @@ No Department fields.
 * **BR-CAT-024:** Product mapping stores canonical `CategoryId` only. Selecting path `A > B > C` persists `C`. Do not auto-map ancestors.
 * **BR-CAT-025 / BR-CAT-DEPTH-001:** Create: `newCategoryLevel <= 5`. Move: `newParentLevel + movedSubtreeRelativeDepth <= 5`. Failed validation = no partial mutation.
 * **BR-CAT-026:** Category Code unique within Tenant (`NormalizeCode` = trim + ToUpperInvariant). 409 `category.duplicate_code`.
+* **BR-CAT-026A:** Product Setup AUTO SKU uses the selected assignable
+  Category's persisted `category_code` as its immutable category token. The
+  backend resolves it by `CategoryId`; SKU generation never abbreviates
+  `category_name`, concatenates ancestors, or trusts a client-submitted code.
 * **BR-CAT-027:** Category Name unique within Tenant (trim; case-insensitive compare). **Tenant-wide, including DELETED.** 409 `category.duplicate_name`.
 * **BR-CAT-028:** Category has **no** Department relationship.
 * **BR-CAT-029:** Inactivating a Category does not delete `product_categories`. The Category cannot be newly selected for Product Setup.

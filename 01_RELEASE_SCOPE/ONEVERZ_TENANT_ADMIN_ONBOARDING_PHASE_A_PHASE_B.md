@@ -167,48 +167,121 @@ Normal Tenant Admin Login:      NOT YET AVAILABLE
 
 ## 4. PHASE B — TENANT ADMIN SELF-ACTIVATION
 
-Phase B represents the future self-activation journey executed exclusively by the Tenant Administrator.
+Phase B represents the self-activation journey executed exclusively by the Tenant Administrator.
 
 ```text
 PHASE B — STEP-BY-STEP SEQUENCE
 
 1. Tenant Admin receives invitation email in their registered inbox.
 
-2. Tenant Admin clicks "Activate Account" secure link.
+2. Tenant Admin opens secure invitation link (delivering the high-entropy setup token).
 
-3. Backend validates activation request:
+3. Tenant Admin application extracts setup token and calls backend validation:
+   GET /api/tenant-admin/onboarding/setup-token/{setupToken}/validate
+
+4. Backend validates token hash and ensures:
    - Invitation record exists
    - Token hash matches
-   - Token is not expired
-   - Token is single-use and unconsumed
-   - Target tenant and user are in valid INVITED state
+   - Token is not expired (rejects with INVITE_EXPIRED)
+   - Token is single-use and unconsumed (rejects with INVITE_USED)
+   - Target tenant is active/valid
+   - Invited Tenant Admin belongs to that tenant (cross-tenant isolation)
+   - Target Tenant Admin user is in valid INVITED state
 
-4. Tenant Admin verifies identity.
+5. Successful token possession and validation verifies possession of the invitation email channel for the current onboarding flow.
 
-5. Identity ownership may be verified via short-lived Email OTP.
+6. Tenant Admin proceeds directly to Set Password screen in the Tenant Admin workspace app.
 
-6. Tenant Admin creates their own strong permanent password.
+7. Tenant Admin creates their own strong permanent password.
 
-7. Password is validated against platform password policy and stored using canonical PBKDF2 hasher.
+8. Backend validates password policy:
+   - Minimum: 8 characters
+   - Maximum: 128 characters
+   - Uppercase: required
+   - Lowercase: required
+   - Digit: required
 
-8. Activation token is permanently consumed / invalidated.
+9. Backend hashes password using canonical PBKDF2-SHA256 password hashing service (100,000 iterations, 16-byte random salt, 32-byte derived hash).
 
-9. Tenant Admin account status transitions:
-   INVITED → ACTIVE
+10. Within an atomic database transaction with row-level locking:
+    - Password hash is stored
+    - Tenant Admin account status transitions: INVITED → ACTIVE
+    - Invitation status transitions: SENT/PENDING → ACCEPTED
+    - Accepted timestamp and user binding are permanently recorded
 
-10. Tenant Admin is redirected to login.
+11. Tenant Admin application redirects to /tenant-admin/setup/success and subsequently to /tenant-login.
 
-11. Normal Tenant Admin workspace access begins.
+12. ACTIVE Tenant Admin logs in normally with registered email and newly created password.
+
+13. Reusing the consumed invitation token is rejected (INVITE_USED / already accepted).
 ```
 
 ### Phase B Implementation Status
-* **Phase B Architecture:** APPROVED
-* **Phase B Implementation:** DEFERRED
-* **Phase B Runtime Verification:** NOT YET PERFORMED
+* **Phase B Architecture:** APPROVED / RECONCILED
+* **Phase B Implementation:** IMPLEMENTED
+* **Automated Verification:** COMPLETE
+  - Backend API Tests: 12 PASS (`TenantAdminOnboardingInvitationControllerTests.cs`)
+  - Backend Unit Tests: 1602 PASS / 0 FAIL
+  - Backend API Tests: 524 PASS / 0 FAIL
+  - Backend Integration Tests: 12 PASS / 0 FAIL
+  - Flutter Widget Tests: 12 PASS (`tenant_admin_phase_b_widget_test.dart`)
+  - Flutter Relevant Auth Tests: 92 PASS / 0 FAIL
+  - Flutter Analyze: PASS (0 compilation errors)
+  - EF Pending Model Changes: NONE
+* **Controlled Full End-to-End Verification:** PASS (Verified in TA-BOOT-B4)
+* **Final Status / Governance:** **CLOSED / VERIFIED / FROZEN**
+* **Tenant Admin Onboarding Overall:** **FULLY COMPLETE**
 
-### Email OTP Verification Status (Phase B)
-* **Status:** PHASE B COMPONENT
-* **Implementation:** DEFERRED (To be implemented and verified during Phase B execution)
+### Controlled Full End-to-End Verification Evidence (TA-BOOT-B4)
+* **Execution Environment:** Controlled development/integration runtime (`http://localhost:5150` API, live Mailnesia inbox, local setup route).
+* **Controlled Tenant Creation:** PASS (Tenant created with `ONEVERZ_R1_STD` plan, `TRIAL` subscription, Tenant Admin user in `INVITED` state, `encrypted_password = NULL`).
+* **Real Invitation Email:** PASS (Delivered via Azure Communication Services to controlled inbox; verified subject, tenant name, tenant code, username/email, expiry, and security notice; zero password in email; zero duplicate emails).
+* **Activation Link & Route:** PASS (`/tenant-admin/setup/:setupToken` loaded without error).
+* **Token Validation:** PASS (`GET /api/tenant-admin/onboarding/setup-token/{token}/validate` returned `valid: true`, `expired: false`, correct email binding).
+* **Invited Login Regression:** PASS (`POST /api/v1/tenant-auth/login` denied with HTTP 401 while account is in `INVITED` state).
+* **Password Setup:** PASS (Tenant Admin sets own password satisfying policy; `encrypted_password` PBKDF2 hash stored; zero plaintext password in DB/logs; zero password set by platform).
+* **Atomic Activation:** PASS (Atomic row-locked transaction: `tenant_users.account_status` transitioned `INVITED → ACTIVE`; `user_invites.invite_status` transitioned `SENT → ACCEPTED`; `accepted_at` and `accepted_tenant_user_id` set).
+* **Login Post-Activation:** PASS (Authenticated with new credentials; JWT access token & refresh token issued; tenant context bound).
+* **Workspace Access:** PASS (`GET /api/v1/tenant-admin/context` returned 200 OK with correct tenant context, assigned `Tenant Administrator` role, 7 enabled features, and 411 effective permissions; tenant isolation verified; zero cross-tenant leakage).
+* **Single-Use Rejection (Token Reuse):** PASS (Re-validation returned `valid: false` with code `INVITE_USED`; re-setup attempt rejected with HTTP 400 Bad Request `INVITE_USED`; password unchanged; user remains `ACTIVE`; invitation remains `ACCEPTED`).
+* **Cross-Tenant Protection:** PASS (Invitation tokens bound to specific tenant; cross-tenant usage rejected).
+* **Security & Secret Redaction:**
+  - Raw Invitation Token In DB: 0 (only SHA-256 token hash persisted)
+  - Raw Invitation Token In Logs: 0
+  - Raw Invitation Token In API Responses: 0
+  - Raw Password In DB: 0
+  - Raw Password In Logs: 0
+  - Password In Email: 0
+* **Local Test URL Note:** Controlled E2E used local/development activation endpoints (`http://localhost:4200/tenant-admin/setup/{token}`). Production invitation links remain environment-configured and HTTPS when production deployment is undertaken.
+* **Production Status:** Controlled Runtime Verification: PASS. Production Deployment: NOT PERFORMED / DEFERRED.
+
+### Tenant Admin Secondary Email OTP Architecture Decision
+```text
+TENANT ADMIN SECONDARY EMAIL OTP
+
+Current R1 Requirement:
+NOT REQUIRED
+
+Current Runtime Implementation:
+NOT USED
+
+Current Verification Mechanism:
+SECURE SINGLE-USE EMAIL INVITATION TOKEN
+
+Future Secondary OTP:
+OPTIONAL FUTURE SECURITY ENHANCEMENT
+NOT PART OF CURRENT R1 TENANT ADMIN ACTIVATION
+```
+
+> [!NOTE]
+> **Email Possession Verification Rationale:**  
+> The secure invitation token is delivered directly to the registered Tenant Admin email address. Successful possession and validation of this high-entropy, single-use, expiring invitation token establishes control of that invitation email channel for the current activation flow.  
+> 
+> A secondary code delivered through that same email channel is not required for the approved current R1 activation contract.
+> 
+> *Security Note:* This token-link possession verification is not multi-factor authentication (MFA/2FA) because the link is delivered through the email channel itself. Optional secondary OTP or MFA may be introduced in a future release as a separate enhancement.  
+> 
+> *(Unrelated E-Commerce customer authentication OTP flows remain distinct and unchanged).*
 
 ---
 
@@ -224,7 +297,7 @@ PHASE B — STEP-BY-STEP SEQUENCE
 
 ### 5.2 Expiry Policy
 * **Invitation Token Expiry:** Configurable activation window (defaulting to 24–72 hours; runtime default locked during Phase A implementation).
-* **OTP Expiry (Phase B):** Short-lived verification code (e.g., 5–10 minutes; finalized during Phase B implementation).
+* **Tenant Admin Secondary OTP:** Not required / not used for current R1 Tenant Admin activation.
 
 ### 5.3 Password Security Contract
 * **Password generated by Platform Admin:** NO.
@@ -232,7 +305,7 @@ PHASE B — STEP-BY-STEP SEQUENCE
 * **Password sent by email:** STRICTLY PROHIBITED.
 * **Password created by Tenant Admin:** YES (Phase B self-activation only).
 * **Plaintext password persisted:** NEVER.
-* **Password storage:** Persisted exclusively via canonical PBKDF2 password hashing.
+* **Password storage:** Persisted exclusively via canonical PBKDF2 password hashing (100,000 iterations, 16-byte random salt, 32-byte derived hash).
 
 ### 5.4 Email Contract — Phase A Invitation
 The invitation email must adhere to the following contract:
@@ -298,22 +371,23 @@ PHASE A:
                                             │
 ════════════════════════════════════════════╪═════════════════════════════
                                             ▼
-PHASE B (DEFERRED):
+PHASE B (CLOSED / VERIFIED / FROZEN):
                                   [ INVITATION OPENED ]
                                             │
                                             ▼
-                                  [ IDENTITY VERIFIED ]
+                                  [ TOKEN VERIFIED ]
+                        (Email channel control established)
                                             │
                                             ▼
                                   [ PASSWORD CREATED ]
                                             │
                                             ▼
-                                      [ ACTIVE ]
+                                       [ ACTIVE ]
 ```
 
 > [!NOTE]
 > **Persisted Status vs. Journey States:**  
-> The actual persisted database account status in `tenant_users.account_status` transitions from `INVITED` (Phase A) to `ACTIVE` (Phase B). Intermediate journey states (`EMAIL DISPATCHED`, `IDENTITY VERIFIED`, `PASSWORD CREATED`) represent operational milestones and audit logs, not database enum schema modifications.
+> The actual persisted database account status in `tenant_users.account_status` transitions from `INVITED` (Phase A) to `ACTIVE` (Phase B). Concurrently, the invitation in `user_invites.invite_status` transitions to `ACCEPTED`. Intermediate journey states (`EMAIL DISPATCHED`, `TOKEN VERIFIED`, `PASSWORD CREATED`) represent operational milestones and audit logs, not database enum schema modifications.
 
 ---
 
@@ -324,10 +398,10 @@ PHASE B (DEFERRED):
 | Component | Phase A Responsibilities | Phase B Responsibilities |
 | :--- | :--- | :--- |
 | **Platform Admin UI** | Captures wizard data; initiates `POST /api/v1/platform-admin/tenants` | None (Platform Admin does not participate in Phase B) |
-| **Backend API / Core** | Validates request; provisions tenant, role, and admin user (`INVITED`); generates activation token; hashes token; commits transaction | Validates token; coordinates identity/OTP verification; hashes user password; transitions user to `ACTIVE` |
-| **Database** | Atomically commits tenant, user, role, token hash, and expiry records | Updates user password hash; invalidates token; updates account status to `ACTIVE` |
-| **Email Service** | Delivers Phase A activation invitation email | Delivers Phase B OTP / confirmation email (if required) |
-| **Tenant Admin UI** | None | Hosts activation landing page, OTP entry, password creation form, and login redirect |
+| **Backend API / Core** | Validates request; provisions tenant, role, and admin user (`INVITED`); generates activation token; hashes token; commits transaction | Validates token hash (`GET /api/tenant-admin/onboarding/setup-token/{token}/validate`); verifies token expiry, single-use, and tenant-binding; hashes user password; atomically sets password, marks invite `ACCEPTED`, transitions user to `ACTIVE` (`POST /api/tenant-admin/onboarding/setup-password`) |
+| **Database** | Atomically commits tenant, user, role, token hash, and expiry records | Updates user password hash; invalidates token; marks invitation `ACCEPTED`; updates account status to `ACTIVE` |
+| **Email Service** | Delivers Phase A activation invitation email | Delivers confirmation email (if configured) |
+| **Tenant Admin UI** | None | Hosts activation landing page (`/tenant-admin/setup/:setupToken`), token validation UI, password creation form, success screen (`/tenant-admin/setup/success`), and login redirect (`/tenant-login`) |
 
 ### 7.2 Transaction Boundary & Failure Isolation
 1. **Single Provisioning Transaction:** Tenant entity, subscription records, `TENANT_ADMIN` role assignment, Tenant Admin user (`INVITED`), and the activation token hash/expiry MUST be committed in a single atomic database transaction.
@@ -365,7 +439,7 @@ PHASE B (DEFERRED):
 | Store Activation Token Hash | **YES** | NO |
 | Send Activation Invitation Email | **YES** | NO |
 | Open Activation Link | NO | **YES** |
-| Verify Email Ownership / OTP | NO | **YES** |
+| Verify Email Possession (Token Link) | NO | **YES** |
 | Create Confidential Permanent Password | NO | **YES** |
 | Consume Activation Token | NO | **YES** |
 | Activate Account (`INVITED` → `ACTIVE`) | NO | **YES** |
@@ -373,21 +447,21 @@ PHASE B (DEFERRED):
 
 ### 9.2 Implementation Status Matrix
 
-| Functional Capability | Architecture Status | Implementation Status | Implementation Phase |
-| :--- | :--- | :--- | :--- |
-| Tenant Creation | **APPROVED** | **EXISTING** | Phase A |
-| TENANT_ADMIN Role Bootstrap | **APPROVED** | **EXISTING** | Phase A |
-| Tenant Admin User Provisioning | **APPROVED** | **EXISTING** | Phase A |
-| `INVITED` Account State | **APPROVED** | **TO VERIFY / IMPLEMENT** | Phase A |
-| Password `NOT SET` State | **APPROVED** | **TO VERIFY / IMPLEMENT** | Phase A |
-| Secure Activation Token Generator | **APPROVED** | **TO IMPLEMENT** | Phase A |
-| Token Hash Storage & Expiry | **APPROVED** | **TO IMPLEMENT** | Phase A |
-| Canonical Invitation Email Dispatch | **APPROVED** | **TO RECONCILE / IMPLEMENT**| Phase A |
-| Activation Token Validation API | **APPROVED** | **DEFERRED** | Phase B |
-| Email OTP Verification | **APPROVED** | **DEFERRED** | Phase B |
-| Tenant Admin Password Setup UX & API | **APPROVED** | **DEFERRED** | Phase B |
-| Account Activation (`ACTIVE`) | **APPROVED** | **DEFERRED** | Phase B |
-| Normal Tenant Admin Workspace Login | **APPROVED** | **DEFERRED** | Phase B |
+| Functional Capability | Architecture Status | Implementation Status | Verification Status | Implementation Phase |
+| :--- | :--- | :--- | :--- | :--- |
+| Tenant Creation | **APPROVED** | **EXISTING** | **VERIFIED** | Phase A |
+| TENANT_ADMIN Role Bootstrap | **APPROVED** | **EXISTING** | **VERIFIED** | Phase A |
+| Tenant Admin User Provisioning | **APPROVED** | **EXISTING** | **VERIFIED** | Phase A |
+| `INVITED` Account State | **APPROVED** | **IMPLEMENTED** | **VERIFIED** | Phase A |
+| Password `NOT SET` State | **APPROVED** | **IMPLEMENTED** | **VERIFIED** | Phase A |
+| Secure Activation Token Generator | **APPROVED** | **IMPLEMENTED** | **VERIFIED** | Phase A |
+| Token Hash Storage & Expiry | **APPROVED** | **IMPLEMENTED** | **VERIFIED** | Phase A |
+| Canonical Invitation Email Dispatch | **APPROVED** | **IMPLEMENTED** | **VERIFIED** | Phase A |
+| Activation Token Validation API | **APPROVED** | **IMPLEMENTED** | **VERIFIED (12 Backend API Tests PASS)** | Phase B |
+| Email Possession Verification (Token Link) | **APPROVED** | **IMPLEMENTED** | **VERIFIED (API + Widget Tests PASS)** | Phase B |
+| Tenant Admin Password Setup UX & API | **APPROVED** | **IMPLEMENTED** | **VERIFIED (12 Widget Tests PASS)** | Phase B |
+| Account Activation (`INVITED` → `ACTIVE`) | **APPROVED** | **IMPLEMENTED** | **VERIFIED (Integration + API Tests PASS)** | Phase B |
+| Normal Tenant Admin Workspace Login | **APPROVED** | **IMPLEMENTED** | **VERIFIED (Auth Suite PASS)** | Phase B |
 
 ---
 
@@ -408,8 +482,17 @@ PHASE B (DEFERRED):
 * **Supporting Module:** **Platform Administration (Tenant Onboarding / Lifecycle)**
 * No new business modules are created.
 
-### 10.3 Release 1 Governance & Pause State
-* **Phase A Governance:** APPROVED FOR NEXT IMPLEMENTATION SPRINT (`TA-BOOT-PHASE-A`).
-* **Phase B Governance:** APPROVED ARCHITECTURE / IMPLEMENTATION DEFERRED.
-* **Online Store (OS-R1-3):** **PAUSED** pending completion and verification of Tenant Admin onboarding reconciliation.
-* **Commercial Scope (`ONEVERZ_R1_STD`):** Preserved and unchanged during this documentation task.
+### 10.3 Release 1 Governance & Final Verification Status
+* **Phase A Governance:** **CLOSED / VERIFIED / FROZEN** (Platform Admin provisioning terminates at invitation email dispatch).
+* **Phase B Governance:** **CLOSED / VERIFIED / FROZEN** (Controlled Full E2E runtime verified in TA-BOOT-B4; zero defects found; zero source changes required).
+* **Tenant Admin Onboarding Overall:** **FULLY COMPLETE**
+* **Audit Gaps Closed:**
+  - `GAP-TA-BOOT-B1-001`: CLOSED (Backend HTTP/API controller tests merged).
+  - `GAP-TA-BOOT-B1-002`: CLOSED (Flutter widget tests merged).
+  - `GAP-TA-BOOT-B1-003`: CLOSED (Second Brain reconciled to token-link self-activation architecture).
+  - `GAP-TA-BOOT-B1-004`: CLOSED (Secondary Tenant Admin Email OTP defined as NOT REQUIRED; canonical mechanism is secure single-use invitation token link).
+* **Known Open Gaps:** 0 (P0: 0, P1: 0, P2: 0, P3: 0).
+* **Freeze Rule:** Do not modify Tenant Admin onboarding flow further unless a new approved requirement, verified defect, or security requirement is introduced. Invitation architecture, token-link verification, password self-setup, and `INVITED → ACTIVE` lifecycle are FROZEN.
+* **Online Store (OS-R1-4):** **CLOSED / RECONCILED / RE-FROZEN** (Commercial baseline preserved).
+* **Commercial Scope (`ONEVERZ_R1_STD`):** Preserved and unchanged (7 physical features, 15 conceptual capabilities).
+* **Production Deployment:** NOT PERFORMED / DEFERRED (Runtime readiness certified; production deployment remains deferred until explicitly authorized).

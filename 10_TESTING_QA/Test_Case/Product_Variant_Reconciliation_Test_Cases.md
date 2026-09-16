@@ -1,12 +1,12 @@
 <!-- title: Product Variant Reconciliation Test Cases -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-13 -->
+<!-- last_updated: 2026-09-12 -->
 
 # Product Variant Reconciliation Test Cases
 
 ## Purpose
-Specifies the automated integration test cases for Step 4 Variant Configuration, strictly enforcing stable Option/Value/Variant identities.
+Specifies the automated integration test cases for Step 5 Variant Configuration (FORMER Step 4 before scanner-first renumbering), strictly enforcing stable Option/Value/Variant identities.
 
 ## TC-01: ProductOption Stable Identity
 **Scenario:**
@@ -63,17 +63,17 @@ Specifies the automated integration test cases for Step 4 Variant Configuration,
 **Assertion:**
 - Included variants remain in `DRAFT` status with `is_sellable=true` until Step 7.
 - Excluded variants remain in `DRAFT` status with `is_sellable=false`.
-- Step 4 NEVER publishes variants.
+- Step 5 NEVER publishes variants; final publish remains Step 7.
 
 ## TC-06: UOM Resolution
 **Scenario A (Track Inventory ON):**
-1. Step 3 sets Parent Stock UOM to Box and Sales UOM to Piece.
-2. Save Step 4 Variant.
+1. Step 4 Unit & Pack sets Parent Stock UOM to Box and Sales UOM to Piece.
+2. Save Step 5 Variant.
 **Assertion:** Variant inherits Box and Piece respectively.
 
 **Scenario B (Track Inventory OFF):**
-1. Track Inventory is OFF (Step 3 skipped).
-2. Save Step 4 Variant.
+1. Step 3 Product Type & Tracking still completed with Track Inventory OFF; Step 4 Unit & Pack is `NOT_APPLICABLE` (bypassed — not “Step 3 skipped”).
+2. Save Step 5 Variant.
 **Assertion:** Backend canonical Product Wizard UOM resolver automatically sets both Stock and Sales UOM. No error or missing UOM.
 
 ## TC-07: Idempotency and Concurrency

@@ -334,8 +334,8 @@ CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 
 | Label | Store | When written |
 |---|---|---|
-| CURRENT policy | `product_inventory_settings` | Step 2 draft |
-| TARGET Step 1 draft (GAP) | `product_setup_initial_tracking` | Step 1/2 wizard draft. Full schema: [[10_Catalog_Master_Data_And_Product_Core_UPDATED]] |
+| CURRENT policy | `product_inventory_settings` | Step 3 tracking policy (and related draft saves) |
+| EXISTING Step 3 draft | `product_setup_initial_tracking` | Initial Batch/Expiry/Serial on CURRENT Step 3. Migration: `20260824095742_AddProductSetupInitialTracking`. **Not** scanner-first B1. Full schema: [[10_Catalog_Master_Data_And_Product_Core_UPDATED]]. Live DB/E2E: Initial Tracking closure audit — do not infer production acceptance from docs alone. |
 | CURRENT Batch + Expiry identity | `product_batches.batch_number`, `product_batches.expiry_date` | Step 7 Publish if applicable; later receiving |
 | CURRENT Serial identity | `serial_numbers.serial_number` | Step 7 Publish if applicable; later receiving |
 | Quantity | `inventory_balances`, `stock_movements` | Opening Stock / stock receiving — **not** Product Setup identity input |

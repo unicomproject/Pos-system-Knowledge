@@ -1,9 +1,15 @@
 <!-- title: POS Reusable Component Specifications -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-09-01 -->
+<!-- last_updated: 2026-09-08 -->
 
 # POS Reusable Component Specifications
+
+## OO-06 canonicalization update (2026-09-09)
+
+OO06 source-verified reuse directions are recorded in the tracker UI companion: existing ReadyForCollectionScreen/Hero/Summary and PickingProgressMetrics are extension owners; OO05 private summary/progress require same-feature extraction before reuse. No new shared component or implemented variant is claimed. Shell and action components remain unchanged; print/share excluded.
+
+Current OO06 authority: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO06_Canonicalization_Status_2026-09-09]]. This scoped update supersedes older conflicting Ready/notification wording, not unrelated history.
 
 ## Purpose and Authority
 
@@ -17,6 +23,39 @@ Use this file with [[Design_System]],
 [[../08_FLUTTER_POS_KNOWLEDGE/Frontend_Reusable_Component_Governance]] and the
 relevant screen specification. Current source remains final evidence when this
 registry is being updated.
+
+## Verified Source Baseline (2026-09-08)
+
+This registry was re-audited against the current Flutter implementation. The
+measurement and behaviour evidence used by the tables below is owned by:
+
+- `lib/app/app.dart` â€” application `ThemeData`, colour scheme and font family.
+- `lib/core/theme/pos_theme_provider.dart` â€” backend-driven POS brand colour
+  resolution.
+- `lib/features/tenant_admin/presentation/theme/tenant_admin_theme.dart` â€” the
+  currently implemented named spacing, radius, breakpoint, inset, colour and
+  shadow tokens used by shared POS controls.
+- `lib/shared/widgets/pos_action_buttons.dart` â€” shared primary and outlined
+  action sizes, padding, radii, icons and interaction states.
+- `lib/shared/presentation/app_modal.dart` â€” shared dialog/bottom-sheet
+  presentation and blur behaviour.
+- `lib/shared/widgets/app_cached_network_image.dart` â€” shared network-image
+  loading/error boundary.
+- `lib/features/fulfilment_pickup/presentation/widgets/online_order_ui.dart` â€”
+  online-order summary cards, semantic mappings, status chips and screen state.
+- `lib/features/fulfilment_pickup/presentation/widgets/oo01_online_orders_widgets.dart`
+  â€” active OO-01 search, order-card and responsive-list composition.
+- `lib/features/fulfilment_pickup/presentation/widgets/online_order_detail_widgets.dart`
+  â€” OO-02 rich summaries, item rows and product thumbnails.
+- `lib/features/fulfilment_pickup/presentation/widgets/start_fulfilment_dialog.dart`
+  â€” OO-03 confirmation composition and responsive modal selection.
+- `lib/features/pos/presentation/widgets/new_sale/navigation/pos_cashier_bottom_navigation.dart`
+  â€” cashier footer/navigation dimensions.
+
+Only values directly declared by those sources, or inherited behaviour that
+the sources explicitly select, are recorded. Categories without a single
+current reusable owner remain `GAP`; this audit does not promote prototype CSS
+or screenshots into Flutter authority.
 
 ## Interpretation Rules
 
@@ -186,22 +225,23 @@ because they incorrectly classify `UNPAID`.
 
 Application typography is configured in `lib/app/app.dart`:
 
-- Body/label theme: Google Fonts Inter.
-- Display, headline and title theme slots: Google Fonts Poppins.
+- The app-wide `ThemeData.fontFamily` is `Roboto`.
+- No app-wide custom `TextTheme` remaps display/headline/title slots to a second
+  font family. Material generates those roles using the configured family.
 - Line heights are not explicitly declared by the application theme and remain
-  inherited from the generated Google Fonts/Material styles.
+  inherited from Material/Roboto styles.
 
 | Role | Verified token/style | Size / weight |
 |---|---|---|
 | Page title, online orders | `OnlineOrderUi.title` | 22 / w800; feature ink literal |
 | Page subtitle/metadata | `OnlineOrderUi.subtitle` | 13 / inherited weight; feature muted literal |
-| General page heading | `TextTheme.headline*` | Poppins; size/weight inherited unless consumer overrides |
-| Section title | `TextTheme.titleLarge` in OO-02 | Poppins; OO-02 uses w800 |
+| General page heading | `TextTheme.headline*` | Roboto; size/weight inherited unless consumer overrides |
+| Section title | `TextTheme.titleLarge` in OO-02 | Roboto; OO-02 uses w800 |
 | Card title, shared online-order summary | Ambient body style | inherited |
 | Card count | Component literal | 21 / w800 |
-| Rich card primary | `bodyMedium` | Inter / w800 |
-| Rich card secondary | `bodyMedium` | Inter / inherited |
-| Amount | `titleMedium` | Poppins / w800 |
+| Rich card primary | `bodyMedium` | Roboto / w800 |
+| Rich card secondary | `bodyMedium` | Roboto / inherited |
+| Amount | `titleMedium` | Roboto / w800 |
 | Order identifier | `headlineMedium`/`headlineLarge` in OO-02; local w800 | responsive token plus w800 |
 | Button label, canonical primary | Component-local | inherited size / w800 |
 | Badge label | Component-local | order 12/w700; payment 11/w700 |
@@ -329,6 +369,19 @@ Every screen specification must record component, existing path,
 classification, variant, this canonical dimension reference, colour authority,
 typography token and spacing token. Developers and AI assistants must not
 re-decide these values for each screen.
+
+### OO-04B planned reuse boundary (documentation only)
+
+The dedicated **OO-04B â€” Pick Item / Barcode Verification** screen is not yet
+an implemented registry component. Its Chunk 3 composition must reuse the POS
+shell/header/footer, online-order status and screen-state owners,
+`AppCachedNetworkImage`, `PosPrimaryActionButton`, `PosBottomOutlinedButton` and
+shared modal presentation. It must extend the existing picking scanner/manual
+input and quantity-panel owners to separate transient barcode verification from
+explicit pick submission. Selected-product/location composition, Next Items and
+permission-filtered page composition remain feature-local. No `SHARED/NEW`
+component is currently authorized. Exact reuse matrix and responsive contract:
+[[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
 
 ## Contradiction and Gap Register
 

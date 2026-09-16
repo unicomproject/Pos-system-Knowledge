@@ -1,4 +1,4 @@
-﻿<!-- title: Feature Test Case Template -->
+<!-- title: Feature Test Case Template -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-06-30 -->

@@ -1,9 +1,11 @@
 <!-- title: Tenant Admin Product Setup Permission NFR API DB Contract Closure Audit -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-12 -->
 
 # Tenant Admin Product Setup Permission / NFR / API / DB Contract Closure Audit
+
+> **Numbering note (2026-09-12):** Permission rules remain in force under `catalog.*`. Wizard step indexes below may use **pre-scanner-first** numbering (e.g. “Step 3 UOM” = CURRENT Step 4 Unit & Pack). Scanner-first authority: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]], [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
 
 ## 1. Executive Summary
 

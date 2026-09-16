@@ -217,13 +217,13 @@ Platform APIs require platform JWT authentication and explicit canonical `platfo
 - [[../05_BACKEND_ARCHITECTURE/Error_Response_Standards]]
 
 ### Exact Permission Matrix for Bundles
-Candidate search endpoint (`GET /api/v1/tenant-admin/products/{productId}/bundle-component-candidates`) and Step 4 endpoints have exact authorization:
+Candidate search endpoint (`GET /api/v1/tenant-admin/products/{productId}/bundle-component-candidates`) and **Step 5 Bundle/Product Configuration** endpoints have exact authorization:
 - `catalog.combo_components.manage` is required for modifications.
 - `catalog.products.update` (or `create`) is required depending on the draft state.
 - Cost must NOT leak without `catalog.product_cost.view`.
 - Stock must NOT leak without `inventory.stock.view`.
 
-Entitlement code mapping between `product_catalog` and `product_management` must be explicitly resolved according to the runtime feature entitlement code.
+**Product Setup entitlement (LOCKED):** runtime entitlement is **`product_catalog` only**. `product_management` is the platform/module grouping label (`platform_modules.module_code`) and is **not** a runtime Product Setup entitlement check. Do not introduce dual entitlement authority. Authority: [[Feature_Entitlement_Matrix]], [[Tenant_Admin_Add_Product_7_Step_Permission_Matrix]], [[../00_START_HERE/Current_Source_Of_Truth]].
 <!-- RBAC_HARDENING_2026_08_15_START -->
 ## Historical Tenant RBAC Authorization Addendum - 2026-08-15
 

@@ -1,7 +1,9 @@
 # PRODUCT SETUP Step 6 — Pricing & Tax (SIMPLE + VARIANT) Second Brain Closure
 
 <!-- status: Active — documentation only -->
-<!-- last_updated: 2026-09-03 -->
+<!-- last_updated: 2026-09-11 -->
+
+> **Stepper note (2026-09-11):** Pricing & Tax remains global **Step 6**. Any full wizard lists in this evidence file that still show Basic Details first + standalone Barcode & SKU are **historical**. Current order: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].
 
 **Scope:** Second Brain / source-of-truth update only.  
 **Did NOT:** implement Backend, Flutter, migrations, wizard redesign, or a parallel Pricing module.

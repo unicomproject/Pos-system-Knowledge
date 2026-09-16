@@ -1,7 +1,7 @@
 <!-- title: Frontend Engineering Canonical Standard -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-31 -->
+<!-- last_updated: 2026-09-08 -->
 
 # Frontend Engineering Canonical Standard
 
@@ -78,6 +78,12 @@ names a concern.
 13. POS brand styling consumes the backend-driven theme through `ThemeData`,
     theme providers, and shared tokens; feature widgets do not hardcode tenant
     brand colours.
+14. Dialog/modal `TextEditingController` / `FocusNode` ownership: create and
+    dispose them in the dialog `State` (`dispose` after unmount). Never dispose
+    a caller-owned controller immediately after `showDialog` / `showAppDialog`
+    returns — the Future completes before the exit animation, and early dispose
+    can leave InheritedWidget dependents registered (`_dependents.isEmpty`).
+    Prefer return-value-from-modal then mutate screen/provider state.
 14. Typography, spacing, radius, elevation, control sizing, and icons use
     canonical tokens/shared component styles rather than screenshot-derived
     repeated literals.
@@ -85,6 +91,11 @@ names a concern.
     production feature screens contain no mock business data. Mock values are
     restricted to tests/prototypes. Tenant branding comes through canonical
     theme state, not feature-screen hardcoding.
+16. A realtime transport event must not directly manufacture authoritative
+    domain UI state when a canonical API projection exists. It should
+    invalidate/refetch the relevant provider(s). Unread counts, order cards,
+    and lifecycle status come from HTTP APIs — never from `unreadCount++` or
+    local insertion of socket payloads.
 
 ## Separation of Concerns
 

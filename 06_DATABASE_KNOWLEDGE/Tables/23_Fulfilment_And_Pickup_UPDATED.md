@@ -6,6 +6,12 @@
 
 # 23. Fulfilment & Pickup
 
+## OO-06 canonicalization update (2026-09-09)
+
+OO06 adds no schema. ReadyAt is fulfillment_orders.ready_at; pickup_orders has no ReadyAt or RowVersion in source. CollectedAt remains NULL on entry; fulfillment_orders.row_version is existing bigint concurrency token. Reuse notification_events/messages/inbox_items; outbox existence alone is not OO06 integration. Attribute inventory linked from tracker distinguishes persisted versus derived values.
+
+Current OO06 authority: [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO06_Canonicalization_Status_2026-09-09]]. This scoped update supersedes older conflicting Ready/notification wording, not unrelated history.
+
 ## Purpose
 
 This file documents the database tables, attributes, keys, nullability, indexes, constraints, and external reference entities for this module.
@@ -29,8 +35,24 @@ This markdown version follows the uploaded ERD image as the source of truth. Tab
 | `fulfillment_order_events` | Stores append-only fulfillment event history. |
 | `pickup_orders` | Stores customer pickup execution headers. |
 | `pickup_order_events` | Stores append-only pickup event history. |
-| `fulfillment_packages` | Canonical package/bag headers (implementation pending). |
-| `fulfillment_package_lines` | Canonical package contents (implementation pending). |
+| `fulfillment_packages` | Canonical package/bag headers (implementation pending; **not required for OO-05 MVP**). |
+| `fulfillment_package_lines` | Canonical package contents (implementation pending; **not required for OO-05 MVP**). |
+
+## OO-05 Review & Pack schema notes (2026-09-08)
+
+Tracker:
+[[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO05_Canonicalization_Status_2026-09-08]].
+
+Chunk 2 decision (verified):
+
+- Line packing uses existing `fulfillment_order_lines.packed_quantity` / packed-by.
+- Header timestamps `packed_at` / `ready_at` exist on `fulfillment_orders` and are set by Pack/Ready.
+- Packing notes: **no dedicated column**. Pack optional note persists on
+  `fulfillment_order_events.event_note` (event type `FULFILLMENT_PACKED`); server max **200**.
+- `fulfillment_packages` / `fulfillment_package_lines` remain **future ADR only** —
+  OO-05 does not require them (no package count/barcode/dimensions collected).
+- Schema for OO-05: **New table NO; New column NO; Migration NO.**
+- Do not add UI convenience columns (`remaining_minutes`, `is_overdue`, `can_pack`).
 
 ## `fulfillment_methods`
 
@@ -235,6 +257,15 @@ payload JSON. Issue is audit-only and non-blocking. Picking Note reuses
 row version atomically but changes no quantity/status/pack eligibility. No
 issue/note table, column or migration was added. Progress and `canPack` are
 derived from existing quantities.
+
+OO-04B is the selected-line UI sub-flow of this same OO-04 persistence contract.
+It adds no barcode-verification, remaining quantity, progress percentage,
+current/next item, location-part or display-status column. Transient
+`barcodeVerified` belongs only to the current UI action. Authoritative pick
+state remains `fulfillment_order_lines`; optimistic concurrency remains
+`fulfillment_orders.row_version`; evidence remains append-only
+`fulfillment_order_events`. Full attribute consumption/mutation audit:
+[[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
 
 ## `fulfillment_order_lines`
 

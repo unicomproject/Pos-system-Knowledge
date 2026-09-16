@@ -1,10 +1,22 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-09-09 -->
+<!-- last_updated: 2026-09-13 -->
 
 
 # Current Source Of Truth
+
+## Online Order realtime cashier refresh (2026-09-09)
+
+**Production invariant:** Cashier Online Orders and notification surfaces use realtime events only as refresh triggers. The authoritative Online Orders list API (`GET .../click-collect/orders`) and POS notification API (`GET /api/v1/pos/notifications`) remain the source of truth. Do not manufacture order cards or unread counts from WebSocket payloads.
+
+Chunk 1 implementation + automated validation: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Realtime_Cashier_Refresh_Chunk1_2026-09-09]]. Live Ecommerce→cashier runtime acceptance is deferred to Chunk 2.
+
+## OO-06 canonicalization update (2026-09-09)
+
+OO-06 Ready for Collection Chunk 2 backend/API/DB is complete: existing picking GET supports authoritative READY and the existing ClickCollectOrdersController owns POST notify-ready. OO05 still owns Pack/Ready; OO06 consumes Fulfillment READY + Pickup READY with ReadyAt populated and CollectedAt NULL. Optional customer IN_APP notification never changes tracking/lifecycle. Build and 125 focused tests passed, including local PostgreSQL concurrency; live authenticated HTTP/device acceptance is not claimed. Chunk 3 Flutter implementation remains pending. Evidence: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO06_Backend_Chunk2_2026-09-09]].
+
+Current OO06 authority: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO06_Canonicalization_Status_2026-09-09]]. This scoped update supersedes older conflicting Ready/notification wording, not unrelated history.
 
 ## POS Payment Method Selection (2026-09-03)
 
@@ -220,21 +232,41 @@ The approved prototype/UI layer is governed by [[../07_UI_UX_KNOWLEDGE/Cashier/O
 
 OO-04 Picking is canonicalized by
 [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO04_Canonicalization_Status_2026-09-02]].
-Existing Flutter picking code is partial scaffolding only. Backend picking
-detail/pick/issue contracts, runtime permission catalogues/enforcement, atomic
-events, backend `canPack` and expected-version conflict handling are implemented
-under the existing `ClickCollectOrdersController`/Customer Orders ownership with
-no new table, column or migration. Implemented events are
-`FULFILLMENT_LINE_PICKED`, `FULFILLMENT_LINE_ISSUE_REPORTED` and
-`FULFILLMENT_PICKING_COMPLETED` and `FULFILLMENT_PICKING_NOTE_ADDED`. Picking
-Note reuses `fulfillment_order_events.event_note`: `POST
+Its selected-line sub-flow is canonically named **OO-04B — Pick Item / Barcode
+Verification**. OO-04 remains the Pick Order overview; selecting one line opens
+OO-04B, where scan/manual input verifies only that line and an explicit Mark as
+Picked command performs the authoritative mutation. Barcode capture alone never
+picks. Backend picking detail/pick/issue/notes, `canPack`, and expected-version
+conflict handling are implemented under `ClickCollectOrdersController`.
+
+**Barcode-pickable SalesOrderLines capture the authoritative product/variant
+barcode into `sales_order_lines.barcode_snapshot` at order creation/ingestion
+time** (`StorefrontCheckoutConfirmationRepository` →
+`SalesOrderLine.CreateForClickAndCollect`). OO-04B verifies the immutable
+order-line snapshot and **must not** fall back to the current catalogue barcode.
+Missing unexpected NULL snapshots surface
+`online_orders.barcode_snapshot_unavailable` (not a false “wrong barcode”).
+Do not blindly backfill historical NULL snapshots from live catalogue state.
+
+**OO-05 — Review & Pack** is canonicalized by
+[[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO05_Canonicalization_Status_2026-09-08]].
+All-picked / `canPack` does **not** mean Ready. OO-05 reviews picked lines,
+optionally captures packing notes, then performs separate authoritative
+**Pack** (`POST .../pack`) and **Mark Ready** (`POST .../ready`) commands.
+Permissions: `commerce.online_order.packing.view`, `.packing.pack`,
+`.collection.mark_ready`. Review state **REUSE**s picking GET. Pack/Ready APIs,
+pack/ready events, and packing-note persistence are implemented in current source
+(see latest OO05 tracker evidence). Do not use legacy status PATCH as
+the cashier Ready path. OO-06 owns the post-Ready / Ready-for-Collection
+boundary. Prototype_flow IDs that numbered Review & Pack as OO-06 are
+superseded.
+
+Picking Note reuses `fulfillment_order_events.event_note`: `POST
 .../orders/{orderId}/picking/notes?outletId=...` requires
 `commerce.online_order.picking.note`, a trimmed note of 1–500 characters and a
 positive current `expectedVersion`; it is PICKING-only, increments `row_version`,
 and is returned in the existing Picking Detail as the latest 50 notes in
-oldest-to-newest order. It never changes quantity, lifecycle or `canPack`. Chunk
-3 must add `expectedVersion` to Flutter mutations, consume backend
-eligibility/version/notes, refetch 409 and complete authenticated E2E.
+oldest-to-newest order. It never changes quantity, lifecycle or `canPack`.
 
 Cashier **Open Till** requirements are governed by
 [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]] and
@@ -438,11 +470,6 @@ tables, screens, or flows.
 - [[Developer_Reading_Guide]]
 - [[Project_Glossary]]
 - [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Review_Create_Specification.md]]
-- [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
-- [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
-- [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
-- [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
 - [[../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_PRODUCT_TAX_INCLUSIVE_EXCLUSIVE_DECISION_2026-08-27]]
 - [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]
 - [[../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_TAX_MANAGEMENT_DECISION_REGISTER_2026-09-03]]
@@ -463,8 +490,6 @@ tables, screens, or flows.
 
 Authority: [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]
 
-## Wizard Step Rule
-The Tenant Admin Add Product workflow is strictly a 7-step wizard. Step 7 is Review & Create. Legacy 8-step documentation and standalone Channel Visibility steps are obsolete.
 ## Tenant Admin User Creation Authority — 2026-08-25
 
 The canonical Add New User journey is [[../03_USER_JOURNEYS/Tenant_Admin/07_User_Management_Add_New_User_Flow]]. It is a five-step UI target backed by the existing atomic user-create contract. Current Flutter remains three-step. Tenant-wide/selected-outlet role assignment and additive direct grants are supported; user-specific till/default-till, draft, access-start, and 2FA controls are not currently supported.
@@ -472,25 +497,6 @@ The canonical Add New User journey is [[../03_USER_JOURNEYS/Tenant_Admin/07_User
 ### 2026-08-26 Correction
 
 Role selection is owned only by Step 2. Step 3 adds user-specific direct grants and never mutates the Base Role. `No Outlet Access`, Access Level, Save Draft, and till/default controls are absent from the active contract. Review counts and invitation content derive from final wizard state.
-
-### Product Setup Step 6 — Pricing & Tax (LOCKED 2026-09-03)
-
-Authority: [[../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]] §6.1–6.5.
-
-| Structure | Selling price | Tax |
-|---|---|---|
-| SIMPLE | One sellable identity → one applicable price-list configuration | Product Tax Assignment + TaxPriceMode |
-| VARIANT | Independent selling price per `ProductVariantId` via `price_list_items` | Common Product Tax Class / TaxPriceMode for current scope |
-
-Default Selling Price wording on the VARIANT screen is **retired**. Canonical bulk helper label: **Set Same Price for All Variants** (Flutter-only; Apply to All). POS / Online Store use the selected sellable ProductVariant’s price. Cost = product-level `reference_cost_price`. Do not invent parallel pricing tables. Tax masters remain Tax Management. Closures: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_PRICING_TAX_SIMPLE_VARIANT_SECOND_BRAIN_CLOSURE_2026-09-03]], [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_BULK_PRICE_UX_REFINEMENT_CLOSURE_2026-09-04]].
-
-**Implementation note:** SIMPLE Step 6 UI/backend path is confirmed. VARIANT per-variant Step 6 **backend** is **IMPLEMENTED** (2026-09-03) — see [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_PRICING_TAX_BACKEND_IMPLEMENTATION_CLOSURE_2026-09-03]]. Flutter VARIANT Step 6 UI is **IMPLEMENTED** (2026-09-04) — see [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_PRICING_TAX_FLUTTER_IMPLEMENTATION_CLOSURE_2026-09-04]]. Product Setup Step 6 frontend is complete for SIMPLE + VARIANT.
-
-Step 2 Product Type & Tracking collects optional **Initial Tracking Details** (Batch Number, Expiry Date, Serial Number) **after Product Type is explicitly selected** (SIMPLE / VARIANT; hidden for BUNDLE). Step 1 is Product master + images + channels only. Those identity values remain provisional wizard input. Step 2 remains tracking-policy authority (`product_inventory_settings`). Actual identity persists at Step 7 Publish into `product_batches` / `serial_numbers`, not into Product master columns. Opening Stock remains responsible for quantity. Authority: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]], [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]], and [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
-
-Product Setup authorization authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]. Canonical permission namespace is `catalog.*`. Runtime Product Setup entitlement is `product_catalog`. Advanced tracking entitlement is `inventory_tracking`. Closure audit: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-08-24_Tenant_Admin_Product_Setup_Permission_NFR_API_DB_Contract_Closure_Audit]].
-
-Implementation status (2026-09-01): Flutter collection UI is on Step 2 after Product Type select. Permission-first + Initial Tracking draft table remain in Unified Commerce (`product_setup_initial_tracking` migration `20260824095742_AddProductSetupInitialTracking`). Live 7-scenario E2E, persona permission E2E, PostgreSQL integration, and 1024x768 tablet verification are not complete. Destructive-clear confirmation dialog remains a GAP versus BR-TRACK-008. Authority for remaining gaps: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/TENANT_ADMIN_PRODUCT_SETUP_INITIAL_TRACKING_PERMISSION_FIRST_IMPLEMENTATION_CLOSURE_2026-08-24]].
 
 ## Category Management Rule
 
@@ -527,8 +533,6 @@ DELETE /api/v1/tenant-admin/categories/{categoryId}/image
 ```
 
 **Media:** upload/replace/remove via tenant-admin category image endpoints (not write `imageUrl` on Create/Update).
-
-**Product Setup:** recursive effectively-ACTIVE category hierarchy via `GET /api/v1/tenant-admin/products/create-options` (backend enforces **BR-CAT-PRODUCT-SELECT-001**); persist `CategoryId` only.
 
 **Management tree:** `GET /api/v1/categories/tree` — ACTIVE+INACTIVE, DELETED excluded, no `status` query parameter.
 

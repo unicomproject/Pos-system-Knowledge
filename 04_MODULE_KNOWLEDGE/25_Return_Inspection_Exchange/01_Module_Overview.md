@@ -38,7 +38,7 @@ merchandising, attractions, and temporary retail locations.
 | `sales_exchange_events` | Used by this module |
 
 ## Core Business Rules
-
+ 
 - Return must reference original order/sale.
 - Returned quantity cannot exceed sold and not-yet-returned quantity.
 - Inspection records condition and disposition before restock, scrap, or reject decisions.
@@ -47,6 +47,8 @@ merchandising, attractions, and temporary retail locations.
   resolution against a validated inspection draft.
 - Store-credit settlement is unsupported by the current completion flow.
 - Online return request is allowed only if the business policy enables it; supplier return is separate.
+- **Sale-Time Policy Snapshot Integrity**: Eligibility and return window MUST evaluate the immutable policy snapshot stored at sale time (`sales_order_lines.return_policy_snapshot` / `return_policy_version_id`), NEVER the product's mutable live policy. (Historical live-policy evaluation defect documented and scheduled for Stage C checkout snapshotting).
+- **Existing Cashier Implementation**: The 10-screen Cashier return/refund flow in Flutter POS (`/pos/returns-refunds/*`) and backend POS return services are fully implemented with 185 passing automated tests. It must be refined and reused, not rebuilt.
 
 ## Access Summary
 
