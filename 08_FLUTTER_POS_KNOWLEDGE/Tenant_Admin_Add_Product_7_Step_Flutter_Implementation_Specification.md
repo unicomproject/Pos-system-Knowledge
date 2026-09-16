@@ -1,15 +1,37 @@
 <!-- title: Tenant Admin Add Product — 7-Step Wizard Flutter Implementation Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS Flutter Client Scope -->
-<!-- last_updated: 2026-09-04 -->
+<!-- last_updated: 2026-09-12 -->
+<!-- supersedes: basic_details_first_standalone_step5_barcode_sku -->
 
 # Tenant Admin Add Product — 7-Step Wizard Flutter Implementation Specification
+
+> **Canonical stepper (LOCKED):** 1 Scan Barcode → 2 Basic Details → 3 Product Type & Tracking → 4 Unit & Pack Conversion → 5 Product Configuration (+ identifiers) → 6 Pricing & Tax → 7 Review & Create.  
+> Decision: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].  
+> Scan: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Setup_Scan_Barcode_Specification]].  
+> Identifiers: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]].  
+> **Implementation architecture:** [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Setup_Scanner_First_Implementation_Architecture]] (REUSE/EXTEND/NEW, Step 1 SM, sequences).  
+> **Final checklist / gaps:** [[../15_IMPLEMENTATION_TRACKING/PRODUCT_SETUP_SCANNER_FIRST_FINAL_IMPLEMENTATION_CHECKLIST_2026-09-12]], [[../15_IMPLEMENTATION_TRACKING/PRODUCT_SETUP_SCANNER_FIRST_FINAL_GAP_MATRIX_2026-09-12]].  
+> **SUPERSEDED:** standalone global Barcode & SKU step; Basic Details as wizard entry.
 
 ## 1. Executive Overview
 
 This document specifies the canonical Flutter architecture, Riverpod state management, widget hierarchy, DTO mapping, and business rule enforcement for the **Tenant Admin Add Product Wizard** (7-Step layout).
 
-TARGET Step 2 Initial Tracking Details must live on shared wizard state/controller:
+### 1.0 Step 1 — Scan Barcode state model (TARGET)
+
+Extend `AddProductWizardController` (do not invent a parallel wizard controller):
+
+- States S1-A…S1-G + recovery S1-R* from Scan Barcode spec (UI panels inside Step 1 only — **not** extra stepper items).
+- Methods (semantic names): `startFreshWizard` → lands on **Scan Barcode** (Step 1); `submitScanCandidate`; `resolveBarcode`; `runExternalLookup`; `requestNoBarcodeSkuCandidate`; `continueCreateManually`; `continueNoBarcodeBootstrap`; `hydrateScanContextFromDraft`.
+- Pre-draft: no Product ID / no auto-save until creation-path transition creates draft via **`POST /api/v1/tenant-admin/products/draft`** (`current_setup_step` normally **2**). Subsequent steps use `PUT .../{id}/draft`.
+- No-barcode Auto-generate SKU: call **IMPLEMENTED B5** `POST .../sku-candidates/generate` when the toggle is enabled; retain `candidate` in Step 1 state; do **not** call on every rebuild; explicit refresh may regenerate; never silently overwrite a user-edited value; persist into scan context only on creation-path commit. Never fan-out to VARIANT rows.
+- HID: reuse keyboard-wedge framing; call tenant-admin resolve/external-lookup — **never** POS by-barcode.
+- External zero providers: treat as public `NO_MATCH` (no fourth UI status).
+
+Decision (technical): [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_TECHNICAL_CONTRACT_DECISION_2026-09-12]].
+
+TARGET Step 3 Initial Tracking Details must live on shared wizard state/controller:
 
 ```text
 initialBatchNumber
@@ -22,14 +44,16 @@ Plus Step 7 VARIANT assignment: `initialTrackingAssignedVariantId`.
 Render `ProductInitialTrackingCard` from `product_type_tracking.dart` only after
 `productStructureConfirmed` and structure is SIMPLE or VARIANT. Place it **above**
 Tracking & Stock Rules. Do not render tracking tiles until type is selected.
-Do not render the card on Step 1. Hide for BUNDLE. Do not auto-enable tracking
+Do not render the card on Step 1 Scan or Step 2 Basic Details. Hide for BUNDLE. Do not auto-enable tracking
 toggles from typed values.
 
-## 1.1 Step 5 — VARIANT SKU & Barcode (Flutter)
+## 1.1 Step 5 — Identifier section (VARIANT SKU & Barcode Flutter)
 
-Canonical contract: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Barcode_SKU_Specification]].
+Canonical contract: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]] (stub: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Barcode_SKU_Specification]]).
 
-### State (`Step5BarcodeSkuState`)
+Identifiers live **inside Step 5 Product Configuration**, not a separate global step.
+
+### State (`Step5BarcodeSkuState` / identifier section state)
 - `targets` / identifier rows with: productVariantId, clientCombinationKey, displayName, imageUrl?, sku, barcode, barcodeType, derived status, fieldErrors
 - UI-only: `selectedVariantIds`, `searchQuery`, `statusFilter`
 - `isLoading`, `isSaving`, `validatingVariantIds`, `globalError`, `expectedRowVersion`
@@ -37,21 +61,21 @@ Canonical contract: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Produc
 
 ### Controller (`AddProductWizardController`)
 Extend existing controller — do not create a parallel Step 5 controller:
-`loadStep5`, `toggleStep5RowSelection`, `updateVariantSku`, `updateVariantBarcode`, `updateVariantBarcodeType`, `handleBarcodeScanComplete`, `setStep5SearchQuery`, `setStep5StatusFilter`, `openVariantIdentifierEditor`, `clearVariantIdentifierDraft`, `validateStep5Row`, `saveDraftStep5`, `saveAndContinueStep5`, `hydrateStep5FromDraft`
+`loadStep5`, `toggleStep5RowSelection`, `updateVariantSku`, `updateVariantBarcode`, `updateVariantBarcodeType`, `handleBarcodeScanComplete`, `setStep5SearchQuery`, `setStep5StatusFilter`, `openVariantIdentifierEditor`, `clearVariantIdentifierDraft`, `validateStep5Row`, `saveDraftStep5`, `saveAndContinueStep5`, `hydrateStep5FromDraft` — plus Step 1 scan methods above.
 
 ### DTO round-trip
-`BarcodeSkuAssignmentDto` must include `barcodeType`. Never parse barcode as number. Preserve leading zeros.
+`BarcodeSkuAssignmentDto` must carry `barcodeType` (**symbology**: `EAN13`/`EAN8`/`UPCA`/`CODE128`/`CODE39`/`UNKNOWN`) and `identifierStandard` (**GTIN standard**: `GTIN8`/`GTIN12`/`GTIN13`/`GTIN14`/`OTHER`) as **two separate fields**. `GTIN14` is never a `barcodeType`. Never parse barcode as number. Preserve leading zeros. Assignments ride inside `barcodeSkuConfiguration.assignments[]` — not a flat `variantIdentifiers[]`.
 
-### Widgets (`presentation/widgets/step_5/`)
-Evolve: `step_5_barcode_sku_form.dart`, `step_5_identifier_table.dart`, `edit_variant_identifier_drawer.dart`, `duplicate_barcode_details_drawer.dart`.
+### Widgets (`presentation/widgets/barcode_sku/` or `identifiers/`)
+Evolve: `barcode_sku_form.dart`, `identifier_table.dart`, `edit_variant_identifier_drawer.dart`, `duplicate_barcode_details_drawer.dart`.
 - VARIANT = table-first (search, filter, multi-select UI-only, status chips, ⋮ actions).
   Select checkbox → enter SKU/Barcode (draft only) → **Apply** commits → status Incomplete→Complete.
   Unselected rows stay read-only/disabled. Save & Continue still requires every included variant SKU.
-SIMPLE / BUNDLE = compact editors + one-row assignment table (green selected dot, Scan, pencil). Apply commits then clears SKU/barcode fields. Edit drawer hides Barcode Type in UI. When barcode is non-empty, persist type internally (valid GTIN checksum → EAN13/UPCA/EAN8, otherwise CODE128). Validate barcode+type on Step 5 Save & Continue (field error on the barcode input). Do not surface that validation first on Step 7 Create.
-**No Auto-generate SKUs.** Retire Additional Barcode widgets from Step 5 surface only after confirming unused elsewhere.
+SIMPLE / BUNDLE = compact editors + one-row assignment table (green selected dot, Scan, pencil). Apply commits then clears SKU/barcode fields. Edit drawer hides Barcode Type in UI. When barcode is non-empty, the **server** derives `identifierStandard` from digits/checksum and sets `barcodeType` only when the symbology is genuinely known (otherwise `UNKNOWN`) — Flutter must not invent a symbology. Validate barcode on Step 5 Save & Continue (field error on the barcode input). Do not surface that validation first on Step 7 Create.
+**No Auto-generate SKUs** on VARIANT fan-out. No-barcode Step 1 bootstrap may seed a SKU candidate per decision D9. Retire Additional Barcode widgets from Step 5 identifier surface only after confirming unused elsewhere.
 
 ### Scanner
-HID keyboard wedge: focus barcode → characters → trailing Enter completes → validate once → debounce draft save (not per digit).
+HID keyboard wedge: focus barcode → characters → trailing Enter completes → validate once → debounce draft save (not per digit). Step 1 uses same framing against resolve API; Step 5 identifier Scan uses assignment validation.
 
 ---
 
@@ -62,19 +86,19 @@ UI: [[../07_UI_UX_KNOWLEDGE/Tenant_Admin_Add_Product_7_Step_UI_UX_Specification]
 
 ### Shared
 - `createOptions.currencyCode` from `GET …/create-options` (tenant base currency). Price prefix / preview / rate labels only — **no currency banner**, no hard-coded `LKR`, no currency dropdown.
-- Widget: `step_6_pricing_tax_form.dart`. Draft/resume must not wipe Step 6 on rebuild.
+- Widget: `presentation/widgets/pricing_tax/pricing_tax_form.dart`. Draft/resume must not wipe Step 6 on rebuild.
 - Wizard-create / draft: adapt existing `pricingTax` DTO — **extend**, do not invent parallel endpoints. Accept `taxId` / `taxClassId` alias; persist `taxExclusive`.
 - Permissions UX: `canManagePricing`, tax lookup, cost redaction per permission matrix. Backend remains authoritative.
 
 ### SIMPLE / BUNDLE (IMPLEMENTED)
 - `_buildSimpleForm`: Standard Selling Price, Tax Class (rate in label), Tax Exclusive/Inclusive cards, `_TaxPreviewCard`.
 - No Cost / Discount / Effective Tax Rate field / currency banner.
-- Preview math: `presentation/utils/step_6_tax_preview.dart` `computeStep6TaxPreview`.
+- Preview math: `presentation/utils/pricing_tax_preview.dart` `computeStep6TaxPreview`.
 - Continue: selling price > 0 + tax; Cost **not** required.
-- Tests: `test/features/tenant_admin/products/step_6_pricing_tax_form_test.dart`.
+- Tests: `test/features/tenant_admin/products/pricing_tax_form_test.dart`.
 
 ### VARIANT (IMPLEMENTED — 2026-09-04)
-- Shell: `step_6_pricing_tax_form.dart` switches to `step_6_variant_pricing_tax_form.dart` when `productStructure == VARIANT`.
+- Shell: `pricing_tax/pricing_tax_form.dart` switches to `pricing_tax/variant_pricing_tax_form.dart` when `productStructure == VARIANT`.
 - Per-variant Selling Price table keyed by `productVariantId` / `clientCombinationKey` (never row index / SKU / label).
 - **Set Same Price for All Variants** + **Apply to All** = local bulk helper only (confirm when overwriting; not serialized as parent product price). No “Default Selling Price” / “Default Price” column on VARIANT UI.
 - Table columns: Variant, SKU, Selling Price, Status, Actions.- Derived Priced/Pending counts and Price Range from `variantPrices`.
@@ -83,8 +107,8 @@ UI: [[../07_UI_UX_KNOWLEDGE/Tenant_Admin_Add_Product_7_Step_UI_UX_Specification]
 - Wire payload: `pricingTax.variantPrices[]` full snapshot via `toSnapshotJson()` (keeps `sellingPrice: null` for PENDING).
 - SIMPLE must not send `variantPrices`; VARIANT must not send scalar `standardSellingPrice` as multi-variant authority.
 - Step 7 Review: VARIANT shows priced count / range / compact per-variant list (no Default helper).
-- Utils: `presentation/utils/step_6_variant_pricing.dart`.
-- Tests: `step_6_pricing_tax_form_test.dart`, `step_6_variant_pricing_util_test.dart`.
+- Utils: `presentation/utils/variant_pricing.dart`.
+- Tests: `pricing_tax_form_test.dart`, `variant_pricing_util_test.dart`.
 - Closure: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_PRICING_TAX_FLUTTER_IMPLEMENTATION_CLOSURE_2026-09-04]]
 
 ---
@@ -97,7 +121,7 @@ UI: [[../07_UI_UX_KNOWLEDGE/Tenant_Admin_Add_Product_7_Step_UI_UX_Specification]
 - After `createProductFromWizard()` returns true, `AddProductWizard` shows `product_created_success.dart` and **does not** show a create-success toast or `go` to Product List.
 - Snapshot: `ProductCreateSuccessSnapshot.fromWizard` (name, code/SKU, status, type, SKU count, variant count for VARIANT, created-at, primary image). No hardcoded sample products.
 - **View Product** → `/tenant-admin/products/{productId}` (product detail view, not edit).
-- **Add Another Product** → `startFreshWizard()` (Step 1). If the current route is resume/duplicate, navigate to `/tenant-admin/products/add`.
+- **Add Another Product** → `startFreshWizard()` (**Step 1 Scan Barcode**). If the current route is resume/duplicate, navigate to `/tenant-admin/products/add`.
 - **Back to Products** → `/tenant-admin/products`.
 - Still invalidate list / summary / local-draft providers so Product List is current on return.
 - Tests: `test/features/tenant_admin/products/product_created_success_test.dart`.
@@ -105,7 +129,7 @@ UI: [[../07_UI_UX_KNOWLEDGE/Tenant_Admin_Add_Product_7_Step_UI_UX_Specification]
 ---
 
 CURRENT Flutter (2026-09-01): fields exist on `AddProductWizardState`; card is on
-Step 2 after type select; batch/serial text controllers are synced from the
+Step 3 after type select; batch/serial text controllers are synced from the
 wizard. Confirmation dialog before destructive clear remains a GAP
 (continue currently applies the clear plan with `confirmed: true`).
 
@@ -131,44 +155,42 @@ Shared query/DTO types may be reused only if they stay consistent with Product S
 
 ```text
 lib/features/tenant_admin/products/
-├── application/
-│   ├── usecases/
-│   │   ├── save_product_draft_usecase.dart
-│   │   └── get_product_setup_usecase.dart
 ├── data/
 │   ├── datasources/
-│   │   ├── tenant_product_remote_datasource.dart
-│   ├── mappers/
-│   │   └── tenant_product_mapper.dart
-│   └── models/
-│       ├── save_product_draft_request_dto.dart
-│       ├── product_draft_response_dto.dart
-│       └── product_setup_wizard_dto.dart
+│   │   ├── remote/
+│   │   │   └── tenant_product_remote_datasource.dart
+│   │   └── local/
+│   │       └── product_wizard_draft_local_datasource.dart
+│   ├── repositories/
+│   ├── dtos/
+│   │   ├── save_product_draft_request_dto.dart
+│   │   └── product_draft_response_dto.dart
+│   └── mappers/
+├── domain/
+│   ├── entities/
+│   ├── repositories/
+│   └── usecases/
+│       ├── save_product_draft.dart
+│       └── get_product_setup.dart
 └── presentation/
+    ├── providers/
     ├── controllers/
     │   └── add_product_wizard_controller.dart
-    ├── state/
-    │   ├── add_product_wizard_state.dart
-    │   └── step4_variant_configuration_state.dart
+    ├── screens/
     ├── widgets/
-│   ├── step_1_basic_details_form.dart
-│   ├── product_initial_tracking_card.dart   // rendered on Step 2 after type select
-│   ├── step_2_product_type_tracking_form.dart
-    │   ├── step_3_units_pack_conversion_form.dart
-    │   ├── step_4_variant_configuration_form.dart
-    │   ├── step_6_pricing_tax_form.dart
-    │   ├── edit_variant_drawer.dart
-    │   ├── delete_variant_modal.dart
-    │   ├── step_7_review_create.dart
-    │   ├── product_created_success.dart
-    │   └── product_summary_card.dart
-    └── screens/
-        └── add_product_wizard_screen.dart
+    │   ├── basic_details/basic_details.dart
+    │   ├── product_type_tracking/product_type_tracking.dart
+    │   ├── units_pack_conversion/units_pack_conversion.dart
+    │   ├── variant_configuration/variant_configuration_form.dart
+    │   ├── barcode_sku/barcode_sku_form.dart
+    │   ├── pricing_tax/pricing_tax_form.dart
+    │   └── review_create/review_create.dart
+    └── utils/
 ```
 
 ---
 
-## 3. Riverpod State Architecture for Step 4
+## 3. Riverpod State Architecture for Step 5 (Product Configuration matrix)
 
 ### 3.1 `Step4VariantConfigurationState`
 ```dart
@@ -197,8 +219,8 @@ class Step4VariantConfigurationState {
 
 > **Estimated Variant Count contract**: Computed locally in Flutter. No API call. Not persisted as authoritative data. Recomputed on draft reopen from restored attribute/value graph. See [[../04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification#3.4 Estimated Variant Count (Live UX Preview)]].
 
-### 3.2 `AddProductWizardController` Methods for Step 4
-- `loadStep4()`: Restores step 4 state graph from `ProductSetupWizardDto`.
+### 3.2 `AddProductWizardController` Methods for Step 5 — Product Configuration / Variant Matrix
+- `loadStep5Matrix()`: Restores Step 5 matrix state graph from `ProductSetupWizardDto`.
 - `addAttributeRow()`: Appends new attribute configuration row.
 - `removeAttributeRow(int index)`: Removes row from configuration.
 - `selectAttribute(int index, String templateId)`: Selects option template and loads active values.
@@ -212,8 +234,8 @@ class Step4VariantConfigurationState {
 - `removeVariantImageOverride(String variantId)`: Clears variant exact image override.
 - `saveDrawerChanges()`: Applies drawer edits to wizard state.
 - `confirmDeleteVariant(String variantId)`: Archives combination tombstone (`status = 'ARCHIVED'`).
-- `saveDraftStep4()`: Invokes `saveDraft(currentSetupStep: 4, advanceStep: false)`.
-- `saveAndContinueStep4()`: Invokes `saveAndContinue(currentSetupStep: 4, advanceStep: true)`. Advances to Step 5.
+- `saveDraftStep5Matrix()`: Invokes `saveDraft(currentSetupStep: 5, advanceStep: false)`. Remains on Step 5.
+- `saveAndContinueStep5Matrix()`: Invokes `saveAndContinue(currentSetupStep: 5, advanceStep: true)`. Advances to **Step 6 Pricing & Tax**.
 
 ---
 
@@ -221,7 +243,7 @@ class Step4VariantConfigurationState {
 
 - **Toggle Label**: Always use **`Include Variant`** (never "Availability").
 - **Polymorphic Rendering**: Renders Variant Configuration when `productStructure == 'VARIANT'`.
-- **Estimated Variant Count Card**: Render only for VARIANT. Hide for SIMPLE and BUNDLE Step 4 modes. Update on every attribute/value mutation without network I/O.
+- **Estimated Variant Count Card**: Render only for VARIANT. Hide for SIMPLE and BUNDLE Step 5 modes. Update on every attribute/value mutation without network I/O.
 - **Validation**: Rejects `Save & Continue` if zero attributes are defined, any attribute has zero selected values, or zero variants are included.
 - **Drawer Isolation**: Edits in `EditVariantDrawer` are held in local drawer state until `Save Changes` is clicked. `Cancel` or clicking background overlay discards uncommitted drawer changes.
 

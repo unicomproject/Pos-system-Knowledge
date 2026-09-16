@@ -1,19 +1,20 @@
 <!-- title: Tenant Admin Add Product Initial Tracking Details Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-09-01 -->
+<!-- last_updated: 2026-09-11 -->
+<!-- supersedes: collection_step2_numbering_pre_scanner_first -->
 
 # Tenant Admin Add Product Initial Tracking Details Specification
 
 Filename retained as `Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification`
-for wikilink stability. **Collection UI is Step 2**, not Step 1, from 2026-09-01.
+for wikilink stability. **Collection UI is global Step 3 (Product Type & Tracking)**. Filename retains Step1 for wikilink stability. Remumbered 2026-09-11 (was Step 2 from 2026-09-01; Step 1 is now Scan Barcode).
 
 ## Purpose
 
 Canonical TARGET contract for optional Initial Tracking Details inside Tenant
-Admin Add Product **Step 2 — Product Type & Tracking**, shown after Product Type
+Admin Add Product **Step 3 — Product Type & Tracking**, shown after Product Type
 is explicitly selected. This does not add an 8th wizard step. Tracking **policy**
-stays on Step 2. Step 1 is Product master + images + channels only.
+stays on Step 3. Step 1 is Scan Barcode; Step 2 is Product master + images + channels only.
 
 Authority: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
 and identity rules in
@@ -24,26 +25,30 @@ and identity rules in
 | Layer | CURRENT | TARGET | GAP |
 |---|---|---|---|
 | Wizard length | 7 steps | Remain 7 steps | None |
-| Collection UI | Step 2 after Product Type confirmed (SIMPLE / VARIANT). Hidden for BUNDLE. Not on Step 1 | Same | None (Flutter 2026-09-01) |
-| Tracking policy | Step 2 → `product_inventory_settings` | Unchanged | None |
-| Destructive clear | Step 2 continue may apply clear plan with `confirmed: true` | Explicit confirmation dialog + `confirmClearIncompatibleInitialTracking` | Flutter confirmation UX |
+| Collection UI | Step 3 after Product Type confirmed (SIMPLE / VARIANT). Hidden for BUNDLE. Not on Step 1 Scan or Step 2 Basic Details | Same ownership on Type & Tracking; global number now 3 | Docs remumber 2026-09-11 |
+| Tracking policy | Step 3 → `product_inventory_settings` | Unchanged | None |
+| Destructive clear | Step 3 continue may apply clear plan with `confirmed: true` | Explicit confirmation dialog + `confirmClearIncompatibleInitialTracking` | Flutter confirmation UX |
 | Actual Batch/Expiry | Inventory `product_batches` | Same final owner | None |
 | Actual Serial | Inventory `serial_numbers` | Same final owner | None |
 | `products.batch_number` / `expiry_date` / `serial_number` | Do not exist | Must **not** be added as Product master identity | Do not invent these columns |
 
-## Wizard Remains Exactly 7 Steps
+## Wizard Remains Exactly 7 Steps (LOCKED 2026-09-11)
 
-1. Basic Details
-2. Product Type & Tracking
-3. Units & Pack Conversion
-4. Product Configuration
-5. Barcode & SKU
+1. Scan Barcode
+2. Basic Details
+3. Product Type & Tracking
+4. Unit & Pack Conversion
+5. Product Configuration
 6. Pricing & Tax
 7. Review & Create
 
-`products.current_setup_step` CURRENT EF constraint is `BETWEEN 1 AND 7`.
+Standalone global **Barcode & SKU** is superseded (identifiers under Step 5).  
+Decision: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].  
+Scan: [[Tenant_Admin_Product_Setup_Scan_Barcode_Specification]].
 
-## Step 1 Layout — Basic Details Only
+`products.current_setup_step` CURRENT EF constraint is `BETWEEN 1 AND 7`. Semantics: 1=Scan, 2=Basic Details, 3=Type & Tracking, …
+
+## Step 2 Layout — Basic Details Only (no Initial Tracking)
 
 ### Section A — Product Basic Information
 
@@ -51,9 +56,9 @@ Existing fields remain: Product Name, Internal Product Code / Short Name,
 Category, Brand, Short Description, Long Description, Product Images,
 In-Store POS, Online Store.
 
-Step 1 MUST NOT render Initial Tracking Details.
+Step 2 MUST NOT render Initial Tracking Details. Step 1 Scan also MUST NOT.
 
-## Step 2 Layout — Product Type, Identity Inputs, Then Policy
+## Step 3 Layout — Product Type, Identity Inputs, Then Policy
 
 ### Section A — Product Type
 
@@ -83,12 +88,12 @@ Unchanged: Track Inventory, Batch Tracking, Expiry Tracking, Serial Tracking
 (SIMPLE / VARIANT). Bundle shows read-only component behaviour, not parent
 tracking toggles. Render **below** Initial Tracking Details.
 
-## Step 2 Collection Behaviour
+## Step 3 Collection Behaviour
 
-These values are **INITIAL TRACKING INPUT** until Step 2 tracking policy makes
+These values are **INITIAL TRACKING INPUT** until Step 3 tracking policy makes
 them semantically valid. They are not tracking policy.
 
-- All three are optional on Step 2.
+- All three are optional on Step 3.
 - The card is hidden until Product Type is explicitly selected.
 - SIMPLE / VARIANT: show the card **above** Tracking & Stock Rules.
 - BUNDLE: never show the card; warn/clear if values already exist from resume.
@@ -101,13 +106,14 @@ them semantically valid. They are not tracking policy.
   uniqueness is deferred until Product identity/ownership is finalized at
   publish (or VARIANT assignment).
 
-Successful Step 2 Save & Continue: `current_setup_step = 3` (or skip per
+Successful Step 3 Save & Continue: `current_setup_step = 4` (or skip per
 structure / Track Inventory rules).
 
-## Step 1 Behaviour
+## Step 1 / Step 2 Behaviour (no Initial Tracking)
 
-Step 1 Save & Continue does not collect or validate Initial Tracking fields.
-Successful Step 1 Save & Continue: `current_setup_step = 2`.
+Step 1 Scan and Step 2 Basic Details do not collect or validate Initial Tracking fields.
+Successful Step 2 Save & Continue: `current_setup_step = 3`.
+Fresh drafts after scan creation-path normally start at `current_setup_step = 2`.
 
 ## Draft Persistence Decision (LOCKED)
 
@@ -116,19 +122,23 @@ Successful Step 1 Save & Continue: `current_setup_step = 2`.
 | Option | Decision |
 |---|---|
 | A — Existing wizard draft pipeline | **SELECTED for API/lifecycle.** Reuse `POST/PUT .../draft` and `GET .../setup`. Do not invent a second Product Setup endpoint. |
-| B — Dedicated draft-safe entity | **SELECTED for persistence.** TARGET table `product_setup_initial_tracking` (1:1 with `products`). |
+| B — Dedicated draft-safe entity | **SELECTED for persistence.** **EXISTING** table `product_setup_initial_tracking` (1:1 with `products`). Migration evidence: `20260824095742_AddProductSetupInitialTracking`. Collected on **CURRENT Step 3**. **Not** scanner-first B1. |
 | C — `products` temporary identity columns | **REJECTED.** Would pollute Product master semantics and imply one lifetime Batch/Serial. |
 
 ### Why Option B
 
-CURRENT `SaveProductDraftRequest` persists Step 1 into `products` master columns
-and Step 2 into `product_inventory_settings`. There is **no CURRENT safe column**
+CURRENT `SaveProductDraftRequest` persists Step 2 into `products` master columns
+and Step 3 into `product_inventory_settings`. There is **no CURRENT safe column**
 for provisional Batch/Expiry/Serial. Creating `product_batches` /
 `serial_numbers` before structure and policy are known is forbidden. Collection
-therefore happens on Step 2 after Product Type is selected. Identity rows are
+therefore happens on Step 3 after Product Type is selected. Identity rows are
 still created only at Step 7 Publish.
 
-### TARGET table `product_setup_initial_tracking` (GAP — migration required)
+### EXISTING table `product_setup_initial_tracking`
+
+**Status:** EXISTING (not a scanner-first TARGET). Migration: `20260824095742_AddProductSetupInitialTracking`.  
+Live DB/E2E: [[../../15_IMPLEMENTATION_TRACKING/99_AUDITS/TENANT_ADMIN_PRODUCT_SETUP_INITIAL_TRACKING_PERMISSION_FIRST_IMPLEMENTATION_CLOSURE_2026-08-24]] — do not infer production acceptance from documentation alone.  
+Scanner-first B1 must **not** recreate this table.
 
 | Column | Type | Null | Meaning |
 |---|---|---|---|
@@ -147,7 +157,9 @@ still created only at Step 7 Publish.
 | `updated_by_tenant_user_id` | uuid | NULL | FK tenant_users |
 | `row_version` | bigint | NOT NULL DEFAULT 1 | Internal; incremented in the same transaction as `products.row_version`. **API concurrency token remains `products.row_version` / `expectedRowVersion` only.** |
 
-### TARGET constraints (no Step 2 combination CHECK)
+### TARGET constraints (no Step 3 combination CHECK)
+
+> Constraints below describe the **EXISTING** table (already migrated). Do not treat as a new migration work item for scanner-first B1.
 
 ```text
 PK(id)
@@ -169,7 +181,7 @@ INDEX(tenant_id, consumed_at) WHERE consumed_at IS NULL
 ```
 
 Do **not** CHECK-forbid Batch+Expiry+Serial together on this draft table.
-Combination validation is application/domain until Step 2 normalization.
+Combination validation is application/domain until Step 3 normalization.
 Final `product_batches` / `serial_numbers` keep their existing identity CHECKs.
 
 Delete behaviour: CASCADE when the Product row is removed. Product ARCHIVE
@@ -183,7 +195,7 @@ Cleanup: on successful publish, create applicable inventory identity rows, set
 
 Resume: `GET .../setup` MUST return the three values and any assigned variant id.
 
-## Step 2 Tracking Policy Plus Identity Collection
+## Step 3 Tracking Policy Plus Identity Collection
 
 Unchanged policy fields: Product Structure (`SIMPLE` / `VARIANT` / `BUNDLE`), Track
 Inventory, Batch Tracking, Expiry Tracking, Serial Tracking.
@@ -201,7 +213,7 @@ Release 1 mutual exclusivity CURRENT and TARGET:
 - Expiry requires Batch
 - Track Inventory OFF forces Batch/Expiry/Serial OFF
 
-## Step 2 Policy → Identity Reconciliation Matrix
+## Step 3 Policy → Identity Reconciliation Matrix
 
 | Identity Input | Tracking Policy | Result |
 |---|---|---|
@@ -222,7 +234,7 @@ Confirmation copy:
 
 `Tracking is disabled for the entered Batch/Expiry/Serial values. These values will be cleared if you continue.`
 
-After confirmation, persist the **normalized** draft state. Returning to Step 2
+After confirmation, persist the **normalized** draft state. Returning to Step 3
 must show the normalized values, not restored discarded values.
 
 API must require an explicit confirmation flag such as
@@ -246,7 +258,7 @@ Expiry lives on the initial Batch: `product_batches.expiry_date`.
 
 ### VARIANT — LOCKED Option 2
 
-Step 2 values stay provisional until an exact included Variant is selected.
+Step 3 values stay provisional until an exact included Variant is selected.
 Do not create parent-Product Batch/Serial rows for VARIANT products.
 
 **Assignment surface: Step 7 Review & Create**, not Step 4. Step 4 remains
@@ -262,7 +274,7 @@ Final rows MUST use that `product_variant_id`.
 
 ### BUNDLE / KIT
 
-Bundle parent inventory remains component-based. Step 2 identities cannot become
+Bundle parent inventory remains component-based. Step 3 identities cannot become
 Bundle-parent `product_batches` / `serial_numbers`.
 
 Warning:
@@ -293,15 +305,16 @@ tenant scope, variant applicability, Bundle restriction, and expiry validity.
 ## When Actual Inventory Records Are Created
 
 ```text
-Step 1  → product master + images + channels (no identity inputs)
-Step 2  → select Product Type, tracking policy, optional identity inputs, reconcile
+Step 1  → Scan Barcode (pre-draft acquire; no Initial Tracking)
+Step 2  → product master + images + channels (no identity inputs)
+Step 3  → select Product Type, tracking policy, optional identity inputs, reconcile
 Steps 3–6 → units / variants / identifiers / pricing
 Step 7  → validate complete Product model
         → Create/Publish Product
         → persist applicable initial Batch / Serial identity
 ```
 
-Step 2 itself creates **no** `product_batches` or `serial_numbers`.
+Step 3 itself creates **no** `product_batches` or `serial_numbers`.
 
 Identity without positive stock is allowed by CURRENT schema (`serial_numbers.current_inventory_balance_id` nullable; `product_batches` has no quantity). Product Setup MUST NOT fabricate:
 
@@ -314,9 +327,9 @@ Opening Stock / Stock Receiving remain responsible for quantity.
 
 ## Domain Semantics
 
-Expiry UI on Step 2 is convenience only. Domain owner remains
+Expiry UI on Step 3 is convenience only. Domain owner remains
 `product_batches.expiry_date`. One Product may later have many batches with
-different expiries. Step 2 expiry is the **initial** Batch expiry only.
+different expiries. Step 3 expiry is the **initial** Batch expiry only.
 
 Serial identifies one physical unit, not a Product-wide reusable code. Later
 receiving may add more serials.
@@ -327,18 +340,18 @@ Batch identifies a lot. Later receiving may add more batches.
 
 | ID | Rule |
 |---|---|
-| BR-TRACK-001 | Step 2 may collect optional initial Batch Number after Product Type is selected. |
-| BR-TRACK-002 | Step 2 may collect optional initial Expiry Date after Product Type is selected. |
-| BR-TRACK-003 | Step 2 may collect optional initial Serial Number after Product Type is selected. |
-| BR-TRACK-004 | Step 2 identity values do not determine tracking policy. |
-| BR-TRACK-005 | Step 2 is authoritative for tracking enable/disable state. |
+| BR-TRACK-001 | Step 3 may collect optional initial Batch Number after Product Type is selected. |
+| BR-TRACK-002 | Step 3 may collect optional initial Expiry Date after Product Type is selected. |
+| BR-TRACK-003 | Step 3 may collect optional initial Serial Number after Product Type is selected. |
+| BR-TRACK-004 | Step 3 identity values do not determine tracking policy. |
+| BR-TRACK-005 | Step 3 is authoritative for tracking enable/disable state. |
 | BR-TRACK-006 | Expiry Tracking requires Batch Tracking. |
 | BR-TRACK-007 | Serial Tracking is mutually exclusive with Batch/Expiry in Release 1. |
 | BR-TRACK-008 | Incompatible identity values must never be silently discarded. |
 | BR-TRACK-009 | Expiry remains batch-owned domain data. |
 | BR-TRACK-010 | Serial remains physical-unit identity data. |
-| BR-TRACK-011 | Step 2 serial is an INITIAL serial, not a Product-wide reusable serial. |
-| BR-TRACK-012 | Step 2 batch is an INITIAL batch; later batches may be added. |
+| BR-TRACK-011 | Step 3 serial is an INITIAL serial, not a Product-wide reusable serial. |
+| BR-TRACK-012 | Step 3 batch is an INITIAL batch; later batches may be added. |
 | BR-TRACK-013 | No positive inventory quantity may be invented from Batch/Expiry/Serial input alone. |
 | BR-TRACK-014 | Variant tracking identity must resolve to an exact Variant before final physical ownership. |
 | BR-TRACK-015 | Bundle parent cannot receive direct physical tracking identities while Bundle inventory remains component-based. |
@@ -352,11 +365,11 @@ Batch identifies a lot. Later receiving may add more batches.
 
 | ID | Requirement |
 |---|---|
-| FR-IT-001 | Step 2 captures optional Batch Number after Product Type is selected. |
-| FR-IT-002 | Step 2 captures optional Expiry Date after Product Type is selected. |
-| FR-IT-003 | Step 2 captures optional Serial Number after Product Type is selected. |
+| FR-IT-001 | Step 3 captures optional Batch Number after Product Type is selected. |
+| FR-IT-002 | Step 3 captures optional Expiry Date after Product Type is selected. |
+| FR-IT-003 | Step 3 captures optional Serial Number after Product Type is selected. |
 | FR-IT-004 | Save Draft / resume / back restore the three values. |
-| FR-IT-005 | Step 2 reconciles values against tracking policy. |
+| FR-IT-005 | Step 3 reconciles values against tracking policy. |
 | FR-IT-006 | Confirmation required before destructive clearing. |
 | FR-IT-007 | SIMPLE identity publishes to base Product (`product_variant_id` NULL). |
 | FR-IT-008 | VARIANT identity requires Step 7 assignment. |
@@ -389,7 +402,7 @@ Canonical matrix:
 
 ## API Permission Matrix
 
-Same routes as the 7-step wizard. Step 2 identity fields ride on `POST/PUT .../draft`.
+Same routes as the 7-step wizard. Step 3 identity fields ride on `POST/PUT .../draft`.
 GET `/setup` returns them. Publish consumes them. See permission matrix §16.
 
 ## NFR
@@ -402,10 +415,10 @@ GET `/setup` returns them. Publish consumes them. See permission matrix §16.
 | NFR-CON-001 | `expectedRowVersion` vs `products.row_version`; stale → 409 `product.concurrency_conflict`. |
 | NFR-TXN-001 | Step save atomically updates Product Setup draft tables including `product_setup_initial_tracking`. Publish atomically validates, writes Product graph, writes identity rows, sets `consumed_at`, or rolls back. |
 | NFR-IDEM-001 | Repeated Save Draft must not duplicate the initial tracking row, batch row, or serial row. |
-| NFR-PERF-001 | Avoid N+1. Align with existing Product Setup: Step 2 save P95 &lt; 100ms; setup GET P95 &lt; 150ms. |
+| NFR-PERF-001 | Avoid N+1. Align with existing Product Setup: Step 3 save P95 &lt; 100ms; setup GET P95 &lt; 150ms. |
 | NFR-AUD-001 | Material changes audit actor, tenant, product, timestamp via existing `audit_logs` / Product draft events. |
 | NFR-OBS-001 | Errors include canonical code and trace ID; no cross-tenant leakage. |
-| NFR-UX-001 | Step 2 Initial Tracking card respects 1024×768 Product Setup layout and appears only after Product Type is selected. |
+| NFR-UX-001 | Step 3 Initial Tracking card respects 1024×768 Product Setup layout and appears only after Product Type is selected. |
 | NFR-ACC-001 | Keyboard, semantics, focus order, accessible date picker, labeled validation. |
 
 ## Audit Contract
@@ -417,7 +430,7 @@ TARGET events (same naming family; GAP until implemented):
 
 | Event | When | Payload (no secrets) |
 |---|---|---|
-| `PRODUCT_DRAFT_INITIAL_TRACKING_UPDATED` | Step 2 persist of tracking draft fields | tenantId, productId, actor, which fields set (booleans), rowVersion — **not** full serial/batch strings if policy treats them as sensitive operational IDs; store presence flags + hashes optional |
+| `PRODUCT_DRAFT_INITIAL_TRACKING_UPDATED` | Step 3 persist of tracking draft fields | tenantId, productId, actor, which fields set (booleans), rowVersion — **not** full serial/batch strings if policy treats them as sensitive operational IDs; store presence flags + hashes optional |
 | `PRODUCT_DRAFT_INITIAL_TRACKING_CLEARED` | Explicit incompatible clear | tenantId, productId, actor, reason/policy, rowVersion |
 | `PRODUCT_DRAFT_INITIAL_TRACKING_VARIANT_ASSIGNED` | Step 7 assignment | tenantId, productId, variantId, actor, rowVersion |
 | `PRODUCT_PUBLISH_INITIAL_BATCH_CREATED` | Identity batch inserted | tenantId, productId, productBatchId, actor |
@@ -442,7 +455,7 @@ Do not invent a separate audit subsystem. Do not log tokens or cross-tenant data
 | HTTP | Code | When |
 |---|---|---|
 | 400 | `product.initial_tracking.incompatible_values_require_confirmation` | Incompatible values and confirm flag false |
-| 400 | `product.initial_tracking.batch_required_for_expiry` | Expiry tracking/identity finalization without Batch (reuse policy `BATCH_REQUIRED_FOR_EXPIRY` only for Step 2 toggles) |
+| 400 | `product.initial_tracking.batch_required_for_expiry` | Expiry tracking/identity finalization without Batch (reuse policy `BATCH_REQUIRED_FOR_EXPIRY` only for Step 3 toggles) |
 | 400 | `product.initial_tracking.invalid_expiry_date` | Malformed date |
 | 400 | `product.initial_tracking.bundle_parent_not_supported` | Attempt to finalize identity on BUNDLE parent |
 | 400 | `product.initial_tracking.variant_assignment_required` | VARIANT identity without assigned variant |
@@ -456,24 +469,24 @@ Do not invent a separate audit subsystem. Do not log tokens or cross-tenant data
 
 ## Validation
 
-**Batch Number:** optional Step 2; trim; max 100; uniqueness
+**Batch Number:** optional Step 3; trim; max 100; uniqueness
 `UNIQUE(tenant_id, product_id, batch_number)` when `product_variant_id` is NULL,
 or with variant when assigned; checked before final persistence.
 
-**Expiry Date:** optional Step 2; valid date only; if Expiry Tracking ON at
+**Expiry Date:** optional Step 3; valid date only; if Expiry Tracking ON at
 finalization, Batch Number must exist; enforce
 `expiry_date >= manufactured_at` when manufacture date exists (CURRENT column
 `product_batches.manufactured_at`). Product Setup does not collect manufacture
 date, so that check is N/A unless a later receiving/edit supplies it.
 
-**Serial Number:** optional Step 2; trim; max 150; uniqueness CURRENT
+**Serial Number:** optional Step 3; trim; max 150; uniqueness CURRENT
 `UNIQUE(tenant_id, product_id, serial_number)` — product-scoped, not tenant-wide.
 
 ## API — distinguish values from policy
 
 Do not invent duplicate endpoints. Extend existing draft DTOs.
 
-Step 2 draft input (policy + optional identity):
+Step 3 draft input (policy + optional identity):
 
 ```json
 {

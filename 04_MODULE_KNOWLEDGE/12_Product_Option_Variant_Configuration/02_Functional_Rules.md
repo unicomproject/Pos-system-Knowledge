@@ -14,17 +14,18 @@ These rules must be applied before creating backend APIs, Flutter screens, respo
 
 - Option templates standardize common values such as size, color, portion, or type.
 - Variant option combinations identify sellable variants via deterministic `option_combination_hash` (SHA-256). Unsaved variants are identified by `clientCombinationKey`.
-- **Add Product Step 4 Variant Configuration**:
-  - Stepper Step 4 Label: `Product Configuration`.
+- **Add Product Step 5 Variant Configuration** (CURRENT; FORMER global Step 4 before scanner-first renumbering):
+  - Stepper Step 5 Label: `Product Configuration`.
   - Page Heading: `Variant Configuration`.
   - Toggle Label: **`Include Variant`** (CANONICAL MANDATE: NEVER use "Availability" for this toggle).
-  - Step 4 defines options, option values, Cartesian matrix generation, display labels, variant inclusion toggles, and variant image overrides.
+  - Step 5 defines options, option values, Cartesian matrix generation, display labels, variant inclusion toggles, and variant image overrides.
+  - Final SKU/Barcode assignment is the Step 5 **identifier section** (same global step; not a separate stepper item).
   - **Estimated Variant Count** (VARIANT only): live frontend Cartesian-product preview during attribute/value configuration. Not shown for SIMPLE. Not authoritative. No dedicated estimate API. See [[Tenant_Admin_Product_Variant_Configuration_Specification#3.4 Estimated Variant Count (Live UX Preview)]].
-  - Step 4 MUST NOT include SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility controls (belonging to Step 1).
-  - Image fallback priority: Exact Variant Override $\rightarrow$ Colour Group Image (`product_option_values.image_media_asset_id`) $\rightarrow$ Step 1 Primary Product Image $\rightarrow$ Standard Placeholder.
+  - Step 5 MUST NOT include Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility controls (Channel = Step 2; Pricing = Step 6).
+  - Image fallback priority: Exact Variant Override $\rightarrow$ Colour Group Image (`product_option_values.image_media_asset_id`) $\rightarrow$ Step 2 Primary Product Image $\rightarrow$ Standard Placeholder.
   - Delete Variant Action: Archives combination tombstone (`status = 'ARCHIVED'`). Operational variants with history cannot be deleted. Tombstoned combinations NEVER automatically resurrect upon regeneration.
   - Variant Lifecycle: Wizard draft variants remain in `DRAFT` status until Step 7 publishes them.
-  - Variant UOM: Inherited from Step 3 if Track Inventory is ON; resolved via canonical system default UOM resolver if OFF.
+  - Variant UOM: Inherited from Step 4 Unit & Pack if Track Inventory is ON; resolved via canonical system default UOM resolver if OFF.
 - POS variant resolution uses option and option-value IDs, completes required groups, disables values that cannot yield an eligible variant, clears incompatible choices, and requires exactly one match. See [[../../21_POS_Operations/07_Product_Variant_Selection_Popup_Feature]].
 
 ## User Rules

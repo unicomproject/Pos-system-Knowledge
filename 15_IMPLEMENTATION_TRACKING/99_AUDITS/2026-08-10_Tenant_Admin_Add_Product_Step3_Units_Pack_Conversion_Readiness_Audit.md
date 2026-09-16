@@ -4,6 +4,9 @@
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- date: 2026-08-10 -->
+<!-- last_updated: 2026-09-12 -->
+
+> **HISTORICAL EVIDENCE ONLY.** FORMER global Step 3 Units & Pack. **CURRENT:** global Step 4. Authority: [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Units_Pack_Conversion_Specification]], [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].
 
 ## 1. Executive Summary
 

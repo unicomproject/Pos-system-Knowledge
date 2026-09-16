@@ -1,6 +1,8 @@
 # Tenant Admin Bundle Kit Step 4 Second Brain Readiness Audit
 **Date:** 2026-08-14
 
+> **HISTORICAL EVIDENCE ONLY (pre-scanner-first numbering).** CURRENT: BUNDLE bypasses Step 4 Unit & Pack → Step 5 Product Configuration (Bundle Composition). Back from Step 5 → Step 3. Authority: [[../../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]], [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].
+
 ## 1. Canonical User Journey
 - Step 1 (Basic Details) -> Step 2 (Product Type & Tracking)
 - Step 2 `productStructure` = `BUNDLE` -> Step 4 (Product Configuration)

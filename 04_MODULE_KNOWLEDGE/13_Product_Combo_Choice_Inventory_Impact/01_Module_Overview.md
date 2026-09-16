@@ -76,7 +76,7 @@ merchandising, attractions, and temporary retail locations.
 - [[04_MODULE_KNOWLEDGE/13_Product_Combo_Choice_Inventory_Impact/03_Technical_Contract]]
 
 ## Component Unit Rule
-Component Unit comes from the selected Product/Variant's existing UOM setup. It is read-only in Bundle Step 4.
+Component Unit comes from the selected Product/Variant's existing UOM setup. It is read-only in Bundle **Step 5 Product Configuration / Bundle Composition**.
 Persisted as: `component_uom_id` in the `combo_components` table.
 
 ## POS Downstream Contract

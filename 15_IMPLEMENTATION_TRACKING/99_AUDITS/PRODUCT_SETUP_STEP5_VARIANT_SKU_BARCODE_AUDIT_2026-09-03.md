@@ -1,6 +1,8 @@
 # PRODUCT SETUP STEP 5 VARIANT SKU & BARCODE — PRE-IMPLEMENTATION AUDIT
 <!-- status: Active -->
-<!-- last_updated: 2026-09-03 -->
+<!-- last_updated: 2026-09-11 -->
+
+> **SUPERSEDED AS GLOBAL-STEP AUTHORITY (2026-09-11):** Standalone “Step 5 Barcode & SKU” is obsolete. Identifier UI now lives inside **Product Configuration (global Step 5)** after scanner-first remumber. Use [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]] and [[PRODUCT_SETUP_SCANNER_FIRST_SECOND_BRAIN_CANONICALIZATION_2026-09-11]]. This file remains historical implementation evidence only.
 
 ## Scope
 VARIANT-only Step 5 table-first alignment. SIMPLE remains separate. No Auto-generate SKU.

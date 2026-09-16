@@ -7,7 +7,7 @@
 
 ## Purpose
 
-Defines the implementation contract for `Product_Option_Variant_Configuration`. This contract is aligned with OneVerz POS MVP scope and the canonical Step 4 specification.
+Defines the implementation contract for `Product_Option_Variant_Configuration`. This contract is aligned with OneVerz POS MVP scope and the canonical **Step 5** Product Configuration specification (FORMER: Step 4 before scanner-first renumbering).
 
 ## API Contract
 
@@ -15,7 +15,7 @@ Defines the implementation contract for `Product_Option_Variant_Configuration`. 
 |---|---|
 | API Endpoints | `PUT /api/v1/tenant-admin/products/{productId}/draft`, `GET /api/v1/tenant-admin/products/{productId}/setup`, `GET /api/v1/tenant-admin/products/create-options` |
 | Create Options Extension | Extended `TenantAdminProductCreateOptionsResponse` so `VariantOptionTemplates` includes nested `Values` array (`IReadOnlyList<TenantAdminProductVariantOptionTemplateValueResponse>`) |
-| Request format | Typed `SaveProductDraftRequest` with `variantConfiguration` payload (`currentSetupStep = 4`). Submit selected attributes + values only. Do **NOT** require authoritative `estimatedVariantCount`. |
+| Request format | Typed `SaveProductDraftRequest` with `variantConfiguration` payload (`currentSetupStep = 5`). Submit selected attributes + values only. Do **NOT** require authoritative `estimatedVariantCount`. |
 | Response format | Typed `ProductDraftResponse` / `ProductSetupWizardDto` with full `variantConfiguration` graph |
 | Estimate APIs | **None required.** No `GET /estimated-variant-count` or `POST /calculate-variant-count` for live UX preview. |
 | Derived count fields | If present in any DTO, treat as informational/non-authoritative. Backend recalculates combination count from submitted configuration. |

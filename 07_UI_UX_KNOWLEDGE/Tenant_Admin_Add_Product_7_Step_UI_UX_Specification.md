@@ -1,7 +1,8 @@
 <!-- title: Tenant Admin Add Product — 7-Step Wizard UI/UX Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Scope -->
-<!-- last_updated: 2026-09-04 -->
+<!-- last_updated: 2026-09-11 -->
+<!-- supersedes: basic_details_first_standalone_barcode_sku_stepper -->
 
 # Tenant Admin Add Product — 7-Step Wizard UI/UX Specification
 
@@ -15,20 +16,37 @@ It enforces strict alignment with **Reference UI 2** and replaces legacy 4-step 
 
 ## 2. Global Stepper Header & Layout Structure
 
-### 2.1 Fixed 7-Step Horizontal Stepper Header
-1. **Basic Details**
-2. **Product Type & Tracking**
-3. **Units & Pack Conversion**
-4. **Product Configuration** (VARIANT mode: Variant Configuration)
-5. **Barcode & SKU**
+### 2.1 Fixed 7-Step Horizontal Stepper Header (LOCKED 2026-09-11)
+
+> **SUPERSEDED:** Basic Details first + standalone Barcode & SKU. Do **not** render a 10-step stepper from reference panels — panels are interaction-only inside Step 1.
+
+1. **Scan Barcode**
+2. **Basic Details**
+3. **Product Type & Tracking**
+4. **Unit & Pack Conversion**
+5. **Product Configuration** (VARIANT: Variant Configuration + identifier section; BUNDLE: Kit + identifiers)
 6. **Pricing & Tax**
 7. **Review & Create**
 
+Decision: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].  
+Scan: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Setup_Scan_Barcode_Specification]].  
+Identifiers: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]].
+
 ---
 
-## 2.1 Step 5 — VARIANT table-first layout (canonical)
+## 2.1A Step 1 — Scan Barcode UI (canonical)
 
-Reference: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Barcode_SKU_Specification]].
+States S1-A…S1-G / recovery panels remain **inside** Global Step 1 (not extra stepper items). Reuse HID keyboard-wedge framing. Call tenant-admin resolve/external-lookup — **not** POS by-barcode.
+
+Primary surfaces: scan/type field, validation feedback, existing-product conflict projection, no-local-match actions, optional external suggestion card, no-barcode bootstrap.
+
+---
+
+## 2.1B Step 5 — Identifier section (VARIANT table-first; former standalone Barcode & SKU UI)
+
+Reference: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]].  
+Redirect stub for old Step-5 filename: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Barcode_SKU_Specification]].  
+Decision: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].
 
 For `productStructure == VARIANT` only:
 
@@ -56,7 +74,7 @@ Rules:
 
 SIMPLE / BUNDLE keep a compact single-product identifier form **plus** a one-row assignment table (not the VARIANT multi-row checkbox table).
 
-### 2.1.1 Step 5 — SIMPLE / BUNDLE identifier polish (2026-09-03)
+### 2.1B.1 Step 5 — SIMPLE / BUNDLE identifier polish (2026-09-03)
 
 - Product Name is locked. User types **Base SKU** and **Parent Product Barcode**, then **Apply**.
 - Apply commits identifiers into the assignment row, then **clears** Base SKU and Parent Product Barcode. Generate may auto-fill SKU from Internal Code only when SKU is still empty.
@@ -65,14 +83,14 @@ SIMPLE / BUNDLE keep a compact single-product identifier form **plus** a one-row
 
 ---
 
-## 3. Step 1 Form Layout — Basic Details
+## 3. Step 2 Form Layout — Basic Details
 
 TARGET layout for 1024×768 tablet: compact cards, professional spacing, no
 unnecessary page-length growth, avoid nested scrolling. Preserve the existing
 Add Product visual system. Do not redesign unrelated UI.
 
 ```text
-STEP 1 — BASIC DETAILS
+STEP 2 — BASIC DETAILS
 
 ┌ Product Information ────────────────────────────┐
 │ Product Name                                    │
@@ -89,14 +107,14 @@ STEP 1 — BASIC DETAILS
 └─────────────────────────────────────────────────┘
 ```
 
-Initial Tracking Details do **not** belong on Step 1 (moved 2026-09-01).
+Initial Tracking Details do **not** belong on Step 1 Scan or Step 2 Basic Details (collected on Step 3).
 
 ---
 
-## 4. Step 2 Form Layout — Product Type & Tracking
+## 4. Step 3 Form Layout — Product Type & Tracking
 
 ```text
-STEP 2 — PRODUCT TYPE & TRACKING
+STEP 3 — PRODUCT TYPE & TRACKING
 
 Select Product Type *
 Simple / Variant / Bundle / Kit
@@ -138,19 +156,19 @@ rules:
 
 ---
 
-## 4.1 Step 3 Form Layout — Units & Pack Conversion Setup
+## 4.1 Step 4 Form Layout — Unit & Pack Conversion Setup
 (Maintains standard units & pack conversion UI specifications).
 
 ---
 
-## 4.2 Step 4 Form Layout — Variant Configuration Setup (VARIANT Mode)
+## 4.2 Step 5 Form Layout — Variant Configuration Setup (VARIANT Mode)
 
 - **Stepper Step Label**: `Product Configuration`
 - **Page Heading**: Variant Configuration
 - **Page Subtitle**: Define variant options, pick values, generate combination matrix, edit display labels, and manage variant images.
 
 ### Layout Overview
-Step 4 renders four primary UI regions (VARIANT mode):
+Step 5 renders four primary UI regions (VARIANT mode):
 1. **Define Attributes Card** (Top section):
    - Attribute Name dropdown (select from active tenant/platform option templates e.g. Size, Colour).
    - Values multi-select tag input (select active option values).
@@ -292,7 +310,7 @@ Great job! {Product Name} has been successfully added to your catalog.
 
 - Summary values are the created product (wizard state after backend create). SIMPLE vs VARIANT fields follow structure (hide Total Variants for SIMPLE).
 - **View Product** → product detail view `/tenant-admin/products/{productId}`.
-- **Add Another Product** → fresh wizard at Step 1.
+- **Add Another Product** → fresh wizard at Step 1 Scan Barcode.
 - **Back to Products** → Product List.
 - Product List providers still refresh so the list is current when the user returns.
 
@@ -312,7 +330,9 @@ Great job! {Product Name} has been successfully added to your catalog.
 - [[08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Add_Product_7_Step_Flutter_Implementation_Specification]]
 - [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
 - [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
-- [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Barcode_SKU_Specification]]
+- [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Setup_Scan_Barcode_Specification]]
+- [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]]
+- [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]]
 - [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]
 
 ## Implementation-Grade UI Contract: Add Component Drawer
@@ -341,6 +361,6 @@ Cancel/X/Escape only clears drawer temporary state. It never clears already-adde
 
 Flutter permission checks are UX only. Backend authorization is authoritative.
 
-Hide Add Product when start eligibility fails (create + barcodes.manage + pricing.manage + tax lookup). Disable VARIANT/BUNDLE cards at Step 2 without specialized manage permissions. Hide/disable media, channels, cost, and advanced tracking according to the canonical matrix. Never dead-end the wizard after Step 1.
+Hide Add Product when start eligibility fails (create + barcodes.manage + pricing.manage + tax lookup). Disable VARIANT/BUNDLE cards at Step 3 without specialized manage permissions. Hide/disable media, channels, cost, and advanced tracking according to the canonical matrix. Never dead-end the wizard after Step 2 Basic Details.
 
 Authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].

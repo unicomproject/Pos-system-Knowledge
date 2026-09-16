@@ -2,47 +2,53 @@
 <!-- title: Tenant Admin Add Product 7-Step Implementation Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-09-04 -->
+<!-- last_updated: 2026-09-11 -->
+<!-- supersedes: basic_details_first_standalone_barcode_sku_step -->
 
 # Tenant Admin Add Product 7-Step Implementation Contract
 
 ## 1. Executive Summary & Scope
 
-This contract defines the authoritative specification for the **Tenant Admin Add Product / Product Setup** feature in OneVerz POS Unified Commerce. It replaces the legacy 4-step Product Add UI with a **FIXED 7-STEP WIZARD** aligned with **Reference UI 2**.
+This contract defines the authoritative specification for the **Tenant Admin Add Product / Product Setup** feature in OneVerz POS Unified Commerce. It replaces the legacy 4-step Product Add UI with a **FIXED 7-STEP WIZARD** aligned with **Reference UI 2**, remumbered **scanner-first** (2026-09-11).
 
 This document serves as the single source of truth for Frontend (Flutter), Backend (.NET Web API), Database Schema, Access Control, and QA teams.
 
+Decision: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].  
+Scan: [[Tenant_Admin_Product_Setup_Scan_Barcode_Specification]].  
+Identifiers: [[Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]].
+
+> **Authority:** §2 is locked. Step 1 detail → [[Tenant_Admin_Product_Setup_Scan_Barcode_Specification]]. Identifier detail → [[Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]]. Initial Tracking collection → global **Step 3**.
 ---
 
 ## 2. Fixed 7-Step Wizard Lifecycle
 
 The Add Product experience is structured into exactly 7 sequential steps:
 
-1. **Step 1 — Basic Details** (General info, mandatory Category, optional Brand, Product Image upload, Channel Availability toggles)
-2. **Step 2 — Product Type & Tracking** (`SIMPLE`, `VARIANT`, `BUNDLE` selection, tracking combinations, and optional Initial Tracking Details after type is selected)
-3. **Step 3 — Units & Pack Conversion** (Base UOM, purchase/sales UOM, and conversion factors)
-4. **Step 4 — Product Configuration** (Simple: Not Applicable auto-skip; Variant: Variant Matrix & Options; Bundle: Component search & assembly)
-5. **Step 5 — Barcode & SKU** (SKU, barcode type, UOM mapping, uniqueness rules)
+1. **Step 1 — Scan Barcode** (acquire/validate/duplicate discovery/optional external lookup/no-barcode bootstrap; pre-draft until creation path)
+2. **Step 2 — Basic Details** (General info, mandatory Category, optional Brand, Product Image upload, Channel Availability toggles)
+3. **Step 3 — Product Type & Tracking** (`SIMPLE`, `VARIANT`, `BUNDLE` selection, tracking combinations, and optional Initial Tracking Details after type is selected)
+4. **Step 4 — Unit & Pack Conversion** (Base UOM, purchase/sales UOM, and conversion factors)
+5. **Step 5 — Product Configuration** (Simple: matrix N/A + identifier section; Variant: Variant Matrix & Options + identifiers; Bundle: Component search & assembly + identifiers). Standalone **Barcode & SKU** step is superseded.
 6. **Step 6 — Pricing & Tax** (SIMPLE: single selling + tax + preview; VARIANT: per-variant selling prices + common tax — see §6.1–6.5)
 7. **Step 7 — Review & Create** (Verification summary across all sections, inline edit links, final atomic publish)
 
-### Step 4 Canonical Naming Rule
+### Step 5 Canonical Naming Rule
 - Canonical step title is **"Product Configuration"**.
-- Do NOT label Step 4 as "Variants Configuration" globally.
-- Simple Products mark Step 4 as **Not Applicable** and auto-skip to Step 5.
-- Variant Products render Variant Matrix configuration inside Step 4.
-- Bundle Products render Kit Component configuration inside Step 4.
+- Do NOT label Step 5 as "Variants Configuration" globally.
+- Simple Products mark variant/bundle matrix as **Not Applicable**; identifier section still applies under Step 5.
+- Variant Products render Variant Matrix configuration inside Step 5 plus identifier section.
+- Bundle Products render Kit Component configuration inside Step 5 plus identifiers.
 
 ---
 
-## 3. Step 1 — Basic Details Contract (Reference UI 2 Alignment)
+## 3. Step 2 — Basic Details Contract (Reference UI 2 Alignment)
 
 ### Form Fields & Traceability Matrix
 
 | UI Field Label | Mandatory | Data Type | Validation Rules | Default Value | API Request Property | Entity Property | Database Column | Notes |
 |---|---|---|---|---|---|---|---|---|
 | Product Name | YES | String | Max 200 chars, Non-empty | None | `productName` | `Product.ProductName` | `products.product_name` | Mandatory |
-| Short Name / Internal Code | NO | String | Max 80 chars, Alphanumeric/dash | Auto-slug | `shortName` / `productCode` | `Product.ProductCode` | `products.product_code` | Auto-generated if blank upon Save |
+| Short Name / Internal Code | YES | String | Max 80 chars, Alphanumeric/dash | Auto-slug | `shortName` / `productCode` | `Product.ProductCode` | `products.product_code` | Mandatory, no auto-generation fallback |
 | Category | YES | UUID | Must exist in `categories`; effectively selectable ACTIVE only (**BR-CAT-PRODUCT-SELECT-001**: Category + all ancestors ACTIVE) | None | `categoryId` | `Product.CategoryId` | `product_categories.category_id` | Primary category map. Canonical picker source: **`GET /api/v1/tenant-admin/products/create-options`** (`product_catalog` + `catalog.products.create`). Do **not** call `/api/v1/categories/tree` or require `catalog.categories.view`. **IMPLEMENTED backend:** recursive ACTIVE hierarchy depth 1–5 from single hierarchy-aware `categories[]`; persist selected `CategoryId` only. **HISTORICAL / LEGACY COMPATIBILITY:** prior `categories` + `subCategories` was a flat child-Category list, not a SubCategory entity. |
 | Brand | NO (Optional) | UUID | Must exist in `brands` | NULL | `brandId` | `Product.BrandId` | `products.brand_id` | **Optional** |
 | Short Description | NO | String | Max 500 chars | NULL | `shortDescription` | `Product.ShortDescription` | `products.short_description` | Text |
@@ -52,17 +58,30 @@ The Add Product experience is structured into exactly 7 sequential steps:
 | Online Store | NO | Boolean | - | False | `allowOnlineSale` | `Product.AllowOnlineSale` | - | Channel Availability toggle |
 
 > [!IMPORTANT]
-> SKU, Barcode, Unit Type, Variant Templates, and Initial Tracking Details DO NOT belong to Step 1. Identity inputs are collected on Step 2 after Product Type is selected.
+> Step 1 owns barcode **acquisition** only (see Scan Barcode spec). Final SKU/Barcode assignment belongs to **Step 5 Product Configuration** identifier section. Unit Type belongs to Step 4. Variant Templates belong to Step 5. Initial Tracking Details are collected on **Step 3** after Product Type is selected.
 > Do **not** persist Initial Tracking Details as `products.batch_number`, `products.expiry_date`, or `products.serial_number`.
-> Canonical TARGET contract: [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
+> Canonical TARGET contract: [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]] (filename historical; collection = Step 3).
+
+---
+
+## 3A. Step 1 — Scan Barcode (summary)
+
+Full state machine, resolve/external APIs, and no-barcode bootstrap: [[Tenant_Admin_Product_Setup_Scan_Barcode_Specification]].
+
+No-barcode **Auto Generate SKU** remains inside Step 1. It allocates one backend
+Product base from selected Category Code plus a tenant sequence. Step 3 does not
+allocate again: SIMPLE retains the base; VARIANT Step 5 extends it with ordered
+stable Variant Value codes. There is no new global SKU step.
+
+Pre-draft until creation path → then DRAFT with normally `current_setup_step = 2` and `product_setup_scan_context` persisted.
 
 ---
 
 ## 4. Product Image Upload Contract (Reference Image 1 Alignment)
 
-- **UI Interaction Pattern**: Step 1 displays a compact **Product Image upload card**. Clicking `"Upload Product Image"` or `"Click to Upload Product Images"` opens native file browse dialogs.
+- **UI Interaction Pattern**: **Step 2 Basic Details** displays a compact **Product Image upload card**. Clicking `"Upload Product Image"` or `"Click to Upload Product Images"` opens native file browse dialogs.
 - **Drag & Drop Removal**: Drag & Drop functionality and related UI hints/handles have been completely removed. Image upload relies exclusively on standard file selection.
-- **Legacy UI Deprecation**: The permanently expanded large black gallery and multiple main-form empty Add Image tiles (Reference Image 2 style) are **LEGACY UI** and MUST NOT be used for Add Product Step 1.
+- **Legacy UI Deprecation**: The permanently expanded large black gallery and multiple main-form empty Add Image tiles (Reference Image 2 style) are **LEGACY UI** and MUST NOT be used for Add Product Step 2.
 - **Maximum Image Count**: Up to **10** product images (`TARGET — MAXIMUM 10 PRODUCT IMAGES`).
 - **File Validation**: PNG, JPG (image/png, image/jpeg). Max file size **5 MB** per image. Recommended dimensions: 2000x2000 px.
 - **Primary Image Rule**: First uploaded image automatically becomes Primary (`is_primary_image = true`). Reordering does not silently change Primary. Deleting Primary auto-designates the next remaining image as Primary.
@@ -73,20 +92,22 @@ The Add Product experience is structured into exactly 7 sequential steps:
 
 ## 5. Channel Availability State Synchronization
 
-The **Channel Availability** section in Step 1 exposes 2 toggles that represent canonical state synchronized across the wizard:
+The **Channel Availability** section in **Step 2 Basic Details** exposes 2 toggles that represent canonical state synchronized across the wizard:
 
 1. **In-Store POS**: Represents POS sellability (`posSellable`).
 2. **Online Store**: Represents E-commerce availability (`allowOnlineSale`).
 
 These fields replace the legacy "Status & Options" card and the old "Step 7 Channel Visibility" wizard step.
-The `Track Inventory` toggle has been removed from Step 1 and exists ONLY in Step 2.
+The `Track Inventory` toggle does not belong on Scan Barcode or Basic Details; it exists ONLY in **Step 3 Product Type & Tracking**.
 
 ---
 
 ## 6. Save Draft & Resume Architecture
 
-- **Save Draft Action**: User can save draft at any step (e.g. Step 1).
-- **Backend Persistence**:
+- **Step 1 is PRE-DRAFT.** Random scan/lookup/SKU-candidate preview does **not** create or Save Draft a Product row. There is **no** canonical "Save Draft Step 1 stores Product Name / Basic Details" rule.
+- **First Product persistence** happens only at the committed creation-path boundary (Use This Product / Create Manually / Continue with this barcode / Continue to Basic Details from no-barcode) via **`POST /api/v1/tenant-admin/products/draft`**, which creates `status = DRAFT`, `current_setup_step = 2`, and `product_setup_scan_context`.
+- **After a draft exists**, Save Draft / Save & Continue use **`PUT /api/v1/tenant-admin/products/{id}/draft`** for Steps 2–7.
+- **Backend Persistence** (after draft exists):
   - `products.status` = `DRAFT`
   - `products.current_setup_step` updated according to the rules below
   - `products.draft_saved_at` updated
@@ -95,32 +116,56 @@ The `Track Inventory` toggle has been removed from Step 1 and exists ONLY in Ste
 
 ### 6.1 `current_setup_step` Canonical Rules
 
+| Value | Meaning |
+|---:|---|
+| 1 | Scan Barcode *(UI / resume projection only — no product row while still pre-draft)* |
+| 2 | Basic Details |
+| 3 | Product Type & Tracking |
+| 4 | Unit & Pack Conversion |
+| 5 | Product Configuration (incl. identifiers) |
+| 6 | Pricing & Tax |
+| 7 | Review & Create |
+
 | Operation | Result `current_setup_step` | Notes |
 |---|---|---|
-| Fresh Step 1 `POST .../draft` (Save Draft) | `1` | New incomplete draft |
-| Step 1 Save Draft | `1` | Do **not** advance |
-| Step 1 Save & Continue (`AdvanceStep=true`) | `2` | Only after Step 1 validation succeeds |
-| Save Draft from Step N (via `PUT .../draft`, `CurrentSetupStep=N`) | `N` | Generic draft must **not** hard-reset to `1` |
-| Final Wizard Publication | `7` | Final stage is now Step 7 |
+| Step 1 pre-draft scans / resolve / external-lookup / SKU generation | *(no product row)* | Resolve/lookup are side-effect free; explicit AUTO generation consumes one tenant sequence but creates no Product row |
+| Creation-path from Step 1 → Basic Details | `2` | **`POST .../products/draft`** + `product_setup_scan_context` |
+| Step 2 Save Draft | `2` | Do **not** advance |
+| Step 2 Save & Continue (`AdvanceStep=true`) | `3` | After Basic Details validation |
+| Step 3 Save Draft | `3` | Do **not** advance |
+| Step 3 Save & Continue | `4` or `5` | Units if applicable; else bypass to Product Configuration |
+| Step 4 Save Draft | `4` | Do **not** advance |
+| Step 4 Save & Continue | `5` | After Unit & Pack validation |
+| Step 5 Save Draft | `5` | Do **not** advance |
+| Step 5 Save & Continue | `6` | After config + identifier rules |
+| Step 6 Save Draft | `6` | Do **not** advance |
+| Step 6 Save & Continue | `7` | After pricing/tax rules |
+| Save Draft from Step N (via `PUT .../draft`, `CurrentSetupStep=N`) | `N` | Generic draft must **not** hard-reset to `1` or `2` |
+| Final Wizard Publication | `7` | Review & Create via `POST .../publish` |
+| Legacy resume (old Basic Details was 1) | remap per Draft Lifecycle D11 | Read-time compatibility in `GET .../setup` |
 
 ### 6.2 Save Draft Product Name Placeholder Policy
 
-When Product Name is empty during **Save Draft**:
+When Product Name is empty during **Step 2 Save Draft** (draft already exists):
 
 - Backend MAY persist the deterministic draft placeholder: **`Untitled Product`**.
 - The placeholder is **draft-only**.
-- **Save & Continue** MUST reject blank names and MUST reject the literal placeholder `Untitled Product` (case-insensitive).
-- An auto-generated placeholder MUST NOT satisfy Step 1 Product Name completion for Save & Continue.
+- **Step 2 Save & Continue** MUST reject blank names and MUST reject the literal placeholder `Untitled Product` (case-insensitive).
+- An auto-generated placeholder MUST NOT satisfy **Step 2 Basic Details** Product Name completion for Save & Continue.
 
-### 6.3 Step 1 Save Draft vs Save & Continue Field Rules
+### 6.3 Save Draft vs Save & Continue — All Seven Steps
 
-| Field | Save Draft | Save & Continue (Step 1) |
-|---|---|---|
-| Product Name | Optional (placeholder if blank) | Required (real name; placeholder rejected) |
-| Category | Optional (validate if supplied) | Required |
-| Brand | Optional | Optional |
-| Descriptions / Internal Code | Optional (+ length limits) | Optional (+ length limits) |
-| Batch Number / Expiry Date / Serial Number | Optional (syntax only) | Optional (syntax only; not required) |
+| Step | Meaning | Save Draft | Save & Continue |
+|---:|---|---|---|
+| 1 | Scan Barcode | **N/A** — pre-draft; no Product Save Draft. Resolve / external-lookup / SKU-candidate are side-effect free | Creation-path commit → `POST .../products/draft` → lands at Step 2 |
+| 2 | Basic Details | Product Name optional (placeholder if blank); Category optional if supplied; Brand/descriptions optional | Product Name required (real); Category required; then advance to Step 3 |
+| 3 | Product Type & Tracking | Structure/tracking/identity optional within draft rules | Structure required; tracking combination valid; Initial Tracking reconciled; then Step 4 or bypass to Step 5 |
+| 4 | Unit & Pack Conversion | Partial UOM/conversion allowed in draft | Applicable unit model complete; advance to Step 5 |
+| 5 | Product Configuration + identifiers | Partial matrix/bundle/identifier draft allowed | Structure-specific config + identifier coverage rules; advance to Step 6 |
+| 6 | Pricing & Tax | Partial price/tax draft allowed | Required selling/tax state for structure; advance to Step 7 |
+| 7 | Review & Create | N/A as advance | Publish via `POST .../{id}/publish` (not Save & Continue advance) |
+
+Batch Number / Expiry Date / Serial Number are collected on **Step 3**, never on Step 1 or Step 2.
 
 ### 6.4 Strict DRY Shared Action & Save Pipeline Architecture
 
@@ -131,7 +176,7 @@ Both Backend (.NET) and Frontend (Flutter) MUST follow a single, unified reusabl
 - **Unified Repository Save Pipeline**: All wizard step save requests are executed through a single repository pipeline method: `ITenantAdminProductRepository.SaveProductDraftAsync(tenantId, userId, command, now, ct)`.
 - **Unified Save Command & Result**: All wizard save requests construct `SaveProductDraftCommand` (carrying `ProductId`, `CurrentSetupStep`, `AdvanceStep`, `ExpectedRowVersion`, and step payload data) and return `SaveProductDraftResult`.
 - **Centralized Pipeline Enforcement**: Access policy evaluation (`ProductWizardAccessPolicy`), feature entitlement (`product_catalog`), concurrency validation (`expectedRowVersion`), entity creation/loading, category mapping, channel visibility, inventory settings, media asset linking, transactional audit logging (`AuditLog`), EF `SaveChangesAsync`, and DTO projection exist ONCE in the shared pipeline.
-- **Business Processors**: Step-specific rules are executed by dedicated step processors (`IProductWizardStepProcessor` implementations like `Step1WizardProcessor`, `Step2WizardProcessor`) selected dynamically based on `CurrentSetupStep`.
+- **Business Processors**: After a Product DRAFT exists, step-specific rules for Steps 2–7 are executed by dedicated step processors (`IProductWizardStepProcessor` implementations, e.g. illustrative `Step2WizardProcessor` / `Step3WizardProcessor`) selected dynamically based on `CurrentSetupStep`. **Step 1 Scan is PRE-DRAFT** — barcode resolve, external lookup, and SKU-candidate generation are owned by those side-effect-free discovery endpoints/services, **not** by a Product Draft save processor. Do not invent mandated production class names from these examples.
 
 #### B. FRONTEND (FLUTTER) — ONE SHARED ACTION FOOTER & CONTROLLER
 - **Single Actions Footer Widget**: `ProductWizardActionsFooter` is shared across all 7 wizard steps. Creating independent button widgets per step (`Step1ContinueButton`, `Step2ContinueButton`, etc.) is strictly FORBIDDEN.
@@ -152,14 +197,14 @@ Both Backend (.NET) and Frontend (Flutter) MUST follow a single, unified reusabl
   - Primary Category & Brand
   - Inventory Tracking Badge (`Tracked` / `Not Tracked`)
   - Step Progress Indicator (e.g., "Step 2 of 7 Completed (28%)")
-- **SKU Note**: SKU is assigned in Step 5. Product Summary displays `"SKU: Step 5"` or placeholder prior to Step 5.
+- **SKU Note**: SKU is assigned in **Step 5 Product Configuration** identifier section. Product Summary displays `"SKU: Pending"` or placeholder prior to assignment.
 
 ---
 
-## 8. Step 2 — Product Type & Tracking Setup Detailed Contract
+## 8. Step 3 — Product Type & Tracking Setup Detailed Contract
 
 ### 8.1 Target Functional Overview
-Step 2 configures the product structure classification and inventory tracking rules for the product.
+**Step 3** configures the product structure classification and inventory tracking rules for the product.
 
 - **Title**: Product Type & Tracking Setup
 - **Subtitle**: Choose the product type and how this product should be tracked.
@@ -173,7 +218,7 @@ Step 2 configures the product structure classification and inventory tracking ru
   2. **Batch / Lot Tracking**
   3. **Expiry Tracking**
   4. **Serial Number Tracking**
-- **Footer Actions**: `Back`, `Save Draft`, `Skip` (Disabled/Hidden — Step 2 is NON-SKIPPABLE), `Save & Continue`.
+- **Footer Actions**: `Back`, `Save Draft`, `Skip` (Disabled/Hidden — Step 3 is NON-SKIPPABLE), `Save & Continue`.
 
 ---
 
@@ -195,7 +240,7 @@ The 3 UI options ("Simple Product", "Variant Product", "Bundle / Kit") map canon
 
 ---
 
-### 8.3 Step 2 Implementation Traceability Matrix
+### 8.3 Step 3 Implementation Traceability Matrix
 
 | UI Field / Control | Flutter State / DTO | API Property | Backend Request DTO | Domain Entity & Property | Database Table | Database Column | Validation Rules | Permission Code | Audit Event Field |
 |---|---|---|---|---|---|---|---|---|---|
@@ -204,7 +249,7 @@ The 3 UI options ("Simple Product", "Variant Product", "Bundle / Kit") map canon
 | **Batch / Lot Tracking** | `batchTracking` | `batchTracking` | `UpdateProductDraftStepRequestDto.BatchTracking` | `ProductInventorySetting.RequiresBatchTracking` | `product_inventory_settings` | `requires_batch_tracking` | Requires `TrackInventory = true`; Mutually exclusive with Serial | Same as above | `newBatchTracking` |
 | **Expiry Tracking** | `expiryTracking` | `expiryTracking` | `UpdateProductDraftStepRequestDto.ExpiryTracking` | `ProductInventorySetting.RequiresExpiryTracking` | `product_inventory_settings` | `requires_expiry_tracking` | Requires `TrackInventory = true` AND `BatchTracking = true`; Mutually exclusive with Serial | Same as above | `newExpiryTracking` |
 | **Serial Number Tracking** | `serialTracking` | `serialTracking` | `UpdateProductDraftStepRequestDto.SerialTracking` | `ProductInventorySetting.RequiresSerialTracking` | `product_inventory_settings` | `requires_serial_tracking` | Requires `TrackInventory = true`; Mutually exclusive with Batch and Expiry | Same as above | `newSerialTracking` |
-| **Current Setup Step** | `currentSetupStep` | `currentSetupStep` | `UpdateProductDraftStepRequestDto.CurrentSetupStep` | `Product.CurrentSetupStep` | `products` | `current_setup_step` | 1 to 7; Set to 3 on `Save & Continue` | Same as above | N/A |
+| **Current Setup Step** | `currentSetupStep` | `currentSetupStep` | `UpdateProductDraftStepRequestDto.CurrentSetupStep` | `Product.CurrentSetupStep` | `products` | `current_setup_step` | 1 to 7; Set to 4 (Units) or 5 (Units NOT_APPLICABLE) on `Save & Continue` from Step 3 | Same as above | N/A |
 | **Draft Saved At** | N/A | `draftSavedAt` | N/A | `Product.DraftSavedAt` | `products` | `draft_saved_at` | Server UTC timestamp | Same as above | `timestamp` |
 | **Row Version** | `rowVersion` | `expectedRowVersion` | `UpdateProductDraftStepRequestDto.ExpectedRowVersion` | `Product.RowVersion` | `products` | `row_version` | Optimistic concurrency token | Same as above | `rowVersion` |
 | **Updated By** | N/A | N/A | N/A | `Product.UpdatedByTenantUserId` | `products` | `updated_by_tenant_user_id` | Server authenticated User ID | Same as above | `actorUserId` |
@@ -212,21 +257,21 @@ The 3 UI options ("Simple Product", "Variant Product", "Bundle / Kit") map canon
 
 ---
 
-### 8.4 Canonical Default State & Step 1 Synchronization
+### 8.4 Canonical Default State & Step 2 Synchronization
 
-**Step 2 Canonical Default State**:
+**Step 3 Canonical Default State**:
 - `Product Structure`: `SIMPLE` (unconfirmed until the user selects a type)
 - `Track Inventory`: `false` (`OFF`)
 - `Batch / Lot Tracking`: `false` (`OFF`)
 - `Expiry Tracking`: `false` (`OFF`)
 - `Serial Number Tracking`: `false` (`OFF`)
 
-**Synchronization with Step 1**:
-- The `Track Inventory` toggle has been completely removed from Step 1.
-- Step 2 is now the sole source of truth for the inventory tracking toggle during setup.
-- Optional Initial Tracking Details are collected on Step 2 **after Product Type is selected**. They are **not** policy. Entering Batch/Expiry/Serial must not auto-enable tracking toggles.
-- When Step 2 is saved, reconcile identity values using the matrix in [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Incompatible values require confirmation before clearing (`confirmClearIncompatibleInitialTracking`).
-- Step 2 UI shows the identity card **above** SIMPLE / VARIANT tracking toggles. Hide for BUNDLE. Hide tracking tiles until Product Type is selected.
+**Synchronization with Step 2 (Basic Details)**:
+- The `Track Inventory` toggle does not belong on Step 1 Scan Barcode or Step 2 Basic Details.
+- Step 3 is the sole source of truth for the inventory tracking toggle during setup.
+- Optional Initial Tracking Details are collected on Step 3 **after Product Type is selected**. They are **not** policy. Entering Batch/Expiry/Serial must not auto-enable tracking toggles.
+- When Step 3 is saved, reconcile identity values using the matrix in [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Incompatible values require confirmation before clearing (`confirmClearIncompatibleInitialTracking`).
+- Step 3 UI shows the identity card **above** SIMPLE / VARIANT tracking toggles. Hide for BUNDLE. Hide tracking tiles until Product Type is selected.
 
 ---
 
@@ -275,39 +320,39 @@ The 3 UI options ("Simple Product", "Variant Product", "Bundle / Kit") map canon
 ### 8.7 Footer Actions & Navigation Logic
 
 #### BACK
-- Navigates from Step 2 to Step 1.
+- Navigates from Step 3 to Step 2 Basic Details.
 - Preserves current local state in Flutter form state.
 - Does NOT implicitly publish or commit unvalidated server changes.
 - Row version remains unchanged on client until next explicit save.
 
 #### SAVE DRAFT
-- Validates Step 2 field syntax and tracking combination rules.
-- Persists Step 2 values to the database.
-- Keeps client on Step 2 (does NOT advance step).
+- Validates Step 3 field syntax and tracking combination rules.
+- Persists Step 3 values to the database.
+- Keeps client on Step 3 (does NOT advance step).
 - Retains lifecycle `status = 'DRAFT'`.
 - Updates `draft_saved_at`, `updated_at`, `updated_by_tenant_user_id`.
 - Increments `row_version` and returns the latest `rowVersion` in response.
 - `current_setup_step` remains unchanged (or updated to max reached step if higher).
 
 #### SAVE & CONTINUE
-1. Validates Step 2 rules completely against the truth table.
+1. Validates Step 3 rules completely against the truth table.
 2. Normalizes dependent tracking fields.
-3. Persists Step 2 values atomically in a PostgreSQL transaction.
-4. Updates `current_setup_step` from `2` to `3` (via request flag `advanceStep: true`).
+3. Persists Step 3 values atomically in a PostgreSQL transaction.
+4. Updates `current_setup_step` from `3` to `4` (Units applicable) or `5` (Units `NOT_APPLICABLE`) via request flag `advanceStep: true`.
 5. Increments `row_version`.
 6. Returns HTTP 200 OK with authoritative persisted draft state and new `rowVersion`.
-7. Client navigates to Step 3 ONLY after receiving server success response.
+7. Client navigates to Step 4 (Unit & Pack) or Step 5 (when Units are NOT_APPLICABLE) ONLY after receiving server success response.
 
 #### SKIP
-- **Canonical Decision**: Step 2 is **NON-SKIPPABLE**.
-- The `Skip` footer button MUST be hidden or disabled on Step 2 in the UI.
-- Product Structure selection and inventory tracking configuration require explicit user confirmation before advancing to Step 3.
+- **Canonical Decision**: Step 3 is **NON-SKIPPABLE**.
+- The `Skip` footer button MUST be hidden or disabled on Step 3 in the UI.
+- Product Structure selection and inventory tracking configuration require explicit user confirmation before advancing to Step 4 / applicable Step 5 bypass.
 
 ---
 
-### 8.8 Step 2 API Contract
+### 8.8 Step 3 API Contract
 
-#### Update Draft Step 2 Endpoint
+#### Update Draft Step 3 Endpoint
 `PUT /api/v1/tenant-admin/products/{productId}/draft`
 
 **Headers**:
@@ -317,7 +362,7 @@ The 3 UI options ("Simple Product", "Variant Product", "Bundle / Kit") map canon
 **Request Body (`UpdateProductDraftStepRequestDto`)**:
 ```json
 {
-  "currentSetupStep": 2,
+  "currentSetupStep": 3,
   "productStructure": "VARIANT",
   "trackInventory": true,
   "batchTracking": true,
@@ -329,7 +374,7 @@ The 3 UI options ("Simple Product", "Variant Product", "Bundle / Kit") map canon
 ```
 
 **Field Specifications**:
-- `currentSetupStep` (int, required): Current step being submitted (`2`).
+- `currentSetupStep` (int, required): Current step being submitted (`3`).
 - `productStructure` (string, required): Allowed enum values: `"SIMPLE"`, `"VARIANT"`, `"BUNDLE"`.
 - `trackInventory` (boolean, required): Default `true`.
 - `batchTracking` (boolean, required): Default `false`.
@@ -349,29 +394,31 @@ The 3 UI options ("Simple Product", "Variant Product", "Bundle / Kit") map canon
   "batchTracking": true,
   "expiryTracking": false,
   "serialTracking": false,
-  "currentSetupStep": 3,
+  "currentSetupStep": 4,
   "draftSavedAt": "2026-08-09T01:49:07Z",
   "rowVersion": 5
 }
 ```
 
+> When Units are `NOT_APPLICABLE` (e.g. Track Inventory OFF or BUNDLE), the advanced `currentSetupStep` is `5` instead of `4`.
+
 #### Get Wizard Setup State (Resume Endpoint)
 `GET /api/v1/tenant-admin/products/{productId}/setup`
 
 **Response Body (`ProductSetupWizardDto` — HTTP 200 OK)**:
-Exposes all persisted Step 1 and Step 2 state (including `productStructure`, `trackInventory`, `batchTracking`, `expiryTracking`, `serialTracking`, `currentSetupStep`, `rowVersion`, category/brand metadata) to restore the wizard.
+Exposes all persisted Step 2 Basic Details and Step 3 Type & Tracking state (including `productStructure`, `trackInventory`, `batchTracking`, `expiryTracking`, `serialTracking`, `currentSetupStep`, `rowVersion`, category/brand metadata) to restore the wizard.
 
 ---
 
 ### 8.9 Step-Aware Backend Architecture & Atomic Persistence
 
-- Step 2 processing MUST NOT be routed through Step 1-only commands or generic unvalidated updaters.
+- Step 3 processing MUST NOT be routed through Step 2-only commands or generic unvalidated updaters.
 - Backend architecture defines dedicated step processing:
   - Command: `SaveStep2DraftCommand`
   - Validators: `ValidateStep2Draft`, `ValidateStep2SaveAndContinue`
   - Service/Repo Method: `SaveStep2DraftAsync`
 - **Atomic Database Transaction Scope**:
-  Updating Step 2 executes inside a single PostgreSQL transaction:
+  Updating Step 3 executes inside a single PostgreSQL transaction:
   ```sql
   BEGIN TRANSACTION;
   -- 1. Validate tenant ownership & lock product row FOR UPDATE
@@ -413,41 +460,41 @@ CHECK (
 
 - `product_inventory_settings.inventory_uom_id` is mandatory (`NOT NULL` in DB schema).
 - **Draft Creation Strategy**:
-  - When Step 1/2 saves a new product draft before Step 3 (where UOMs are explicitly chosen), the backend resolves the tenant's default system base UOM (e.g. `PIECE` or `EACH` from `unit_of_measures` table where `uom_code = 'PIECE'`).
+  - When Step 2 draft exists before Step 4 (where UOMs are explicitly chosen), the backend resolves the tenant's default system base UOM (e.g. `PIECE` or `EACH` from `unit_of_measures` table where `uom_code = 'PIECE'`).
   - This system default UOM is set silently in `product_inventory_settings.inventory_uom_id`.
-  - When the user completes Step 3 (Units & Pack Conversion), the selected Stock Counting UOM overwrites `inventory_uom_id`.
-  - This internal fallback default is NOT exposed as an explicit user selection in Step 2 UI.
+  - When the user completes Step 4 (Units & Pack Conversion), the selected Stock Counting UOM overwrites `inventory_uom_id`.
+  - This internal fallback default is NOT exposed as an explicit user selection in Step 3 UI.
 
 ---
 
 ### 8.12 Draft Nullability & Default Fields
 
-- `products.product_code`: Auto-slugged draft code generated on Step 1 (e.g., `PROD-DRAFT-XXXXX`).
+- `products.product_code`: Auto-slugged draft code generated on Step 2 Basic Details (e.g., `PROD-DRAFT-XXXXX`).
 - `products.product_slug`: Auto-generated slug.
 - `products.product_type`: Defaults to `'STANDARD'` for merchandise items.
-- `products.product_structure`: Defaults to `'SIMPLE'` until changed in Step 2.
+- `products.product_structure`: Defaults to `'SIMPLE'` until changed in Step 3.
 - All 4 columns retain valid `NOT NULL` strings in PostgreSQL during draft states.
 
 ---
 
 ### 8.13 Product Structure Change Rules (Destructive Transitions)
 
-When a user navigates back to Step 2 and changes `productStructure` after downstream data exists (from Steps 4–7):
+When a user navigates back to Step 3 and changes `productStructure` after downstream data exists (from Steps 4–7):
 
 | Transition | Impact on Downstream Data | Invalidation / Cleanup Action | User Prompt Required |
 |---|---|---|---|
-| **VARIANT $\rightarrow$ SIMPLE** | Destroys Variant Matrix, Option Values, Variant SKUs/Prices | Invalidates Step 4 Variant Options & Matrix. Archives/deletes draft `product_variants` rows (except default). Resets Step 4 to N/A. Forces revalidation of Steps 5 & 6. | **YES** ("Changing to Simple Product will remove all configured variants and option matrix. Proceed?") |
-| **BUNDLE $\rightarrow$ SIMPLE** | Destroys Kit Component mappings | Invalidates Step 4 Kit Assembly. Clears `combo_components` records. Resets Step 4 to N/A. | **YES** ("Changing to Simple Product will remove all bundle component selections. Proceed?") |
-| **SIMPLE $\rightarrow$ VARIANT** | Requires Variant Matrix configuration | Re-enables Step 4 (Product Configuration) for Variant setup. Requires completing Step 4 before publish. | No data loss warning needed, but alerts user Step 4 is now required. |
-| **SIMPLE $\rightarrow$ BUNDLE** | Requires Kit Component assembly | Re-enables Step 4 (Product Configuration) for Component selection. | Alerts user Step 4 is now required. |
-| **VARIANT $\rightarrow$ BUNDLE** | Destroys Variant Matrix, requires Components | Clears `product_variants` matrix. Switches Step 4 to Kit Component mode. | **YES** ("Changing from Variant to Bundle will remove all variant options. Proceed?") |
-| **BUNDLE $\rightarrow$ VARIANT** | Destroys Components, requires Variant Matrix | Clears `combo_components` mappings. Switches Step 4 to Variant Matrix mode. | **YES** ("Changing from Bundle to Variant will remove all bundle components. Proceed?") |
+| **VARIANT $\rightarrow$ SIMPLE** | Destroys Variant Matrix, Option Values, Variant SKUs/Prices | Invalidates Step 5 Variant Options & Matrix. Archives/deletes draft `product_variants` rows (except default). Resets Step 5 matrix to N/A. Forces revalidation of Steps 5 identifiers & 6. | **YES** ("Changing to Simple Product will remove all configured variants and option matrix. Proceed?") |
+| **BUNDLE $\rightarrow$ SIMPLE** | Destroys Kit Component mappings | Invalidates Step 5 Kit Assembly. Clears `combo_components` records. Resets Step 5 bundle config to N/A. | **YES** ("Changing to Simple Product will remove all bundle component selections. Proceed?") |
+| **SIMPLE $\rightarrow$ VARIANT** | Requires Variant Matrix configuration | Re-enables Step 5 (Product Configuration) for Variant setup. Requires completing Step 5 before publish. | No data loss warning needed, but alerts user Step 5 is now required. |
+| **SIMPLE $\rightarrow$ BUNDLE** | Requires Kit Component assembly | Re-enables Step 5 (Product Configuration) for Component selection. | Alerts user Step 5 is now required. |
+| **VARIANT $\rightarrow$ BUNDLE** | Destroys Variant Matrix, requires Components | Clears `product_variants` matrix. Switches Step 5 to Kit Component mode. | **YES** ("Changing from Variant to Bundle will remove all variant options. Proceed?") |
+| **BUNDLE $\rightarrow$ VARIANT** | Destroys Components, requires Variant Matrix | Clears `combo_components` mappings. Switches Step 5 to Variant Matrix mode. | **YES** ("Changing from Bundle to Variant will remove all bundle components. Proceed?") |
 
 ---
 
 ### 8.14 Edit-Mode Safety Rules (Active Products with History)
 
-When Step 2 is edited for an existing **`ACTIVE`** product (outside initial wizard draft):
+When Step 3 is edited for an existing **`ACTIVE`** product (outside initial wizard draft):
 - **Track Inventory ON $\rightarrow$ OFF**: BLOCKED if product has non-zero stock balances in `inventory_balances` or active historical `stock_movements`.
 - **Batch Tracking ON $\rightarrow$ OFF**: BLOCKED if active batches with on-hand stock exist in `product_batches`.
 - **Expiry Tracking ON $\rightarrow$ OFF**: BLOCKED if batches with expiry dates and stock exist.
@@ -478,7 +525,7 @@ Appears in the right-side rail (Desktop) for persisted drafts and edit mode:
   - Product Structure Badge (`SIMPLE`, `VARIANT`, `BUNDLE`)
   - Primary Category & Brand
   - Inventory Tracking Badge (`Tracked` / `Not Tracked`)
-  - Setup Step Progress Indicator (e.g. "Step 2 of 7 Completed")
+  - Setup Step Progress Indicator (e.g. "Step 3 of 7 Completed")
 - **SKU Note**: SKU is NOT assigned until Step 5. Product Summary displays `"SKU: Step 5"` or placeholder prior to Step 5.
 
 ---
@@ -508,7 +555,7 @@ Appears in the right-side rail (Desktop) for persisted drafts and edit mode:
 
 ### 8.18 Audit Logging Requirements
 
-Event logged on material Step 2 update: `PRODUCT_DRAFT_STEP2_UPDATED`.
+Event logged on material Step 3 update: `PRODUCT_DRAFT_STEP3_UPDATED` (legacy audit name `PRODUCT_DRAFT_STEP2_UPDATED` may remain during migration).
 - **Logged Properties**: `tenantId`, `productId`, `actorUserId`, `timestamp`, `oldProductStructure`, `newProductStructure`, `oldTrackInventory`, `newTrackInventory`, `oldBatchTracking`, `newBatchTracking`, `oldExpiryTracking`, `newExpiryTracking`, `oldSerialTracking`, `newSerialTracking`, `rowVersion`.
 
 Initial Tracking TARGET events (existing `audit_logs` family; GAP until implemented): `PRODUCT_DRAFT_INITIAL_TRACKING_UPDATED`, `PRODUCT_DRAFT_INITIAL_TRACKING_CLEARED`, `PRODUCT_DRAFT_INITIAL_TRACKING_VARIANT_ASSIGNED`, `PRODUCT_PUBLISH_INITIAL_BATCH_CREATED`, `PRODUCT_PUBLISH_INITIAL_SERIAL_CREATED`. See Initial Tracking spec Audit Contract.
@@ -545,7 +592,7 @@ Initial Tracking TARGET events (existing `audit_logs` family; GAP until implemen
 
 ### 8.20 Optimistic Concurrency Control
 
-- Every Step 2 update request MUST supply `expectedRowVersion`.
+- Every Step 3 update request MUST supply `expectedRowVersion`.
 - Server compares `expectedRowVersion` against `products.row_version`.
 - If mismatched, request fails with `409 Conflict`. Response returns latest server `rowVersion` and updated draft state for reload.
 
@@ -553,15 +600,15 @@ Initial Tracking TARGET events (existing `audit_logs` family; GAP until implemen
 
 ### 8.21 Non-Functional Requirements (NFR)
 
-- **Atomicity**: Step 2 structure and tracking flags save in a single PostgreSQL transaction.
+- **Atomicity**: Step 3 structure and tracking flags save in a single PostgreSQL transaction.
 - **Consistency**: UI, API, Domain entity, and Database columns must remain strictly synchronized.
 - **Tenant Isolation**: All queries filter by authenticated `tenant_id`.
-- **Performance**: Save Step 2 operation executes under 100ms (no N+1 queries). Wizard-wide NFRs including Initial Tracking: see Initial Tracking spec NFR-SEC/CON/TXN/IDEM/PERF/AUD/OBS/UX/ACC.
-- **Idempotency**: Submitting the same Step 2 state repeatedly produces identical results without corrupting data.
+- **Performance**: Save Step 3 operation executes under 100ms (no N+1 queries). Wizard-wide NFRs including Initial Tracking: see Initial Tracking spec NFR-SEC/CON/TXN/IDEM/PERF/AUD/OBS/UX/ACC.
+- **Idempotency**: Submitting the same Step 3 state repeatedly produces identical results without corrupting data.
 
 ---
 
-### 8.22 Step 2 Automated Test Matrix
+### 8.22 Step 3 Automated Test Matrix
 
 | Category | Test Case | Expected Result |
 |---|---|---|
@@ -579,47 +626,47 @@ Initial Tracking TARGET events (existing `audit_logs` family; GAP until implemen
 | **Tracking** | Track Inventory ON + Serial ON + Batch OFF + Expiry OFF | Valid save. Serial `true`. |
 | **Tracking** | Track Inventory ON + Serial ON + Batch ON | API returns `400 SERIAL_AND_BATCH_MUTUALLY_EXCLUSIVE`. |
 | **Tracking** | Track Inventory ON + Serial ON + Expiry ON | API returns `400 SERIAL_AND_EXPIRY_MUTUALLY_EXCLUSIVE`. |
-| **Navigation** | Save Draft from Step 2 | Step remains 2. `current_setup_step = 2`. `draft_saved_at` updated. |
-| **Navigation** | Save & Continue from Step 2 | Step advances based on structure (BUNDLE → Step 4; SIMPLE/VARIANT → Step 3 if applicable, else Step 4). |
+| **Navigation** | Save Draft from Step 3 | Step remains 3. `current_setup_step = 3`. `draft_saved_at` updated. |
+| **Navigation** | Save & Continue from Step 3 | Step advances based on structure (Units ON → Step 4; Units NOT_APPLICABLE / BUNDLE → Step 5). |
 | **Concurrency** | Stale `expectedRowVersion` | API returns `409 product.concurrency_conflict`. |
 | **Security** | Missing `catalog.products.create` | API returns `403 auth.forbidden`. |
 | **Transitions** | `VARIANT` $\rightarrow$ `SIMPLE` with existing variants | Destructive prompt shown; draft variants cleared upon confirmation. |
-| **Audit** | Step 2 update success | Audit event `PRODUCT_DRAFT_STEP2_UPDATED` written. |
+| **Audit** | Step 3 update success | Audit event `PRODUCT_DRAFT_STEP3_UPDATED` written (legacy name may remain). |
 
 ---
 
 ## 9. Cross-Step Business Rules (Steps 3 - 7)
 
-### Step 3 — Units & Pack Conversion Contract
+### Step 4 — Unit & Pack Conversion Contract
 - **Detailed Specification**: Refer to canonical specification [[Tenant_Admin_Product_Units_Pack_Conversion_Specification]].
 - **Unit Models**: Supports `SINGLE_UNIT` (Single Unit Only) and `MULTIPLE_UNITS` (Multiple Units & Pack Conversion).
 - **Product-Specific Rule**: Unit package sizes and conversion multipliers are strictly PRODUCT-SPECIFIC. 1 Pack = 6 Pieces for Product A does NOT dictate 1 Pack for Product B. Global `unit_of_measures` stores UOM master types only (`PCS`, `PK`, `CTN`, etc.). Product conversion factors are stored in `product_unit_settings` and `product_unit_conversions`.
-- **Applicability & Navigation Matrix**:
-  - `SIMPLE` + Track Inventory ON: Step 3 REQUIRED $\rightarrow$ target Step 5 (Step 4 `NOT_APPLICABLE`).
-  - `VARIANT` + Track Inventory ON: Step 3 REQUIRED at parent product level (variants inherit) $\rightarrow$ target Step 4.
-  - `SIMPLE` + Track Inventory OFF: Step 3 `NOT_APPLICABLE` $\rightarrow$ target Step 5.
-  - `VARIANT` + Track Inventory OFF: Step 3 `NOT_APPLICABLE` $\rightarrow$ target Step 4.
-  - `BUNDLE` (Release 1): Parent tracking is forced `false` / component-based $\rightarrow$ Step 3 `NOT_APPLICABLE` $\rightarrow$ target Step 4.
+- **Applicability & Navigation Matrix** (Step 4 = Unit & Pack Conversion):
+  - `SIMPLE` + Track Inventory ON: Step 4 REQUIRED → target Step 5.
+  - `VARIANT` + Track Inventory ON: Step 4 REQUIRED at parent product level (variants inherit) → target Step 5.
+  - `SIMPLE` + Track Inventory OFF: Step 4 `NOT_APPLICABLE` → target Step 5.
+  - `VARIANT` + Track Inventory OFF: Step 4 `NOT_APPLICABLE` → target Step 5.
+  - `BUNDLE` (Release 1): Parent tracking is forced `false` / component-based → Step 4 `NOT_APPLICABLE` → target Step 5.
 - **Selling Unit Constraint**: Selling Unit MUST match Base Unit, Purchase Unit, or Outer Pack Unit.
 - **Base Unit & Stock Ledger**: Base Unit serves as primary stock ledger unit (`inventory_uom_id` in `product_inventory_settings` synchronizes with `base_uom_id`).
 - **Conversion Mathematics**: purchaseToBaseFactor = itemsPerPurchaseUnit; outerPackToBaseFactor = itemsPerPurchaseUnit * purchaseUnitsPerOuterPack.
 
 
 
-### Step 4 — Configuration
-- `SIMPLE`: Auto-skips to Step 5.
+### Step 5 — Product Configuration (matrix / bundle / identifiers)
+- `SIMPLE`: Matrix N/A; identifier section still applies under Step 5.
 - `VARIANT`: Generates Cartesian product of selected option values. Displays **Estimated Variant Count** live preview during attribute/value configuration (frontend-only; not authoritative). See [[../12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification#3.4 Estimated Variant Count (Live UX Preview)]].
 - `BUNDLE`: Selects component variants and fixed component quantities.
 
-### Step 5 — Identifiers
-- Canonical detail: [[Tenant_Admin_Product_Barcode_SKU_Specification]].
+### Step 5 — Identifier section (standalone Barcode & SKU superseded)
+- Canonical detail: [[Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]].
 - SKU & Barcode uniqueness enforced tenant-wide (case-sensitive SKU after trim; barcode as string with leading zeros preserved).
 - Every sellable product must have at least one `product_variants` row. Base SKU for `SIMPLE` / `BUNDLE` is stored on the default variant row.
-- **VARIANT**: table-first Step 5 listing all Step 4 included/sellable variants. Manual SKU only — **no Auto-generate SKUs**. Row checkbox selection is UI-only and must not change sellability.
-- **SIMPLE / BUNDLE**: compact editors + one-row assignment table (green selected dot, Scan column, pencil). Apply commits then clears SKU/barcode inputs. Edit drawer hides Barcode Type in UI but still persists `barcodeType`.
-- Assignments must carry `barcodeType` end-to-end; never hard-code `EAN13` on persist.
-- Save & Continue validates **authoritative** Step 4 coverage (not only client-submitted subset). SKU mandatory per included sellable variant; barcode optional when blank.
-- `product_barcodes.barcode_type` already exists → **EF migration not required** for barcodeType DTO alignment.
+- **VARIANT**: table-first Step 5 listing all included/sellable variants from the Step 5 matrix. Manual SKU only — **no Auto-generate SKUs** (except controlled no-barcode Step 1 candidate for one identity). Row checkbox selection is UI-only and must not change sellability.
+- **SIMPLE / BUNDLE**: compact editors + one-row assignment table (green selected dot, Scan column, pencil). Apply commits then clears SKU/barcode inputs. Edit drawer hides Barcode Type in UI but still persists `barcodeType` / `identifierStandard`.
+- Assignments must carry `barcodeType` and `identifierStandard` end-to-end; never hard-code `EAN13` on persist; never persist `GTIN14` as `barcodeType`.
+- Save & Continue validates **authoritative** Step 5 identifier coverage (not only client-submitted subset). SKU mandatory per included sellable variant; barcode optional when blank.
+- `product_barcodes.barcode_type` already exists → **EF migration not required** for barcodeType DTO alignment. **`identifier_standard` is IMPLEMENTED** in Backend source via `20260912085454_AddProductSetupScannerIdentifierContext` (nullable; locally PostgreSQL-verified). **Production/shared apply not claimed.**
 
 ### Step 6 — Pricing & Tax
 
@@ -645,7 +692,7 @@ Inclusive/Exclusive ADR: [[../../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_PRODUCT_T
 
 #### 6.2 SIMPLE Product Pricing & Tax (CONFIRMED)
 
-Journey: Basic Details → Type & Tracking → Units → **skip Product Configuration** → Barcode & SKU → **Pricing & Tax** → Review.
+Journey: Scan → Basic Details → Type & Tracking → Unit & Pack → **Product Configuration identifiers** (matrix N/A for SIMPLE) → **Pricing & Tax** → Review.
 
 One sellable identity (default `product_variants` row for SKU/barcode). **No variant price matrix.**
 
@@ -666,7 +713,7 @@ One sellable identity (default `product_variants` row for SKU/barcode). **No var
 
 **Business rule:** A VARIANT product has multiple independently sellable `ProductVariant` identities. Attributes (size, capacity, colour, pack, …) **may** change commercial value. Different variants **MAY** have different selling prices. Do **not** force one final selling price for all variants.
 
-**Entry:** Step 4 produces included/sellable combinations; Step 5 assigns SKU/barcode. Step 6 **prices existing variants only** — must not generate variants, change combinations, or generate SKU/barcode.
+**Entry:** Step 5 Product Configuration matrix produces included/sellable combinations; Step 5 identifier section assigns SKU/barcode. Step 6 **prices existing variants only** — must not generate variants, change combinations, or generate SKU/barcode.
 
 **Authoritative sell price** belongs to the sellable variant identity (`product_variants.id` / stable `clientCombinationKey` → `productVariantId`). Never use UI row index as identity.
 
@@ -697,7 +744,7 @@ Subtitle: “Set pricing and tax details for each variant. Prices are managed at
 
 **Status:** PRICED = included variant has selling price &gt; 0 and valid; PENDING = incomplete. Draft may save with mix of PRICED/PENDING. Save & Continue requires **all included/sellable** variants PRICED + Tax Class + TaxPriceMode.
 
-**Reconciliation with Step 4:** Stable ProductVariantId / combination key preserves prices; excluded/tombstoned variants do not leak prices; new included variants start PENDING unless Apply to All is used. Never remap by display label alone.
+**Reconciliation with Step 5 Product Configuration (variant matrix):** Stable ProductVariantId / combination key preserves prices; excluded/tombstoned variants do not leak prices; new included variants start PENDING unless Apply to All is used. Never remap by display label alone.
 
 **Conceptual wire shape (adapt to existing DTO names; extend — do not invent parallel APIs):**
 
@@ -733,8 +780,8 @@ PricingTax {
 
 ### Step 7 — Review & Create
 - Performs full server-side validation graph. Atomically updates `status` to `ACTIVE` or `INACTIVE`, sets `published_at`, and returns final Product DTO.
-- Includes Channel Availability summary from Step 1.
-- TARGET: display applicable **Initial Tracking Details** from remaining draft values (Batch + Expiry, or Serial) according to Step 2 policy. Do not display cleared/incompatible fields.
+- Includes Channel Availability summary from **Step 2 Basic Details**.
+- TARGET: display applicable **Initial Tracking Details** from remaining draft values (Batch + Expiry, or Serial) according to **Step 3** tracking policy. Do not display cleared/incompatible fields.
 - VARIANT + remaining identities: require `initialTrackingAssignedVariantId` before publish (Option 2). SIMPLE identities use `product_variant_id` NULL. BUNDLE parent identities must already have been cleared.
 - Publish MAY create identity-only `product_batches` / `serial_numbers` rows. It MUST NOT invent on-hand quantity, `stock_movements`, or cost layers. Opening Stock remains quantity owner.
 - **Pricing on Review:** SIMPLE shows selling + tax presentation; VARIANT shows priced count / price range / tax class (per-variant detail as UI allows). Do not show a fake single parent selling price for VARIANT when variants differ.
@@ -787,7 +834,8 @@ Full matrix: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permissio
 - `media_assets` + `product_images`: Canonical normalized Product media model (`STAGED` → `ACTIVE` on link)
 - `product_channel_visibility`: POS and Online visibility flags
 - `product_inventory_settings`: Track stock (`is_stock_tracked`), batch (`requires_batch_tracking`), expiry (`requires_expiry_tracking`), serial (`requires_serial_tracking`) flags
-- TARGET GAP `product_setup_initial_tracking`: provisional Step 1 Batch/Expiry/Serial draft values (not Product master identity)
+- **EXISTING** `product_setup_initial_tracking`: provisional **Step 3** Batch/Expiry/Serial draft values (not Product master identity). Migration: `20260824095742_AddProductSetupInitialTracking`. **Not** scanner-first B1.
+- `product_setup_scan_context` schema/model is **IMPLEMENTED in B1** (`20260912085454_AddProductSetupScannerIdentifierContext`; local test DB verified; prod/shared apply not claimed). Remaining **TARGET** is **B8** draft-bootstrap write path / later hydration wiring — **not** the table itself. Final barcode ownership remains `product_barcodes`.
 
 ---
 
@@ -795,10 +843,12 @@ Full matrix: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permissio
 
 | Trigger | Rules Enforced | Failure Result |
 |---|---|---|
-| **Save Draft (Step 1)** | Category optional; Brand optional; blank Product Name $\rightarrow$ persist `Untitled Product`; Batch/Expiry/Serial optional (syntax only) | HTTP 400 with field errors |
-| **Save & Continue (Step 1)** | Real Product Name required; Category required; Brand optional; then `current_setup_step = 2` | UI stays on Step 1; step not advanced |
-| **Save Draft (Step 2)** | Structure valid enum; Tracking combination valid according to truth table; incompatible identity values require confirmation; `advanceStep = false` | Keeps on Step 2; returns updated `rowVersion` |
-| **Save & Continue (Step 2)** | Structure valid enum; Product Type confirmed; Tracking matrix valid according to truth table; identity reconciliation complete; `advanceStep = true` | Advances to next applicable Step upon HTTP 200 OK |
+| **Step 1 pre-draft** | Resolve / external-lookup / SKU-candidate only; **no** Product Save Draft | 401/403/422 as applicable; business outcomes are 200 |
+| **Step 1 creation-path** | `POST .../products/draft` creates DRAFT + scan context; `current_setup_step = 2` | Pre-draft scans do not create rows |
+| **Save Draft (Step 2 Basic Details)** | Category optional; Brand optional; blank Product Name → persist `Untitled Product`; no Initial Tracking fields | HTTP 400 with field errors |
+| **Save & Continue (Step 2 Basic Details)** | Real Product Name required; Category required; Brand optional; then `current_setup_step = 3` | Advances to Step 3 on success |
+| **Save Draft (Step 3 Type & Tracking)** | Structure valid enum; Tracking combination valid; incompatible identity values require confirmation; `advanceStep = false` | Keeps on Step 3; returns updated `rowVersion` |
+| **Save & Continue (Step 3)** | Structure valid; Product Type confirmed; Tracking matrix valid; identity reconciliation complete; `advanceStep = true` | Advances to Step 4 or Step 5 (Units NOT_APPLICABLE) upon HTTP 200 OK |
 | **Publish (Step 7)** | All 7 steps valid; SKU/Barcode unique; Price >= 0; Channels configured; initial tracking ownership/uniqueness/variant assignment/Bundle restriction | HTTP 400/409 error envelope, transaction rolls back |
 
 ---
@@ -816,12 +866,12 @@ Full matrix: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permissio
 - [[../../15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-08-24_Tenant_Admin_Product_Setup_Permission_NFR_API_DB_Contract_Closure_Audit]]
 - [[../../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_FINAL_CONTRACT_HARDENING_2026-08-27]]
 
-## Step 3 — Units & Pack Conversion (NOT_APPLICABLE for BUNDLE)
-For `BUNDLE`: `Step 3 = NOT_APPLICABLE`.
+## Step 4 — Unit & Pack Conversion (NOT_APPLICABLE for BUNDLE)
+For `BUNDLE`: **Step 4** = `NOT_APPLICABLE`.
 The Bundle parent does not configure Base Unit, Purchase Unit, Stock Unit, Selling Unit Conversion, Outer Pack, Pack Conversion, Multiple Unit Conversion, or Parent inventory conversion.
-The user must NEVER enter the Step 3 form.
+The user must NEVER enter the Step 4 Unit & Pack form. Save & Continue from Step 3 navigates directly to Step 5.
 
-## Step 4 — Bundle / Kit Composition
+## Step 5 — Bundle / Kit Composition
 
 ### Header
 ```text
@@ -865,6 +915,6 @@ BundleAvailableQuantity = MIN(SupportsBundles for every mandatory component)
 Ties for the limiting component are handled deterministically.
 
 ### Save Logic
-- Save Draft allows 0, 1, or 2+ components. Stays on Step 4.
-- Save & Continue requires minimum 2 valid distinct components. On success, `targetSetupStep = 5`.
-
+- Save Draft allows 0, 1, or 2+ components. `currentSetupStep = 5`, `advanceStep = false`. Remains on **Step 5**.
+- Save & Continue requires minimum 2 valid distinct components. On success: `currentSetupStep = 5`, `advanceStep = true`, `targetSetupStep = 6` (Pricing & Tax).
+- Step 3 → Step 5 bypass of Step 4 for BUNDLE is unchanged (Units remain NOT_APPLICABLE).

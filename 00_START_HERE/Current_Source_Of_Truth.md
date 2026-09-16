@@ -1,7 +1,7 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-09-09 -->
+<!-- last_updated: 2026-09-13 -->
 
 
 # Current Source Of Truth
@@ -470,11 +470,6 @@ tables, screens, or flows.
 - [[Developer_Reading_Guide]]
 - [[Project_Glossary]]
 - [[../01_RELEASE_SCOPE/Release_1_Scope]]
-- [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Review_Create_Specification.md]]
-- [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
-- [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
-- [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
-- [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
 - [[../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_PRODUCT_TAX_INCLUSIVE_EXCLUSIVE_DECISION_2026-08-27]]
 - [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]
 - [[../13_DECISIONS_AND_CHANGES/TENANT_ADMIN_TAX_MANAGEMENT_DECISION_REGISTER_2026-09-03]]
@@ -495,8 +490,6 @@ tables, screens, or flows.
 
 Authority: [[../04_MODULE_KNOWLEDGE/14_Pricing_Tax_Management/Tenant_Admin_Tax_Management_Canonical_Contract]]
 
-## Wizard Step Rule
-The Tenant Admin Add Product workflow is strictly a 7-step wizard. Step 7 is Review & Create. Legacy 8-step documentation and standalone Channel Visibility steps are obsolete.
 ## Tenant Admin User Creation Authority — 2026-08-25
 
 The canonical Add New User journey is [[../03_USER_JOURNEYS/Tenant_Admin/07_User_Management_Add_New_User_Flow]]. It is a five-step UI target backed by the existing atomic user-create contract. Current Flutter remains three-step. Tenant-wide/selected-outlet role assignment and additive direct grants are supported; user-specific till/default-till, draft, access-start, and 2FA controls are not currently supported.
@@ -504,25 +497,6 @@ The canonical Add New User journey is [[../03_USER_JOURNEYS/Tenant_Admin/07_User
 ### 2026-08-26 Correction
 
 Role selection is owned only by Step 2. Step 3 adds user-specific direct grants and never mutates the Base Role. `No Outlet Access`, Access Level, Save Draft, and till/default controls are absent from the active contract. Review counts and invitation content derive from final wizard state.
-
-### Product Setup Step 6 — Pricing & Tax (LOCKED 2026-09-03)
-
-Authority: [[../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]] §6.1–6.5.
-
-| Structure | Selling price | Tax |
-|---|---|---|
-| SIMPLE | One sellable identity → one applicable price-list configuration | Product Tax Assignment + TaxPriceMode |
-| VARIANT | Independent selling price per `ProductVariantId` via `price_list_items` | Common Product Tax Class / TaxPriceMode for current scope |
-
-Default Selling Price wording on the VARIANT screen is **retired**. Canonical bulk helper label: **Set Same Price for All Variants** (Flutter-only; Apply to All). POS / Online Store use the selected sellable ProductVariant’s price. Cost = product-level `reference_cost_price`. Do not invent parallel pricing tables. Tax masters remain Tax Management. Closures: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_PRICING_TAX_SIMPLE_VARIANT_SECOND_BRAIN_CLOSURE_2026-09-03]], [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_BULK_PRICE_UX_REFINEMENT_CLOSURE_2026-09-04]].
-
-**Implementation note:** SIMPLE Step 6 UI/backend path is confirmed. VARIANT per-variant Step 6 **backend** is **IMPLEMENTED** (2026-09-03) — see [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_PRICING_TAX_BACKEND_IMPLEMENTATION_CLOSURE_2026-09-03]]. Flutter VARIANT Step 6 UI is **IMPLEMENTED** (2026-09-04) — see [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP6_VARIANT_PRICING_TAX_FLUTTER_IMPLEMENTATION_CLOSURE_2026-09-04]]. Product Setup Step 6 frontend is complete for SIMPLE + VARIANT.
-
-Step 2 Product Type & Tracking collects optional **Initial Tracking Details** (Batch Number, Expiry Date, Serial Number) **after Product Type is explicitly selected** (SIMPLE / VARIANT; hidden for BUNDLE). Step 1 is Product master + images + channels only. Those identity values remain provisional wizard input. Step 2 remains tracking-policy authority (`product_inventory_settings`). Actual identity persists at Step 7 Publish into `product_batches` / `serial_numbers`, not into Product master columns. Opening Stock remains responsible for quantity. Authority: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]], [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]], and [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
-
-Product Setup authorization authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]. Canonical permission namespace is `catalog.*`. Runtime Product Setup entitlement is `product_catalog`. Advanced tracking entitlement is `inventory_tracking`. Closure audit: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/2026-08-24_Tenant_Admin_Product_Setup_Permission_NFR_API_DB_Contract_Closure_Audit]].
-
-Implementation status (2026-09-01): Flutter collection UI is on Step 2 after Product Type select. Permission-first + Initial Tracking draft table remain in Unified Commerce (`product_setup_initial_tracking` migration `20260824095742_AddProductSetupInitialTracking`). Live 7-scenario E2E, persona permission E2E, PostgreSQL integration, and 1024x768 tablet verification are not complete. Destructive-clear confirmation dialog remains a GAP versus BR-TRACK-008. Authority for remaining gaps: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/TENANT_ADMIN_PRODUCT_SETUP_INITIAL_TRACKING_PERMISSION_FIRST_IMPLEMENTATION_CLOSURE_2026-08-24]].
 
 ## Category Management Rule
 
@@ -559,8 +533,6 @@ DELETE /api/v1/tenant-admin/categories/{categoryId}/image
 ```
 
 **Media:** upload/replace/remove via tenant-admin category image endpoints (not write `imageUrl` on Create/Update).
-
-**Product Setup:** recursive effectively-ACTIVE category hierarchy via `GET /api/v1/tenant-admin/products/create-options` (backend enforces **BR-CAT-PRODUCT-SELECT-001**); persist `CategoryId` only.
 
 **Management tree:** `GET /api/v1/categories/tree` — ACTIVE+INACTIVE, DELETED excluded, no `status` query parameter.
 

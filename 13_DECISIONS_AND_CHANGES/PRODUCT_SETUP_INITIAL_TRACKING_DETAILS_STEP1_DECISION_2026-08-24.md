@@ -1,15 +1,18 @@
 <!-- title: Product Setup Initial Tracking Details Step 1 Decision 2026-08-24 -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-09-01 -->
+<!-- last_updated: 2026-09-11 -->
 
 # Product Setup Initial Tracking Details Step 1 Decision 2026-08-24
+
+> **Numbering note (2026-09-11 / corrected 2026-09-12):** Identity rules remain in force. Collection is on Product Type & Tracking = global **Step 3** after scanner-first remumber. Historical “Step 1 / Step 2” wording below records the pre-scanner-first decision surface. See [[PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]] and [[PRODUCT_SETUP_SCANNER_FIRST_TECHNICAL_CONTRACT_DECISION_2026-09-12]].  
+> **Table status (2026-09-12):** `product_setup_initial_tracking` is **EXISTING** (migration `20260824095742_AddProductSetupInitialTracking`). Historical “TARGET” wording below is superseded for migration status. **Out of scanner-first B1** (B1 = scan_context + identifier_standard + UNKNOWN only). Live DB/E2E: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/TENANT_ADMIN_PRODUCT_SETUP_INITIAL_TRACKING_PERMISSION_FIRST_IMPLEMENTATION_CLOSURE_2026-08-24]] — do not infer production acceptance from docs alone.
 
 ## Collection surface update (2026-09-01)
 
 Identity, draft table, publish path, and tracking-policy ownership in this
-decision remain in force. **Collection UI** moved from Step 1 to Step 2 after
-Product Type is selected.
+decision remain in force. **Collection UI** moved from Basic Details to Product Type & Tracking after
+Product Type is selected (global Step 3 as of 2026-09-11).
 
 Authority for the collection move:
 [[PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]].
@@ -17,8 +20,8 @@ Authority for the collection move:
 ## Status And Purpose
 
 Approved and active from 2026-08-24 for Product Setup identity rules. Original
-collection surface was Tenant Admin Add Product **Step 1 — Basic Details**.
-That collection surface is superseded on 2026-09-01 (Step 2 after type select).
+collection surface was Tenant Admin Add Product **Basic Details** (then numbered Step 1).
+That collection surface is superseded (moved to Product Type & Tracking).
 
 Canonical contract:
 [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
@@ -79,7 +82,7 @@ tables, not into `products.batch_number` / `products.expiry_date` /
 |---|---|
 | Wizard length | 7 steps. Step 7 = Review & Create. `current_setup_step` 1–7. |
 | Draft API | Option A: reuse existing `POST/PUT /api/v1/tenant-admin/products[/{id}]/draft` and `GET .../setup`. |
-| Draft storage | Option B: TARGET `product_setup_initial_tracking` (1:1 draft entity). Option C Product identity columns rejected. |
+| Draft storage | Option B: `product_setup_initial_tracking` (1:1 draft entity) — **now EXISTING** via `20260824095742_AddProductSetupInitialTracking`; Option C Product identity columns rejected. Out of scanner-first B1. |
 | Policy table | `product_inventory_settings` unchanged. |
 | Batch + Expiry owner | `product_batches.batch_number`, `product_batches.expiry_date` |
 | Serial owner | `serial_numbers.serial_number` |

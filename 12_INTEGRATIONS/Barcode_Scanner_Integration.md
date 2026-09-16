@@ -1,7 +1,7 @@
 <!-- title: Barcode Scanner Integration -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-16 -->
+<!-- last_updated: 2026-09-11 -->
 
 # Barcode Scanner Integration
 
@@ -26,6 +26,21 @@ Physical acceptance remains open — see
 
 Scanner capture may be local; product lookup remains part of the POS/catalogue
 backend flow.
+
+### Tenant Admin Product Setup — Step 1 Scan Barcode (2026-09-11)
+
+Tenant Admin Add Product **Step 1 Scan Barcode** reuses the same **HID keyboard-wedge framing** (focus field → characters → trailing Enter completes → validate once).
+
+Tenant Admin API status:
+
+- `POST /api/v1/tenant-admin/products/barcodes/resolve` = **IMPLEMENTED — Backend B4**
+- `POST /api/v1/tenant-admin/products/barcodes/external-lookup` = **IMPLEMENTED — Backend B7** (no tenant duplicate checking; zero providers → NO_MATCH)
+
+Tenant Admin must **not** call POS Cashier `GET /api/v1/pos/products/by-barcode/{barcode}`.
+
+Canonical: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Setup_Scan_Barcode_Specification]].  
+Decision: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].  
+Evidence: [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_SCANNER_FIRST_BACKEND_B4_BARCODE_RESOLVE_IMPLEMENTATION_2026-09-12]].
 
 Authority:
 [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]]

@@ -7,7 +7,7 @@
 
 ## Purpose
 
-Define reusable option templates, option values, business type option defaults, product options, product option values, variant option mapping, and the canonical Add Product Step 4 Variant Configuration specification.
+Define reusable option templates, option values, business type option defaults, product options, product option values, variant option mapping, and the canonical Add Product **Step 5** Variant Configuration specification (FORMER: Step 4 before scanner-first renumbering).
 
 This module is part of the OneVerz POS MVP scope: mobile and desktop EPOS, responsive online store, offline-capable operation, click and collect, multi-device support, and low-cost hardware usage for events, stalls, food and beverage, merchandising, attractions, and temporary retail locations.
 
@@ -18,7 +18,7 @@ This module is part of the OneVerz POS MVP scope: mobile and desktop EPOS, respo
 | Module | `Product_Option_Variant_Configuration` |
 | Module number | 12 |
 | Primary users | Tenant Admin, Food stall manager, Merchandise shop manager |
-| Frontend surfaces | Variant option builder, Size/color configuration, Food/beverage option setup, Add Product Step 4 (Variant Configuration) |
+| Frontend surfaces | Variant option builder, Size/color configuration, Food/beverage option setup, Add Product Step 5 (Variant Configuration; FORMER Step 4) |
 | API groups | `/api/v1/tenant-admin/products/{id}/draft`, `/api/v1/tenant-admin/products/create-options` |
 | Specification | [[Tenant_Admin_Product_Variant_Configuration_Specification]] |
 
@@ -37,9 +37,9 @@ This module is part of the OneVerz POS MVP scope: mobile and desktop EPOS, respo
 
 - Option templates standardize common values such as size, color, portion, or type.
 - Variant option combinations identify sellable variants via deterministic `option_combination_hash` (SHA-256).
-- Add Product Step 4 uses **`Include Variant`** (never "Availability") to toggle global variant inclusion.
-- **Estimated Variant Count** (VARIANT Step 4 only): live frontend Cartesian preview; backend recalculates authoritatively on persist.
-- Step 4 does NOT configure SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, or Channel Visibility (belonging to Step 1).
+- Add Product Step 5 uses **`Include Variant`** (never "Availability") to toggle global variant inclusion.
+- **Estimated Variant Count** (VARIANT Step 5 only): live frontend Cartesian preview; backend recalculates authoritatively on persist.
+- Step 5 matrix does NOT configure Selling Price, Cost Price, Tax, Opening Stock, or Channel Visibility (Channel Visibility = Step 2; Pricing & Tax = Step 6). SKU/Barcode finalization belongs to the **Step 5 identifier section** (same global step). Acquisition/scan remains Step 1.
 - Option values shown online must match sellable variant configuration.
 - Do not use option templates for combo choice groups; combos have their own module.
 

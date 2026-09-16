@@ -3,7 +3,9 @@
 <!-- title: Final Canonicalization Audit: Tenant Admin Add Product Step 4 — Variant Configuration -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Scope -->
-<!-- last_updated: 2026-08-11 -->
+<!-- last_updated: 2026-09-12 -->
+
+> **HISTORICAL EVIDENCE ONLY.** FORMER global Step 4 Variant/Product Configuration. **CURRENT:** global Step 5 Product Configuration after scanner-first renumbering. Authority: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]], [[../../04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification]].
 
 ## 1. Executive Summary
 
