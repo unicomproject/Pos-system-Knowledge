@@ -74,9 +74,12 @@ Rationale: existing clients often expect property keys; null avoids fake numeric
 
 | Canonical Permission | Class | Notes |
 | --- | --- | --- |
-| `pos.home.session_summary.total_sales` | NO_ENDPOINT | Not on POS home API DTOs |
-| `pos.home.session_summary.discounts` | NO_ENDPOINT | Same |
-| `pos.home.session_summary.net_sales` | NO_ENDPOINT | Same |
+| `pos.home.session_summary.total_sales` | BACKEND_FILTERED | Nullable `summary.grossSalesAmount` |
+| `pos.home.session_summary.discounts` | BACKEND_FILTERED | Nullable `summary.discountAmount`; applicability returned separately |
+| `pos.home.session_summary.net_sales` | BACKEND_FILTERED | Nullable `summary.netSalesAmount` |
+| `pos.home.session_summary.transaction_count` | BACKEND_FILTERED | Nullable `summary.transactionCount` |
+| `pos.home.session_summary.returns` | BACKEND_FILTERED | Nullable refund amount/count; applicability returned separately |
+| `pos.home.session_summary.view` | BACKEND_FILTERED | Denial omits the entire `summary` object |
 
 ### C–E. Cart / Checkout / Payment / Sale complete / Receipt
 
@@ -171,7 +174,6 @@ Added / removed / renamed canonical codes: **0**.
 
 - Flutter centralized PermissionGate / permission visibility
 - Route guards / navigation chrome
-- Home session summary API (if product adds metrics endpoint)
 - Receipt customer field on detail DTO (if product adds it)
 - Customer AOV response field
 

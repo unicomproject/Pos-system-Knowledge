@@ -48,6 +48,28 @@ new OneVerz POS MVP scope images and the uploaded Unified Commerce database desi
 | `/api/v1/pos/till-summary` | Module API group |
 | `/api/v1/pos/events` | Module API group |
 
+### POS Home current-session summary
+
+`GET /api/v1/pos/home` returns nullable `summary`. Null means unavailable or the
+section permission is denied; clients must not manufacture zeros. The projection is
+scoped by `tenant_id`, resolved outlet, assigned till and open `till_session_id`.
+Included sales are non-cancelled `COMPLETED` orders whose payment state is `PAID`,
+`PARTIALLY_REFUNDED`, or `REFUNDED`. Gross uses `SubtotalAmount`, Discounts uses
+`DiscountAmount`, Returns uses `RefundedAmount` plus completed refund count, and
+Net uses `TotalAmount - RefundedAmount`, matching Tenant Admin reporting semantics.
+The typed summary is:
+
+```text
+scope, businessDate, tillSessionId, currencyCode,
+grossSalesAmount?, transactionCount?, refundAmount?, refundCount?,
+returnsApplicable, discountAmount?, discountsApplicable, netSalesAmount?
+```
+
+Nullable metric fields enforce the existing granular `pos.home.session_summary.*`
+permissions. Real zero remains a value. `returnsApplicable` requires at least one
+completed, non-cancelled refund joined to an included order;
+`discountsApplicable` requires a positive included-order discount total.
+
 ## Database Contract
 
 | Table | Contract |

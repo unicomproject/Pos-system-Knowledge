@@ -5,6 +5,30 @@
 
 # Flutter Cash Payment Screen Implementation Specification
 
+## Implemented payment safety follow-up — 2026-09-12
+
+Cash intent states now drive the screen: submitting disables financial actions;
+unknown exposes **Check Payment Status**, known rejection exposes **Start New
+Attempt**, and succeeded exposes only the completed receipt. Unknown never issues
+another checkout or creates a new key. Status reconciliation uses the original
+key with `POST /api/v1/pos/checkout/payment-status`.
+
+`succeeded` restores the authoritative backend payment/receipt and locks the cart;
+`not_completed` permits an explicit fresh attempt; unresolved status retains both
+cart and key. The backend fences the original attempt before reporting
+`not_completed`, so a late original request cannot charge after a new attempt.
+
+Completed carts reject mutation and checkout serialization. Success uses route
+replacement and system-back protection; intent `open()` cannot turn a completed
+attempt into a new one. Only **Start New Sale** resets the cart/payment lifecycle;
+receipt state is retained. Recovery does not automatically repeat print/drawer
+side effects. These protections are session-scoped, not a claim of durable
+recovery after application data loss or process restart.
+
+See the existing Cashier Login to Receipt runtime audit for dated verification
+and remaining acceptance limitations; historical implementation labels below do
+not supersede that evidence.
+
 ## Canonical decision and journey
 
 `Current Sale -> Customer Find/Add/Skip -> Payment Method -> select Cash -> Continue Payment -> Cash Payment -> Complete Sale -> Payment Success`

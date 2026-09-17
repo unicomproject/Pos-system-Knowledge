@@ -5,6 +5,24 @@
 **Scope:** Chunks 1–3 — Second Brain, backend contract and Flutter OO-01  
 **Status:** COMPLETE — implementation, static validation and authenticated runtime acceptance passed
 
+## Search scan extension (2026-09-10)
+
+Scope: extend only the existing search interaction, not the original whole-screen acceptance above. Search field EXTEND (`Oo01Header`); scanner service REUSE (`PosBarcodeScannerListener` / `PosHidScannerInputService`); list, search repository/API and 400 ms debounce REUSE. No new shared component, role checks, backend, DB, migration, commit or push.
+
+OO-01 search accepts typed text or scanner input through the same canonical search pipeline. Scanner events provide query input only; authoritative matching remains the existing Online Orders API.
+
+Placement: existing search prefix + `Search by order number, customer, phone or scan...` + vertical divider + compact right-side scan icon. Material styling inherits tenant theme. Tooltip/semantic label: `Scan order`; field: `Search or scan online orders`. Icon selects/focuses the field for HID input; background HID capture does not require tapping it. Focused text input and background capture are mutually exclusive. No camera integration or picking-card UI is added.
+
+Backend evidence: `PosOnlineOrderDetailRepository.ListAsync` search predicates match `OrderNumber`, `ExternalOrderReference`, `CustomerNameSnapshot`, `CustomerPhoneSnapshot`. Plain searchable order/reference text is supported; opaque QR payloads/collection tokens are not interpreted. Unknown input uses the normal no-results state; empty/incomplete capture is silent; no auto-open or local result synthesis. Physical HID disconnection is not detectable through keyboard events, so no false hardware-health claim is made.
+
+Provider extension cancels old list requests when query changes and rejects late responses by token/outlet identity. Outlet change clears old results and resets page; realtime refresh keeps query/filter/page. Widget lifecycle disables background capture off-route or while paused and disposes owned resources.
+
+Automated evidence: scanner/affordance tests cover three sizes (1280x800, 1180x820, 1100x700), orange/pink themes, accessibility, HID, typing/debounce, empty/unknown/duplicate input, clear, focus/lifecycle and stale/outlet responses. Final focused OO-01 run: 16 passed / 0 failed / 0 skipped. Online Orders + HID listener + realtime regression run: 169 passed / 0 failed / 0 skipped (includes the focused tests; totals are not additive). Physical scanner/device acceptance is not claimed; use the existing hardware acceptance matrix. No live customer order is mocked in production.
+
+Task-scoped frontend and documentation diff checks pass. The full Second Brain worktree diff check still reports a pre-existing trailing blank line in the unrelated OO05 prototype `README_COMPONENT_MAP.md`; this task preserves that edit. Application changes are limited to `pos_online_orders_screen.dart`, `oo01_online_orders_widgets.dart` and `pos_online_orders_provider.dart`; new coverage is `test/features/online_orders/oo01_scan_search_test.dart`. Existing unrelated edits remain untouched.
+
+Full `flutter analyze --no-pub`: PASS, no issues (final run). Software implementation and automated validation are complete; authenticated physical-scanner/device acceptance remains separate and unverified.
+
 ## Realtime list refresh (2026-09-09 Chunk 1)
 
 OO-01 list previously refreshed only on screen open / local fulfilment mutations. Chunk 1 wires `ecommerce.order_placed.staff` (and related Ecommerce order event types) through `NotificationInboxController` → `posOnlineOrdersProvider.refreshFromRealtime()` without resetting search/filter/page and without inserting raw socket DTOs. Bell ownership: `posNotificationsProvider`. Tracker: [[Online_Order_Realtime_Cashier_Refresh_Chunk1_2026-09-09]]. Live runtime proof deferred to Chunk 2.

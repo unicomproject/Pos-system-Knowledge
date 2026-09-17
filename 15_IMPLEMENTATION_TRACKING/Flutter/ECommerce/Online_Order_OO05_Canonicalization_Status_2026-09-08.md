@@ -74,9 +74,19 @@ Logical **1280×800** landscape (Pixel Tablet). Header/footer unchanged. Whole-p
 |---|---|
 | `oo05_review_pack_workflow_test.dart` | PASS |
 | `oo05_review_pack_layout_test.dart` | PASS |
-| `flutter analyze` (fulfilment_pickup + permission access) | PASS |
-| `test/features/online_orders/` regression | 112 passed (prior full suite) |
+| `review_pack_error_mapper_test.dart` | PASS |
+| `test/features/online_orders/permissions/` | PASS (2 passed) |
+| `test/features/online_orders/detail/` | PASS (10 passed) |
+| `test/features/online_orders/picking/` | PASS (3 passed) |
+| `flutter analyze` (lib/ test/) | PASS |
+| `test/features/online_orders/` regression | 137 passed (full suite) |
 | Commit/push | **NOT PERFORMED** |
+
+Online Order test suite organization (responsibility-based; production owner remains `lib/features/fulfilment_pickup/`):
+- `test/features/online_orders/permissions/`: canonical access and view permission matrix tests
+- `test/features/online_orders/detail/`: error message mapping and Start Fulfilment lifecycle tests
+- `test/features/online_orders/picking/`: OO04 picking sidebar, items list, and workspace fixed-viewport layout tests
+- `test/features/online_orders/helpers/`: shared test harness (`pickingHarness`, `detailHarness`), test fixtures, and mock-free test session storage
 
 ### Live Development acceptance (2026-09-09)
 
@@ -692,7 +702,14 @@ eligibility messages, review step, display location.
 | Item | Path |
 |---|---|
 | Feature root | `lib/features/fulfilment_pickup/` |
-| Existing screen evidence | `presentation/screens/review_pack_screen.dart` |
+| Screen composition | `presentation/screens/review_pack_screen.dart` |
+| Review & Pack widgets | `presentation/widgets/review_pack/review_pack_header.dart` (`ReviewPackHeader`) |
+| | `presentation/widgets/review_pack/review_pack_sidebar.dart` (`ReviewPackSidebar`) |
+| | `presentation/widgets/review_pack/picked_items_list.dart` (`PickedItemsList`) |
+| | `presentation/widgets/review_pack/packing_notes.dart` (`PackingNotes`) |
+| | `presentation/widgets/review_pack/order_summary.dart` (`OrderSummary`) |
+| | `presentation/widgets/review_pack/order_progress.dart` (`OrderProgress`) |
+| Transport error utility | `presentation/utils/review_pack_error_mapper.dart` (`mapReviewPackError`, `mapReviewPackException`) |
 | Host | `pos_online_order_picking_screen.dart` (mode switch; no dedicated `/pack` route today) |
 | Provider | `pos_online_orders_provider.dart` → `PosPickingActions.pack` / `.ready` |
 | Endpoints | `api_endpoints.dart` → `.../pack`, `.../ready` |

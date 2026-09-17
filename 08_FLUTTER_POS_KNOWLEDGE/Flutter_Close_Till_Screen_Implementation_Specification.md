@@ -19,11 +19,33 @@ Canonical business contract:
 | Screen | `features/cash_drawer/presentation/screens/pos_close_till_screen.dart` |
 | State | `features/cash_drawer/presentation/providers/close_till_provider.dart` |
 | Summary/API bridge | `features/cash_drawer/presentation/providers/cash_drawer_provider.dart` |
-| Close datasource | `features/till/data/datasources/till_remote_datasource.dart` |
+| Close datasource | `features/till/data/datasources/remote/till_remote_datasource.dart` |
+| Session response mapping | `features/till/data/mappers/till_session_mapper.dart` |
+| Till Dio error conversion | `features/till/data/utils/till_api_error_mapper.dart` |
 | Route | `/pos/cash-drawer/close-till` |
 | End Shift | same route with `endShift=true` |
 
 Current UI is componentized and must be extended in place.
+
+Structural extraction (2026-09-12): datasource retains HTTP requests, payloads,
+timing and safe `pos.session` logging. Mapper owns open/closed response unwrapping,
+validation and primitive/date parsing. Error functions reuse core
+`messageFromDioException`. Runtime semantics are unchanged, including Close Till's
+message-only TillException (no code), date-now fallbacks, note trimming and
+current-session `404 till_session.not_found` returning null. No backend, provider
+ownership or business rules were changed.
+
+Verification for that extraction:
+
+- `flutter test --no-pub test/features/till`: 49 passed, 0 failed.
+- `flutter test --no-pub`: 1953 passed, 0 failed, 1 skipped (includes POS session regression).
+- Scoped `flutter analyze --no-pub lib/features/till/ test/features/till/`: no issues.
+- Requested `flutter analyze lib/ test/`: nonzero exit for three unrelated
+  `prefer_const_literals_to_create_immutables` infos in collection_handover_screen,
+  collection_qr_scan_screen and collection_verification_screen. Those files were
+  not changed by this refactor; do not claim a clean full-project analyzer.
+- Mapper extraction compared equal to the original logic after function renaming,
+  moving envelope unwrapping to the public mapper boundary and formatting.
 
 ## Screen Composition
 

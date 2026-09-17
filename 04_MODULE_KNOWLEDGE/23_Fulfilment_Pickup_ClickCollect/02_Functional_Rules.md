@@ -1,9 +1,13 @@
 <!-- title: Fulfilment & Pickup / Click & Collect Functional Rules -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-31 -->
+<!-- last_updated: 2026-09-12 -->
 
 # Fulfilment & Pickup / Click & Collect Functional Rules
+
+## Customer collection Chunk 2 / Chunk 1 (2026-09-12)
+
+This file remains the Business Rules owner. Chunk 2 implements QR validate (no mutation), shared POS outstanding settle, and handover complete = Collected only. Numbered inventories remain in Chunk 1 tracker; implementation + Development API↔DB live evidence in Chunk 2 tracker (Flutter device UI still PENDING / PARTIAL).
 
 ## OO-06 canonicalization update (2026-09-09)
 
@@ -27,9 +31,12 @@ responsive online store screens, Angular/admin screens, tests, or database chang
 - `Delayed` is derived, never persisted as another lifecycle.
 - One fulfilment may have multiple packages and package lines.
 - Ready requires resolved picking, valid package contents and backend validation.
-- QR is READY-only, opaque, hash-stored, expiring, tenant/outlet/order bound and single-use on collection.
-- Paid Online and Cash on Collection are valid; payment must complete before handover and duplicate charging is forbidden.
-- Handover is idempotent and atomically finalizes pickup, fulfilment, sales-order projection and events/audit.
+- QR is READY-only, opaque, hash-stored on `pickup_orders`, expiring, tenant/outlet/order bound; single-use finality is on successful collection complete, not on validate.
+- QR validate performs zero lifecycle and zero financial mutation.
+- Paid Online and pay-on-collection are valid; outstanding balance settles through the shared POS payment engine against the existing Ecommerce sales order; New Sale cart creation is forbidden; duplicate charging is forbidden.
+- Payment Successful ≠ Collected; Notify ≠ Collected; Receipt Printed ≠ Collected.
+- Handover / collection complete is idempotent and atomically finalizes pickup COLLECTED, fulfilment FULFILLED, sales-order completed projection and events/audit under `FulfillmentOrder.row_version`.
+- Actor/till/device evidence prefers pickup/fulfilment events and existing audit over new `collected_by` columns unless proven insufficient.
 
 ## User Rules
 
@@ -173,3 +180,19 @@ Ready path. Authority:
 
 - [[04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/01_Module_Overview]]
 - [[04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]]
+
+## Detail next-action rules — 2026-09-15
+
+Online Order Detail must never become a dead-end for an actionable non-terminal fulfilment lifecycle state. DisplayStatus is informational; action authority is the fulfilment/pickup graph, positive version, authoritative line remaining quantities and existing permissions.
+
+| Authoritative condition | Primary action |
+|---|---|
+| PENDING/ALLOCATED, valid unstarted graph and Start permission | Start Fulfilment through OO-03 |
+| PICKING, remaining > 0, picking-view permission | Continue Picking |
+| PICKING, remaining = 0, backend CanPack=true, packing-view permission | Review & Pack |
+| PACKED, no remaining picking, packing-view permission | Existing OO-05 continuation; do not Pack again |
+| Canonical READY eligibility, ready-view permission | View Ready for Collection |
+| Cancelled, collected, completed, fulfilled, voided or expired | Read-only; no continuation mutation |
+| Missing graph/version/progress or conflicting lifecycle/capability | Safe refresh/recovery; never guess from Preparing |
+
+Remaining uses server `max(requested - cancelled - picked, 0)`, never UI item count. Backend remains final security/lifecycle authority. Preparing does not imply Ready. Only one primary lifecycle action is shown. Start/Pack/Ready mutations retain their existing confirmation/version rules.

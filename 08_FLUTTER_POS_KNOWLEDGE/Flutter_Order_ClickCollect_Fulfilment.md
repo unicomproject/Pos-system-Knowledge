@@ -1,8 +1,32 @@
 <!-- title: Flutter Online Order Click & Collect Fulfilment -->
-<!-- status: OO-01 accepted; OO-02 Flutter implemented / authenticated production acceptance pending -->
-<!-- last_updated: 2026-09-08 -->
+<!-- status: OO-01 accepted; collection Chunk 1 frozen 2026-09-12; OO-02 Flutter implemented / authenticated production acceptance pending -->
+<!-- last_updated: 2026-09-12 -->
 
 # Flutter Online Order Click & Collect Fulfilment
+
+## Customer collection Chunk 2 implementation (2026-09-12)
+
+**Status:** software COMPLETE; Development API↔DB live PASS; Flutter device UI drive PENDING (PARTIAL). See [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Collection_QR_Payment_Handover_Chunk2_2026-09-12]].
+
+## Customer collection Chunk 2 routes (2026-09-12)
+
+Flutter routes under `/pos/online-orders/collection/*`; OO-01 distinct Collection QR action; HID REUSE; payment Method/Cash EXTEND with `collectionPaymentContextProvider` + `existingSalesOrderId`; payment success → Handover only. Tracker: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Collection_QR_Payment_Handover_Chunk2_2026-09-12]].
+
+## Customer collection Chunk 1 freeze (2026-09-12)
+
+Chunk 2 will add collection screens under `lib/features/fulfilment_pickup/presentation/screens/` and `widgets/collection/`, plus routes in `pos_shell_router.dart`. OO-01 gains a **Collection QR entry** distinct from the existing search scan icon (search remains query-only). REUSE `PosBarcodeScannerListener` / `PosHidScannerInputService`. REUSE/EXTEND `features/sale` Payment Method, cash tender, card route, and receipt/printer — **do not** create a New Sale cart for ecommerce collection. Full contract: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Collection_QR_Payment_Handover_Chunk1_2026-09-12]].
+
+## OO-01 search scanner input (2026-09-10)
+
+OO-01 search accepts typed text or scanner input through the same canonical search pipeline. Scanner events provide query input only; authoritative matching remains the existing Online Orders API.
+
+The feature-local `Oo01Header` search field is extended with the hint `Search by order number, customer, phone or scan...`, a theme-inherited vertical divider and compact right-side Material scan icon (`Scan order` tooltip/semantics). Width and surrounding screen composition remain unchanged. No new shared search component is introduced.
+
+`PosOnlineOrdersScreen` reuses `PosBarcodeScannerListener` / `PosHidScannerInputService` for background keyboard-wedge capture on the current, resumed route. The icon focuses/selects the existing field; it does not open a camera or picking workspace. While the field is focused, normal text input handles wedge characters instead of a second HID listener. Submitted text is selected for replacement by the next input. Focus/controller resources are disposed with the screen. Empty scans and incomplete HID frames are silent; disconnected HID has no reliable device-presence signal and manual typing remains available.
+
+Both paths call existing `setQuery` and its 400 ms debounce, then repository/datasource -> `GET /api/v1/tenant/ecommerce/click-collect/orders`. No widget HTTP, local matching, automatic navigation, new permission, backend or DB change. Current search matches order number, external order reference, customer name and phone. Opaque pickup QR tokens, URLs and collection codes are not decoded or newly supported by this extension.
+
+Query changes cancel old requests immediately; response guards reject cancelled/superseded/outlet-stale responses even during the debounce window. Realtime refresh retains query/filter/page. Outlet changes clear old outlet results and reload the preserved query/filter at page 1. This is search input, not collection validation. Evidence: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO01_Canonicalization_Status_2026-08-27]].
 
 ## Realtime cashier refresh (2026-09-09)
 
@@ -47,7 +71,8 @@ Dependency direction is `Screen/Widget → Provider → Use case/repository → 
 | Loading/error/empty/permission/feature states | Existing shared state components |
 | Confirmation | Existing canonical confirmation modal |
 | Barcode and QR input | Existing hardware abstraction/scanner components; manual input uses same use case |
-| Cash collection | Existing POS cash-payment amount, payment summary and unified payment orchestration UI where compatible |
+| Cash collection | Existing POS Payment Method + cash-payment tender + unified payment orchestration UI, **extended** with existing Ecommerce `SalesOrder` outstanding context (no New Sale cart) |
+| Receipt / print | Existing sale receipt preview/print/reprint + hardware printer service after Collection Complete |
 | Product/media | Existing product/variant image components |
 | Notification/printing | Existing services; no feature-local transport |
 
@@ -177,3 +202,13 @@ OO-02 canonicalization and Flutter implementation are complete, not production a
 
 - [[../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]]
 - [[../04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/03_Technical_Contract]]
+
+## OO-02 next-action implementation — 2026-09-15
+
+EXTEND `presentation/screens/online_order_detail_screen.dart`; FEATURE-LOCAL mapping `presentation/utils/order_detail_next_action.dart`; REUSE `PosPrimaryActionButton`, existing detail header/summary/items and existing `/pos/online-orders/:orderId/picking` workspace. No duplicate Pick/Pack/Ready screen or shared button.
+
+A single action region follows the item list. No region or spacer is reserved for permission-hidden/terminal actions. Primary color, disabled/loading and focus behavior come from the reusable button. Header/footer ownership is unchanged. All navigation is read-only; mutations stay in existing workflow owners.
+
+Before entering the workspace, invalidate its family provider. On pushed-workspace return, refetch detail; normal route re-entry also refetches by orderId. Existing request generations discard stale detail responses. Loading or failed refresh disables the old CTA. Incomplete authoritative graphs show refresh/recovery instead of guessing an action from the display label.
+
+Authoritative decision matrix: [[../04_MODULE_KNOWLEDGE/23_Fulfilment_Pickup_ClickCollect/02_Functional_Rules#Detail next-action rules — 2026-09-15]]. Evidence remains in the existing OO-02 tracker.

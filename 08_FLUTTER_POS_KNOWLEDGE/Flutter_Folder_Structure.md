@@ -140,6 +140,24 @@ under `hardware`, `pos`, or `tenant_admin`. Widgets must not call Dio directly.
 Canonical specification:
 [[Flutter_Cash_Drawer_Management_Screen_Implementation_Specification]].
 
+### Till data responsibilities (2026-09-12)
+
+```text
+features/till/data/
+  datasources/
+    remote/till_remote_datasource.dart
+    till_session_storage.dart
+  mappers/till_session_mapper.dart
+  utils/till_api_error_mapper.dart
+  repositories/till_repository_impl.dart
+```
+
+Remote datasource owns HTTP/payloads/logging; the mapper owns open/closed session
+conversion and private parsing helpers; the error utility reuses the core Dio
+message converter. Data helpers depend only on domain/core, never presentation.
+Existing local session storage remains in place; this is not a new feature or a
+change to till/session behavior.
+
 ## Core Folder Meaning
 
 | Folder | Purpose |

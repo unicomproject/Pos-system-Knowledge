@@ -1,7 +1,7 @@
 <!-- title: POS Home Dashboard Implementation Status -->
 <!-- status: Active -->
 <!-- system: SCS-TIX EPOS Release 1 -->
-<!-- last_updated: 2026-07-24 -->
+<!-- last_updated: 2026-09-15 -->
 
 
 # POS Home Dashboard Implementation Status
@@ -90,6 +90,20 @@ Summary values remain API-backed. The shared `SessionSummaryCard` now accepts
 metric-specific foreground and pastel background colours. Total Sales is
 orange, Transactions green, Returns purple, Discounts amber and Net Sales blue.
 Icon containers are 56x56 logical pixels with 30 logical-pixel Material icons.
+
+## Current-session production hardening (2026-09-15)
+
+Flutter now preserves nullable/unavailable summary fields and never converts an
+absent backend summary into five zero cards. Total Sales, Transactions and Net
+Sales preserve authoritative real zero values. Returns and Discounts render only
+when the backend applicability flag is true and the permitted values are present.
+Only visible metrics enter the existing dynamic card list, so permission and
+applicability filtering leave no slots.
+
+Focused widget validation passed 30/30, including one through five equal-width
+cards at 1280, 1180 and 1100 widths, optional-card hiding, section denial, large
+values, mobile and desktop overflow checks. Focused Flutter analysis passed with
+no issues. The existing `SessionSummaryCard` and shared theme tokens remain in use.
 
 ## Related Second Brain Files
 

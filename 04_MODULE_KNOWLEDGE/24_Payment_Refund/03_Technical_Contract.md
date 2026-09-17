@@ -5,6 +5,26 @@
 
 # Payment & Refund Technical Contract
 
+## Cash payment reconciliation — 2026-09-12
+
+`POST /api/v1/pos/checkout/payment-status` accepts `{ idempotencyKey }` and
+returns `status` (`succeeded`, `not_completed`, or `unknown`) plus the original
+payment payload on success. Existing checkout and cash-accept permissions and
+tenant context remain mandatory; existing sensitive-response filtering applies.
+
+Existing checkout replay requires financial submission and did not safely prove
+that an absent payment could never commit later. This status operation instead
+serializes with cash submission using a tenant/key PostgreSQL session advisory
+lock acquired before the checkout transaction/snapshot. It uses existing
+`idempotency_requests` storage with scope `pos.checkout.cash.closed-attempt` for
+a permanent closure marker before reporting `not_completed`. Late original cash
+submissions reject with `pos_checkout.attempt_closed`. No new table/migration or
+permission bypass is introduced. Existing successful same-key replay remains.
+
+Reconciliation uses the stored receipt snapshot and original paid transaction,
+not a recalculated stale cart. It does not create another financial transaction
+or automatically repeat drawer/printing operations.
+
 ## Purpose
 
 Defines the implementation contract for `Payment_Refund`. This contract is based on
