@@ -1,8 +1,9 @@
 <!-- title: Product Mapping, Media, Attributes & Channel Visibility -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-01 -->
+<!-- last_updated: 2026-09-11 -->
 <!-- source: Updated from uploaded ERD image: 11_Product Mapping, Media, Attributes & Channel Visibility(3).png -->
+<!-- note: barcode_type is symbology-only; identifier_standard IMPLEMENTED IN SOURCE (GTIN14 rejected as a barcode_type value, 2026-09-12); local test DB applied; prod/shared apply not claimed -->
 
 # 11. Product Mapping, Media, Attributes & Channel Visibility
 
@@ -171,7 +172,8 @@ Purpose: Stores product/variant barcodes by optional UOM.
 | `product_id` | uuid | FK | NOT NULL | References products(id) |
 | `product_variant_id` | uuid | FK | NULL | References product_variants(id) |
 | `barcode` | varchar(100) |  | NOT NULL | Barcode value |
-| `barcode_type` | varchar(40) |  | NOT NULL | Barcode type |
+| `barcode_type` | varchar(40) |  | NOT NULL | **EXISTING — symbology only.** `EAN13`, `EAN8`, `UPCA`, `CODE128`, `CODE39`, **IMPLEMENTED** `UNKNOWN` (application/domain CanonicalTypes). **`GTIN14` is NOT a valid value** (superseded 2026-09-11 statement). Do not invent ITF-14; do not map GTIN-14 to EAN13/UPCA. |
+| `identifier_standard` | varchar(40) |  | NULL | **IMPLEMENTED IN BACKEND SOURCE** — nullable identifier standard: `GTIN8`, `GTIN12`, `GTIN13`, `GTIN14`, `OTHER`. NULL = legacy/unclassified. Migration `20260912085454_AddProductSetupScannerIdentifierContext`. Local PostgreSQL test DB verified; **production/shared apply not claimed**. Separate from `barcode_type`. |
 | `uom_id` | uuid | FK | NULL | References unit_of_measures(id) |
 | `quantity_per_scan` | numeric(18,4) |  | NOT NULL | Quantity represented by one scan |
 | `is_primary_barcode` | boolean |  | NOT NULL DEFAULT false | Primary barcode flag |
@@ -196,6 +198,21 @@ CHECK(quantity_per_scan > 0)
 One primary barcode per product / variant.
 CHECK(status IN ('ACTIVE', 'INACTIVE', 'DELETED'))
 ```
+
+### Identifier standard vs symbology (LOCKED 2026-09-12 — Option A)
+
+`barcode_type` answers *"how is this encoded physically?"*. `identifier_standard` answers *"which identifier standard is this value?"*. Neither substitutes for the other, and a GTIN checksum never proves catalogue existence.
+
+| Change | Classification |
+|---|---|
+| `barcode_type` (symbology set) | **EXISTING**; allowed-value set includes `UNKNOWN` (**IMPLEMENTED** application/domain support; column type unchanged) |
+| `identifier_standard` | **IMPLEMENTED IN BACKEND SOURCE** — nullable `varchar(40)` + CHECK; no backfill required; local test DB verified; production/shared apply not claimed |
+| `UNIQUE(tenant_id, barcode)` / FKs / `quantity_per_scan` | **EXISTING — unchanged** |
+| `barcode_type = 'GTIN14'` | **REJECTED / SUPERSEDED** |
+
+Backward compatibility: existing rows keep their symbology and get `identifier_standard IS NULL`. No consumer may treat `identifier_standard` as label-rendering authority, and none may treat `barcode_type` as identifier arithmetic authority.
+
+Authority: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_TECHNICAL_CONTRACT_DECISION_2026-09-12]] TD-2.
 
 ## `product_attribute_definitions`
 

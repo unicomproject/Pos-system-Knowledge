@@ -1,7 +1,7 @@
 <!-- title: POS Hardware Integration -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-17 -->
+<!-- last_updated: 2026-09-09 -->
 
 # POS Hardware Integration
 
@@ -533,3 +533,8 @@ assignment list → truthful empty message.
 - [[../15_IMPLEMENTATION_TRACKING/Backend/HardwareCash/Tenant_Admin_Hardware_Read_Assignment_Status_Implementation]]
 - [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Canonicalization_2026-08-16]]
 - [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/POS_Hardware_Production_Readiness_Implementation_Status]]
+
+
+## Hardware setup UI update — 2026-09-09
+
+Tenant Admin registry UI now provides dashboard, discovery guidance, conditional configuration, assignment/release and test readiness flow. Flutter hardware tests: 6 passed; analyze: clean; isolated backend tests: 21 passed. Physical/provider integration and full end-to-end acceptance remain pending. Implementation and limitations: [[../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Tenant_Admin_Hardware_Integration_2026-09-09]].

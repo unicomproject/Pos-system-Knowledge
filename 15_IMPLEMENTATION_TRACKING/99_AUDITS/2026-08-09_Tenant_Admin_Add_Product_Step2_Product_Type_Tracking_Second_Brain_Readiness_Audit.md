@@ -1,5 +1,9 @@
 # 2026-08-09 Tenant Admin Add Product Step 2 "Product Type & Tracking Setup" Second Brain Readiness Audit Report
 
+> **HISTORICAL IMPLEMENTATION EVIDENCE — PRE-SCANNER-FIRST NUMBERING.**  
+> FORMER “Step 2 Product Type & Tracking” = **CURRENT Step 3**. FORMER Step 1 Basic Details = CURRENT Step 2. FORMER Step 3 Units = CURRENT Step 4.  
+> Do not implement from numbering below. Authority: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]], [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Type_Tracking_Specification]].
+
 **Date**: 2026-08-09  
 **Audit Scope**: Tenant Admin Add Product Step 2 — Product Type & Tracking Setup  
 **Auditor**: Senior Solution Architect, Principal Backend Engineer (.NET Core), Principal Mobile Architect (Flutter), Lead Database Architect, QA & Security Specialist  

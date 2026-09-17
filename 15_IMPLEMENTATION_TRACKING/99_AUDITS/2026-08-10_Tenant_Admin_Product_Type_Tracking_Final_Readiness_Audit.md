@@ -3,7 +3,10 @@
 <!-- title: Tenant Admin Add Product — Product Type & Tracking Final Readiness Audit Report -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-10 -->
+<!-- last_updated: 2026-09-12 -->
+
+> **HISTORICAL IMPLEMENTATION EVIDENCE — PRE-SCANNER-FIRST NUMBERING.**  
+> “Stage 2 / Step 2 Product Type & Tracking” below = **CURRENT Step 3**. Authority: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]], [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Type_Tracking_Specification]].
 
 **Date**: 2026-08-10  
 **Audit Scope**: Tenant Admin Add Product Wizard — Stage 2: Product Type & Tracking Setup  

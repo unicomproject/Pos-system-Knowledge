@@ -32,14 +32,19 @@
 - Tenant permissions: `catalog.return_policies.view`, `catalog.return_policies.create`, `catalog.return_policies.update`, `catalog.return_policies.delete`, `catalog.return_policies.manage`.
 - Migration seeds platform permissions, tenant permissions, and development role assignments.
 - Platform Admin Angular journey: list, create, detail/edit, delete — [[SA-P1-04_Return_Policy_Template_UI_Implementation]].
-## Not Included
 
+## Not Included / Subsequent Roadmap Stages
+ 
+- **Tenant Provisioning Automatic Seeding (Stage A)**: Automatic creation of a tenant-owned `return_policies` row from the platform template during tenant creation wizard (`PlatformTenantService.Wizard.cs`) is not yet wired; it belongs to Stage A.
+- **Tenant Admin Product Setup Integration (Stage B)**: The Product Setup 7-step wizard currently uses a hardcoded Return Policy field and is disconnected from backend policy persistence. Real integration (populating published tenant policies in the dropdown and persisting `ReturnPolicyId`) belongs strictly to Stage B.
+- **Sale-Time Snapshotting (Stage C)**: Checkout snapshotting of `return_policy_snapshot` on `sales_order_lines` belongs to Stage C.
 - Full Tenant Admin product-to-return-policy assignment UI workflows beyond CRUD.
 - Product non-returnable flag/table.
 - Return request/refund workflow (see Cashier Return flow docs).
 - Customer-facing return policy display API.
 - Import/export for return policies.
-
+ 
 ## Development seed assignment (2026-07-18)
-
+ 
 Migration `20260718180000_AssignReturnPolicyToExistingPosProducts` creates tenant policy `DEV-14DAYS` (`dddd0001-0014-4000-8000-000000000001`) as default and sets `products.return_policy_id` for ACTIVE sellable `MER-%` products that had no policy. This unblocks POS Return Step 3 for seeded merchandise such as `MER-006-SIZE-8`.
+Notice: In live production, tenant seeding must occur via the tenant provisioning wizard (Stage A), not manual test migrations.

@@ -2,8 +2,15 @@
 
 <!-- title: Step 5 VARIANT SKU & Barcode Audit Matrix -->
 <!-- status: Active -->
-<!-- last_updated: 2026-09-03 -->
+<!-- last_updated: 2026-09-12 -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
+
+> **HISTORICAL / SUPERSEDED AS STANDALONE GLOBAL-STEP AUTHORITY.**  
+> Standalone “Step 5 Barcode & SKU” is obsolete. Identifier ownership is the **identifier section inside CURRENT Step 5 Product Configuration**. Acquisition is CURRENT Step 1 Scan Barcode. Authority: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]], [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]].
+> The historical “No Auto-generate SKU” decision below is also superseded for
+> the Step 1 no-barcode AUTO lifecycle by
+> [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SKU_AUTO_GENERATION_CANONICAL_DECISION_2026-09-14]].
+> MANUAL per-variant entry remains supported.
 
 ## Purpose
 

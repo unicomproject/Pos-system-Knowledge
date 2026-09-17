@@ -1,7 +1,7 @@
 <!-- title: Product CRUD And Wizard Test Cases -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-09-01 -->
+<!-- last_updated: 2026-09-12 -->
 
 # Product CRUD & Wizard Test Cases
 
@@ -10,7 +10,7 @@
 | Field | Value |
 |---|---|
 | Module | 10_Product_Core / 12_Product_Option_Variant_Configuration |
-| Feature | Product Wizard Setup Flow — Step 4 Variant Configuration |
+| Feature | Product Wizard Setup Flow — Step 5 Variant Configuration |
 | Feature Type | End-to-End / API / Unit / Integration |
 | API Endpoint | `/api/v1/tenant-admin/products/{id}/draft`, `/api/v1/tenant-admin/products/{id}/setup` |
 | Required Permission | `catalog.products.create` / `catalog.products.update` + `catalog.variants.manage` |
@@ -19,24 +19,24 @@
 
 ---
 
-## 1. Step 4 Variant Configuration Test Matrix
+## 1. Step 5 Variant Configuration Test Matrix
 
 ### 1.1 Backend API & Integration Test Cases
 - **PROD-VAR-001 (Cartesian Matrix Generation)**: 3 Sizes $\times$ 2 Colours $\times$ 1 Material produces exactly 6 combinations with unique deterministic `option_combination_hash` values.
 - **PROD-VAR-002 (Idempotency)**: Submitting identical attributes and values twice retains existing variant GUIDs, custom display labels, and `Include Variant` states without creating duplicates.
 - **PROD-VAR-003 (Validation Errors)**: Rejects Save & Continue with HTTP 400 when 0 attributes defined (`product.variant_options_required`), an attribute has 0 values (`product.option_values_required`), or 0 variants are included (`product.included_variant_required`).
-- **PROD-VAR-004 (Include Variant Semantics)**: Toggling `Include Variant = OFF` sets `is_sellable = false`. Variant remains in matrix but is excluded from downstream Step 5 SKU requirements.
+- **PROD-VAR-004 (Include Variant Semantics)**: Toggling `Include Variant = OFF` sets `is_sellable = false`. Variant remains in matrix but is excluded from Step 5 identifier-section SKU requirements.
 - **PROD-VAR-005 (Delete & Tombstone Safety)**: Deleting variant `Red / M` archives variant (`status = 'ARCHIVED'`). Regenerating matrix does NOT recreate deleted `Red / M`.
 - **PROD-VAR-006 (Operational History Delete Protection)**: Deleting a variant with existing sales/stock history is blocked with HTTP 400 (`variant.has_operational_history`).
-- **PROD-VAR-007 (Image Hierarchy Resolution)**: Validates priority order: Exact Variant Override $\rightarrow$ Colour Group Image $\rightarrow$ Step 1 Primary Image $\rightarrow$ Standard Placeholder.
+- **PROD-VAR-007 (Image Hierarchy Resolution)**: Validates priority order: Exact Variant Override $\rightarrow$ Colour Group Image $\rightarrow$ Step 2 Primary Image $\rightarrow$ Standard Placeholder.
 - **PROD-VAR-008 (UOM Inheritance)**: VARIANT + Track Inventory ON inherits parent base UOM as `stock_uom_id` and selling UOM as `sales_uom_id`. Track Inventory OFF resolves system default UOM (`PCS`).
 - **PROD-VAR-009 (Concurrency & Tenant Isolation)**: Stale `expectedRowVersion` returns HTTP 409 Conflict. Cross-tenant option/media IDs return HTTP 403.
-- **PROD-VAR-010 (Downstream Cleanup)**: Deleting a variant in Step 4 cleans up linked draft barcodes, variant price overrides, and channel visibility records atomically.
+- **PROD-VAR-010 (Downstream Cleanup)**: Deleting a variant in Step 5 cleans up linked draft barcodes, variant price overrides, and channel visibility records atomically.
 - **PROD-VAR-011 (Estimated Count — Backend Authority)**: Backend recalculates Cartesian combination count from submitted `variantConfiguration.options[].values[]` graph. Client-supplied derived totals are ignored. Count > `MaxVariantCombinationsPerProduct (100)` returns validation error.
-- **PROD-VAR-012 (Estimated Count — No Estimate API)**: No dedicated estimate endpoint exists or is required for Step 4 UX.
+- **PROD-VAR-012 (Estimated Count — No Estimate API)**: No dedicated estimate endpoint exists or is required for Step 5 UX.
 
 ### 1.2 Flutter Unit & Widget Test Cases
-- **FLUT-VAR-001**: Step 4 main screen rendering, **Estimated Variant Count card**, configuration summary card counts, and Cartesian preview updates.
+- **FLUT-VAR-001**: Step 5 main screen rendering, **Estimated Variant Count card**, configuration summary card counts, and Cartesian preview updates.
 - **FLUT-VAR-001A (Live Estimate)**: Colour 3 values → shows 3; add Capacity 2 values → immediately 6; remove one Colour value → immediately 4; no API stub invoked for estimate refresh.
 - **FLUT-VAR-001B (Incomplete Config)**: Attribute with zero values → estimate 0 / incomplete state; Save & Continue blocked per existing validation.
 - **FLUT-VAR-001C (Draft Reopen)**: Persisted Colour 3 + Capacity 2 → reopen draft → frontend recalculates 6 without reading persisted estimate field.
@@ -47,28 +47,28 @@
 
 ---
 
-## 2. Step 2 Initial Tracking Details Test Knowledge
+## 2. Step 3 Initial Tracking Details Test Knowledge
 
 Canonical rules: [[../../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
 Collection surface: [[../../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]].
 
 | ID | Case | Expected |
 |---|---|---|
-| PROD-TRACK-001 | Step 2 accepts Batch Number after Product Type is selected | Syntax valid; optional; not required for Continue |
-| PROD-TRACK-002 | Step 2 accepts Expiry Date after Product Type is selected | Date picker; malformed date rejected |
-| PROD-TRACK-003 | Step 2 accepts Serial Number after Product Type is selected | Optional; trim; max 150 |
-| PROD-TRACK-004 | Step 2 accepts all three provisionally | Saved without auto-enabling tracking toggles |
-| PROD-TRACK-004A | Card hidden until Product Type is selected | No Initial Tracking Details and no Tracking & Stock Rules on unconfirmed Step 2 |
-| PROD-TRACK-004B | Card hidden on Step 1 | Basic Details has no Initial Tracking card |
+| PROD-TRACK-001 | Step 3 accepts Batch Number after Product Type is selected | Syntax valid; optional; not required for Continue |
+| PROD-TRACK-002 | Step 3 accepts Expiry Date after Product Type is selected | Date picker; malformed date rejected |
+| PROD-TRACK-003 | Step 3 accepts Serial Number after Product Type is selected | Optional; trim; max 150 |
+| PROD-TRACK-004 | Step 3 accepts all three provisionally | Saved without auto-enabling tracking toggles |
+| PROD-TRACK-004A | Card hidden until Product Type is selected | No Initial Tracking Details and no Tracking & Stock Rules on unconfirmed Step 3 |
+| PROD-TRACK-004B | Card hidden on Step 1 and Step 2 | Scan Barcode and Basic Details have no Initial Tracking card |
 | PROD-TRACK-004C | Card hidden for BUNDLE | Bundle / Kit shows no identity inputs |
 | PROD-TRACK-004D | Identity card above tracking rules | After type select, Initial Tracking Details renders above Tracking & Stock Rules |
 | PROD-TRACK-005 | Save Draft preserves all values | Draft store returns same three fields |
 | PROD-TRACK-006 | Resume preserves all values | GET setup restores values |
-| PROD-TRACK-007 | Step 2 Batch ON preserves Batch | `initialBatchNumber` retained |
-| PROD-TRACK-008 | Step 2 Batch + Expiry preserves both | Batch and Expiry retained |
-| PROD-TRACK-009 | Step 2 Serial ON preserves Serial only | Serial retained when only serial entered |
-| PROD-TRACK-010 | Step 2 Serial conflicts with Batch | Confirmation required; Batch cleared only after confirm |
-| PROD-TRACK-011 | Step 2 Serial conflicts with Expiry | Confirmation required; Expiry cleared only after confirm |
+| PROD-TRACK-007 | Step 3 Batch ON preserves Batch | `initialBatchNumber` retained |
+| PROD-TRACK-008 | Step 3 Batch + Expiry preserves both | Batch and Expiry retained |
+| PROD-TRACK-009 | Step 3 Serial ON preserves Serial only | Serial retained when only serial entered |
+| PROD-TRACK-010 | Step 3 Serial conflicts with Batch | Confirmation required; Batch cleared only after confirm |
+| PROD-TRACK-011 | Step 3 Serial conflicts with Expiry | Confirmation required; Expiry cleared only after confirm |
 | PROD-TRACK-012 | Track Inventory OFF | Confirmation then clear tracking values |
 | PROD-TRACK-013 | Expiry ON without Batch identity | Finalization blocked until Batch Number supplied |
 | PROD-TRACK-014 | SIMPLE final ownership | `product_batches`/`serial_numbers` use `product_variant_id` NULL |
@@ -77,13 +77,13 @@ Collection surface: [[../../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TR
 | PROD-TRACK-017 | Duplicate Batch | Publish rejects per tenant/product/(variant) uniqueness |
 | PROD-TRACK-018 | Duplicate Serial | Publish rejects per `UNIQUE(tenant_id, product_id, serial_number)` |
 | PROD-TRACK-019 | Final Review display | Shows only applicable remaining tracking fields |
-| PROD-TRACK-020 | Back navigation preserves compatible values | Step 2 still shows them |
+| PROD-TRACK-020 | Back navigation preserves compatible values | Step 3 still shows them |
 | PROD-TRACK-021 | Explicit confirmation before clearing | No silent discard (TARGET; CURRENT Flutter continue may auto-confirm) |
 | PROD-TRACK-022 | No stock quantity from identity | `inventory_balances.on_hand_quantity` unchanged/not invented |
 | PROD-TRACK-023 | No fake inventory balance | No fabricated balance row with positive qty |
 | PROD-TRACK-024 | No fake stock movement | No `stock_movements` from Product Setup identity |
 
-CURRENT: widget tests cover Step 1 hide + Step 2 show after type select. TARGET confirmation dialog and live E2E remain open.
+CURRENT: widget tests cover Step 1/2 hide + Step 3 show after type select. TARGET confirmation dialog and live E2E remain open.
 
 ---
 
@@ -100,7 +100,7 @@ Canonical matrix: [[../../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_P
 | PROD-PERM-005 | Non-empty Initial Tracking without `inventory_tracking` | 403 `product.entitlement_denied` |
 | PROD-PERM-006 | Initial Tracking with stock.adjust missing but create+inventory_tracking present | Allowed (identity, no quantity) |
 | PROD-PERM-007 | Image stage without `catalog.product_media.manage` | 403; product still savable without images |
-| PROD-PERM-008 | Channel fields without `catalog.product_channels.manage` | Ignored; defaults/existing preserved; Step 1 save 200 |
+| PROD-PERM-008 | Channel fields without `catalog.product_channels.manage` | Ignored; defaults/existing preserved; Step 2 Basic Details draft save returns 200 |
 | PROD-PERM-009 | VARIANT config without `catalog.variants.manage` | 403; no silent SIMPLE downgrade |
 | PROD-PERM-010 | BUNDLE config without `catalog.combo_components.manage` | 403 |
 | PROD-PERM-011 | Barcode mutation without `catalog.barcodes.manage` | 403 even with product update |
@@ -110,7 +110,7 @@ Canonical matrix: [[../../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_P
 | PROD-PERM-015 | Tax lookup without TARGET `pricing.tax_classes.view` (compat: `tax.classes.view`) | 403 / empty lookup |
 | PROD-PERM-016 | Crafted draft payload with specialized fields the caller cannot mutate | Fields not persisted (BR-TRACK-017) |
 | PROD-PERM-017 | Publish with privileged subgraph and only publish permission | 403 subgraph recheck; draft intact |
-| PROD-PERM-018 | Permission revoked between Step 1 and Step 7 | Next mutation 403; draft not destroyed |
+| PROD-PERM-018 | Permission revoked after wizard entry (between Step 1 Scan entry and Step 7) | Next protected draft/publish mutation 403; draft not destroyed. Does **not** imply Step 1 created a Product row — draft exists only after creation-path `POST .../products/draft` |
 | PROD-PERM-019 | Inactive permission definition | Denied immediately |
 | PROD-PERM-020 | Cross-tenant product / variant assignment | 404 `product.not_found` / invalid assignment |
 | PROD-PERM-021 | Tenant isolation on `product_setup_initial_tracking` | Other tenant 404 |

@@ -98,11 +98,11 @@ them.
 | SKU | Stock keeping unit |
 | Barcode | Scannable identifier for product or variant |
 | Product Batch | Batch/lot record used where tracking or expiry applies |
-| Initial Tracking Details | Optional Step 2 Add Product inputs for initial Batch Number, Expiry Date, and Serial Number, shown after Product Type is selected. Provisional until tracking policy applies. Not tracking policy. Not collected on Step 1. |
+| Initial Tracking Details | Optional **Step 3** Product Type & Tracking inputs for initial Batch Number, Expiry Date, and Serial Number, shown after Product Type is explicitly selected. Provisional until tracking policy applies. Not tracking policy. Not collected on Step 1 Scan Barcode or Step 2 Basic Details. |
 | Initial Batch Number | First batch/lot identity captured during Product Setup. Later receiving may add more batches. Final owner: `product_batches.batch_number`. |
 | Initial Expiry Date | Expiry associated with the initial Batch only. Domain owner remains `product_batches.expiry_date`, never `products.expiry_date`. |
 | Initial Serial Number | First physical-unit serial captured during Product Setup. Not a Product-wide reusable serial. Final owner: `serial_numbers.serial_number`. |
-| Tracking Policy | Step 2 enable/disable flags stored in `product_inventory_settings` (track inventory, batch, expiry, serial). Distinct from Initial Tracking Details. |
+| Tracking Policy | Step 3 enable/disable flags stored in `product_inventory_settings` (track inventory, batch, expiry, serial). Distinct from Initial Tracking Details. |
 | Inventory Balance | Current quantity state for product/variant/batch/location |
 | Stock Movement | Immutable record of stock quantity movement |
 | Pending Inventory Movement | Offline or pending stock movement waiting for backend processing |

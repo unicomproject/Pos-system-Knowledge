@@ -373,11 +373,16 @@ Base route: `/api/v1/tenant-admin/products` · Controller: `TenantAdminProductsC
 | GET | `/api/v1/tenant-admin/products` | `catalog.products.view` | Paginated product list with search and filters | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/create-options` | `catalog.products.create` + `product_catalog` | Product Setup lookup options. **IMPLEMENTED:** ACTIVE hierarchy-aware `categories[]` depth 1–5. Apply **BR-CAT-PRODUCT-SELECT-001** for effective selectability. Do **not** call `/api/v1/categories/tree` for this picker. | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/filter-options` | `catalog.products.view` | Dropdown values for category, brand, and status filters | PARTIAL |
-| POST | `/api/v1/tenant-admin/products` | `catalog.products.create` | Create a product wizard graph (DRAFT or published) | PARTIAL |
+| POST | `/api/v1/tenant-admin/products/draft` | `catalog.products.create` + `product_catalog` | **Canonical** Add Product wizard DRAFT create. Scanner-first: nested `scanBootstrap` (B8 **IMPLEMENTED**); lands at `current_setup_step = 2` + `product_setup_scan_context`; write-boundary duplicate when candidate exists; **no** final `product_barcodes` | **IMPLEMENTED B8** (scanner path) / EXISTING (legacy draft) |
+| POST | `/api/v1/tenant-admin/products` | `catalog.products.create` | Direct/legacy product graph create (DRAFT or published). **Not** the scanner-first wizard draft-bootstrap endpoint | PARTIAL |
+| PUT | `/api/v1/tenant-admin/products/{id}/draft` | create (initial draft) **or** update + step specialized | Subsequent wizard draft mutation for Steps 2–7. **Steps 2–4 & 6 BACKEND IMPLEMENTED** (reality audit 2026-09-13). Scanner-first public Step 5 = composite Product Configuration + final identifiers (**B10 IMPLEMENTED**; atomic; DRAFT only). **BUNDLE Step 5 component graph PARTIAL** (identity+IDs only) | **IMPLEMENTED** (Steps 2–4/6 + VARIANT/SIMPLE Step 5) / **PARTIAL** (BUNDLE components) |
 | GET | `/api/v1/tenant-admin/products/{id}` | `catalog.products.view` | Get complete details of a specific product | PARTIAL |
-| GET | `/api/v1/tenant-admin/products/{id}/setup` | view **OR** create **OR** update | Get ProductSetupWizardDto Review snapshot and validation checklist | DOCUMENTED CONTRACT |
+| GET | `/api/v1/tenant-admin/products/{id}/setup` | view **OR** create **OR** update | **PURE READ** ProductSetupWizardDto: hydrate `scanContext` when present; legacy without scan context → `LEGACY` + read remap (1→2 … 5→5); missing POS/ONLINE channel visibility → in-memory defaults only; **zero writes / no channel auto-provision** | **IMPLEMENTED B9** |
+| POST | `/api/v1/tenant-admin/products/barcodes/resolve` | `catalog.products.create` + `product_catalog` | Step 1 tenant catalogue barcode resolve (not POS by-barcode) | **IMPLEMENTED** (B4 2026-09-12) |
+| POST | `/api/v1/tenant-admin/products/barcodes/external-lookup` | `catalog.products.create` + `product_catalog` | Step 1 optional external product-data suggestion; **no tenant duplicate checking** | **IMPLEMENTED B7** |
+| POST | `/api/v1/tenant-admin/products/sku-candidates/generate` | `catalog.products.create` + `product_catalog` | Step 1 no-barcode AUTO Product base from selected Category Code + atomic tenant sequence | **EXTENDED 2026-09-14** |
 | PUT | `/api/v1/tenant-admin/products/{id}` | `catalog.products.update` | Update product details | PARTIAL |
-| POST | `/api/v1/tenant-admin/products/{id}/publish` | `catalog.products.publish` + subgraph recheck | Finalize and publish the draft (transactional) | DOCUMENTED CONTRACT |
+| POST | `/api/v1/tenant-admin/products/{id}/publish` | `catalog.products.publish` + subgraph recheck | Finalize and publish the draft (transactional). **B11:** final SKU/barcode revalidation; DRAFT-only; `expectedRowVersion`; no B5/B6/B7 | **IMPLEMENTED B11** |
 | DELETE | `/api/v1/tenant-admin/products/{id}` | `catalog.products.delete` | Perform soft delete (ARCHIVE status mutation) | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/imports/template` | `catalog.products.import` | Download UTF-8 CSV import template | PARTIAL |
 | POST | `/api/v1/tenant-admin/products/imports` | `catalog.products.import` | Upload CSV and create batch row logs | PARTIAL |
@@ -386,12 +391,94 @@ Base route: `/api/v1/tenant-admin/products` · Controller: `TenantAdminProductsC
 | POST | `/api/v1/tenant-admin/products/imports/{importId}/commit` | `catalog.products.import` | Commit valid rows in batch to database | PARTIAL |
 | GET | `/api/v1/tenant-admin/products/imports/{importId}/errors.csv` | `catalog.products.import` | Export validation failures CSV log | PARTIAL |
 
-### Step 1 Initial Tracking Details (collection moved to Step 2)
+### Step 1 Scan + Step 3 Initial Tracking (draft notes)
 
-`PUT /api/v1/tenant-admin/products/{productId}/draft` and `GET .../setup` remain the only Product Setup draft routes. TARGET identity fields (collected on Step 2 after Product Type is selected): `initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`. Step 2 also remains tracking policy (`productStructure`, `trackInventory`, `batchTracking`, `expiryTracking`, `serialTracking`) plus `confirmClearIncompatibleInitialTracking` when clearing incompatible identity values. Step 7 VARIANT assignment: `initialTrackingAssignedVariantId`. Authority: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Collection decision: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]. Permission authority: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]. Entitlement: `product_catalog`; advanced tracking / non-empty identity: `inventory_tracking`.
+IMPLEMENTED: `POST /api/v1/tenant-admin/products/barcodes/resolve` (B4); `POST /api/v1/tenant-admin/products/barcodes/external-lookup` (B7; **no tenant duplicate checking**; zero providers → NO_MATCH). **B6** provider abstraction + coordinator IMPLEMENTED. Do **not** use POS `GET /api/v1/pos/products/by-barcode/...` from Tenant Admin Product Setup. Decision: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_TECHNICAL_CONTRACT_DECISION_2026-09-12]]. Scan: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Setup_Scan_Barcode_Specification]]. Implementation ownership: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Setup_Scanner_First_Implementation_Architecture]]. Evidence: B4 / B6 / [[../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_SCANNER_FIRST_BACKEND_B7_EXTERNAL_LOOKUP_ENDPOINT_IMPLEMENTATION_2026-09-13]].
 
-### Step 5 Barcode & SKU Payload & Duplicate Projection
-`PUT /api/v1/tenant-admin/products/{productId}/draft` accepts `UpdateProductDraftStep5RequestDto`.
+#### `POST /api/v1/tenant-admin/products/barcodes/resolve` (IMPLEMENTED — B4)
+
+**Side-effect free.** Creates no product, draft, barcode, or scan-context row. No `deviceId`/outlet/till context. Validation runs **before** any catalogue lookup.
+
+| Direction | Field | Type | Notes |
+|---|---|---|---|
+| Request | `barcode` | string (required) | Raw captured identifier; leading zeros preserved; never parsed to numeric |
+| Request | `inputMode` | enum (required) | `SCAN` \| `MANUAL`; telemetry/UX only, never changes validation strictness |
+| Response | `outcome` | enum | `VALID_LOCAL_MATCH` \| `VALID_NO_LOCAL_MATCH` \| `INVALID` |
+| Response | `normalizedBarcode` | string? | Null when `INVALID` |
+| Response | `identifierStandard` | enum? | `GTIN8`\|`GTIN12`\|`GTIN13`\|`GTIN14`\|`OTHER` |
+| Response | `barcodeType` | enum? | Symbology when known, else `UNKNOWN`. **Never** a GTIN value |
+| Response | `invalidReason` | enum? | `LENGTH_NOT_SUPPORTED`\|`CHECKSUM_FAILED`\|`NON_NUMERIC_GTIN`\|`EMPTY` |
+| Response | `localMatch` | object? | Only on `VALID_LOCAL_MATCH`; safe tenant-scoped projection with `matchedAt = PRODUCT\|VARIANT` |
+
+`INVALID` is a **200 business outcome**, not a 4xx. Reuses the shared identifier validation service (one owner, shared with POS validation logic); no duplicate implementation.
+
+#### `POST /api/v1/tenant-admin/products/barcodes/external-lookup` (IMPLEMENTED B7)
+
+**Side-effect free.** Performs **no** tenant duplicate checking. Rejects invalid identifiers before any provider call.
+
+| Direction | Field | Type | Notes |
+|---|---|---|---|
+| Request | `barcode` | string (required) | Must already be a valid identifier |
+| Request | `identifierStandard` | enum? | Optional hint |
+| Response | `status` | enum | `FOUND` \| `NO_MATCH` \| `TEMPORARY_FAILURE` |
+| Response | `suggestion` | object? | Normalized provider-neutral fields: `productName`, `shortName`, `brandText`, `categoryText`, `unitText`, `countryCode`, `shortDescription`, `longDescription`, `imageCandidate`, `primaryGtin`, `identifierStandard` |
+| Response | `sourceReference` | string? | Provider-neutral reference; **never** tokens/credentials |
+| Response | `retryAllowed` | bool | True on `TEMPORARY_FAILURE` |
+
+**Forbidden in the response:** raw provider DTOs/JSON, provider secrets or headers, provider stack traces, provider names implying an unimplemented integration. Zero configured providers → **`NO_MATCH`** (locked public outcome; no fourth Flutter business status). Optional internal telemetry may distinguish "no providers configured" without altering the public state machine. `NO_MATCH` and `TEMPORARY_FAILURE` are **200 business outcomes** — provider failure never surfaces as 5xx.
+
+#### `POST /api/v1/tenant-admin/products/sku-candidates/generate` (EXTENDED 2026-09-14)
+
+**Pre-draft.** Creates no Product, ProductVariant, or scan-context row. It does
+atomically consume one tenant-wide Product SKU sequence; abandoned allocations
+may leave gaps. The returned base is persisted on draft creation and finalized
+at Step 5. DB `UNIQUE (tenant_id, sku)` remains authoritative.
+
+Auth: `catalog.products.create` + `product_catalog`. No Product ID required.
+
+| Direction | Field | Type | Notes |
+|---|---|---|---|
+| Request | `purpose` | enum (required) | `NO_BARCODE_PRODUCT` |
+| Request | `categoryId` | uuid (required) | Selected assignable Category; backend resolves `category_code` |
+| Request | `mode` | enum | `AUTO`; omitted maps to AUTO for compatibility |
+| Request | `productId` | uuid? | Existing no-barcode DRAFT for explicit Category-change regeneration |
+| Request | `expectedRowVersion` | long? | Required with `productId`; checks Product draft concurrency |
+| Request | `productName` | string? | Legacy field; ignored by the canonical AUTO formatter |
+| Response | `candidate` | string | Stable Product base, e.g. `TSH-000125` |
+| Response | `reserved` | bool | `true` because the tenant sequence value is consumed |
+
+Flutter calls only on explicit Auto Generate and persists the response through
+the existing draft bootstrap. Step 5 backend finalization uses the base
+unchanged for SIMPLE and appends ordered stable Variant Value codes for VARIANT.
+Flutter never composes either form. Category change requires explicit
+regeneration.
+
+#### Wizard draft persistence routes (LOCKED 2026-09-12)
+
+| Route | Role |
+|---|---|
+| `POST /api/v1/tenant-admin/products/draft` | **Canonical** scanner-first wizard DRAFT create (creation-path from Step 1) |
+| `PUT /api/v1/tenant-admin/products/{id}/draft` | Subsequent Steps 2–7 draft mutation |
+| `GET /api/v1/tenant-admin/products/{id}/setup` | Resume / hydrate |
+| `POST /api/v1/tenant-admin/products/{id}/publish` | Final publish |
+| `POST /api/v1/tenant-admin/products` | Direct/legacy graph create — **not** wizard draft bootstrap |
+
+#### Step 1 authorization responses (both endpoints)
+
+| Case | Status |
+|---|---|
+| Missing/invalid JWT | 401 |
+| Missing `catalog.products.create` | 403 (generic; never reveals barcode existence) |
+| Missing `product_catalog` entitlement | 403 (entitlement code; not disguised as 404) |
+| Resource outside caller's tenant | 404 (cross-tenant existence never disclosed) |
+| Identifier conflict on later save/publish | 409 with safe tenant-scoped projection |
+| Unparseable/oversize payload, invalid identifier for external lookup | 422 |
+
+`PUT /api/v1/tenant-admin/products/{productId}/draft` and `GET .../setup` remain the Product Setup draft routes. Fresh drafts after Step 1 creation-path normally start at `current_setup_step = 2`. **EXISTING** Initial Tracking identity fields (collected on **Step 3** after Product Type is selected; table `product_setup_initial_tracking`, migration `20260824095742_AddProductSetupInitialTracking`): `initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`. Step 3 also remains tracking policy (`productStructure`, `trackInventory`, `batchTracking`, `expiryTracking`, `serialTracking`) plus `confirmClearIncompatibleInitialTracking`. Step 7 VARIANT assignment: `initialTrackingAssignedVariantId`. `product_setup_scan_context` **schema = IMPLEMENTED B1**; **B8** draft-bootstrap population = **IMPLEMENTED**; **B9** GET `/setup` hydration + legacy read remap = **IMPLEMENTED** (`ScannerFirstSetupReadMapper`; **PURE READ** — no channel auto-provision / no historical rewrite). **B10** scanner-first composite Step 5 final SKU/barcode = **IMPLEMENTED** (candidate ≠ final; ScanContext history retained; Save & Continue → public step 6; Product remains DRAFT). Authority: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Permission: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
+
+### Step 5 Product Configuration — Identifier Payload & Duplicate Projection
+Standalone global Barcode & SKU step is **SUPERSEDED**. Identifier graph rides on Step 5 Product Configuration (`currentSetupStep=5`) via `PUT .../draft`. Domain: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]].
+`PUT /api/v1/tenant-admin/products/{productId}/draft` accepts the Step 5 identifier section DTO (legacy name `UpdateProductDraftStep5RequestDto` may remain during migration).
 On duplicate detection, the endpoint returns a `409 Conflict` containing a structured duplicate projection payload:
 ```json
 {
@@ -399,7 +486,8 @@ On duplicate detection, the endpoint returns a `409 Conflict` containing a struc
   "message": "Duplicate barcode detected.",
   "conflictDetails": {
     "barcode": "8901234567890",
-    "barcodeType": "EAN-13",
+    "barcodeType": "EAN13",
+    "identifierStandard": "GTIN13",
     "productId": "...",
     "productName": "Conflicting Product",
     "productStructure": "SIMPLE",
@@ -410,6 +498,8 @@ On duplicate detection, the endpoint returns a `409 Conflict` containing a struc
   }
 }
 ```
+
+Conflict projections are **tenant-scoped only** — never disclose another tenant's product. `barcodeType` uses canonical symbology codes without hyphens (`EAN13`, not `EAN-13`); `identifierStandard` carries the GTIN standard separately. When `assignedLevel = VARIANT`, `sku` and `productVariantId` must describe the **matched variant**, not the parent.
 
 Note: Legacy route `/api/v1/products` is maintained as compatibility alias pointing to the same application layer logic. Duplicate controller implementation must be retired.
 

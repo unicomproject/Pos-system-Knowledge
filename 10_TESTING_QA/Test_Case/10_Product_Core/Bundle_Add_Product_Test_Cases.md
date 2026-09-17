@@ -1,21 +1,19 @@
 <!-- title: Bundle Add Product Test Cases -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-09-01 -->
-
-<!-- title: Bundle / Kit QA Test Cases -->
-<!-- status: Active -->
-<!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-09-01 -->
+<!-- last_updated: 2026-09-12 -->
 
 # Bundle / Kit QA Test Cases
+
+Canonical scanner-first ownership: Step 2 Basic Details → Step 3 Product Type & Tracking (select BUNDLE) → Step 4 Unit & Pack **NOT_APPLICABLE** → Step 5 Product Configuration (Bundle Composition + identifiers) → Step 6 → Step 7.
+Authority: [[../../../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]], [[../../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Units_Pack_Conversion_Specification]].
 
 1. select BUNDLE structure
 2. Bundle parent tracking controls hidden
 3. Inventory Method = Component-based
-4. Step 2 → Step 4 (Step 3 NOT APPLICABLE)
-5. legacy BUNDLE Step 3 draft normalizes to Step 4
-5b. Step 4 Back → Step 2
+4. Step 3 → Step 5 (Step 4 Unit & Pack NOT_APPLICABLE for BUNDLE)
+5. legacy BUNDLE draft on old Units step normalizes to Step 5 Product Configuration (read-time `GET .../setup`)
+5b. Step 5 Back → Step 3 (Units bypassed; prior applicable step is Product Type & Tracking)
 5c. malformed duplicate API payload returns duplicate_component
 6. BUNDLE renders Bundle Composition
 7. SIMPLE does not render Bundle Composition
@@ -61,7 +59,7 @@
 47. serial stock handled correctly
 48. no Batch selected during Bundle setup
 49. no Serial selected during Bundle setup
-50. First Step 4 Save Draft with 0 components creates one empty combo_definitions row, zero combo_components rows.
+50. First Step 5 Save Draft with 0 components creates one empty combo_definitions row, zero combo_components rows.
 50b. First non-empty Save creates/updates combo_definitions and inserts combo_components.
 50c. Repeated Save updates combo_components.
 50d. All components removed physically deletes all combo_components rows.
@@ -78,17 +76,17 @@
 61. Bundle → SIMPLE confirmation
 62. Bundle → VARIANT confirmation
 63. confirmed type change clears Bundle draft mappings
-64. Step 4 Skip unavailable
-65. Step 4 success targets Step 5
+64. Step 5 Skip unavailable
+65. Step 5 success targets Step 6 Pricing & Tax
 66. final Review rejects newly inactive component
 67. final Review rejects deleted component
 68. POS Bundle sale uses quantity multiplier
 69. insufficient component stock blocks sale
 70. component deductions remain atomic
-71. Step 2 Batch/Expiry/Serial on a later BUNDLE selection shows the parent-identity warning
+71. Step 3 Batch/Expiry/Serial on a later BUNDLE selection shows the parent-identity warning
 72. confirmed BUNDLE conflict clears initial tracking values and creates no Bundle-parent `product_batches` / `serial_numbers`
 73. Product Setup identity persist does not invent Bundle parent stock quantity
 74. Initial Tracking values with BUNDLE selected show the parent-identity warning
 75. Confirming BUNDLE conflict clears provisional Batch/Expiry/Serial and does not create Bundle-parent `product_batches` / `serial_numbers`
-76. Cancelling the BUNDLE conflict warning retains Step 2 values and does not advance/save the incompatible structure change silently
+76. Cancelling the BUNDLE conflict warning retains Step 3 values and does not advance/save the incompatible structure change silently
 

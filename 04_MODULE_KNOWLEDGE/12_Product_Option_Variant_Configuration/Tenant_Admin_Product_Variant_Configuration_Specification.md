@@ -1,25 +1,31 @@
-# Tenant Admin Add Product — Step 4: Variant Configuration Specification
+# Tenant Admin Add Product — Step 5: Variant Configuration Specification
 
-<!-- title: Tenant Admin Add Product — Step 4: Variant Configuration Specification -->
+<!-- title: Tenant Admin Add Product — Step 5: Variant Configuration Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-09-02 -->
+<!-- last_updated: 2026-09-11 -->
+<!-- supersedes: old_global_step4_variant_config_numbering_pre_scanner_first -->
+
+> **SUPERSEDED:** Formerly global **Step 4 — Product Configuration / Variant Configuration**.  
+> **Canonical (LOCKED):** Global **Step 5 — Product Configuration** (variant/bundle matrix + **identifier section**).  
+> Standalone global Barcode & SKU is superseded. Final SKU/Barcode assignment belongs to this step's identifier section ([[../10_Product_Core/Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]]).  
+> Decision: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].
 
 ## 1. Executive Summary & Core Architectural Principles
 
-This document defines the final canonical Second Brain specification for **Step 4: Variant Configuration** within the Tenant Admin **Add Product Wizard**.
+This document defines the final canonical Second Brain specification for **Step 5: Variant Configuration** (Product Configuration — VARIANT mode) within the Tenant Admin **Add Product Wizard**.
 
 ### 1.1 Core Business Purpose
-Step 4 allows Tenant Admin users to configure multi-variant products (e.g. apparel with Size, Colour, Material combinations) by defining options, selecting option values, generating a Cartesian variant matrix, customising individual variant labels and images, and toggling variant inclusion before configuring downstream steps.
+Step 5 allows Tenant Admin users to configure multi-variant products (e.g. apparel with Size, Colour, Material combinations) by defining options, selecting option values, generating a Cartesian variant matrix, customising individual variant labels and images, toggling variant inclusion, and completing **final SKU/barcode assignment** in the identifier section before Pricing & Tax.
 
-### 1.2 Polymorphic Step 4 Behavior
-Step 4 is polymorphic based on `product_structure` selected in Step 2:
-1. **SIMPLE Product (`product_structure = SIMPLE`)**: Step 4 is **NOT_APPLICABLE** and auto-bypassed.
-2. **VARIANT Product (`product_structure = VARIANT`)**: Step 4 renders this **Variant Configuration Specification**.
-3. **BUNDLE / Kit Product (`product_structure = BUNDLE`)**: Step 4 renders **Bundle/Kit Component Configuration** (assembly of component products/variants).
+### 1.2 Polymorphic Step 5 Behavior
+Step 5 is polymorphic based on `product_structure` selected in Step 3:
+1. **SIMPLE Product (`product_structure = SIMPLE`)**: Variant matrix is **NOT_APPLICABLE** and auto-bypassed; identifier section still applies for sellable identity.
+2. **VARIANT Product (`product_structure = VARIANT`)**: Step 5 renders this **Variant Configuration Specification** plus the identifier section.
+3. **BUNDLE / Kit Product (`product_structure = BUNDLE`)**: Step 5 renders **Bundle/Kit Component Configuration** (assembly of component products/variants) plus identifiers.
 
 > [!IMPORTANT]
-> Step 4 for VARIANT mode defines options, option values, combination matrix generation, display labels, variant inclusion toggles, and variant image overrides. It MUST NOT include SKU, Barcode, Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility controls. Those belong strictly to Step 5 (`Barcode & SKU`), Step 6 (`Pricing & Tax`), and Step 1 (`Basic Details`).
+> Step 5 VARIANT **matrix** UI defines options, option values, combination matrix generation, display labels, variant inclusion toggles, and variant image overrides. It MUST NOT include Selling Price, Cost Price, Tax, Opening Stock, Stock Quantity, or Channel Visibility controls. Those belong to Step 6 (`Pricing & Tax`) and Step 2 (`Basic Details`). **SKU and Barcode belong to the Step 5 identifier section** (same global step; not a separate stepper item). Acquisition/scan remains Step 1.
 
 ---
 
@@ -27,36 +33,36 @@ Step 4 is polymorphic based on `product_structure` selected in Step 2:
 
 ### 2.1 Applicability Rules
 1. **VARIANT Product + Track Inventory ON (`is_stock_tracked = true`)**:
-   - Step 3 (`Units & Pack Conversion`) is **REQUIRED**.
-   - Step 4 (`Product Configuration` — Variant Configuration) is **REQUIRED**.
-   - Entry to Step 4 is from Step 3 via Save & Continue.
+   - Step 4 (`Unit & Pack Conversion`) is **REQUIRED**.
+   - Step 5 (`Product Configuration` — Variant Configuration + identifiers) is **REQUIRED**.
+   - Entry to Step 5 is from Step 4 via Save & Continue.
 2. **VARIANT Product + Track Inventory OFF (`is_stock_tracked = false`)**:
-   - Step 3 is **NOT_APPLICABLE** (auto-bypassed).
-   - Step 4 (`Product Configuration` — Variant Configuration) is **REQUIRED**.
-   - Entry to Step 4 is directly from Step 2 via Save & Continue.
+   - Step 4 is **NOT_APPLICABLE** (auto-bypassed).
+   - Step 5 (`Product Configuration` — Variant Configuration + identifiers) is **REQUIRED**.
+   - Entry to Step 5 is directly from Step 3 via Save & Continue.
 3. **SIMPLE Product (Track Inventory ON or OFF)**:
-   - Step 4 is **NOT_APPLICABLE** (bypassed).
+   - Variant matrix is **NOT_APPLICABLE** (bypassed); identifier section still applies under Step 5 ownership.
 4. **BUNDLE Product**:
-   - Step 4 is **REQUIRED** for Bundle Component Assembly.
+   - Step 5 is **REQUIRED** for Bundle Component Assembly (+ identifiers).
 
 ### 2.2 Navigation Table for VARIANT Mode
 
 | Setup Action | Current Step | Condition / Validation | Target Step | Persistence / API Action |
 |---|---|---|---|---|
-| Back | Step 4 | Track Inventory ON | Step 3 | Draft state preserved in local/remote state |
-| Back | Step 4 | Track Inventory OFF | Step 2 | Draft state preserved in local/remote state |
-| Save Draft | Step 4 | None | Step 4 | `PUT /api/v1/tenant-admin/products/{productId}/draft` (`currentSetupStep=4`, `wizardAction="SAVE_DRAFT"`) |
-| Save & Continue | Step 4 | Valid options + values + $\ge 1$ included variant | Step 5 | `PUT /api/v1/tenant-admin/products/{productId}/draft` (`currentSetupStep=4`, `wizardAction="SAVE_AND_CONTINUE"`, `targetSetupStep=5`) |
+| Back | Step 5 | Track Inventory ON | Step 4 | Draft state preserved in local/remote state |
+| Back | Step 5 | Track Inventory OFF | Step 3 | Draft state preserved in local/remote state |
+| Save Draft | Step 5 | None | Step 5 | `PUT /api/v1/tenant-admin/products/{productId}/draft` (`currentSetupStep=5`, `wizardAction="SAVE_DRAFT"`) |
+| Save & Continue | Step 5 | Valid options + values + $\ge$ 1 included variant + identifier rules | Step 6 | `PUT /api/v1/tenant-admin/products/{productId}/draft` (`currentSetupStep=5`, `wizardAction="SAVE_AND_CONTINUE"`, `targetSetupStep=6`) |
 
 ---
 
 ## 3. Canonical User Journey & Three UI States
 
-Step 4 for Variant products consists of three distinct UI states:
+Step 5 for Variant products consists of three distinct UI states:
 
 ### 3.1 State A: Variant Configuration Main Screen
 
-- **Stepper Header**: Step 4 label reads `Product Configuration`.
+- **Stepper Header**: Step 5 label reads `Product Configuration`.
 - **Page Heading**: `Variant Configuration`.
 - **Define Attributes Section**:
   - Attribute Name dropdown (select from active tenant/platform option templates e.g. Size, Colour, Material).
@@ -119,7 +125,7 @@ Clicking `Delete` on a variant table row opens a centered modal dialog.
 
 - **Modal Header**: `Delete Variant`
 - **Body Text**: `Are you sure you want to remove the variant combination "Red / M"?`
-- **Warning Alert**: `This action will exclude this variant combination from generation.` (If downstream Step 5/6/7 draft data exists for this variant, append: `Deleting this variant will also remove its SKU, barcode, price, and channel settings.`)
+- **Warning Alert**: `This action will exclude this variant combination from generation.` (If downstream Step 5 identifier / Step 6 / Step 7 draft data exists for this variant, append: `Deleting this variant will also remove its SKU, barcode, price, and channel settings.`)
 - **Modal Actions**:
   - `Cancel` (closes modal, no changes)
   - `Delete Variant` (Destructive Red button)
@@ -131,7 +137,7 @@ Clicking `Delete` on a variant table row opens a centered modal dialog.
 ### 3.4 Estimated Variant Count (Live UX Preview)
 
 > [!IMPORTANT]
-> **Estimated Variant Count** applies **only** when `product_structure = VARIANT`. It MUST NOT be shown for SIMPLE products. It MUST NOT be shown for BUNDLE Step 4 (Kit Component Assembly).
+> **Estimated Variant Count** applies **only** when `product_structure = VARIANT`. It MUST NOT be shown for SIMPLE products. It MUST NOT be shown for BUNDLE Step 5 (Kit Component Assembly).
 
 #### 3.4.1 Business Definition
 
@@ -207,14 +213,14 @@ will be created
 
 Helper text may indicate that attributes and values are required.
 
-The user MUST NOT proceed to final variant generation / `Save & Continue` while required variant configuration is incomplete. Reuse existing Step 4 validation:
+The user MUST NOT proceed to final variant generation / `Save & Continue` while required variant configuration is incomplete. Reuse existing Step 5 validation:
 - `product.variant_options_required`
 - `product.option_values_required`
 - `product.included_variant_required`
 
 #### 3.4.5 UI Contract — Estimated Variant Count Card
 
-**Applies to**: VARIANT products only, inside Step 4 Variant Configuration (State A).
+**Applies to**: VARIANT products only, inside Step 5 Variant Configuration (State A).
 
 **Suggested card structure**:
 
@@ -335,18 +341,37 @@ Estimated Variant Count only predicts the number of **Variant Combinations**.
 
 It MUST NOT be confused with:
 - Variant Attributes
-- SKU (Step 5)
-- Barcode (Step 5)
+- SKU (Step 5 identifier section)
+- Barcode (Step 5 identifier section)
 - Product ID
 - Variant ID (`productVariantId`)
 
-SKU / Barcode allocation continues under the existing Step 5 Barcode & SKU contract.
+SKU / Barcode allocation continues under the Step 5 identifier section ([[../10_Product_Core/Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]]).
+
+### 3.4.12 AUTO SKU suffix contract (2026-09-14)
+
+For a no-barcode Product with a persisted AUTO SKU base, the backend finalizes
+each included VARIANT SKU as:
+
+```text
+{PRODUCT_BASE}-{VALUE_CODE_1}-{VALUE_CODE_2}-...
+```
+
+Tokens come from persisted `product_option_values.value_code`. Ordering follows
+`product_options.sort_order`, then `product_options.option_code`; it never
+depends on labels, dictionary order, or arbitrary query return order. Missing or
+invalid value code blocks AUTO finalization. All combinations retain the same
+parent Product base/tenant sequence. Flutter displays the backend result and
+does not compose it.
+
+Authority:
+[[../../13_DECISIONS_AND_CHANGES/PRODUCT_SKU_AUTO_GENERATION_CANONICAL_DECISION_2026-09-14]].
 
 #### 3.4.11 Configuration Change After Variants Generated
 
 Changing attribute/value configuration may change the complete variant matrix.
 
-If variant data, SKU assignments, barcode assignments, pricing, or persisted variants already exist, apply the existing Step 4 downstream invalidation rules (Section 8): warning confirmation, draft cleanup, and step revalidation.
+If variant data, SKU assignments, barcode assignments, pricing, or persisted variants already exist, apply the existing Step 5 downstream invalidation rules (Section 8): warning confirmation, draft cleanup, and step revalidation.
 
 Do not invent a separate destructive-edit policy here; Section 8 remains canonical.
 
@@ -365,7 +390,7 @@ When estimated count exceeds 100:
 ## 4. Attribute / Option & Value Model Rules
 
 ### 4.1 Master Data Entity Reuse
-Step 4 reuses existing catalog entities without duplicating schemas:
+Step 5 reuses existing catalog entities without duplicating schemas:
 - `product_option_templates` & `product_option_template_values` (Platform master option templates).
 - `product_options` (Tenant product-level option headers).
 - `product_option_values` (Tenant product-level option values).
@@ -428,7 +453,7 @@ For each expected Cartesian combination, backend validates:
 - **Existing hash found**: Reuse existing ProductVariant. Preserve approved custom state: ProductVariant ID, Variant Code, Display Label, Include Variant, exact image, and lifecycle state.
 - **Hash not found and not tombstoned**: Create a new Variant in the `DRAFT` lifecycle.
 - **Hash tombstoned**: Do not regenerate it.
-- **Existing active/draft Variant no longer present**: Transition to existing canonical Step 4 removal/archive behavior (`ARCHIVED`).
+- **Existing active/draft Variant no longer present**: Transition to existing canonical Step 5 removal/archive behavior (`ARCHIVED`).
 
 ### 5.5 Delete / Tombstone Permanent Exclusion
 An explicitly deleted canonical Variant combination must NEVER automatically return through "Generate Variants" merely because attribute selections changed and reverted.
@@ -449,7 +474,7 @@ An explicitly deleted canonical Variant combination must NEVER automatically ret
 
 ### 6.2 Server-Side Variant Code Generation
 `product_variants.variant_code` is `NOT NULL` and product-scoped unique (`uq_product_variants_tenant_id_product_id_variant_code`).
-Users are NOT asked to type `variantCode` in Step 4.
+Users are NOT asked to type `variantCode` in Step 5.
 
 **Generation Standard**:
 `VAR-{ProductCode|ProductId_Short}-{HexPrefix8}`
@@ -460,10 +485,10 @@ Example: `VAR-PRD001-A4F89C12`. Immutable after creation. Reused on repeated rec
 ## 7. "Include Variant" Semantics & Persistence Lifecycle
 
 ### 7.1 "Include Variant" vs. Channel Visibility
-"Include Variant" is a **global catalog configuration flag** (`is_sellable`). It is NOT outlet availability or channel visibility (which belong to Step 1). Include OFF is independent and does NOT create a tombstone/delete.
+"Include Variant" is a **global catalog configuration flag** (`is_sellable`). It is NOT outlet availability or channel visibility (which belong to Step 2). Include OFF is independent and does NOT create a tombstone/delete.
 
 ### 7.2 Inclusion Lifecycle & Draft State
-New included Step 4 Variants remain in a wizard **DRAFT** lifecycle status. Step 4 NEVER publishes/activates variants.
+New included Step 5 Variants remain in a wizard **DRAFT** lifecycle status. Step 5 NEVER publishes/activates variants.
 
 | Condition | Variant Status | Include/is_sellable |
 |---|---|---|
@@ -478,7 +503,7 @@ New included Step 4 Variants remain in a wizard **DRAFT** lifecycle status. Step
 
 ## 8. Downstream Step Invalidation & Cleanup Rules
 
-When a user returns to Step 4 from Step 5, 6, or 7 and alters the variant matrix (deleting a variant or changing attribute values):
+When a user returns to Step 5 from Step 6 or 7 and alters the variant matrix (deleting a variant or changing attribute values):
 
 1. **Warning Confirmation**: Prompt user with modal warning before applying destructive matrix changes.
 2. **Draft Cleanup**: Downstream draft records linked to deleted/archived variants (`product_barcodes`, variant **price_list_items** / pricing rows, variant channel visibility rows) are automatically removed in the same atomic database transaction.
@@ -498,7 +523,7 @@ Authority: [[../10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]] §
 ## 9. Variant Image Hierarchy & Logic
 
 ### 9.1 Canonical Image Resolution Order
-$$\text{Resolved Image} = \text{Coalesce}(\text{Exact Override}, \text{Colour Group Image}, \text{Step 1 Primary Product Image}, \text{Placeholder})$$
+$$\text{Resolved Image} = \text{Coalesce}(\text{Exact Override}, \text{Colour Group Image}, \text{Step 2 Primary Product Image}, \text{Placeholder})$$
 
 ---
 
@@ -507,12 +532,12 @@ $$\text{Resolved Image} = \text{Coalesce}(\text{Exact Override}, \text{Colour Gr
 Every variant requires `stock_uom_id` and `sales_uom_id` (`NOT NULL` in `product_variants`). There is exactly one canonical rule:
 
 1. **VARIANT + Track Inventory ON (`is_stock_tracked = true`)**:
-   - Inherits Step 3 parent base UOM (`base_unit_id`) as `stock_uom_id`.
-   - Inherits Step 3 parent selling UOM (`selling_unit_id`) as `sales_uom_id`.
-   - Inherits Step 3 `allow_decimal_quantity` as `allow_fractional_quantity`.
+   - Inherits Step 4 parent base UOM (`base_unit_id`) as `stock_uom_id`.
+   - Inherits Step 4 parent selling UOM (`selling_unit_id`) as `sales_uom_id`.
+   - Inherits Step 4 `allow_decimal_quantity` as `allow_fractional_quantity`.
    - No per-Variant UOM conversion configuration in Release 1.
 2. **VARIANT + Track Inventory OFF (`is_stock_tracked = false`)**:
-   - Step 3 was bypassed (NOT_APPLICABLE).
+   - Step 4 was bypassed (NOT_APPLICABLE).
    - Backend resolves system default UOM for both `stock_uom_id` and `sales_uom_id` using the **one canonical Product Wizard default UOM resolver**. No manual UOM field is displayed. All conflicting references to PCS/PIECE fall back to this single source of truth.
 
 ---
@@ -520,15 +545,15 @@ Every variant requires `stock_uom_id` and `sales_uom_id` (`NOT NULL` in `product
 ## 11. Save / Back / Resume Semantics & State Persistence
 
 ### 11.1 Shared Wizard Pipeline
-Step 4 mutations persist via the shared draft endpoint:
+Step 5 mutations persist via the shared draft endpoint:
 - `PUT /api/v1/tenant-admin/products/{productId}/draft`
 
-### 11.2 Request Payload Graph (`currentSetupStep = 4`)
+### 11.2 Request Payload Graph (`currentSetupStep = 5`)
 
 ```json
 {
   "productId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "currentSetupStep": 4,
+  "currentSetupStep": 5,
   "wizardAction": "SAVE_AND_CONTINUE",
   "expectedRowVersion": 1045,
   "variantConfiguration": {
@@ -585,7 +610,7 @@ Step 4 mutations persist via the shared draft endpoint:
 *Note: Fake GUIDs as primary identity for unsaved variants are explicitly banned. `productVariantId` is null for new variants, and `clientCombinationKey` is the authoritative client identity.*
 
 ### 11.3 GET Setup Resume Response (`GET /api/v1/tenant-admin/products/{productId}/setup`)
-Restores complete Step 4 graph including options, values, generated variants, display labels, inclusion states, exact images, group images, and excluded hashes for exact reconciliation. Includes `clientCombinationKey` and `productVariantId`.
+Restores complete Step 5 graph including options, values, generated variants, display labels, inclusion states, exact images, group images, and excluded hashes for exact reconciliation. Includes `clientCombinationKey` and `productVariantId`.
 
 ---
 
@@ -595,12 +620,12 @@ Restores complete Step 4 graph including options, values, generated variants, di
 
 | Operation | Canonical Permission Code | Description |
 |---|---|---|
-| Step 4 Draft Create (Initial Add Product) | `catalog.products.create` + `catalog.variants.manage` | Save Step 4 draft on new product |
-| Step 4 Draft Update (Existing Product Edit) | `catalog.products.update` + `catalog.variants.manage` | Update Step 4 draft on existing product |
+| Step 5 Draft Create (Initial Add Product) | `catalog.products.create` + `catalog.variants.manage` | Save Step 5 draft on new product |
+| Step 5 Draft Update (Existing Product Edit) | `catalog.products.update` + `catalog.variants.manage` | Update Step 5 draft on existing product |
 | Image Mutation | Product access + `catalog.variants.manage` + `catalog.product_media.manage` | Upload and assign variant images |
 
 Missing product entitlement is completely denied.
-**Resume/Setup access**: Approved creator/updater access works according to Product Wizard policy (original creator does not suddenly require Update permission merely because Step 1 produced a Product ID).
+**Resume/Setup access**: Approved creator/updater access works according to Product Wizard policy (original creator does not suddenly require Update permission merely because Step 1 creation-path produced a Product ID).
 
 ### 12.2 Feature Entitlement
 - Runtime Feature Entitlement Code: `product_catalog`.
@@ -625,7 +650,7 @@ Missing product entitlement is completely denied.
 2. **Server-Authoritative Validation**: Client IDs are treated as untrusted inputs. ProductOption and ProductOptionValue reconciliation is deterministic and idempotent.
 3. **Optimistic Concurrency**: Enforced via `expectedRowVersion` vs `Product.RowVersion`. Stale updates return HTTP 409.
 4. **Cartesian Safeguard Limit**: `MaxVariantCombinationsPerProduct = 100`. Matrix sizes $> 100$ are rejected before generation. No N+1 queries.
-5. **Atomic Full Save**: Any failure rolls back the entire Step 4 transaction. No partial graph commits. No duplicate Option/Value/Hashes permitted.
+5. **Atomic Full Save**: Any failure rolls back the entire Step 5 transaction. No partial graph commits. No duplicate Option/Value/Hashes permitted.
 
 ---
 
@@ -635,8 +660,8 @@ Test specification must prove the following:
 1. **ProductOption/ProductOptionValue Identity**: First selection creates one logical active entity. Repeated save reuses same ID. Remove/re-add reuses same ID (no duplicates).
 2. **Variant Identity**: Unsaved Variant has `clientCombinationKey`. First save returns real `productVariantId`. Repeated save reuses Variant ID. Attribute/Value remove/re-add preserves identical semantic matrix hash.
 3. **Tombstone Stability**: Generate Red/M -> Delete Red/M -> Generate unchanged -> Red/M is absent. Modify matrix and return to original -> Red/M still absent. Save Draft and reopen -> Red/M absent. No silent resurrection.
-4. **Variant Lifecycle**: New Included Step 4 Variant is DRAFT+is_sellable=true. Include OFF is DRAFT+is_sellable=false. Deleted is ARCHIVED. Final Step 7 saves final status. Step 4 NEVER publishes variants.
-5. **UOM Resolution**: Track Inventory ON correctly inherits from Step 3. Track Inventory OFF correctly resolves via canonical Product Wizard default UOM resolver. No manual Step 4 UOM field.
+4. **Variant Lifecycle**: New Included Step 5 Variant is DRAFT+is_sellable=true. Include OFF is DRAFT+is_sellable=false. Deleted is ARCHIVED. Final Step 7 saves final status. Step 5 NEVER publishes variants.
+5. **UOM Resolution**: Track Inventory ON correctly inherits from Step 4. Track Inventory OFF correctly resolves via canonical Product Wizard default UOM resolver. No manual Step 5 UOM field.
 6. **Permission**: Create+Variant Manage works for new product. Missing Product entitlement is Denied.
 7. **Idempotency**: Same request repeated -> no duplicates. Concurrent stale rowVersion request rejected.
 8. **Estimated Variant Count (Frontend)**: Live estimate updates immediately on attribute/value changes without API calls. Incomplete configuration shows 0 / not-ready state. Draft reopen recalculates from persisted configuration only. Estimate exceeding `MaxVariantCombinationsPerProduct = 100` shows validation feedback.
@@ -644,4 +669,4 @@ Test specification must prove the following:
 
 ---
 
-*This document is the sole source of truth for Step 4 Variant Configuration.*
+*This document is the sole source of truth for Step 5 Variant Configuration (matrix). Identifier domain rules: [[../10_Product_Core/Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]].*

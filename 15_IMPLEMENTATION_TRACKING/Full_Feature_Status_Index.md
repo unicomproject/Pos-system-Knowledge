@@ -1,7 +1,9 @@
 <!-- title: Full Feature Status Index -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-09-09 -->
+<!-- last_updated: 2026-09-10 -->
+
+> Hardware Phase 16 (2026-09-10): [[Flutter/Hardware/Hardware_Phase_16_Progress_2026-09-10]] — PARTIAL. Backend 75 tests and PostgreSQL rollback checks pass. Final Flutter analysis: no issues; combined hardware/Customers/scanner suite: 141 pass, 1 physical skip, 0 fail. Scanner timing fix verified; prior execution limit resolved. Authenticated Android reached Open Till; cash-entry permissions and complete hardware flow remain to verify. Actual printer/scanner/drawer equipment is still required.
 
 > Park / Recall Sale update (2026-08-06): Flutter Chunk 2 data integration is code complete with typed backend create/list/recall/cancel, stable idempotency, canonical permissions, safe cart rules, and 791 passing Flutter tests. Authenticated Flutter-backend verification and final UI/E2E acceptance remain pending; the full feature is not Completed.
 
@@ -128,9 +130,9 @@ PR/commit reference is recorded.
 | Backend | OutletTillDevice | Till Session Open/Close | Open complete; Close production-blocked | 2026-08-11 | Current source audit | Routes/schema/permission reuse. Close trusts caller Expected Cash and omits `cash_reconciliations`; CLOSED event exists. [[Backend/OutletTillDevice/Till_Session_Open_Close_Implementation_Status]] |
 | Full Stack | HardwareTillCash | Open Till Screen | Completed — production runtime accepted | 2026-08-11 | Current working tree + Local Development E2E | Dashboard Top Bar reuse, orange theme, white parent, Phone+Tablet+Desktop, offline failure safety. New API/table/attribute/permission: NOT REQUIRED. Audit OPENED event remains documented non-blocking gap. [[../04_MODULE_KNOWLEDGE/08_Hardware_Till_Cash_Control/04_Open_Till_Feature]] · [[../08_FLUTTER_POS_KNOWLEDGE/Flutter_Open_Till_Screen_Implementation_Specification]] |
 | Backend | POSOperations | POS Home Dashboard API | Testing | 2026-07-08 | Current working tree | Branding + explicit current-session sales/refund/discount/net metrics added; focused API/repository tests pass |
-| Backend | CatalogProduct | Tenant Admin Product Setup Wizard (Steps 1 & 2) | In Progress | - | - | Steps 1 & 2 backend implementation complete; Step 3 & Step 4 Second Brain Contracts READY (Implementation Gaps recorded for DB/Backend/Frontend). |
-| Cross-platform | CatalogProduct | Tenant Admin Add Product Step 3 — Units & Pack Conversion | Second Brain READY | 2026-08-10 | [[04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Units_Pack_Conversion_Specification]] | Detailed implementation-ready spec complete. DB/Backend/Frontend implementation pending. |
-| Cross-platform | CatalogProduct | Tenant Admin Add Product Step 4 — Variant Configuration | Backend PARTIAL / Second Brain READY | 2026-09-02 | [[04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification]] | Estimated count contract documented. Backend Cartesian count/generation enforced on Step 4 draft save. `GET /setup` variant rehydration still pending. Flutter pending. |
+| Backend | CatalogProduct | Tenant Admin Product Setup — scanner-first B1–B12 + CURRENT Steps 2–7 | Backend Complete for Steps 2–4/6 + VARIANT Step 5; BUNDLE Step 5 PARTIAL / Flutter journey PARTIAL (provider blocked) | 2026-09-13 | [[99_AUDITS/PRODUCT_SETUP_SUPPLIED_USER_JOURNEY_GAP_MATRIX_2026-09-13]] | User-supplied journey Flutter Step 1 S1-A…R3 implemented; Create Duplicate wired; **REAL EXTERNAL FOUND DATA BLOCKED** (zero providers). BUNDLE graph OUT OF SCOPE. |
+| Cross-platform | CatalogProduct | Tenant Admin Add Product CURRENT Step 4 — Units & Pack Conversion (FORMER Step 3) | Backend IMPLEMENTED / Flutter pending | 2026-09-13 | [[04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Units_Pack_Conversion_Specification]] | Backend draft Units path + validators + GET hydrate proven. VARIANT+TrackInventory ON routes to Step 4 (`ProductWizardNextStageResolver`). BUNDLE NOT_APPLICABLE (advance+read+write reject). Flutter UI pending. |
+| Cross-platform | CatalogProduct | Tenant Admin Add Product Step 5 — Variant Configuration (FORMER Step 4) | Backend IMPLEMENTED (VARIANT) / BUNDLE PARTIAL / Flutter pending | 2026-09-13 | [[04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification]] | VARIANT Cartesian/count/hash/tombstones/`ProjectVariantConfigurationAsync` + B10 identifiers IMPLEMENTED. BUNDLE component graph draft persist still PARTIAL. Flutter Step 5 UI pending. |
 | Backend | CatalogProduct | Tenant Admin Product List & Filters | In Progress | - | - | Added API, filter options, lifecycle/stock calculations, and pagination details. |
 | Backend | CatalogProduct | Tenant Admin Product CSV Import | In Progress | - | - | CSV batch upload, row parsing validations, template, and commit logic details. |
 | Backend | CatalogProduct | POS Products List | Completed | 2026-07-23 | Current `main` audit | `GET /api/v1/pos/products`, categories, detail and exact barcode lookup exist |
@@ -262,3 +264,26 @@ The following Draft records document inspected local changes. They are not compl
 - [[15_IMPLEMENTATION_TRACKING/Backend/Tenant/Permission_Migration_Local_Inventory_2026-09-09|Local permission migration inventory]] - ten untracked migration source files; discovery/application and regression verification still require review.
 
 Earlier CI pass counts do not certify this entire uncommitted change set. The tax table diff inspected for this update was only a leading blank line. No source code, migrations or runtime permissions were changed by this documentation update.
+
+## Hardware setup UI update — 2026-09-09
+
+Tenant Admin registry UI now provides dashboard, discovery guidance, conditional configuration, assignment/release and test readiness flow. Flutter hardware tests: 6 passed; analyze: clean; isolated backend tests: 21 passed. Physical/provider integration and full end-to-end acceptance remain pending. Implementation and limitations: [[Flutter/Hardware/Tenant_Admin_Hardware_Integration_2026-09-09]].
+
+
+## Online Store historical closure evidence imported — 2026-09-09
+
+- [[Online_Store/Tenant_Admin_Online_Store_E2E_Evidence_2026-08-28]] — nine routes verified; publish acceptance remained blocked in that run.
+- [[Online_Store/Customer_Storefront_Closure_Evidence_2026-09-02]] — 1781 recorded automated passes; checkout/order/deployment acceptance remained blocked.
+
+These are dated source-report results, not new runtime verification. Later implementation evidence remains unchanged.
+
+
+## Canonical full implementation reports — 2026-09-09
+
+Full reports moved from application repositories: [[Source_Reports/README]]. Original contents were hash-verified before removing project copies. Older notes referencing project report paths should now use this index.
+
+## Hardware frontend master - 2026-09-12
+
+[[Flutter/Hardware/Hardware_Frontend_Master_2026-09-12]]: PARTIAL implementation, software checks passed (1857 full-suite pass + 17 final scoped checks; 1 physical skip), Android/Web builds passed. Physical/live acceptance and backend/provider gaps remain explicit. [[Flutter/Hardware/Hardware_Frontend_Master_Phase_0_Audit_2026-09-12|Phase 0 audit]].
+
+Hardware continuation: [[Flutter/Hardware/Hardware_Frontend_Master_2026-09-12]] updated with health/help/filter implementation, 1866 full-suite passes and successful builds. Live authenticated flow and provider-specific payment integration await user inputs; no production-ready claim.
