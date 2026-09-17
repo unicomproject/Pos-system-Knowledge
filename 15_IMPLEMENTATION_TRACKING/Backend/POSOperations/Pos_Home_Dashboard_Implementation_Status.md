@@ -1,7 +1,7 @@
 <!-- title: POS Home Dashboard Backend Implementation Status -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-23 -->
+<!-- last_updated: 2026-09-15 -->
 
 
 # POS Home Dashboard Backend Implementation Status
@@ -59,14 +59,41 @@ When device/till/session cannot be resolved, returns structured
 - Added explicit `CURRENT_TILL_SESSION` summary scope, business date, session ID,
   currency, gross sales, completed transaction count, completed refunds,
   discounts, and net sales.
-- Summary includes only `COMPLETED` + `PAID` orders for the resolved till session.
-  Gross is reconstructed as total plus discount; net is gross minus discounts
-  and completed refunded amounts.
+- Summary includes non-cancelled `COMPLETED` orders in `PAID`,
+  `PARTIALLY_REFUNDED`, or `REFUNDED` payment state for the resolved till session.
+  Gross is subtotal (tax is not added); net is total minus refunded amount,
+  matching the Tenant Admin reporting projection.
 - No database migration was required.
 - Focused verification: controller 1/1 pass; repository integration 5/5 pass.
   Application/API/Infrastructure projects compile in Release. Full solution build
   is blocked by the pre-existing duplicate `GetProductByBarcodeAsync` method in
   `PosReturnServiceTests.FakeProductCatalogRepository`.
+
+## Current-session production hardening (2026-09-15)
+
+- Restored the typed `summary` response and repository aggregation to current
+  tenant/outlet/till/open-session scope.
+- Added explicit Returns and Discounts applicability while preserving meaningful
+  zero for base metrics and null for unavailable/unauthorized fields.
+- Enforced the existing section and five metric permissions in the application
+  service; Flutter permission filtering remains UX enforcement.
+- Backend API build passed with 0 warnings/errors. Focused service tests passed
+  7/7, repository tests 6/6, and controller tests 1/1.
+- No migration was required; existing `sales_orders`, `sales_refunds`, till and
+  session relationships are used.
+
+## Financial semantics correction (2026-09-15)
+
+- Corrected Gross Sales from `TotalAmount + DiscountAmount` to `SubtotalAmount`,
+  preventing tax from being counted in Gross.
+- Retained completed partially/fully refunded orders in transaction, gross,
+  discount, return and net aggregates.
+- Net Sales now directly sums `TotalAmount - RefundedAmount`, matching the
+  established reporting implementation.
+- Regression coverage uses `SalesOrder.RecordRefund()` for partial and full
+  refunds and verifies tax, unpaid/cancelled exclusion and tenant/outlet/till/
+  session isolation. This is implemented and focused-test verified; PostgreSQL,
+  live API and live Flutter acceptance remain pending.
 
 ## Permissions
 

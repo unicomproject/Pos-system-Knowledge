@@ -312,8 +312,14 @@ $$\mathbf{domain.module.feature.action}$$
 | `commerce.online_order.collection.verify_items` | Verify package items with customer | `pos.online_orders.collection.verify` |
 | `commerce.online_order.collection.handover` | Confirm physical handover of collection | `pos.online_orders.collection.handover` |
 | `commerce.online_order.collection.collect` | Finalize collected state in database | `pos.online_orders.collection.collect` |
-| `commerce.online_order.payment.accept_cash` | Accept pay-on-collection cash payment | `payments.cash.accept` (in collection context) |
-| `commerce.online_order.payment.retry` | Retry failed collection payment | `pos.online_orders.payment.retry` |
+| `commerce.online_order.payment.accept_cash` | Historical alias for pay-on-collection cash — **prefer REUSE `pos.payments.cash.accept`** for tender authority | `payments.cash.accept` (in collection context) |
+| `commerce.online_order.payment.retry` | Retry failed collection payment (optional; prefer payment-status reconcile) | `pos.online_orders.payment.retry` |
+
+### Customer collection permission enforcement note (2026-09-12)
+
+Chunk 2 **added** documented collection codes (`scan_qr`…`collect`, plus `manual_lookup` / `verify_items`) to the CashierPos `OnlineOrderPermissions` catalog and reconciliation seed/migration `20260912140100` (**applied** on Development). Cashier freeze counts: All **359**, RoleAssignable **352**. Tender authority remains **REUSE** `pos.payments.cash.accept` / `pos.payments.card.accept`. Tracker: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Collection_QR_Payment_Handover_Chunk2_2026-09-12]].
+
+### Customer collection permission enforcement note (Chunk 1 — historical)
 
 ---
 

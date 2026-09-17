@@ -75,3 +75,18 @@ Flutter implementation should preserve:
 - interaction order
 
 and should reuse existing canonical POS shell, buttons, status, dialog, form and state widgets before creating new feature widgets.
+
+## Flutter Canonical Production Mapping
+
+| Prototype Component | Flutter Production Owner | File Location | Responsibility |
+|---|---|---|---|
+| `ReviewPackScreen` | `ReviewPackScreen` | `lib/features/fulfilment_pickup/presentation/screens/review_pack_screen.dart` | Screen composition, responsive layout, capability gates, provider orchestration |
+| `Header / SummaryMetrics` | `ReviewPackHeader` | `lib/features/fulfilment_pickup/presentation/widgets/review_pack/review_pack_header.dart` | Back button, title, workflow badge, subtitle, PickingProgressMetrics |
+| `Sidebar Composition` | `ReviewPackSidebar` | `lib/features/fulfilment_pickup/presentation/widgets/review_pack/review_pack_sidebar.dart` | Sidebar layout, notes, summary, progress, primary/back action buttons |
+| `PickedItemsList` | `PickedItemsList` | `lib/features/fulfilment_pickup/presentation/widgets/review_pack/picked_items_list.dart` | Picked item verification list, all-picked badge, empty state, PickingItemCard |
+| `PackingNotes` | `PackingNotes` | `lib/features/fulfilment_pickup/presentation/widgets/review_pack/packing_notes.dart` | Packing note input, character count (max 200), semantics |
+| `OrderSummary` | `OrderSummary` | `lib/features/fulfilment_pickup/presentation/widgets/review_pack/order_summary.dart` | Order #, status chip, customer, outlet, collection time, urgency |
+| `Progress / Legend` | `OrderProgress` | `lib/features/fulfilment_pickup/presentation/widgets/review_pack/order_progress.dart` | Progress ring, legend (Picked, Pending, Issues), ready-to-pack status banner |
+| `Transport Error Parsing` | `ReviewPackErrorMapper` | `lib/features/fulfilment_pickup/presentation/utils/review_pack_error_mapper.dart` | Maps Dio / backend error codes to safe presentation messages |
+
+

@@ -14,8 +14,7 @@ Apply [[../../08_FLUTTER_POS_KNOWLEDGE/Frontend_Reusable_Component_Governance]],
 | Page header, debounced search, six aggregate cards and responsive order-card list | `lib/features/fulfilment_pickup/presentation/widgets/` |
 | Detail screen and detail composition | `presentation/screens/online_order_detail_screen.dart`, `presentation/widgets/online_order_detail_widgets.dart` |
 | Start confirmation | `presentation/widgets/start_fulfilment_dialog.dart` |
-| Picking workspace | `presentation/screens/pos_online_order_picking_screen.dart`, `presentation/widgets/picking/` |
-| Review/pack and ready | `presentation/screens/review_pack_screen.dart`, `presentation/screens/ready_for_collection_screen.dart` |
+| Review/pack and ready | `presentation/screens/review_pack_screen.dart`, `presentation/widgets/review_pack/` (`ReviewPackHeader`, `ReviewPackSidebar`, `PickedItemsList`, `PackingNotes`, `OrderSummary`, `OrderProgress`), `presentation/utils/review_pack_error_mapper.dart`, `presentation/screens/ready_for_collection_screen.dart` |
 | Shared feature UI tokens/status primitives | `presentation/widgets/online_order_ui.dart` |
 | State/query coordination | `lib/features/fulfilment_pickup/presentation/providers/` |
 | Use cases/entities/repository contract | `lib/features/fulfilment_pickup/domain/` |
@@ -35,7 +34,7 @@ Apply [[../../08_FLUTTER_POS_KNOWLEDGE/Frontend_Reusable_Component_Governance]],
 | Picking item/location card | Identify next work | OO-04–06 | media, product, variant, SKU, qty, location | open/confirm | contextual picking | detail/pick | product media + feature card | image alt/fallback | EXTEND |
 | Barcode scan panel/manual entry | Capture item evidence | OO-05 | scanner status, entered barcode, match/mismatch | scan/manual submit | `.picking.scan`, `.picking.manual_entry` | pick | shared scanner capability | hardware/keyboard/touch; focus | EXTEND |
 | Issue action and notes | Report unavailable item | OO-05 | reason, note, pending/error | report/cancel | `.picking.report_issue` | issue command | shared dialog/form | labelled fields, error summary | EXTEND |
-| Review list/packing notes | Reconcile before package | OO-06 | picked/packed qty, notes, discrepancies | save | `.packing.view`, `.packing.pack` | packing | feature + shared list/form | responsive rows | NEW FEATURE-SPECIFIC |
+| Review list/packing notes | Reconcile before package | OO-05,06 | picked/packed qty, notes, discrepancies | save / pack / ready | `.packing.view`, `.packing.pack`, `.collection.mark_ready` | packing/ready | `ReviewPackScreen`, `ReviewPackHeader`, `ReviewPackSidebar`, `PickedItemsList`, `PackingNotes`, `OrderSummary`, `OrderProgress`, `review_pack_error_mapper` | responsive rows; two-column tablet/desktop | CANONICAL MODULAR |
 | Package/staging card | Package identity and staging | OO-06,07,10,12,13 | package no., location, packed by/at, lines | view/retrieve | contextual | detail/pack | online-order feature | concise card; copy-safe IDs | NEW FEATURE-SPECIFIC |
 | Ready/notification/print panel | Mark ready and communicate | OO-07 | ready eligibility, notification/print state | mark/notify/print | `commerce.online_order.collection.mark_ready`, `commerce.online_order.collection.notify_customer` | ready/notify; print integration | shared action patterns | independent failures | EXTEND |
 | QR scanner/manual action | Capture pickup credential | OO-09 | permission, camera, scan, pending/error | validate/manual | `.collection.scan_qr` | validate | shared scanner | camera fallback and keyboard route | EXTEND |

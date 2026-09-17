@@ -250,7 +250,10 @@ lib/features/cash_drawer/
 
 lib/features/till/
   application/usecases/open_till.dart
-  data/datasources/{till_remote_datasource,till_session_storage}.dart
+  data/datasources/remote/till_remote_datasource.dart
+  data/datasources/till_session_storage.dart
+  data/mappers/till_session_mapper.dart
+  data/utils/till_api_error_mapper.dart
   data/repositories/till_repository_impl.dart
   domain/...
   presentation/providers/till_provider.dart

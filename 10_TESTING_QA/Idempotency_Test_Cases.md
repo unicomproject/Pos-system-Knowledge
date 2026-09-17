@@ -5,6 +5,27 @@
 
 # Idempotency Test Cases
 
+## Cash reconciliation regression — 2026-09-12
+
+- Unknown payment keeps the original key and blocks checkout/new-attempt calls.
+- Status recovery returns the original authoritative paid cash sale, scoped to
+  tenant and cashier, without adding a payment, receipt or drawer request.
+- Absence alone is not proof of failure: reconciliation serializes with cash
+  submission and commits a closed-attempt marker before returning `not_completed`.
+- A queued original submission must observe that marker and return
+  `pos_checkout.attempt_closed`; only explicit new attempt obtains a new key.
+- Still unknown preserves cart/context and exposes reconciliation again.
+- Completed intent cannot generate a fresh key; completed cart cannot serialize;
+  system back cannot reopen checkout; explicit next sale starts cleanly.
+
+`PosCheckoutCashReconciliationPostgreSqlTests.cs` exercises the queued-request
+race against a generated isolated local PostgreSQL database, removed afterward.
+In-memory repository tests are not concurrency evidence. Flutter recovery widget
+tests initialize unknown/rejected state and assert status-only requests. The
+additional `pos_checkout_journey_test.dart` real-screen tests submit Cash and
+simulate a transport timeout or structured rejection, verifying retained cart,
+the correct intent phase and recovery action with only one financial request.
+
 ## Purpose
 
 This file defines idempotency test cases for retryable and duplicate-sensitive backend workflows.

@@ -7,3 +7,19 @@
 # Obsidian local workspace state
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
+
+# Local screenshots / pasted media dumps (do not commit or push)
+screenshots/
+**/screenshots/
+attachments/
+**/attachments/
+Pasted image*.png
+Pasted image*.jpg
+Pasted image*.jpeg
+Pasted image*.webp
+*screenshot*.png
+*screenshot*.jpg
+*screenshot*.jpeg
+*screenshot*.webp
+*_e2e_artifacts/
+test_evidence/

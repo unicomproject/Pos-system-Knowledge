@@ -4,6 +4,25 @@
 <!-- last_updated: 2026-08-17 -->
 # Flutter Hardware Payment Receipt
 
+## Manual pending-print recovery — 2026-09-15
+
+`PrintOperationState.awaitingConfirmation` is the canonical state for a
+receipt whose printer was not configured, unreachable or unavailable before a
+confirmed physical result. Legacy `pendingPrint` records are migrated to this
+state when the controller initializes; initialization does not call the
+printer. Receipt History is the operator surface: it shows the device-local
+pending count and permits **Print Now** or **Remove** only to a session with the
+existing receipt physical-print permission.
+
+**Print Now** requires a second explicit confirmation and creates one fresh
+print-request identity. A successful operation disappears from the pending
+list. If the printer remains unavailable, the fresh attempt returns to the
+confirmation queue. **Remove** deletes the encrypted local operation without a
+physical request. Printer reconnect, app restart, login, provider rebuild and
+audit retry are not print triggers. `printOutcomeUnknown` remains outside this
+queue because repeating it could duplicate paper; operator reconciliation is
+still required.
+
 ## Purpose
 
 This file defines Flutter hardware, payment, and receipt rules.

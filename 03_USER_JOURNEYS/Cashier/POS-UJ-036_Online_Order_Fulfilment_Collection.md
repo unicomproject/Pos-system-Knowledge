@@ -1,8 +1,16 @@
 <!-- title: POS-UJ-036 Online Order Fulfilment and Collection -->
-<!-- status: Canonicalized - OO-01 accepted; OO-02/OO-03 implemented / runtime acceptance open -->
-<!-- last_updated: 2026-09-01 -->
+<!-- status: Canonicalized - OO-01 accepted; OO-02/OO-03 implemented / runtime acceptance open; collection Chunk 1 frozen 2026-09-12 -->
+<!-- last_updated: 2026-09-12 -->
 
 # POS-UJ-036 — Online Order Fulfilment and Collection
+
+## Customer collection Chunk 2 implementation (2026-09-12)
+
+Software path implemented: OO-01 Collection QR → validate → verification → optional shared payment (`existingSalesOrderId`) → Confirm Handover → `POST .../collection/complete` → Collection Complete. Development authenticated API↔DB live PAID/UNPAID/negatives/concurrency **PASS**; Flutter device UI drive still **PENDING** (Chunk 2 PARTIAL). Tracker: [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Collection_QR_Payment_Handover_Chunk2_2026-09-12]].
+
+## Customer collection Chunk 1 freeze (2026-09-12)
+
+Frozen target after OO-06 READY: OO-01 Collection QR entry → Scan Customer Collection QR → server validate (no lifecycle/financial mutation) → Verification → PAID → Confirm Handover → Collected, or UNPAID → shared POS Payment Method/tender → Payment Success ≠ Collected → Confirm Handover → Collected → Collection Complete → Print/Reprint. Backend owners: `POST .../collection/qr/validate` and `POST .../orders/{orderId}/collection/complete` on `ClickCollectOrdersController`. QR material stays on `pickup_orders`. Full inventory: [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Collection_QR_Payment_Handover_Chunk1_2026-09-12]]. Implementation remains Chunk 2.
 
 ## OO-06 canonicalization update (2026-09-09)
 
@@ -129,11 +137,14 @@ not the cashier Ready path. Ready ≠ Collected. Full canonical contract:
 
 ## QR, payment and handover
 
-- QR is generated/exposed only when fulfilment and pickup are READY. Store hash/version/expiry only; raw tokens are not stored or logged.
-- Server validation is tenant/outlet/order/status bound, expiring and single-use on successful collection. Invalid, malformed, expired, used, wrong-scope and not-ready outcomes are safe and non-disclosing.
-- Paid Online and Cash on Collection are canonical. Already-paid orders are never charged again. Cash reuses the unified payment/till/cash-drawer authority.
-- Failed or unknown payment blocks handover. Retry requires its permission and original idempotency context.
-- Handover atomically revalidates package/items/payment and concurrency, marks pickup COLLECTED, fulfilment FULFILLED and sales order completed, and writes events/audit. Replay cannot duplicate payment, stock or events.
+- QR is generated/exposed only when fulfilment and pickup are READY. Store hash/version/expiry only on `pickup_orders`; raw tokens are not stored or logged. No separate token table.
+- OO-01 order-search scan is **not** collection validation. Collection uses a distinct QR entry + validate command.
+- Server validation is tenant/outlet/order/status/payment/pack bound and expiring. Validate is **side-effect free**. Single-use finality occurs on successful collection complete (`collected_at` / COLLECTED), not on scan/validate.
+- Invalid, malformed, expired, revoked, used/already-collected, wrong-outlet, not-ready, cancelled and missing-graph outcomes are safe and non-disclosing.
+- Paid Online and pay-on-collection are canonical. Already-paid orders are never charged again. Outstanding balance uses the **shared POS payment Method/tender engine** against the existing Ecommerce `SalesOrder` — do not create a New Sale cart and do not invent a Click & Collect-only cash endpoint as the primary contract.
+- Payment Successful ≠ Collected. Failed or unknown payment blocks handover.
+- Confirm Handover / `collection/complete` atomically revalidates package/items/payment and `expectedVersion`, marks pickup COLLECTED, fulfilment FULFILLED and sales order completed, and writes events/audit. Replay cannot duplicate payment, stock or events.
+- Receipt print/reprint reuses existing receipt/printer authority after Collection Complete; print failure does not reverse Collected.
 
 ## Guest label
 
@@ -146,3 +157,11 @@ not the cashier Ready path. Ready ≠ Collected. Full canonical contract:
 - [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Order_ClickCollect_Fulfilment]]
 - [[../../06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup_UPDATED]]
 - [[../../15_IMPLEMENTATION_TRACKING/Online_Store/Online_Order_Fulfilment_Collection_Canonicalization_Status_2026-08-21]]
+
+## Order Detail lifecycle gateway — 2026-09-15
+
+Order Detail exposes the next valid workflow action, using authoritative fulfilment/pickup state and line progress rather than DisplayStatus. The journey is Detail → Start Fulfilment (existing OO-03 confirmation), Continue Picking (OO-04), Review & Pack (OO-05), or View Ready for Collection (OO-06). No direct Preparing → Ready transition is permitted. Terminal orders remain read-only.
+
+The existing `/pos/online-orders/:orderId/picking` workspace hosts OO-04, OO-05 and OO-06 and chooses its screen from a fresh picking response. Re-entry/return to detail refetches authority; a late response cannot restore an older action. Missing/inconsistent fulfilment data gets a non-mutating refresh/recovery message. Permission-hidden actions reserve no layout space.
+
+Decision matrix and acceptance evidence: [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO02_Canonicalization_Status_2026-08-31#Order Detail next-action gateway — 2026-09-15]]. This scoped rule supersedes the earlier Start-only detail action wording.

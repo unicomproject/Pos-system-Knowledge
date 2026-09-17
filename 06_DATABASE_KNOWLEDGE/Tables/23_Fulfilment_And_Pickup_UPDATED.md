@@ -339,6 +339,16 @@ CHECK(sequence_number > 0)
 Append-only event history.
 ```
 
+## Customer collection QR persistence (Chunk 2 — 2026-09-12)
+
+**IMPLEMENTED:** Mark Ready issues `pickup_qr_token_hash` / `pickup_qr_version` / `pickup_qr_expires_at` (7-day). Validate is hash lookup only. Complete sets `collected_at` + COLLECTED. Unique filtered index on `(tenant_id, pickup_qr_token_hash)` where hash not null — migration `20260912140000` **applied** on Development. No `pickup_collection_tokens` table.
+
+**Historical READY QR policy:** Future Ready issues QR. Historical READY needing collection uses canonical Ready reissue when possible, else Development-only crypto hash repair aligned to IssueCollectionQr. COLLECTED/CANCELLED must not receive active QR. Tracker: [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Collection_QR_Payment_Handover_Chunk2_2026-09-12]].
+
+## Customer collection QR persistence (Chunk 1 freeze — 2026-09-12)
+
+**Decision: OPTION B — EXTEND `pickup_orders`.** Columns `pickup_qr_token_hash`, `pickup_qr_version`, `pickup_qr_expires_at`, `collected_at`, `verified_*` already exist. Chunk 2 must issue hash/version/expiry on Ready, validate by hash without mutation, and finalize via `collected_at` + COLLECTED. **OPTION C dedicated `pickup_collection_tokens` = NOT REQUIRED** (explicitly rejected). Prefer event/audit for collector/till/device; do not add `collected_by` unless events prove insufficient. Authority: [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Collection_QR_Payment_Handover_Chunk1_2026-09-12]].
+
 ## `pickup_orders`
 
 Purpose: Stores customer pickup execution headers.

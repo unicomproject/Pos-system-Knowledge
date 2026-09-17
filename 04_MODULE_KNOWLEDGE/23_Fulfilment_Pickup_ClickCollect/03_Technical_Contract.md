@@ -1,8 +1,36 @@
 <!-- title: Fulfilment & Pickup / Click & Collect Technical Contract -->
-<!-- status: Canonicalized - OO-01/OO-02/OO-03 implemented; later operations tracked separately -->
-<!-- last_updated: 2026-09-08 -->
+<!-- status: Canonicalized - OO-01/OO-02/OO-03 implemented; collection Chunk 1 frozen 2026-09-12 -->
+<!-- last_updated: 2026-09-12 -->
 
 # Fulfilment & Pickup / Click & Collect Technical Contract
+
+## Customer collection Chunk 2 implementation (2026-09-12)
+
+| Capability | Route | Status |
+|---|---|---|
+| Validate collection QR | `POST /collection/qr/validate` | **IMPLEMENTED** (read-only) |
+| Complete collection | `POST /orders/{orderId}/collection/complete` | **IMPLEMENTED** |
+| Shared POS outstanding settle | `POST /api/v1/pos/checkout/start-payment` + `existingSalesOrderId` | **IMPLEMENTED** |
+| QR issue on Ready | Mark Ready writes `pickup_qr_*`; one-time token in response | **IMPLEMENTED** |
+| Unique QR hash index | migration `20260912140000_AddPickupQrTokenHashUniqueIndex` | **ADDED** |
+| Collection permissions catalog | `scan_qr`…`collect` + reconcile migration | **IMPLEMENTED** |
+
+Development authenticated HTTP↔API↔DB live acceptance: **PASS** (2026-09-12). Flutter device UI drive: **PENDING** (Chunk 2 PARTIAL). Tracker: [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Collection_QR_Payment_Handover_Chunk2_2026-09-12]].
+
+## Customer collection Chunk 1 freeze (2026-09-12)
+
+Documentation-only freeze for QR validate → shared POS payment for outstanding Ecommerce balance → collection complete. Tracker: [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Collection_QR_Payment_Handover_Chunk1_2026-09-12]].
+
+| Capability | Route | Permission | Chunk 1 classification |
+|---|---|---|---|
+| Validate collection QR | `POST /collection/qr/validate` | `.collection.scan_qr` + `.collection.validate_qr` | **GAP — NEW ACTION** on `ClickCollectOrdersController`; **read-only** |
+| Manual lookup (optional) | `GET /collection/lookup` | `.collection.manual_lookup` | **GAP — NEW ACTION** optional |
+| Complete collection | `POST /orders/{orderId}/collection/complete?outletId=` body `{ expectedVersion }` | `.collection.handover` + `.collection.collect` | **GAP — NEW ACTION**; UI label Confirm Handover |
+| Dedicated collection cash pay | `POST /orders/{orderId}/collection/payment/cash` | — | **NOT REQUIRED / SUPERSEDED** — EXTEND shared `api/v1/pos/checkout` payment family for existing `SalesOrderId` outstanding settle |
+| QR persistence | `pickup_orders.pickup_qr_token_hash|version|expires_at` | — | **REUSE columns**; issue on Ready path in Chunk 2; **no** `pickup_collection_tokens` table |
+| Concurrency | `fulfillment_orders.row_version` | — | **REUSE** for complete |
+
+Competing controllers: **NO**. Payment Successful ≠ Collected. Validate mutates neither lifecycle nor money.
 
 ## Ecommerce order → cashier realtime refresh (2026-09-09)
 
@@ -37,12 +65,12 @@ Base: `/api/v1/tenant/ecommerce/click-collect`. Every operation below is **canon
 | POST | `/orders/{orderId}/picking/lines/{lineId}/pick` | `.picking.pick` plus scan/manual capability | Barcode/quantity pick |
 | POST | `/orders/{orderId}/picking/lines/{lineId}/issues` | `.picking.report_issue` | Cannot-find issue event only |
 | POST | `/orders/{orderId}/pack` | `.packing.pack` | Validate and create package(s) / finalize packed quantities |
-| POST | `/orders/{orderId}/ready` | `.collection.mark_ready` | Validate and commit Ready; notification is separate |
-| GET | `/collection/ready` | `.collection.view_ready` | Outlet ready queue |
-| POST | `/collection/qr/validate` | `.collection.scan_qr` + `.collection.validate_qr` | Server QR validation |
-| GET | `/collection/lookup` | `.collection.manual_lookup` | Manual fallback lookup |
-| POST | `/orders/{orderId}/collection/payment/cash` | `.payment.accept_cash` | Orchestrate existing payment/till engine |
-| POST | `/orders/{orderId}/collection/handover` | `.collection.handover` + `.collection.collect` | Idempotent finalization |
+| POST | `/orders/{orderId}/ready` | `.collection.mark_ready` | Validate and commit Ready; notification is separate; Chunk 2 also issues QR hash/version/expiry |
+| GET | `/collection/ready` | `.collection.view_ready` | Outlet ready queue (optional surface; OO-01 Ready filter may suffice) |
+| POST | `/collection/qr/validate` | `.collection.scan_qr` + `.collection.validate_qr` | Server QR validation (**read-only**; GAP) |
+| GET | `/collection/lookup` | `.collection.manual_lookup` | Manual fallback lookup (GAP; optional) |
+| POST | `/orders/{orderId}/collection/complete` | `.collection.handover` + `.collection.collect` | Idempotent Confirm Handover / Mark Collected (GAP) |
+| — | Shared POS checkout payment | `pos.payments.*.accept` | Settle existing Ecommerce outstanding balance (**EXTEND**; replaces dedicated collection cash route) |
 
 All permission suffixes use the `commerce.online_order` prefix. `PATCH /orders/{orderId}/status` is not the primary cashier contract. If retained, restrict it to safe/internal compatibility and prevent transition bypass.
 
@@ -95,6 +123,10 @@ The queue chevron navigates to `GET /api/v1/tenant/ecommerce/click-collect/order
 `GET /api/v1/tenant/ecommerce/click-collect/orders/{orderId}?outletId={outletId}` is the single staff detail route. It requires the Online Orders access/view permissions and repeats entitlement, tenant, active-user, active-outlet and outlet-scope checks. It is side-effect free.
 
 The typed response must provide, where authoritative: order id/number/external reference, lifecycle and display status, placed/updated timestamps, source/customer classification, customer id/name/phone/email/notes, outlet id/name, collection start/end/timezone, payment status and currency, subtotal/discount/tax/charges/total/paid/balance, fulfilment id/assignment, and ordered lines. Each line may include line id/number, product name, variant/options, SKU/barcode, image metadata, ordered quantity, unit price and line total. Line/unit totals are response facts or deterministic sums of returned lines; no prototype value is hardcoded.
+
+### POS cashier display-status contract (New → Start → Preparing)
+
+POS list and detail share the same projection codes/labels: `NEW`, `PREPARING`, `READY`, `DELAYED`, `COLLECTED`, `CANCELLED`. Before Start, an eligible pre-picking order projects as `NEW`. Successful `POST .../fulfillment/start` transitions fulfilment lifecycle to `PICKING`, projects sales `fulfillment_status` to `PREPARING`, and both list and detail must show `PREPARING` (Preparing outranks overdue DELAYED). Detail still returns raw `fulfillmentStatus=PICKING` for Continue Picking. Closure evidence: [[../../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_New_To_Picking_Gate_Closure_2026-09-12]].
 
 The canonical contract does not require a second detail endpoint. The backend now implements this GET on the existing `ClickCollectOrdersController` family with a dedicated application query and bounded repository projection. It does not mutate the order, status history, fulfilment events or pickup evidence.
 
@@ -206,3 +238,11 @@ event mutation. A wrong barcode still returns `online_orders.invalid_barcode`.
 - [[../../03_USER_JOURNEYS/Cashier/POS-UJ-036_Online_Order_Fulfilment_Collection]]
 - [[../../06_DATABASE_KNOWLEDGE/Tables/23_Fulfilment_And_Pickup_UPDATED]]
 - [[../../08_FLUTTER_POS_KNOWLEDGE/Flutter_Order_ClickCollect_Fulfilment]]
+
+## OO-02 lifecycle projection extension — 2026-09-15
+
+Existing `GET /api/v1/tenant/ecommerce/click-collect/orders/{orderId}?outletId=...` retains its permission/scope/envelope contract. `PosOnlineOrderDetailResponse` adds read-only `canPack`, `isReadyForCollection`, `readyAt`, `collectedAt`, `completedAt`, `cancelledAt`. No API, table, column or migration is added. Existing fulfillmentOrderId/fulfillmentStatus/pickupStatus/fulfillmentVersion and per-line fulfillmentOrderLineId/remainingQuantity remain authority.
+
+`canPack` reuses `CustomerOrderRepositoryBase.CanPackPickingLines`, also used by picking GET, with nonterminal/full-graph checks. `isReadyForCollection` reuses domain `ReadyForCollectionPolicy.IsReady`. Capability fields do not contain button text and do not authorize mutations. Missing fulfilment still returns informational sales-order state for diagnosis; clients must not interpret that fallback as a valid fulfilment graph.
+
+UI permission chains remain orders.access + orders.view, then fulfilment.start / picking.view / packing.view / collection.view_ready as applicable. Packing retains the existing picking-view prerequisite. Detail access does not require picking permission; the shared workflow route permits picking-view or ready-view and its loaded screen enforces the correct state-specific permission. Line picking retains picking-view.

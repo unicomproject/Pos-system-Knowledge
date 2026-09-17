@@ -530,3 +530,34 @@ conflict, route, header or footer behaviour changed.
   PASS. Full Flutter suite: 1,346 PASS, one existing skip, zero failures.
 - Backend, API contract, database, migrations, permissions, expected-version,
   409 refresh handling, routes and journey transitions were unchanged.
+
+## Order Detail next-action gateway — 2026-09-15
+
+Status: IMPLEMENTED / VALIDATION IN PROGRESS. This is an extension of the existing OO-02 owner, not another screen/chunk.
+
+Exact screenshot diagnosis: Development `ECOMM-SEED-PREPARING-001` (`e0000101-0005-4000-8000-000000000001`) has sales order ACCEPTED / sales fulfilment PREPARING, but no fulfillment_orders row, pickup_orders row or fulfillment version. The detail projection falls back to the sales fulfilment status. The old `_action` accepts only PENDING/ALLOCATED/ACCEPTED or exact PICKING and silently returns null otherwise. Thus this screenshot is an incomplete legacy fixture, not proof of missing cashier permission or clipped layout. Its displayed 2 remaining derives from sales-line quantity; it is not evidence of an actual PICKING fulfilment.
+
+The old action matrix also lacked Pack and Ready continuation for valid graphs. The shared route guard incorrectly required picking-view for every online-order detail URL, despite the detail route requiring orders access/view.
+
+Reuse decisions: EXTEND existing detail screen/model, repository detail DTO/projection, common packing-read predicate and router guards. FEATURE-LOCAL next-action mapping. REUSE PosPrimaryActionButton, existing screen composition, OO-03 dialog, OO-04/05/06 workspace, ReadyForCollectionPolicy, repository/provider layers and request generations. No new API/table/attributes/migration/payment logic/role checks/direct widget Dio.
+
+Tests added for authoritative state matrix, cancellation-adjusted server progress/capabilities, terminal/missing graph/version, permissions, theme/three viewport sizes, route return refetch and stale response rejection. Initial focused Flutter result: 36 passed, 0 failed, 0 skipped. Full regression/backend build/live acceptance results will be recorded below after validation.
+
+Safe canonical live fixture: `ECOMM-DETAIL-CTA-001` (`e0950101-0001-4000-8000-000000000001`), created through the existing Development seed graph with a refuse-overwrite guard. The malformed screenshot fixture was not manually promoted or patched into PICKING.
+
+Final status: COMPLETE. Fresh Development acceptance on the Pixel Tablet emulator used the canonical fixture and the rebuilt API/application. The detail screen showed Continue Picking, opened the existing Pick Order workspace, accepted the stored product barcode and completed the remaining quantity. Returning to detail refetched authoritative state and showed Review & Pack. The existing packing/ready workflow marked the order READY. A fresh detail read then showed View Ready for Collection, which opened the existing Ready screen. The first immediate detail read after the ready mutation raced the transition and exposed the existing Retry state; Retry refetched successfully, and a fresh application navigation reproduced the enabled Ready CTA and route.
+
+Final validation:
+
+| Gate | Result |
+|---|---|
+| Flutter analyze | PASS |
+| Detail next-action focused suite | PASS - 36/36 |
+| Full Online Orders regression | PASS - 202/202 |
+| Collection regression | PASS - 27/27 |
+| Backend detail/picking repository tests | PASS - 33/33 |
+| Backend API build | PASS - 0 warnings, 0 errors |
+| Debug APK build/install | PASS |
+| Live PICKING -> Pack -> READY -> Ready-screen continuation | PASS |
+
+No new screen, route, API, database table, migration, role check or direct widget networking was introduced. The existing detail response was extended only with canonical lifecycle facts needed to prevent UI inference from the broad display status.

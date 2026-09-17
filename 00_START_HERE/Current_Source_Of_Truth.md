@@ -1,10 +1,63 @@
 <!-- title: Current Source Of Truth -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-09-09 -->
+<!-- last_updated: 2026-09-12 -->
 
 
 # Current Source Of Truth
+
+## POS Home current-session summary authority — 2026-09-15
+
+`GET /api/v1/pos/home` is the sole Current Session Summary authority. It resolves
+the authenticated tenant's trusted device, assigned active till and open till
+session, then projects only `COMPLETED` + `PAID`, non-cancelled sales belonging to
+that tenant/outlet/till/session. Eligible completed transactions retain `PAID`,
+`PARTIALLY_REFUNDED`, and `REFUNDED` payment states. Gross = order subtotal;
+Discounts = order discount; Returns = completed, non-cancelled refund activity on
+included orders; Net = order total - refunded amount. Total Sales, Transactions and Net Sales
+may be real zero values. Returns is applicable only when a completed refund exists;
+Discounts is applicable only when its session amount is positive. A missing summary
+is unavailable and must never be converted to zero by Flutter.
+
+The section and each field use the existing `pos.home.session_summary.*`
+permissions on both backend and Flutter. Unauthorized fields are omitted as null;
+non-applicable optional cards are removed before responsive composition. The shared
+cards reflow equally for one through five visible metrics at 1280, 1180 and 1100
+logical-pixel widths. No migration is required.
+
+## Pending receipt print authority — 2026-09-15
+
+Receipt printer reconnect, POS restart and provider initialization must never
+physically print a stored pending receipt. A confirmed printer-unavailable
+original attempt is retained in the device's encrypted receipt-operation store
+as `awaitingConfirmation` and is visible from Receipt History. An authenticated
+user with receipt-print permission must select **Print Now** and confirm before
+one new physical request is issued. **Remove** deletes the local pending
+operation without printing. Successful and removed operations do not remain in
+the pending list. Audit-only recovery never sends paper, and unknown physical
+outcomes continue to require operator reconciliation.
+
+## Online Order Detail next-action gateway (2026-09-15)
+
+Detail must expose the next valid Start / Picking / Review & Pack / Ready action from authoritative lifecycle, progress and permissions; display Preparing is not action authority. Missing graphs get safe recovery, terminal orders remain read-only. Implementation and current acceptance evidence: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_OO02_Canonicalization_Status_2026-08-31#Order Detail next-action gateway — 2026-09-15]]. This supersedes older Start-only OO-02 action wording.
+
+## Click & Collect customer collection — Chunk 2 (2026-09-12)
+
+Customer collection software is **implemented**: OO-01 Collection QR entry, HID scan/validate, verification, shared POS payment with `existingSalesOrderId`, Confirm Handover → `POST .../collection/complete`, Collection Complete + receipt wire-up. QR issued on Mark Ready onto `pickup_orders` (no token table). Validate and payment do **not** mark Collected. Development migrations applied; authenticated Development **HTTP → API → DB** PAID/UNPAID/negatives/concurrency **PASS**. **Flutter device UI drive** and physical HID/printer remain **PENDING** (card terminal OUT OF RELEASE). Tracker status **PARTIAL**. Authority: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Collection_QR_Payment_Handover_Chunk2_2026-09-12]]. Chunk 1 freeze: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Collection_QR_Payment_Handover_Chunk1_2026-09-12]].
+
+## Click & Collect customer collection — Chunk 1 (2026-09-12)
+
+Customer collection after READY was **canonicalized** in Chunk 1; **Chunk 2 software is implemented** (see section above). Frozen architecture decisions remain: `fulfilment_pickup` + `ClickCollectOrdersController`; EXTEND `pickup_orders` QR columns (no token table); validate side-effect free; Payment Successful ≠ Collected; only `POST .../collection/complete` marks Collected; shared POS payment with `existingSalesOrderId`. Authority: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_Collection_QR_Payment_Handover_Chunk1_2026-09-12]].
+
+## Online Order New → Picking gate (2026-09-12)
+
+POS cashier New → Start Fulfilment → Preparing is closed for Development: startable seed `ECOMM-SEED-PENDING-001`, FO `PICKING` + sales `PREPARING` projection, shared list/detail `NEW`/`PREPARING` DisplayStatus (Preparing outranks Delayed), live API/DB verified. Authority: [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Online_Order_New_To_Picking_Gate_Closure_2026-09-12]]. Historical PENDING-001 missing-fulfilment diagnosis remains in [[../15_IMPLEMENTATION_TRACKING/Flutter/ECommerce/Current_Changes_And_Start_Fulfilment_Diagnosis_2026-09-10]] and is marked resolved there.
+
+## Workspace provisioning and Start Fulfilment evidence (2026-09-10)
+
+Workspace permission provisioning is implemented and migrated to the configured local Development DB; frontend routing is unchanged and refreshed session/device acceptance remains separate. See [[../02_ACCESS_CONTROL/Workspace_Permission_Provisioning]].
+
+The Start Fulfilment failure for `ECOMM-SEED-PENDING-001` was diagnosed on 2026-09-10 (missing fulfilment row / empty `fulfillmentVersion`) and **resolved 2026-09-12** per the New → Picking gate closure above.
 
 ## Online Order realtime cashier refresh (2026-09-09)
 
