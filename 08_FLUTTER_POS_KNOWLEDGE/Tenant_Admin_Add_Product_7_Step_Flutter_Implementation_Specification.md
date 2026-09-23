@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin Add Product — 7-Step Wizard Flutter Implementation Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS Flutter Client Scope -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-23 -->
 
 # Tenant Admin Add Product — 7-Step Wizard Flutter Implementation Specification
 
@@ -38,6 +38,21 @@ Do **not** call Category Management `GET /api/v1/categories/tree` or `lib/featur
 **HISTORICAL / LEGACY COMPATIBILITY:** prior `categories` + `subCategories` was a flat child-Category representation, not a SubCategory entity.
 
 Shared query/DTO types may be reused only if they stay consistent with Product Setup authorization ownership.
+
+---
+
+## 1.2 Brand resolution and Quick Add Brand (IMPLEMENTED 2026-09-23)
+
+When an external barcode lookup returns brand text, Step 1 also resolves it against
+the tenant's Brands using the same SAVED→EXACT→NORMALIZED→SIMILARITY ladder as the
+Category picker above, with a Quick Add Brand drawer for when no suitable match
+exists. This is now fully implemented and E2E-validated; it does **not** reuse the
+Category picker's endpoint or repository — Brand resolution runs through the External
+Brand Mapping resolver, keyed on a normalized text key rather than a provider ID (see
+ADR 011).
+
+Full detail: [[Product_Setup_External_Enrichment_UX]],
+[[../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Brand_Mapping]].
 
 ---
 
@@ -178,6 +193,9 @@ Canonical: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Mat
 - [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
 - [[../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/Tenant_Admin_Category_Management_Specification]]
 - [[../15_IMPLEMENTATION_TRACKING/Audits/TENANT_ADMIN_CATEGORY_MANAGEMENT_FINAL_CONTRACT_HARDENING_2026-08-27]]
+- [[Product_Setup_External_Enrichment_UX]]
+- [[../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Brand_Mapping]]
+- [[../15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/External_Product_Enrichment_Implementation_Status]]
 
 ## Implementation-Grade Flutter File
 

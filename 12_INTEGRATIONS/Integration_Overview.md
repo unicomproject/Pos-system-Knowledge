@@ -1,7 +1,7 @@
 <!-- title: Integration Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-07-29 -->
+<!-- last_updated: 2026-09-23 -->
 
 # Integration Overview
 
@@ -22,6 +22,7 @@ Index the external service and POS peripheral boundaries used by OneVerz POS MVP
 | QR payment | [[QR_Payment_Integration]] | Not Implemented end to end |
 | Email | [[Email_Service_Integration]] | Integration-specific status |
 | File storage | [[AWS_S3_File_Storage]] | Integration-specific status |
+| External product lookup (OpenFoodFacts / UPCitemdb) | [[External_Product_Lookup_Integration]] | Implemented — full Product Setup E2E validated 2026-09-23 |
 
 ## Boundary Rules
 

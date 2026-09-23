@@ -1,7 +1,7 @@
 <!-- title: Catalog Master Data & Product Core -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-27 -->
+<!-- last_updated: 2026-09-23 -->
 <!-- source: Updated from uploaded ERD image: 10_Catalog Master Data & Product Core(3).png -->
 
 # 10. Catalog Master Data & Product Core
@@ -30,6 +30,9 @@ This markdown version follows the uploaded ERD image as the source of truth. Ent
 | `product_variants` | Stores sellable product variants. |
 | `product_reviews` | Stores 1-5 star customer ratings and text reviews for products. |
 | `product_rating_summaries` | Stores the aggregated rating summary for fast loading on product pages. |
+| `shared_product_metadata_cache` | Provider-scoped cache of external product lookup results, keyed by (normalized barcode, provider). Not tenant-scoped — shared across all tenants since it caches public provider data. |
+| `external_category_mappings` | Tenant-scoped memory of "external provider category → tenant Category" confirmed at Product creation. See [[../../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Category_Mapping]]. |
+| `external_brand_mappings` | Tenant-scoped memory of "external provider brand → tenant Brand" confirmed at Product creation. See [[../../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Brand_Mapping]]. |
 
 ## `business_types`
 
@@ -553,10 +556,113 @@ Purpose: Stores pre-calculated conversion factors to Base Unit for every active 
 | `updated_at` | timestamptz | | NOT NULL | Updated timestamp |
 | `updated_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
 
+## `shared_product_metadata_cache`
+
+Purpose: Provider-scoped cache of external product lookup results. Not tenant-scoped.
+Feeds [[../../12_INTEGRATIONS/External_Product_Lookup_Integration]].
+
+| Attribute | Type | Key | Null | Reference / Note |
+| --- | --- | --- | --- | --- |
+| `id` | uuid | PK | NOT NULL | Primary key |
+| `normalized_barcode` | varchar(40) | | NOT NULL | Normalized barcode value |
+| `identifier_standard` | varchar(40) | | NULL | e.g. `GTIN13` |
+| `provider` | varchar(60) | | NOT NULL | Real provider identity (e.g. `openfoodfacts`, `upcitemdb`) — never the literal `"cache"` |
+| `normalized_metadata_json` | jsonb | | NOT NULL | Canonical mapped fields used by the coordinator |
+| `raw_response_json` | jsonb | | NULL | Raw provider response, retained for diagnostics |
+| `cached_at` | timestamptz | | NOT NULL | When this row was written |
+| `expires_at` | timestamptz | | NOT NULL | TTL boundary (30 days from `ExternalProductLookup:Cache:TtlDays`) |
+| `last_verified_at` | timestamptz | | NULL | Last time this cache row was confirmed still valid |
+| `created_at` | timestamptz | | NOT NULL | Created timestamp |
+| `updated_at` | timestamptz | | NOT NULL | Updated timestamp |
+
+Indexes / Constraints / Notes:
+
+```text
+PK(id)
+UNIQUE(normalized_barcode, provider) — one cache row per barcode per provider
+INDEX(normalized_barcode, expires_at) — efficient expiry filtering
+Only FOUND results are cached. NO_MATCH is never cached.
+```
+
+## `external_category_mappings`
+
+Purpose: Tenant-scoped memory of a confirmed "external provider category → tenant
+Category" mapping. Full behavior:
+[[../../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Category_Mapping]].
+
+| Attribute | Type | Key | Null | Reference / Note |
+| --- | --- | --- | --- | --- |
+| `id` | uuid | PK | NOT NULL | Primary key |
+| `tenant_id` | uuid | FK | NOT NULL | References tenants(id) |
+| `provider` | varchar(80) | | NOT NULL | Lowercase provider identity |
+| `external_category_key` | varchar(200) | | NOT NULL | Normalized provider category key |
+| `external_category_name` | varchar(200) | | NOT NULL | Display name captured at mapping time |
+| `tenant_category_id` | uuid | FK | NOT NULL | References categories(tenant_id, id) — tenant-safe composite FK |
+| `mapping_source` | varchar(40) | | NOT NULL DEFAULT 'PRODUCT_CONFIRMED' | How the mapping was confirmed |
+| `created_at` | timestamptz | | NOT NULL | Created timestamp |
+| `created_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+| `updated_at` | timestamptz | | NOT NULL | Updated timestamp |
+| `updated_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+
+Indexes / Constraints / Notes:
+
+```text
+PK(id)
+FK(tenant_id) REFERENCES tenants(id)
+FK(tenant_id, tenant_category_id) REFERENCES categories(tenant_id, id) — tenant-safe composite FK, Restrict
+FK(created_by_tenant_user_id) REFERENCES tenant_users(id)
+FK(updated_by_tenant_user_id) REFERENCES tenant_users(id)
+UNIQUE(tenant_id, provider, external_category_key)  -- uq_external_category_mappings_tenant_provider_key
+INDEX(tenant_id, tenant_category_id)                -- ix_external_category_mappings_tenant_tenant_category_id
+```
+
+Migration: `20260918042753_AddTenantExternalCategoryMappings`.
+
+## `external_brand_mappings`
+
+Purpose: Tenant-scoped memory of a confirmed "external provider brand → tenant Brand"
+mapping, keyed by a normalized text key (R1 decision — see
+[[../../13_DECISIONS_AND_CHANGES/ADR/ADR_011_External_Brand_Identity_Normalized_Text_Key]]).
+Full behavior: [[../../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Brand_Mapping]].
+
+| Attribute | Type | Key | Null | Reference / Note |
+| --- | --- | --- | --- | --- |
+| `id` | uuid | PK | NOT NULL | Primary key |
+| `tenant_id` | uuid | FK | NOT NULL | References tenants(id) |
+| `provider` | varchar(80) | | NOT NULL | Lowercase provider identity |
+| `external_brand_key` | varchar(200) | | NOT NULL | Normalized text key (see ADR 011) |
+| `external_brand_name` | varchar(200) | | NOT NULL | Display name captured at mapping time (first comma-segment, trimmed) |
+| `tenant_brand_id` | uuid | FK | NOT NULL | References brands(tenant_id, id) — tenant-safe composite FK |
+| `mapping_source` | varchar(40) | | NOT NULL DEFAULT 'PRODUCT_CONFIRMED' | How the mapping was confirmed |
+| `created_at` | timestamptz | | NOT NULL | Created timestamp |
+| `created_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+| `updated_at` | timestamptz | | NOT NULL | Updated timestamp |
+| `updated_by_tenant_user_id` | uuid | FK | NULL | References tenant_users(id) |
+
+Indexes / Constraints / Notes:
+
+```text
+PK(id)
+FK(tenant_id) REFERENCES tenants(id)
+FK(tenant_id, tenant_brand_id) REFERENCES brands(tenant_id, id) — tenant-safe composite FK, Restrict
+FK(created_by_tenant_user_id) REFERENCES tenant_users(id)
+FK(updated_by_tenant_user_id) REFERENCES tenant_users(id)
+UNIQUE(tenant_id, provider, external_brand_key)  -- uq_external_brand_mappings_tenant_provider_key
+INDEX(tenant_id, tenant_brand_id)                -- ix_external_brand_mappings_tenant_tenant_brand_id
+```
+
+Migration: `20260923102245_AddTenantExternalBrandMappings`. **Not yet applied** to the
+persistent `UnifiedCommerceDb` development database as of 2026-09-23 (validated only
+against ephemeral PostgreSQL test databases) — see
+[[../../15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/External_Product_Enrichment_Implementation_Status]].
+
 ## Related Files
 
 - [[11_Product_Mapping_Media_Attributes_And_Channel_Visibility]]
 - [[12_Product_Option_Templates_And_Variant_Configuration]]
+- [[../../12_INTEGRATIONS/External_Product_Lookup_Integration]]
+- [[../../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Category_Mapping]]
+- [[../../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Brand_Mapping]]
 - [[14_Pricing_And_Tax_Management]]
 - [[16_Inventory_Foundation_Product_Tracking_And_Stock_Availability]]
 - [[15_Product_Import_Batches_And_Rows]]
