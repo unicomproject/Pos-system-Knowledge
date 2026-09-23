@@ -129,3 +129,11 @@ Canonical architecture: [[../../12_INTEGRATIONS/POS_Hardware_Integration]] ·
 ## Hardware setup UI update — 2026-09-09
 
 Tenant Admin registry UI now provides dashboard, discovery guidance, conditional configuration, assignment/release and test readiness flow. Flutter hardware tests: 6 passed; analyze: clean; isolated backend tests: 21 passed. Physical/provider integration and full end-to-end acceptance remain pending. Implementation and limitations: [[../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Tenant_Admin_Hardware_Integration_2026-09-09]].
+
+## 2026-09-18 — Till realtime diagnostic development slice
+
+The new Scan Till flow is distinct from operator-assisted Test All. It authenticates the bound native POS, routes a scan to one current connection, persists diagnostic snapshots in existing hardware_test_logs and pushes authorized Admin updates. Detection, driver-reported health and physical operation remain separate. It does not imply payment, drawer, scanner-to-cart or receipt acceptance.
+
+Implementation, API/event contracts, current test evidence, single-process deployment limitation and remaining acceptance work: [Till realtime diagnostics](../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Till_Realtime_Diagnostics_2026-09-18.md).
+
+This is feature-branch work, not a live deployment. Windows native compilation requires the missing Visual Studio C++ toolchain; physical and full persisted five-client acceptance remain unverified.

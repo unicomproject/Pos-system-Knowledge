@@ -124,3 +124,11 @@ See [[../../12_INTEGRATIONS/POS_Hardware_Integration]] and [[../../08_FLUTTER_PO
 ### Implementation honesty
 
 Journey steps 6–8 (cashier, hardware readiness, alerts) remain the **target** UX. As of 2026-08-01: split-view UI is partially present; summary/list bind to real Backend; hardware card often empty ("No hardware connections found"); alerts and peripheral heartbeat are not complete. Do not treat UI appearance as COMPLETED physical integration.
+
+## 2026-09-18 — Till realtime diagnostic development slice
+
+The new Scan Till flow is distinct from operator-assisted Test All. It authenticates the bound native POS, routes a scan to one current connection, persists diagnostic snapshots in existing hardware_test_logs and pushes authorized Admin updates. Detection, driver-reported health and physical operation remain separate. It does not imply payment, drawer, scanner-to-cart or receipt acceptance.
+
+Implementation, API/event contracts, current test evidence, single-process deployment limitation and remaining acceptance work: [Till realtime diagnostics](../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Till_Realtime_Diagnostics_2026-09-18.md).
+
+This is feature-branch work, not a live deployment. Windows native compilation requires the missing Visual Studio C++ toolchain; physical and full persisted five-client acceptance remain unverified.

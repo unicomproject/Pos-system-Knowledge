@@ -76,3 +76,11 @@ An audit of the implementation has revealed the following gaps that must be corr
 - **API Contract:** The backend `GetCreateOptions` endpoint (`TenantAdminTillCreateOptionsResponse`) does not currently provide `outletId`, `status`, or assignment states for POS and Hardware devices. This breaks the UI's ability to filter hardware by outlet (Step 4 & 6) and display real-time statuses (Step 7).
 - **Backend Atomicity:** The backend `TenantAdminTillService.CreateAsync` currently silently ignores missing/invalid hardware IDs instead of throwing a validation error (Step 9). It also bypasses `tenant.hardware.manage` permission checks for the hardware assignment portion.
 - **Frontend Filtering:** The UI erroneously filters POS devices from the `hardwareDevices` list instead of using the dedicated `posDevices` list.
+
+## 2026-09-18 — Till realtime diagnostic development slice
+
+The new Scan Till flow is distinct from operator-assisted Test All. It authenticates the bound native POS, routes a scan to one current connection, persists diagnostic snapshots in existing hardware_test_logs and pushes authorized Admin updates. Detection, driver-reported health and physical operation remain separate. It does not imply payment, drawer, scanner-to-cart or receipt acceptance.
+
+Implementation, API/event contracts, current test evidence, single-process deployment limitation and remaining acceptance work: [Till realtime diagnostics](../../15_IMPLEMENTATION_TRACKING/Flutter/Hardware/Till_Realtime_Diagnostics_2026-09-18.md).
+
+This is feature-branch work, not a live deployment. Windows native compilation requires the missing Visual Studio C++ toolchain; physical and full persisted five-client acceptance remain unverified.

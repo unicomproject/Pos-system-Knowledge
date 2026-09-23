@@ -214,3 +214,11 @@ Remaining work from user request still includes remote job dispatch/execution, f
 - Browser reopened at http://127.0.0.1:5322. Screenshot currently shows the login page; authenticated visual validation remains pending.
 - Remote Test All is NOT implemented by the existing POS CreateTest API. Durable remote request ownership/dispatch and POS consumption still need implementation. Guided local test sessions must not be represented as remote execution.
 - Full screenshot parity and full passive hardware telemetry remain incomplete. No physical printer, scanner, or drawer tests were run.
+
+## 2026-09-18 — Till realtime diagnostic development slice
+
+The new Scan Till flow is distinct from operator-assisted Test All. It authenticates the bound native POS, routes a scan to one current connection, persists diagnostic snapshots in existing hardware_test_logs and pushes authorized Admin updates. Detection, driver-reported health and physical operation remain separate. It does not imply payment, drawer, scanner-to-cart or receipt acceptance.
+
+Implementation, API/event contracts, current test evidence, single-process deployment limitation and remaining acceptance work: [Till realtime diagnostics](Till_Realtime_Diagnostics_2026-09-18.md).
+
+This is feature-branch work, not a live deployment. Windows native compilation requires the missing Visual Studio C++ toolchain; physical and full persisted five-client acceptance remain unverified.
