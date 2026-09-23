@@ -1,15 +1,8 @@
 ﻿# 25 Backend Gap Register
 
-> [!IMPORTANT]
-> This document was generated via automated source audit. Exhaustive deep-traces marked as `NOT VERIFIED` require manual code inspection to clear.
-
-## Audit Status
-Status: `NOT VERIFIED` (Pending deep inspection of all edge cases in `Unified-Commerce`).
-
-## Details
-To be populated from full-stack audit. Please refer to current implementation gaps.
-
 | Area | Requirement | Backend Evidence | Status | Gap | Recommended Next Backend Work |
 |---|---|---|---|---|---|
-| API | Endpoints for all reports | Found GetSales, GetStock, GetOutlets | PARTIAL | Missing dedicated endpoints for Returns and Till Closing | Implement missing endpoints |
-
+| API | Endpoints for all reports | Found GetSales, GetStock, GetOutlets | PARTIAL | Missing dedicated endpoints for Returns and Till Closing | Implement dedicated endpoints for RPT-02, 03, 04, 05 |
+| DB Tables | Separate sales and refund summaries | Seed data found, no physical summary tables | VERIFIED MISSING IMPLEMENTATION | Physical reporting tables missing | Create daily_sales_summaries |
+| Security | Outlet/Till scope | TenantOnly policy verified | IMPLEMENTATION GAP | No outlet/till specific scope enforced in API | Add outlet-level RBAC |
+| Export | CSV Export full dataset | /exports POST endpoint | PARTIAL | Snapshot metadata missing | Add Snapshot ID to export jobs |

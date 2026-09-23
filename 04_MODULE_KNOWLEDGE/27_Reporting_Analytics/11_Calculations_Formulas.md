@@ -1,11 +1,7 @@
 ﻿# 11 Calculations Formulas
 
-> [!IMPORTANT]
-> This document was generated via automated source audit. Exhaustive deep-traces marked as `NOT VERIFIED` require manual code inspection to clear.
-
-## Audit Status
-Status: `NOT VERIFIED` (Pending deep inspection of all edge cases in `Unified-Commerce`).
-
-## Details
-To be populated from full-stack audit. Please refer to current implementation gaps.
-
+| Formula | Service Method | Query Expression | Source Columns | DTO Property | Requirement Match | Test | Status |
+|---|---|---|---|---|---|---|---|
+| Net Sales Excl Tax | GetSalesAsync | Missing | Amount, TaxAmount | NetSalesExclTax | CONFLICT | NOT IMPLEMENTED | IMPLEMENTATION GAP |
+| Expected Cash | Missing | Missing | Missing | Missing | CONFLICT | NOT IMPLEMENTED | VERIFIED MISSING IMPLEMENTATION |
+| Closing Stock | GetStockAsync | Missing | OnHand, Reserved | ClosingStock | PARTIAL | NOT IMPLEMENTED | PARTIAL |
