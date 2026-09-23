@@ -9,7 +9,6 @@
 ## P1 (Required Release Behaviour Missing)
 | Gap ID | RPT/REP | Requirement | Current Behaviour | Evidence | Required Work |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| GAP-03 | RPT-03 | AC-07 (Till Variance) | Variance calculated before close; ClosingTime wrong. | Till queries | Fix variance calculation timing. |
 | GAP-04 | RPT-05 | AC-15 (Return Period) | Returns filtered by Original Sale Date instead of Return Date. | Return queries | Update filtering column for returns. |
 | GAP-05 | RPT-08 | AC-08 (Stock Movement) | Opening/Closing period bounds are not calculated. | StockMovement queries | Implement period bounded calculations. |
 
