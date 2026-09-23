@@ -1,4 +1,4 @@
-﻿# 14 RBAC Permissions Entitlements
+﻿# 25 Backend Gap Register
 
 > [!IMPORTANT]
 > This document was generated via automated source audit. Exhaustive deep-traces marked as `NOT VERIFIED` require manual code inspection to clear.
@@ -8,4 +8,8 @@ Status: `NOT VERIFIED` (Pending deep inspection of all edge cases in `Unified-Co
 
 ## Details
 To be populated from full-stack audit. Please refer to current implementation gaps.
+
+| Area | Requirement | Backend Evidence | Status | Gap | Recommended Next Backend Work |
+|---|---|---|---|---|---|
+| API | Endpoints for all reports | Found GetSales, GetStock, GetOutlets | PARTIAL | Missing dedicated endpoints for Returns and Till Closing | Implement missing endpoints |
 

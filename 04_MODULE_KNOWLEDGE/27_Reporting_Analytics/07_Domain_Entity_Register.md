@@ -1,4 +1,4 @@
-﻿# 14 RBAC Permissions Entitlements
+﻿# 07 Domain Entity Register
 
 > [!IMPORTANT]
 > This document was generated via automated source audit. Exhaustive deep-traces marked as `NOT VERIFIED` require manual code inspection to clear.
