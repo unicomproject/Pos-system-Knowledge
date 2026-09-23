@@ -1,11 +1,5 @@
-﻿# 14 RBAC Permissions Entitlements
+# 14. RBAC, Permissions, and Entitlements
 
-> [!IMPORTANT]
-> This document was generated via automated source audit. Exhaustive deep-traces marked as `NOT VERIFIED` require manual code inspection to clear.
-
-## Audit Status
-Status: `NOT VERIFIED` (Pending deep inspection of all edge cases in `Unified-Commerce`).
-
-## Details
-To be populated from full-stack audit. Please refer to current implementation gaps.
-
+*   **Feature Entitlements:** `ReportFeaturePolicy.cs` contains dead code. Feature flags (e.g., `ReportExport`) are not enforced at the controller level.
+*   **Role Enforcement:** Basic `TenantOnly` policies exist.
+*   **Outlet Scope Leak:** `GetAccessibleOutletIdsAsync` defaults to returning all outlets if the `TenantUser` lacks explicit `OutletUserRoles`. This is a massive P0 security gap.

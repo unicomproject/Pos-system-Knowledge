@@ -1,11 +1,5 @@
-﻿# 20 Performance Index Query Audit
+# 20. Performance, Index, and Query Audit
 
-> [!IMPORTANT]
-> This document was generated via automated source audit. Exhaustive deep-traces marked as `NOT VERIFIED` require manual code inspection to clear.
-
-## Audit Status
-Status: `NOT VERIFIED` (Pending deep inspection of all edge cases in `Unified-Commerce`).
-
-## Details
-To be populated from full-stack audit. Please refer to current implementation gaps.
-
+*   **Paging Issues:** Pagination is ignored in complex reporting queries (like Product Sales), leading to full dataset loading into memory.
+*   **Indexes:** Unique indexes like `TenantId` + `IdempotencyKey` are correctly implemented and performant.
+*   **Query Translation:** Many EF queries in Reporting execute client-side evaluation due to complex grouping, further impacting performance.

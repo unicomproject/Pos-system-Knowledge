@@ -1,4 +1,4 @@
-﻿# 06 Service Query Repository Mapping
+# 06 Service Query Repository Mapping
 
 > [!IMPORTANT]
 > This document was generated via automated source audit. Exhaustive deep-traces marked as `NOT VERIFIED` require manual code inspection to clear.
@@ -9,3 +9,5 @@ Status: `NOT VERIFIED` (Pending deep inspection of all edge cases in `Unified-Co
 ## Details
 To be populated from full-stack audit. Please refer to current implementation gaps.
 
+
+| RPT-05 | TenantAdminReportsRepository | GetReturnRowsAsync | Queries SalesReturns joined with SalesRefunds | IMPLEMENTED | Filters by SalesOrderId list, not Return Date |

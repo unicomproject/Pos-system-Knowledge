@@ -1,7 +1,4 @@
-﻿# 11 Calculations Formulas
+# 11. Calculations and Formulas
 
-| Formula | Service Method | Query Expression | Source Columns | DTO Property | Requirement Match | Test | Status |
-|---|---|---|---|---|---|---|---|
-| Net Sales Excl Tax | GetSalesAsync | Missing | Amount, TaxAmount | NetSalesExclTax | CONFLICT | NOT IMPLEMENTED | IMPLEMENTATION GAP |
-| Expected Cash | Missing | Missing | Missing | Missing | CONFLICT | NOT IMPLEMENTED | VERIFIED MISSING IMPLEMENTATION |
-| Closing Stock | GetStockAsync | Missing | OnHand, Reserved | ClosingStock | PARTIAL | NOT IMPLEMENTED | PARTIAL |
+*   **Stock Opening/Closing Missing:** Stock movement reporting lists ledger rows but fails to calculate Opening and Closing bounds for the selected period (AC-08).
+*   **Till Formula Bug:** Variance is calculated prematurely before the till is closed, and `ClosingTime` incorrectly defaults to `OpenedAt` (AC-07).

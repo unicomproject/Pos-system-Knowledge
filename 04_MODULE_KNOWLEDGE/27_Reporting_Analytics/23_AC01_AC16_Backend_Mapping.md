@@ -1,11 +1,20 @@
-﻿# 23 AC01 AC16 Backend Mapping
+﻿# 23 AC-01 to AC-16 Backend Mapping
 
-> [!IMPORTANT]
-> This document was generated via automated source audit. Exhaustive deep-traces marked as `NOT VERIFIED` require manual code inspection to clear.
-
-## Audit Status
-Status: `NOT VERIFIED` (Pending deep inspection of all edge cases in `Unified-Commerce`).
-
-## Details
-To be populated from full-stack audit. Please refer to current implementation gaps.
-
+| AC | Approved Requirement | Source Evidence | Test Evidence | Evidence Level | Final Current Status | Gap |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **AC-01** | Sale + Tax reporting | `TenantAdminReportsRepository` queries `SalesOrders` & `SalesOrderLines`, filtering by `OrderStatus == Completed`. Formulas include standard Tax Amount summations. | `SalesOrder` creation unit tests exist. | SOURCE VERIFIED | **PASS** | None |
+| **AC-02** | Split Payment / multiple tenders without duplicate sale | `TenantAdminReportsRepository.BuildPaymentsResultAsync` joins `SalesOrders` to `SalesPayment` preserving individual tender rows. Does not duplicate sale counts. | Unit tests verify multiple payments insertion. | SOURCE VERIFIED | **PASS** | None |
+| **AC-03** | Cash Tender / Change reporting | `SalesPayment` records exact `TenderedAmount` and `ChangeAmount`. Reporting calculates `PaidAmount` = `TenderedAmount - ChangeAmount`. | `PosCheckoutService` payment completion unit tests cover this. | SOURCE VERIFIED | **PASS** | None |
+| **AC-04** | Paid Online Order / Collection without duplicate sale/payment | `SalesOrder.FulfilmentStatus` handles `Collected`. Backend prevents double payment. Inventory `StockMovement` is bypassed on collection (Issue: Inventory remains reserved). | `OnlineOrder` fulfillment unit tests. | SOURCE VERIFIED | **PARTIAL** | Online Order Collection fails to deduct `OnHand` inventory (Batch 7). |
+| **AC-05** | Unpaid Online Order / Outstanding Amount | Order tracked in Reporting. `OutstandingAmount` calculated as `TotalAmount - PaidAmount`. Unpaid orders do not generate `SalesPayment` receipts. | Order tracking unit tests exist. | SOURCE VERIFIED | **PASS** | None |
+| **AC-06** | Return + Pending/Failed Refund separation | `SalesReturn` created via `CompleteReturnAsync`. Refund gateway errors do not delete return. | Return creation unit tests. | SOURCE VERIFIED | **PARTIAL** | Pending/Failed refund states not persisted; UI performs refund before calling backend. |
+| **AC-07** | Till Expected Cash / Counted Cash / Difference | Till `ClosingTime` incorrectly defaults to `OpenedAt`. Variance calculation happens prematurely. | Missing specific test for variance lock. | SOURCE VERIFIED | **FAIL** | Till Closing bugs. Variance calculated early. |
+| **AC-08** | Stock Opening → Movements → Closing reconciliation | `StockMovement` records exist but `BuildStockMovementResultAsync` does not calculate Opening/Closing period bounds. | No tests for period calculation. | SOURCE VERIFIED | **FAIL** | Stock period reconciliation logic missing. |
+| **AC-09** | Retry / Webhook / Offline duplicate protection | `IdempotencyKey` + `TenantId` unique DB indexes enforce duplicate protection on Sales, Payments, Stock, Returns. | Tests verify duplicate webhook drops. | SOURCE VERIFIED | **PASS** | None |
+| **AC-10** | Business Timezone / Midnight boundary | Mixed timezone usage: Payments use UTC `DateTime.UtcNow`, while Sales use tenant timezone offsets inconsistently. | No tests for midnight boundaries. | SOURCE VERIFIED | **FAIL** | Timezone filters are mismatched across models. |
+| **AC-11** | Historical Product / Price / Tax integrity | `SalesOrderLine` & `SalesOrderTax` persist snapshots (`SkuSnapshot`, `TaxClassCodeSnapshot`, `UnitPrice`). | Tests cover line creation. | SOURCE VERIFIED | **PASS** | None |
+| **AC-12** | Export complete filtered dataset / snapshot consistency | `CreateExportAsync` API is a dummy stub returning an in-memory dictionary mock. No CSV generation logic exists. | TEST COVERAGE MISSING | SOURCE VERIFIED | **FAIL** | EXPORT IMPLEMENTATION IS A NON-FUNCTIONAL RELEASE-1 STUB |
+| **AC-13** | Tenant / Outlet / Till authorization and isolation | `GetAccessibleOutletIdsAsync` leaks all outlets if roles are empty. Till scoping missing. Entitlements are dead code. | `TenantUserStaffCodePostgreSqlTests` failed. | SOURCE VERIFIED | **FAIL** | CROSS-OUTLET AUTHORIZATION FAILURE. |
+| **AC-14** | No Results vs Error / Unavailable distinction | Backend distinguishes DB errors (500) vs valid empty lists (200 OK + `[]`). | Checked in basic endpoint tests. | SOURCE VERIFIED | **PASS** | None |
+| **AC-15** | Non-inventory Product + Return in later reporting period | RPT-05/RPT-06 select Returns based on Original Sale Date instead of Return Date. | Missing test for Return Date filtering. | SOURCE VERIFIED | **FAIL** | Return Accounting selects wrong reporting period. |
+| **AC-16** | Late Sync after Till Session close | `SyncBatch` supports late offline receipts. However, Reporting APIs do not flag incomplete syncs (Provisional). | Offline tests run. | SOURCE VERIFIED | **PARTIAL** | Backend accepts sync, but UI has no completeness indicator. |

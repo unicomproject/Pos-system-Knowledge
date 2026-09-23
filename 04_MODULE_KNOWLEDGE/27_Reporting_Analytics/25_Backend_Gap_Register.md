@@ -1,8 +1,20 @@
-﻿# 25 Backend Gap Register
+# 25. Final Backend Gap Register
 
-| Area | Requirement | Backend Evidence | Status | Gap | Recommended Next Backend Work |
-|---|---|---|---|---|---|
-| API | Endpoints for all reports | Found GetSales, GetStock, GetOutlets | PARTIAL | Missing dedicated endpoints for Returns and Till Closing | Implement dedicated endpoints for RPT-02, 03, 04, 05 |
-| DB Tables | Separate sales and refund summaries | Seed data found, no physical summary tables | VERIFIED MISSING IMPLEMENTATION | Physical reporting tables missing | Create daily_sales_summaries |
-| Security | Outlet/Till scope | TenantOnly policy verified | IMPLEMENTATION GAP | No outlet/till specific scope enforced in API | Add outlet-level RBAC |
-| Export | CSV Export full dataset | /exports POST endpoint | PARTIAL | Snapshot metadata missing | Add Snapshot ID to export jobs |
+## P0 (Security & Data Integrity)
+| Gap ID | RPT/REP | Requirement | Current Behaviour | Evidence | Required Work |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| GAP-01 | RPT-All | AC-13 (Outlet Isolation) | Cashiers can see all outlets if roles empty. | `GetAccessibleOutletIdsAsync` | Enforce explicit outlet/till scope. |
+| GAP-02 | RPT-All | AC-12 (Export) | Export API is a dummy stub. No CSV generated. | `CreateExportAsync` | Implement actual CSV generation & storage. |
+
+## P1 (Required Release Behaviour Missing)
+| Gap ID | RPT/REP | Requirement | Current Behaviour | Evidence | Required Work |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| GAP-03 | RPT-03 | AC-07 (Till Variance) | Variance calculated before close; ClosingTime wrong. | Till queries | Fix variance calculation timing. |
+| GAP-04 | RPT-05 | AC-15 (Return Period) | Returns filtered by Original Sale Date instead of Return Date. | Return queries | Update filtering column for returns. |
+| GAP-05 | RPT-08 | AC-08 (Stock Movement) | Opening/Closing period bounds are not calculated. | StockMovement queries | Implement period bounded calculations. |
+
+## P2 (Performance & Completeness)
+| Gap ID | RPT/REP | Requirement | Current Behaviour | Evidence | Required Work |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| GAP-06 | RPT-06 | Pagination | Pagination parameters entirely ignored. | RPT-06 API | Implement Skip/Take in repository. |
+| GAP-07 | RPT-01 | AC-10 (Timezone) | Mixed timezone handling (UTC vs Local) across Sales/Payments. | Date predicates | Unify boundary extraction. |

@@ -1,11 +1,5 @@
-﻿# 15 Tenant Outlet Till Scope
+# 15. Tenant, Outlet, and Till Scope
 
-> [!IMPORTANT]
-> This document was generated via automated source audit. Exhaustive deep-traces marked as `NOT VERIFIED` require manual code inspection to clear.
-
-## Audit Status
-Status: `NOT VERIFIED` (Pending deep inspection of all edge cases in `Unified-Commerce`).
-
-## Details
-To be populated from full-stack audit. Please refer to current implementation gaps.
-
+*   **Tenant Scope:** Correctly isolated via `TenantId` globally.
+*   **Outlet Scope:** Broken (CROSS-OUTLET AUTHORIZATION FAILURE). If no roles assigned, user sees all outlets.
+*   **Till Scope:** Completely absent in reporting. Cashiers can view reports for other tills in their outlet.

@@ -1,11 +1,5 @@
-﻿# 22 Backend Test Traceability
+# 22. Backend Test Traceability
 
-> [!IMPORTANT]
-> This document was generated via automated source audit. Exhaustive deep-traces marked as `NOT VERIFIED` require manual code inspection to clear.
-
-## Audit Status
-Status: `NOT VERIFIED` (Pending deep inspection of all edge cases in `Unified-Commerce`).
-
-## Details
-To be populated from full-stack audit. Please refer to current implementation gaps.
-
+*   **Unit Tests:** Executed successfully. Total = 2155, Passed = 2155, Failed = 0.
+*   **Integration Tests:** NOT EXECUTED SUCCESSFULLY — TEST ENVIRONMENT / DATABASE AUTHENTICATION FAILURE (`28P01: password authentication failed for user "postgres"`).
+*   **Coverage Limitations:** While 2155 unit tests passed, they do not cover complex reporting scenarios like return period matching (AC-15), export completeness (AC-12), or variance timing locks (AC-07). 

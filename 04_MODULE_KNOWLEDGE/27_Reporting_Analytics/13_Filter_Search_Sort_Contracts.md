@@ -1,11 +1,4 @@
-﻿# 13 Filter Search Sort Contracts
+# 13. Filter, Search, Sort & Loading Gaps
 
-> [!IMPORTANT]
-> This document was generated via automated source audit. Exhaustive deep-traces marked as `NOT VERIFIED` require manual code inspection to clear.
-
-## Audit Status
-Status: `NOT VERIFIED` (Pending deep inspection of all edge cases in `Unified-Commerce`).
-
-## Details
-To be populated from full-stack audit. Please refer to current implementation gaps.
-
+*   **Paging/Performance Gap:** In multiple reports, specifically RPT-06 (Product Sales), pagination parameters (Skip/Take) are entirely ignored at the repository level. This will cause severe performance degradation for large tenants.
+*   **Search Gap:** Search parameters are sometimes ignored or not mapped to the correct underlying columns (e.g., searching by barcode vs SKU).
