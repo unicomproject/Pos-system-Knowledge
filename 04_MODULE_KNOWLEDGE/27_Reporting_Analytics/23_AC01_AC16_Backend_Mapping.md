@@ -18,3 +18,44 @@
 | **AC-14** | No Results vs Error / Unavailable distinction | Backend distinguishes DB errors (500) vs valid empty lists (200 OK + `[]`). | Checked in basic endpoint tests. | SOURCE VERIFIED | **PASS** | None |
 | **AC-15** | Non-inventory Product + Return in later reporting period | RPT-05/RPT-06 select Returns based on Original Sale Date instead of Return Date. | Missing test for Return Date filtering. | SOURCE VERIFIED | **FAIL** | Return Accounting selects wrong reporting period. |
 | **AC-16** | Late Sync after Till Session close | `SyncBatch` supports late offline receipts. However, Reporting APIs do not flag incomplete syncs (Provisional). | Offline tests run. | SOURCE VERIFIED | **PARTIAL** | Reporting API does not expose provisional/completeness metadata for pending or unknown offline sync state. |
+
+## P3-A Security Update
+
+### Outlet/Till security
+* tenant isolation implemented
+* outlet scope implemented
+* till scope implemented
+* selected Till isolation verified
+* no-access scopes fail closed
+* Till outside authorized Outlet rejected
+* null-Till order hidden from SELECTED_TILLS
+* inactive TenantUser fails closed
+
+### Reporting query isolation
+Verified for:
+* Sales
+* Payments
+* Product Sales
+* Filter Options
+* Till/Session path
+* Sales Transaction Detail IDOR
+* Cross-Tenant isolation
+
+### Entitlement / Permission
+Record:
+Sales permission × entitlement matrix — PASS
+Stock permission × entitlement matrix — PASS
+Export authorization permission × entitlement matrix — PASS
+Dashboard entitlement — PASS
+Filter Options entitlement — PASS
+
+### Test evidence
+ReportingSecurityTests:
+20 Passed / 0 Failed
+
+ReportingEntitlementSecurityTests:
+15 Passed / 0 Failed
+
+### PostgreSQL
+POSTGRESQL RELATIONAL SECURITY VERIFICATION — PENDING P3-H
+
