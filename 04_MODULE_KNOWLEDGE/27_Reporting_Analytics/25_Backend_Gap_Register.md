@@ -4,7 +4,7 @@
 | Gap ID | RPT/REP | Requirement | Current Behaviour | Evidence | Required Work |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | GAP-01 | RPT-All | AC-13 (Outlet Isolation) | Cashiers can see all outlets if roles empty. | `GetAccessibleOutletIdsAsync` | Enforce explicit outlet/till scope. |
-| GAP-02 | RPT-All | AC-12 (Export) | CLOSED - Export API implemented with CSV generation and security filters. | `CreateExportAsync` | N/A |
+| GAP-02 | RPT-All | AC-12 (Export) | PARTIAL — EXPORT SCOPE REQUIRES PRODUCT DECISION. Export API implemented for Sales Transactions, but full scope is ambiguous as OneVerz-Reporting-Requirements-Full.docx is missing. | `CreateExportAsync` | N/A |
 
 ## P1 (Required Release Behaviour Missing)
 | Gap ID | RPT/REP | Requirement | Current Behaviour | Evidence | Required Work |
@@ -57,5 +57,6 @@ ReportingEntitlementSecurityTests:
 
 ### PostgreSQL
 POSTGRESQL RELATIONAL SECURITY VERIFICATION — PENDING P3-H
+
 
 

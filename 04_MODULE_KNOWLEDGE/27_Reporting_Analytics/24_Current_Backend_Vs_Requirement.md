@@ -52,3 +52,7 @@ ReportingEntitlementSecurityTests:
 ### PostgreSQL
 POSTGRESQL RELATIONAL SECURITY VERIFICATION — PENDING P3-H
 
+
+### CSV Export Status
+AC-12 — PARTIAL — EXPORT SCOPE REQUIRES PRODUCT DECISION
+Primary source requirement OneVerz-Reporting-Requirements-Full.docx was not found. Current implementation supports Sales Transactions export.
