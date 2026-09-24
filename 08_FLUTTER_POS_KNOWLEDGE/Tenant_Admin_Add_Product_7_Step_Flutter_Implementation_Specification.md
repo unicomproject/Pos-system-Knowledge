@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin Add Product — 7-Step Wizard Flutter Implementation Specification -->
 <!-- status: Active -->
 <!-- system: OneVerz POS Flutter Client Scope -->
-<!-- last_updated: 2026-09-23 -->
+<!-- last_updated: 2026-09-24 -->
 
 # Tenant Admin Add Product — 7-Step Wizard Flutter Implementation Specification
 
@@ -44,12 +44,23 @@ Shared query/DTO types may be reused only if they stay consistent with Product S
 ## 1.2 Brand resolution and Quick Add Brand (IMPLEMENTED 2026-09-23)
 
 When an external barcode lookup returns brand text, Step 1 also resolves it against
-the tenant's Brands using the same SAVED→EXACT→NORMALIZED→SIMILARITY ladder as the
-Category picker above, with a Quick Add Brand drawer for when no suitable match
-exists. This is now fully implemented and E2E-validated; it does **not** reuse the
-Category picker's endpoint or repository — Brand resolution runs through the External
-Brand Mapping resolver, keyed on a normalized text key rather than a provider ID (see
-ADR 011).
+the tenant's Brands using the External Brand Mapping resolver's own
+`SAVED → EXACT → NORMALIZED → SIMILARITY → NONE` ladder (unchanged as of 2026-09-24,
+now with diacritic-insensitive NORMALIZED/SIMILARITY comparison — see
+[[../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Brand_Mapping]]), with a Quick
+Add Brand drawer for when no suitable match exists. This is now fully implemented and
+E2E-validated; it does **not** reuse the Category picker's endpoint or repository —
+Brand resolution runs through the External Brand Mapping resolver, keyed on a
+normalized text key rather than a provider ID (see ADR 011).
+
+**Note (2026-09-24):** Category's own external-lookup resolution ladder is no longer
+identical to Brand's — Category gained a hierarchy-aware extension (`LEAF_*` /
+`HIERARCHY_*` tiers, see
+[[../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Category_Mapping]]) because
+providers expose a category hierarchy that Brand has no equivalent of. This is
+unrelated to the plain hierarchical `categories[]` **options list** described in § 1.1
+above (that hierarchy is the tenant's own Category tree for the picker dropdown, not
+the provider's external category hierarchy used for suggestion matching).
 
 Full detail: [[Product_Setup_External_Enrichment_UX]],
 [[../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Brand_Mapping]].

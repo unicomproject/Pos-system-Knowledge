@@ -1,7 +1,7 @@
 <!-- title: Tenant Admin Add Product 7-Step Permission Matrix -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-24 -->
 
 # Tenant Admin Add Product 7-Step Permission Matrix
 
@@ -63,11 +63,23 @@ Setup identity, not Stock Adjustment.
 |---|---|---|---|---|
 | Product Setup | `product_catalog` | Required to start/save/publish the wizard | `ProductWizardAccessPolicy` evaluates `PlatformTenantFeatureCodes.ProductCatalog` | Same |
 | Module label | `product_management` | Documentation / historical seed alias | Seed migration mapped `product_management` → `product_catalog` | **Not** a runtime authorization key |
-| Advanced inventory tracking | `inventory_tracking` | Required to enable Batch/Expiry/Serial **policy** and to persist non-empty Initial Tracking / publish identity rows | Feature exists in commercial catalog; wizard does **not** currently gate toggles | Gate advanced tracking + identity |
+| Advanced inventory tracking | `inventory_tracking` | Required to enable Batch/Expiry/Serial **policy** and to persist non-empty Initial Tracking / publish identity rows | **Gated** — `ProductWizardAccessPolicy.HasInventoryTrackingEntitlementAsync` evaluates this; verified live (403 `product.entitlement_denied` on `expiryTracking: true` without the entitlement) | Closed (see 2026-09-24 note below) |
 | Inventory module (docs) | `inventory_management` | Feature_Entitlement_Matrix group name for stock ops | Docs alias | **Not** the Product Setup runtime check |
 
 Quantity Track Inventory ON/OFF remains `product_catalog`.
 `inventory.stock.adjust` is **never** required for Initial Tracking.
+
+**2026-09-24 correction:** the "wizard does **not** currently gate toggles" note that
+previously appeared in the row above (as of the 2026-08-24 lock) is stale — gating is
+implemented (consistent with § 7 "Missing `inventory_tracking`" below, which was
+already correct). A separate, since-fixed catalog-completeness defect was found the
+same day: `inventory_tracking`'s `platform_features` row had never been seeded, so the
+entitlement check failed closed for every tenant regardless of actual commercial
+entitlement, sharing the same misleading `product.entitlement_denied` message used for
+a missing `product_catalog` entitlement. See
+[[Feature_Entitlement_Matrix]] and
+[[../15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/External_Product_Enrichment_Implementation_Status]]
+§ 2026-09-24 Runtime Fixes.
 
 Denied entitlement → `403` `product.entitlement_denied`. Draft is not destroyed.
 
@@ -341,8 +353,17 @@ Do not let the user select a structure they cannot complete.
 
 CURRENT: `ProductWizardAccessPolicy` checks `product_catalog`, then
 `tenant.products.create/update`, plus variants.manage / barcodes.manage / media
-on some steps. **Missing:** channels, combo, pricing, cost, inventory_tracking,
+on some steps. **Missing:** channels, combo, pricing, cost,
 publish subgraph recheck, catalog.* canonical codes.
+
+**2026-09-24 correction:** `inventory_tracking` removed from this "Missing" list — it
+is confirmed checked (`ValidatePayloadAsync` / `ValidatePublishSubgraphAsync` call
+`HasInventoryTrackingEntitlementAsync`), verified live. This entry is unrelated to the
+2026-09-24 platform-feature-catalog-seed fix noted in § 7/§ 8 above; the enforcement
+code path itself was already correct, only the underlying `platform_features` row was
+missing. The remaining items in this "Missing" list were not re-verified as part of
+that runtime debugging pass and may still be accurate — do not assume they are closed
+without checking the current code.
 
 TARGET: one policy evaluates canonical catalog.* + step specialized perms +
 entitlements listed in this file. Repository never decides authorization.

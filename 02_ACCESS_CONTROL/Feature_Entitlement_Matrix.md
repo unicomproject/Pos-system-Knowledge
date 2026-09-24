@@ -1,7 +1,7 @@
 <!-- title: Feature Entitlement Matrix -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-24 -->
 
 
 # Feature Entitlement Matrix
@@ -98,11 +98,27 @@ Do not leave multiple runtime names for the same Product Setup check.
 |---|---|---|---|---|
 | `product_catalog` | Runtime `feature_code` / `PlatformTenantFeatureCodes.ProductCatalog` | Wizard access policy evaluates this | Same — **the** Product Setup entitlement | None |
 | `product_management` | `platform_modules.module_code` (parent of `product_catalog`) | Seeded as module grouping | Docs/module label only. **Not** a runtime entitlement check | Do not start checking this |
-| `inventory_tracking` | Runtime `feature_code` / `PlatformTenantFeatureCodes.InventoryTracking` | Exists commercially; wizard does **not** currently gate advanced toggles | Gate Batch/Expiry/Serial policy, non-empty Initial Tracking, and publish identity | Wizard policy GAP |
+| `inventory_tracking` | Runtime `feature_code` / `PlatformTenantFeatureCodes.InventoryTracking` | **Gated** — `ProductWizardAccessPolicy.HasInventoryTrackingEntitlementAsync` evaluates this whenever Batch/Expiry/Serial tracking is enabled, a non-empty Initial Tracking value is supplied, or publish identity applies | Same — gating is implemented | Closed (see 2026-09-24 note below) |
 | `inventory_management` | Feature matrix **group name** for stock ops | **Not** present in Unified Commerce `PlatformTenantFeatureCodes` | Docs group only. Never a Product Setup runtime check | None |
 
 Quantity Track Inventory ON/OFF remains `product_catalog`.
 Advanced tracking requires `inventory_tracking`.
+
+**2026-09-24 correction:** the "wizard does **not** currently gate advanced toggles /
+Wizard policy GAP" note that previously appeared in this row (as of the 2026-08-24
+lock) is stale — gating was implemented since then and was verified live: enabling
+`expiryTracking` without the `inventory_tracking` entitlement returns 403
+`product.entitlement_denied`. A **separate, since-fixed** defect was found on
+2026-09-24: `inventory_tracking`'s `platform_features` catalog row had never been
+seeded by any migration, so the entitlement check failed closed (`UnknownFeature`) for
+every tenant regardless of their actual commercial entitlement — the same
+`product.entitlement_denied` / "Product management feature is not included in the
+tenant subscription." message is shared with the `product_catalog` check, which made
+this look like a missing Product Catalog entitlement when the tenant actually had one.
+Fixed by migration `20260924080000_SeedInventoryTrackingPlatformFeature` (catalog
+completeness only — no tenant/plan entitlement grants). See
+[[../15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/External_Product_Enrichment_Implementation_Status]]
+§ 2026-09-24 Runtime Fixes.
 
 Product Wizard permission matrix:
 [[Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].

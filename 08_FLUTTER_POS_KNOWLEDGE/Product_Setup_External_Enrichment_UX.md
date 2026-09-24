@@ -2,7 +2,7 @@
 <!-- status: Active -->
 <!-- system: OneVerz POS Flutter Client Scope -->
 <!-- module: CatalogProduct -->
-<!-- last_updated: 2026-09-23 -->
+<!-- last_updated: 2026-09-24 -->
 
 # Product Setup External Enrichment UX
 
@@ -52,10 +52,43 @@ Next scan resolves locally
 
 ## Suggestion Chips
 
-Category and Brand both render up to 3 SIMILARITY suggestion chips when no
-SAVED/EXACT/NORMALIZED match exists. Selecting a chip sets that field's value; the
-user's dropdown selection always remains editable/overridable after picking a chip —
-a chip pick is not a locked-in choice.
+Category and Brand both render up to 3 suggestion chips (whatever `matchType` tier
+found them — see below) when no SAVED match already resolved the field. Selecting a
+chip sets that field's value; the user's dropdown selection always remains
+editable/overridable after picking a chip — a chip pick is not a locked-in choice.
+
+**Category suggestions can now come from a hierarchy match (added 2026-09-24).**
+Backend Category resolution gained a hierarchy-aware extension — see
+[[../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Category_Mapping]] § Resolution
+Order — so `categoryResolution.suggestions` may include a tenant Category matched
+against a *parent* node of the provider's category hierarchy (`matchType:
+"HIERARCHY_EXACT"` etc.), not only the provider's own leaf category text. **No Flutter
+change was required for this**: the suggestion-chip rendering, tap-to-select, and DTO
+parsing already treated `matchType` as an opaque string end-to-end (nothing in Flutter
+branches on its value), so the new `HIERARCHY_*` values flow through the existing Step
+1/Step 2 UI automatically. Brand's `matchType` values are unaffected — Brand has no
+hierarchy concept (see [[../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Brand_Mapping]]).
+
+```text
+Step 1 (scan_barcode_step.dart):
+  displays "Category Hierarchy" (already existing) and, once
+  categoryResolution.suggestions is non-empty, a generic "Suggested: <names>" line —
+  this line existed before 2026-09-24 but was effectively dead for Category, since the
+  backend never returned a hierarchy-derived suggestion until now.
+
+Step 2 (product_basic_details_form.dart, Basic Details form):
+  Category *
+  [ Select category ▼ ]
+  Suggested: [Beverages]        ← tappable chip, key `category_suggestion_<id>`
+
+  Tap "Beverages" → onCategoryChanged(candidate.id) → state.categoryId updated,
+  same tap-to-select path already used for LEAF_* suggestions and for Brand.
+```
+
+Suggestion chips are filtered to ids present in the wizard's current
+`createOptions.categories` (a stale-data safety check, not a `matchType` filter) —
+this never drops a hierarchy suggestion in practice, because the backend only ever
+suggests Categories drawn from that exact same create-options list.
 
 ## Quick Add Brand
 

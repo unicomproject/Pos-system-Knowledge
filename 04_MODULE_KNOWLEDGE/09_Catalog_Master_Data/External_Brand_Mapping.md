@@ -2,7 +2,7 @@
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- module: CatalogProduct -->
-<!-- last_updated: 2026-09-23 -->
+<!-- last_updated: 2026-09-24 -->
 
 # External Brand Mapping
 
@@ -79,9 +79,57 @@ Brand.
 5. NONE         — no candidate; user must pick manually or Quick Add
 ```
 
-Identical resolution ladder to Category, except the "still valid" check for Brand is a
-flat ACTIVE-status check (`BrandBelongsToTenantAsync`) — Brand has no hierarchy, unlike
-Category's ancestor-chain selectability check.
+The "still valid" check for Brand is a flat ACTIVE-status check
+(`BrandBelongsToTenantAsync`) — Brand has no hierarchy, unlike Category's
+ancestor-chain selectability check.
+
+**Divergence from Category (2026-09-24):** Category's resolver gained a
+hierarchy-aware extension (`LEAF_EXACT/LEAF_NORMALIZED/HIERARCHY_EXACT/
+HIERARCHY_NORMALIZED/LEAF_SIMILARITY/HIERARCHY_SIMILARITY` — see
+[[External_Category_Mapping]]) because providers expose a category **hierarchy**.
+Brand has no equivalent multi-level concept in either implemented provider adapter (see
+ADR 011) — a provider brand field is always a single flat text value, never a path —
+so Brand's resolution ladder deliberately stays the simpler 5-tier
+`SAVED → EXACT → NORMALIZED → SIMILARITY → NONE` shown above. Do not introduce
+hierarchy concepts into Brand Mapping; there is no provider data to hierarchy-match
+against.
+
+## Diacritic-Insensitive Comparison (added 2026-09-24)
+
+`NORMALIZED` and `SIMILARITY` now fold Unicode diacritics before comparing (e.g.
+`Nestlé` → `Nestle`), so a tenant Brand entered without an accent still matches
+provider text that includes one.
+
+```text
+External BrandText  : "Nestlé, Ricore, Ricoré"
+externalBrandName    : "Nestlé"   (first comma-segment, as always)
+externalBrandKey     : "nestlé"   (lowercase, but NOT yet diacritic-folded — the raw
+                        key derivation is unchanged; folding happens only inside the
+                        comparison logic described here)
+
+Tenant Brand         : "nestle"
+
+Result: NORMALIZED suggestion (not EXACT — see below)
+```
+
+**Root cause this closes:** before this fix, `Nestlé` (accented) and `nestle`
+(unaccented) never matched at any tier — not EXACT, not NORMALIZED, not SIMILARITY —
+because the comparison pipeline only lowercased and trimmed text; it never stripped
+diacritics. A tenant that genuinely already had the correct Brand ("nestle") still saw
+Quick Add Brand offered instead of a suggestion for their own existing Brand.
+
+**EXACT stays diacritic-strict.** Folding is applied only inside `NORMALIZED` and
+`SIMILARITY`'s comparison helpers, never inside `EXACT`'s. This means `Nestlé` vs
+`nestle` lands as a `NORMALIZED` suggestion (a deliberate, conservative choice — not an
+automatic silent match), while a tenant Brand that is byte-for-byte identical to the
+provider text (after case/trim only) still gets the strongest `EXACT` tier. See
+[[../../13_DECISIONS_AND_CHANGES/ADR/ADR_011_External_Brand_Identity_Normalized_Text_Key]]
+§ Consequences for the same design rationale recorded at the ADR level.
+
+**Comparison-only.** This normalization exists purely inside the matching logic — it
+is applied to values in memory while evaluating suggestions. No persisted Brand name is
+ever rewritten, re-cased, or has its diacritics stripped by this feature. `brands.name`
+continues to store exactly what the tenant/user entered.
 
 ## Brand Mapping Authority Rule
 
@@ -138,6 +186,40 @@ Flutter never supplies `TenantId` when creating a mapping. Tenant isolation was
 E2E-validated live: a mapping seeded for one tenant was confirmed to never appear as a
 mapped Brand or as a suggestion when the same barcode/provider/key was resolved under a
 different tenant.
+
+## Verified Runtime Examples (2026-09-24)
+
+Live HTTP calls against a real Postgres tenant (`DEV-TENANT-001`) and the live
+OpenFoodFacts API.
+
+**Nestlé → nestle (barcode `7613032655495`, Ricoré instant coffee):**
+
+```text
+BrandText            : "Nestlé, Ricore, Ricoré"
+externalBrandName    : "Nestlé"
+externalBrandKey     : "nestlé"
+tenant Brand         : "nestle"
+
+brandResolution.mappedBrand : null
+brandResolution.suggestions : [{ name: "nestle", matchType: "NORMALIZED" }]
+```
+
+**Coca-Cola (barcode `5449000000996`):**
+
+```text
+BrandText            : "COCA-COLA SERVICES SA/NV, Coca-Cola"
+externalBrandName    : "COCA-COLA SERVICES SA/NV"
+tenant Brand         : "coca cola"
+
+brandResolution.mappedBrand : null
+brandResolution.suggestions : [{ name: "coca cola", matchType: "SIMILARITY" }]
+```
+
+The legal-entity suffix (`SERVICES SA/NV`) is different enough from the tenant's plain
+"coca cola" Brand name that it lands at `SIMILARITY` rather than `NORMALIZED` — exactly
+the conservative behavior this ladder is designed to produce for a broader
+company-name variation (see the "Known limitation" note under External Brand Key
+Strategy, above).
 
 ## Related
 

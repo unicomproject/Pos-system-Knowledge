@@ -1,7 +1,7 @@
 <!-- title: Catalog Master Data & Product Core -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-09-23 -->
+<!-- last_updated: 2026-09-24 -->
 <!-- source: Updated from uploaded ERD image: 10_Catalog Master Data & Product Core(3).png -->
 
 # 10. Catalog Master Data & Product Core
@@ -651,10 +651,13 @@ UNIQUE(tenant_id, provider, external_brand_key)  -- uq_external_brand_mappings_t
 INDEX(tenant_id, tenant_brand_id)                -- ix_external_brand_mappings_tenant_tenant_brand_id
 ```
 
-Migration: `20260923102245_AddTenantExternalBrandMappings`. **Not yet applied** to the
-persistent `UnifiedCommerceDb` development database as of 2026-09-23 (validated only
-against ephemeral PostgreSQL test databases) — see
-[[../../15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/External_Product_Enrichment_Implementation_Status]].
+Migration: `20260923102245_AddTenantExternalBrandMappings`. Applied to the persistent
+`UnifiedCommerceDb` development database as of 2026-09-24 — `external_brand_mappings`
+now exists as a table there and was exercised live. (Previously noted "Not yet
+applied" as of 2026-09-23, validated only against ephemeral PostgreSQL test databases
+at that time — that status is now stale; see
+[[../../15_IMPLEMENTATION_TRACKING/Backend/CatalogProduct/External_Product_Enrichment_Implementation_Status]]
+§ Persistent Development Database Note for the current status and history.)
 
 ## Related Files
 

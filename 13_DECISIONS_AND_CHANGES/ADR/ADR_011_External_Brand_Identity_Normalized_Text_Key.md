@@ -82,6 +82,17 @@ brand. This is a known, accepted limitation for R1, not an oversight.
 - SIMILARITY suggestions (token-based, up to 3, deduped) help a user reconcile
   near-duplicate text keys against one tenant Brand instead of silently creating
   duplicates.
+- **NORMALIZED comparison includes diacritic folding (added 2026-09-24).** The
+  normalized-text comparison used at the NORMALIZED and SIMILARITY tiers folds Unicode
+  diacritics before comparing (e.g. `Nestlé` → `Nestle`), so a tenant Brand entered
+  without an accent still matches provider text carrying one, at the NORMALIZED tier.
+  EXACT deliberately stays diacritic-strict, so a byte-for-byte identical tenant Brand
+  name is never conflated with a merely accent-insensitive one. This does not change
+  the R1 decision itself (still a normalized text key, still not a globally stable
+  legal-brand identifier) — it only reduces one avoidable class of false-negative
+  (case: accent-only) key drift within that decision. Full detail:
+  [[../../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Brand_Mapping]] §
+  Diacritic-Insensitive Comparison.
 - A mapping is only ever persisted after explicit user confirmation via successful
   Product creation — the system never auto-creates or auto-maps a Brand from
   normalized text alone.

@@ -2,7 +2,7 @@
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
 <!-- module: CatalogProduct -->
-<!-- last_updated: 2026-09-23 -->
+<!-- last_updated: 2026-09-24 -->
 
 # External Product Lookup Integration
 
@@ -212,6 +212,83 @@ current UPCitemdb integration exposes no stable provider category key equivalent
 OpenFoodFacts' `categories_tags` — only free-text. Mapping on unstable free text would
 produce noisy, non-reusable category keys, so it is deliberately excluded rather than
 approximated.
+
+## Enrichment Resilience (added 2026-09-24)
+
+**Root cause this closes:** a live PostgreSQL exception thrown while resolving
+Category or Brand mapping (e.g. a table missing because a migration had not yet been
+applied to a given environment) previously propagated all the way out of
+`ExternalLookupBarcodeAsync`, turning an already-successful external product lookup
+(`status: FOUND`, a real product suggestion in hand) into an unhandled HTTP 500. The
+Flutter client only ever saw a generic "An unexpected error occurred." banner and lost
+the entire lookup result — including the perfectly good product suggestion and any
+Category resolution that had already succeeded.
+
+**Fix — scoped enrichment resilience:**
+
+```text
+External provider lookup succeeds (status: FOUND)
+    ↓
+Category resolution                       ← wrapped, try/catch
+    success → categoryResolution populated normally
+    failure → categoryResolution = null, warning logged, lookup CONTINUES
+    ↓
+Brand resolution (only when BrandText present)   ← wrapped, try/catch
+    success → brandResolution populated normally
+    failure → brandResolution = null, warning logged, lookup CONTINUES
+    ↓
+HTTP 200, status: FOUND, product suggestion always present
+```
+
+**This is scoped enrichment resilience, not a blanket exception swallow.** Only the two
+enrichment calls (Category resolver, Brand resolver) are wrapped — each in its own
+`try/catch (Exception ex) when (ex is not OperationCanceledException)`. Do not describe
+this as "all exceptions are ignored":
+
+```text
+Still propagates normally (NOT swallowed):
+  - A failure in the primary external provider lookup itself
+    (IExternalProductLookupCoordinator.LookupAsync)
+  - OperationCanceledException from either enrichment resolver — cancellation is a
+    request-lifecycle signal, not an enrichment failure, and is explicitly excluded
+    from the catch filter so it still propagates/cancels the request as normal
+  - Any exception outside the two enrichment call sites (validation, auth, etc.)
+
+Swallowed and degraded to null (enrichment resilience):
+  - Category resolver throwing for any reason (schema drift, transient DB issue, etc.)
+  - Brand resolver throwing for any reason
+```
+
+**Verified runtime example (2026-09-24, live):** before the pending
+`AddTenantExternalBrandMappings` migration was applied to a given environment's
+persistent database, a barcode whose provider result carried brand text (e.g.
+`7613032655495`, "Nestlé, Ricore, Ricoré") reproduced exactly this failure —
+`Npgsql.PostgresException 42P01: relation "external_brand_mappings" does not exist`
+inside `ExternalBrandMappingRepository.GetAsync`, surfacing as a 500. After this fix,
+the same request (even with the table genuinely absent) returns `200 OK`,
+`status: FOUND`, the full product suggestion, and `brandResolution: null` — Quick Add
+Brand remains available, which is the correct fallback when brand enrichment
+genuinely could not run.
+
+## External Provider Data Quality Note
+
+OpenFoodFacts is community-edited and its `categories` / leaf category fields can be
+mixed-language, inconsistently cased, or simply not the most "obvious" tag for a
+product — this is provider data quality, not a OneVerz defect. Do not label provider
+locale noise as a OneVerz bug; if the raw provider fields themselves are inconsistent
+or wrong, that is a **PROVIDER DATA ISSUE**, distinct from a **ONEVERZ
+ADAPTER/NORMALIZER BUG** (a case where OneVerz has correct provider data but
+misprocesses it) — keep these two categories separate when triaging a
+mapping/suggestion complaint.
+
+**Observed example (barcode `5449000000996`, live 2026-09-24):** the provider's own
+leaf category tag for this exact Coca-Cola product was `pt:bebidas cafeína`
+(Portuguese, not English, and not obviously "Colas") — yet the same product's
+`categories_hierarchy` still correctly contained `en:beverages` further up the chain.
+This is exactly why [[../04_MODULE_KNOWLEDGE/09_Catalog_Master_Data/External_Category_Mapping]]'s
+hierarchy-aware matching improves real-world coverage: even when the provider's leaf
+tag/name is locale-noisy or otherwise unhelpful, a broader, cleaner hierarchy node
+further up the same path can still produce a useful, textually-grounded suggestion.
 
 ## Related
 
