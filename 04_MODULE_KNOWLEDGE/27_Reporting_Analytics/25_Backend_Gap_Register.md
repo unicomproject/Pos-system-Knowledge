@@ -4,7 +4,7 @@
 | Gap ID | RPT/REP | Requirement | Current Behaviour | Evidence | Required Work |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | GAP-01 | RPT-All | AC-13 (Outlet Isolation) | Cashiers can see all outlets if roles empty. | `GetAccessibleOutletIdsAsync` | Enforce explicit outlet/till scope. |
-| GAP-02 | RPT-All | AC-12 (Export) | Export API is a dummy stub. No CSV generated. | `CreateExportAsync` | Implement actual CSV generation & storage. |
+| GAP-02 | RPT-All | AC-12 (Export) | CLOSED - Export API implemented with CSV generation and security filters. | `CreateExportAsync` | N/A |
 
 ## P1 (Required Release Behaviour Missing)
 | Gap ID | RPT/REP | Requirement | Current Behaviour | Evidence | Required Work |
@@ -57,4 +57,5 @@ ReportingEntitlementSecurityTests:
 
 ### PostgreSQL
 POSTGRESQL RELATIONAL SECURITY VERIFICATION — PENDING P3-H
+
 
