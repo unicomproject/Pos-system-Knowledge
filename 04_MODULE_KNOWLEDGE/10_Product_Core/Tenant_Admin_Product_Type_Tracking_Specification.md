@@ -1,36 +1,62 @@
-<!-- title: Tenant Admin Add Product — Product Type & Tracking Specification -->
-<!-- status: Active -->
+<!-- title: Tenant Admin Add Product — Step 3 Product Type & Tracking (SUPERSEDED) -->
+<!-- status: SUPERSEDED (2026-09-20) -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-09-11 -->
-<!-- supersedes: old_global_step2_numbering_pre_scanner_first -->
+<!-- last_updated: 2026-09-20 -->
+<!-- superseded_by: Tenant_Admin_Step3_Product_Type_Configuration_Specification.md -->
 
-# Tenant Admin Add Product — Product Type & Tracking Specification
+# ⚠️ SUPERSEDED — DO NOT USE
 
-> **SUPERSEDED:** Formerly documented as global **Step / Stage 2**.  
-> **Canonical (LOCKED):** Global **Step 3 — Product Type & Tracking** after scanner-first remumber.  
-> Decision: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].  
-> Step 1 Scan: [[Tenant_Admin_Product_Setup_Scan_Barcode_Specification]].
+**SUPERSEDED 2026-09-20**
+
+Current Step 3 authority:
+**`Tenant_Admin_Step3_Product_Type_Configuration_Specification.md`**
+
+Do not use this document for new Backend or Flutter implementation. This is retained only for historical reference / implementation migration tracking.
+
+---
+
+# Tenant Admin Add Product — Step 3 Product Type & Tracking (HISTORICAL)
+
+> **UPDATED 2026-09-20:** Renamed from "Product Type & Tracking" to clarify ownership boundaries.  
+> **NEW WIZARD:** 6-step (previously 7-step).  
+> **Current Step:** Step 3 (unchanged from 7-step Step 3 numbering).  
+> **Key Changes:** Tracking toggles moved to Step 5; Units/Packs moved into Step 3 (SIMPLE only); Initial Tracking Details moved to Step 5.  
+> Decision: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_6_STEP_RESTRUCTURING_DECISION_2026-09-20]].
 
 ## 1. Executive Summary & Core Architectural Principles
 
-This document defines the canonical Second Brain specification for **Global Step 3: Product Type & Tracking** within the Tenant Admin **Add Product Wizard**.
+This document defines the canonical specification for **Step 3: Product Type & Configuration** within the Tenant Admin **6-step Add Product Wizard**.
+
+Step 3 owns:
+- Product Type selection (SIMPLE / VARIANT; Bundle LEGACY/DEFERRED)
+- Type-specific configuration (SIMPLE: Units/Packs + SKU; VARIANT: Matrix + Variant SKU)
+
+**Key Architecture Change:**
+
+Tracking toggles and Initial Tracking Details have moved to **Step 5 Product Tracking**.
+
+Step 3 is now focused on **structural configuration only**.
 
 ### Canonical Architectural Principles
-1. **ONE Unified Add Product Wizard**: Add Product is ONE single 7-step wizard pipeline (`ProductId`, `CurrentSetupStep`, `RowVersion`, shared footer, shared save endpoints). Steps are configuration steps owned by the wizard, NOT seven independent backend/frontend features. Legacy 8-stage / Stage 8 wording is obsolete. Standalone global **Barcode & SKU** is superseded — final identifiers live inside **Step 5 Product Configuration**.
-2. **Semantic Technical Naming Only**: Technical code symbols (Flutter widgets, controllers, DTOs, API endpoints, backend services, commands) MUST use semantic business terms (`ProductTypeTracking`, `product_type_tracking.dart`, `ValidateProductTypeTracking`, `ApplyProductTypeTracking`). Step-number names (e.g. `Step3ProductTypeTracking`, `SaveStep3DraftCommand`) are strictly forbidden in code.
-3. **Product Type UI vs Product Structure Domain Mapping**:
-   - UI Section Label: `Select Product Type` (Options: `Simple Product`, `Variant Product`, `Bundle / Kit`).
-   - Domain & Database Mapping: `productStructure` (`SIMPLE`, `VARIANT`, `BUNDLE`).
+
+1. **ONE Unified 6-Step Wizard**: Add Product is ONE single 6-step wizard pipeline (`ProductId`, `CurrentSetupStep`, `RowVersion`, shared footer, shared save endpoints). Steps are configuration steps owned by the wizard. Legacy 7-step wording is superseded.
+
+2. **Product Type UI vs Product Structure Domain Mapping**:
+   - UI Section Label: `Select Product Type` (Options: `Simple Product`, `Variant Product`).
+   - Domain & Database Mapping: `productStructure` (`SIMPLE`, `VARIANT`).
    - `products.product_type`: Reserved for merchandise classification (`STANDARD`, `SERVICE`, `DIGITAL`). Default: `STANDARD`.
-4. **Structure-Aware Stage Rendering**: The Product Type selection card is common at the top. The tracking content below renders dynamically based on the selected `productStructure`:
-   - `SIMPLE`: optional Initial Tracking Details after type is confirmed, then Simple Inventory Tracking toggles (Track Inventory, Batch, Expiry, Serial).
-   - `VARIANT`: same optional Initial Tracking Details card, then Variant Inventory Tracking policy toggles + right-side contextual explanatory card.
-   - `BUNDLE`: Read-only Bundle Inventory Behaviour informational cards (Component-based inventory, Component stock deduction, Component tracking rules). Do **not** show Initial Tracking Details.
-5. **Stage Applicability & Navigation**:
-   - `SIMPLE` + Track Inventory ON: Step 4 (`Unit & Pack Conversion`) is `REQUIRED`. Step 5 variant/bundle matrix is `NOT_APPLICABLE`; Step 5 still owns final SKU/barcode via the **identifier section**. Save & Continue from Step 4 navigates to Step 5 (identifiers), then Step 6 (`Pricing & Tax`).
-   - `VARIANT` + Track Inventory ON: Step 4 (`Unit & Pack Conversion`) is `REQUIRED`. Step 5 (`Product Configuration` — variant matrix + identifier section) is `REQUIRED`. Save & Continue from Step 4 navigates to Step 5.
-   - `SIMPLE` / `VARIANT` + Track Inventory OFF: Step 4 is `NOT_APPLICABLE` (bypassed).
-   - `BUNDLE`: Parent tracking is forced `false` / component-based. Step 4 is `NOT_APPLICABLE` (bypassed). Save & Continue from Step 3 navigates directly to Step 5 (`Product Configuration` — Kit Composition + identifiers).
+   - Bundle: LEGACY/DEFERRED (preserve existing backend capability; not exposed in new UI by default).
+
+3. **Structure-Aware Configuration**: Step 3 rendering is dynamic based on selected `productStructure`:
+   - `SIMPLE`: Base Unit → Optional Packs/Cases → SKU (reuse Step 1 barcode)
+   - `VARIANT`: Variant Matrix + Options → Variant SKU/Barcode assignment
+   - Bundle: NOT exposed in new UI (classify as LEGACY/DEFERRED)
+
+4. **Navigation Rules**:
+   - `SIMPLE` (any tracking): Step 3 → Step 4 (Pricing & Tax)
+   - `VARIANT` (any tracking): Step 3 → Step 4 (Pricing & Tax)
+   - Both products: Step 4 → Step 5 (Product Tracking — optional)
+   - All paths: Step 5 → Step 6 (Review & Create)
 
 
 ---

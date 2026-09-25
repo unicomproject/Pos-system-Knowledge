@@ -1,29 +1,33 @@
 <!-- title: Tenant Admin Product Management Flow -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-09-11 -->
+<!-- last_updated: 2026-09-24 -->
 <!-- supersedes: old_step_order_basic_details_first_barcode_sku_standalone -->
+<!-- extended: 2026-09-24 — VARIANT Quantity opening stock & outlet allocation documented -->
 
 # Tenant Admin Product Management Flow
 
-> **SUPERSEDED numbering (do not treat as current):**  
-> Old: 1 Basic Details → 2 Product Type & Tracking → 3 Units & Pack → 4 Product Configuration → 5 Barcode & SKU → 6 Pricing & Tax → 7 Review & Create.  
-> **Canonical (LOCKED 2026-09-11):** see table below. Decision: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]].  
-> Scan Barcode: [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Setup_Scan_Barcode_Specification]].
+## Canonical Authority
+
+**6-Step Product Setup Wizard (CURRENT — 2026-09-20):**
+
+See [[../../04_MODULE_KNOWLEDGE/10_Product_Core/06_Tenant_Admin_Add_Product_6_Step_Contract.md]] for primary authority.
+
+Specifications:
+- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Step3_Product_Type_Configuration_Specification.md]]
+- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step5_Product_Tracking_Specification.md]]
 
 ## Purpose
 
 Defines the manual product management flows for the Tenant Admin, including the
-canonical 7-Step wizard (scanner-first), optional Step 3 Initial
-Tracking Details after Product Type is selected, draft saving, details overview, editing, duplicating,
-archiving, and manual popular product curation. Product import workflows are
-removed from this active interface scope.
+canonical 6-step wizard (scanner-first), optional Step 5 Product Tracking,
+draft saving, details overview, editing, duplicating, archiving, and manual
+popular product curation. Product import workflows are removed from this active interface scope.
 
 ## Source Basis
 
-Confirmed 7-step Product Setup contract, tracking-policy specification,
-2026-08-24 Initial Tracking identity decision, 2026-09-01 collection-surface
-move onto Product Type & Tracking, and 2026-09-11 scanner-first Step 1 remumber.
+Confirmed 6-step Product Setup contract, product-type-specific configuration
+(Step 3), optional product tracking (Step 5), and canonical decision [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_6_STEP_RESTRUCTURING_DECISION_2026-09-20.md]].
 
 ## Actors
 
@@ -43,17 +47,16 @@ Tenant Admin opens product management navigation menu.
 
 ---
 
-## Main Flow: Fixed 7-Step Product Creation Wizard
+## Main Flow: Canonical 6-Step Product Creation Wizard
 
 | Step | Wizard Step Name | System & User Behavior |
 |---:|---|---|
 | 1 | **Step 1 — Scan Barcode** | Pre-draft acquisition: scan/type barcode, validate format/checksum, tenant duplicate discovery, optional external product-data lookup, or no-barcode bootstrap. Does **not** create a product row for every random scan. On creation-path transition, create/restore DRAFT, persist scan context, enter Step 2. Canonical: [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Setup_Scan_Barcode_Specification]]. |
-| 2 | **Step 2 — Basic Details** | User inputs Product Name (mandatory), Category (mandatory), Brand (optional), Short Name / Internal Code, Short Description, Long Description, Product Images, and Channel Visibility (POS, Online). Prefill may come from scan context. Initial Tracking Details are **not** collected here. |
-| 3 | **Step 3 — Product Type & Tracking** | User selects Product Type (`SIMPLE`, `VARIANT`, `BUNDLE`). After type is selected, SIMPLE / VARIANT first collect optional Initial Tracking Details (Batch Number, Expiry Date, Serial Number), then Tracking & Stock Rules. Bundle does not show the identity card. Compatible identity values are preserved; TARGET warns and confirms before clearing incompatible values. |
-| 4 | **Step 4 — Unit & Pack Conversion** | Applicable when Track Inventory = ON. Configures Single Unit Only or Multiple Units & Pack Conversion. Auto-bypassed when Track Inventory = OFF. After Step 4 (or when bypassed), **SIMPLE and VARIANT/BUNDLE proceed to Step 5** for Product Configuration. BUNDLE products strictly skip Step 4 (`NOT_APPLICABLE`). |
-| 5 | **Step 5 — Product Configuration** | **SIMPLE:** variant/bundle matrix `NOT_APPLICABLE`; **identifier section is required** for final SKU/barcode (do not skip Step 5 entirely). **VARIANT:** Variant Matrix, Options, Values, Display Labels, Include Variant toggles, Image Overrides, **and** final SKU/barcode identifier assignment. **BUNDLE:** Component candidate search and assembly plus parent identifiers. Standalone global **Barcode & SKU** step is superseded. |
-| 6 | **Step 6 — Pricing & Tax** | **SIMPLE:** one sellable identity → Standard Selling Price + Tax Class + Inclusive/Exclusive (+ Tax Preview). **VARIANT:** independent Selling Price per included `ProductVariant` (**Set Same Price for All Variants** / Apply to All = bulk helper only) + common Product Tax Assignment. Cost is product-level architecture (not SIMPLE UI; not VARIANT matrix R1). Persist via existing price list / tax assignment — see 7-Step contract §6.1–6.5. |
-| 7 | **Step 7 — Review & Create** | Displays full review summary across all preceding sections using persisted draft data, including Scan Barcode context (when present) and applicable Initial Tracking Details. User clicks Create Product to complete server validation, publish the product, and persist applicable initial Batch/Serial identity without inventing stock quantity. On success the wizard shows the **Product Created Successfully** screen (not a toast). **View Product** opens product detail; **Add Another Product** starts a fresh wizard at Step 1 Scan Barcode; **Back to Products** opens Product List. |
+| 2 | **Step 2 — Basic Details** | User inputs Product Name (mandatory), Category (mandatory), Brand (optional), Short Name / Internal Code, Short Description, Long Description, Product Images, and Channel Visibility (POS, Online). Prefill may come from scan context. Do **not** collect tracking details here. |
+| 3 | **Step 3 — Product Type & Configuration** | User selects Product Type (`SIMPLE` or `VARIANT`). **SIMPLE:** Base Unit selection → Optional Packs/Cases configuration → SKU configuration (reuse Step 1 barcode). **VARIANT:** Attribute selection → Attribute Values → Generate Combinations → Include/Exclude variants → Assign SKU/Barcode per variant. Do **not** show tracking toggles or tracking details. See [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Step3_Product_Type_Configuration_Specification]]. |
+| 4 | **Step 4 — Pricing & Tax** | **SIMPLE:** one sellable identity → Standard Selling Price + Tax Class + Inclusive/Exclusive (+ Tax Preview). **VARIANT:** independent Selling Price per included variant (**Set Same Price for All Variants** / Apply to All = bulk helper only) + common Product Tax Assignment. Cost is product-level architecture (not SIMPLE UI; not VARIANT matrix R1). Persist via existing price list / tax assignment. |
+| 5 | **Step 5 — Product Tracking** | **OPTIONAL step.** User selects a tracking method or skips. **Tracking Methods:** `Quantity` / `Batch / Lot` / `Batch + Expiry`. **Optional Step Action:** `Skip Product Tracking` (not a tracking method — navigates directly to Step 6). See [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step5_Product_Tracking_Specification]]. **Quantity (SIMPLE):** Opening Stock (>= 0; zero bypasses Outlet Allocation). If > 0: Outlet Allocation (sum must equal opening stock). **Quantity (VARIANT):** Per-Variant Opening Stock table (Variant name & SKU read-only; quantity editable per Variant; >= 0). For each Variant with OpeningQty > 0: per-Variant Outlet Allocation (exact reconciliation); for OpeningQty = 0: no allocation needed. Product-total is informational only. Same Outlet across Variants is valid; duplicate Outlet within same Variant is invalid. **Batch:** Initial Batch Details (optional). **Batch + Expiry:** Initial Batch & Expiry Details (both required if entered). No stock creation in any path except Quantity. |
+| 6 | **Step 6 — Review & Create** | Displays full review summary across all preceding sections using persisted draft data, including Scan Barcode context (when present) and applicable tracking details. User clicks Create Product to complete server validation, publish the product, and persist applicable initial Batch/Expiry/Serial identity without inventing stock quantity. On success the wizard shows the **Product Created Successfully** screen (not a toast). **View Product** opens product detail; **Add Another Product** starts a fresh wizard at Step 1 Scan Barcode; **Back to Products** opens Product List. |
 
 ---
 
@@ -88,27 +91,42 @@ Retain Barcode
         ↓
 Basic Details
         ↓
-Continue normal 7-step Product Setup
+Continue canonical 6-step Product Setup
 ```
 
 ---
 
-## Detailed Step 5 User Journey: Variant Configuration
+## Detailed Step 3 User Journey: Product Type & Configuration
 
-### Entry & Applicability
-- **VARIANT Product**: Enters Step 5 from Step 4 (if Track Inventory ON) or Step 3 (if Track Inventory OFF).
-- **SIMPLE Product**: Variant/bundle matrix auto-bypassed; user still enters Step 5 **identifier section** (SKU/barcode) before Pricing.
-- **BUNDLE Product**: Renders Kit Component Assembly (+ identifiers).
+### SIMPLE Product Configuration
 
-### Main Screen Actions & Matrix Generation
+**Entry & Applicability:**
+- User selects **SIMPLE Product** type.
+
+**User Journey:**
+1. Select Base Unit from UOM Master
+2. Configure Optional Packs/Cases:
+   - This product has packs/cases? [OFF / ON]
+   - If ON: Add Pack Type, Pack Name, Contains, + Add Another Pack
+   - If OFF: Base Unit only
+3. SKU Configuration:
+   - Reuse Step 1 Primary Barcode (do NOT re-scan or re-type)
+   - Display: "Primary Barcode [BC001] Verified/Acquired [Step 1]"
+4. Continue to Step 4 Pricing & Tax
+
+### VARIANT Product Configuration
+
+**Entry & Applicability:**
+- User selects **VARIANT Product** type.
+
+**User Journey:**
 1. User defines attributes by selecting attribute name (e.g. Size, Colour) and picking active values (e.g. S, M, L / Red, Blue).
-2. **Estimated Variant Count** updates live in Flutter as values are added/removed (e.g. Colour 3 × Capacity 2 = 6). No Save or backend call is required for the estimate to refresh.
-3. User clicks `Generate Variants` / `Apply`. Flutter and backend compute the actual Cartesian product ($3 \times 2 = 6$ combinations).
+2. **Estimated Variant Count** updates live in Flutter as values are added/removed (e.g. Colour 3 × Size 2 = 6). No Save or backend call is required for the estimate to refresh.
+3. User clicks `Generate Variants` / `Apply`. Flutter and backend compute the actual Cartesian product (3 × 2 = 6 combinations).
 4. Configuration summary card updates: `6 Variants Generated`, `2 Attributes Defined`, `6 Included`.
 5. Generated Variants table displays `Variant` (e.g. `Red / S`), and actions (`Edit`, `Delete`).
-6. Selling Price, Cost Price, Tax, and Channel Visibility are NOT displayed in the variant-matrix portion of Step 5. Final SKU/Barcode assignment belongs to the Step 5 **identifier section** (not a separate global step).
 
-### Edit Variant Right-Side Drawer
+**Edit Variant Right-Side Drawer:**
 1. Clicking `Edit` opens right-side drawer.
 2. User views read-only combination label and attribute badges.
 3. User edits `Display Label` (e.g. `Home Jersey - Red / S`).
@@ -116,10 +134,18 @@ Continue normal 7-step Product Setup
 5. User manages variant image (uploads custom image, applies colour-group image, or removes override).
 6. Clicking `Save Changes` applies edits to wizard state.
 
-### Delete Variant Confirmation Modal
+**Delete Variant Confirmation Modal:**
 1. Clicking `Delete` opens centered confirmation modal.
 2. User confirms deletion. Combination is archived as tombstone (`status = 'ARCHIVED'`).
 3. Table and summary card update. Success toast is displayed.
+
+**Variant SKU & Barcode Assignment:**
+- Each included variant owns its own barcode/SKU.
+- If Step 1 scanned variant-specific barcode (e.g. Almond soap): Reuse it for that variant; do NOT re-scan.
+- Other variants: Assign own barcode if available.
+- Preserve existing tenant-wide uniqueness rules.
+
+**Continue to Step 4 Pricing & Tax**
 
 ---
 
@@ -131,77 +157,79 @@ Continue normal 7-step Product Setup
 
 ---
 
-## Initial Tracking Details Journey
+## Product Tracking Journey (Step 5)
 
 ```text
 Tenant Admin
     ↓
 Add Product
     ↓
-Step 1 Scan Barcode (pre-draft acquire / validate / discover)
+Steps 1–4 (Scan → Basic → Type & Config → Pricing)
     ↓
-Creation path → DRAFT + scan context
+Step 5 Product Tracking (OPTIONAL)
     ↓
-Step 2 Basic Details
-    ↓
-Enter Product Information
-    ↓
-Save & Continue
-    ↓
-Step 3 Product Type & Tracking
-    ↓
-Select Product Structure
-    ↓
-Optional Initial Batch / Expiry / Serial (SIMPLE / VARIANT only)
-    ↓
-Select Tracking Policy
-    ↓
-Validate identity values against tracking policy
-    ↓
-Compatible?
-   /        \
- Yes        No
- |           |
-Preserve    Warn + Resolve/Clear
-    \        /
-     Continue Wizard
-          ↓
-     Review & Create
-          ↓
-Persist Product + applicable tracking identity
+Tracking Required?
+   ├── NO → Skip Step 5 → Step 6 Review & Create
+   └── YES
+        ↓
+   Select Tracking Method:
+   ├── Quantity → Opening Stock → Outlet Allocation → Step 6
+   ├── Batch → Initial Batch Details (optional) → Step 6
+   └── Batch + Expiry → Initial Batch & Expiry Details → Step 6
+        ↓
+   Review & Create
+        ↓
+   Publish Product + Persist Tracking Identity
+        ↓
+   Product Created Successfully
 ```
 
 ```mermaid
 flowchart TD
-    S1[Step 1 Scan Barcode] --> S1T{Creation path?}
-    S1T -->|Yes| A[Step 2 Basic Details]
-    A --> C[Save and Continue]
-    C --> D[Step 3 Select Product Type]
-    D --> B[Optional Batch / Expiry / Serial]
-    D --> J[BUNDLE: no identity card]
-    B --> I[SIMPLE or VARIANT tracking policy]
-    I --> E{Values compatible with policy?}
-    E -->|Yes| F[Preserve values]
-    E -->|No| G[Warn then confirm clear]
-    F --> H[Steps 4 to 6]
-    G --> H
-    J --> H
-    H --> R[Step 7 Review and Create]
+    S1[Step 1 Scan Barcode] --> S2[Step 2 Basic Details]
+    S2 --> S3[Step 3 Product Type & Configuration]
+    S3 --> S4[Step 4 Pricing & Tax]
+    S4 --> S5{Step 5 Product Tracking Required?}
+    S5 -->|Skip| S6[Step 6 Review & Create]
+    S5 -->|Quantity SIMPLE| SQS[Opening Quantity >= 0]
+    SQS -->|Qty = 0| S6
+    SQS -->|Qty > 0| OA[Outlet Allocation = Opening Stock]
+    OA --> S6
+    S5 -->|Quantity VARIANT| VQS[Per-Variant Opening Quantity]
+    VQS --> VPV{For each Variant}
+    VPV -->|Qty = 0| VQS0[No Outlet Allocation needed]
+    VPV -->|Qty > 0| VOA[Per-Variant Outlet Allocation]
+    VOA --> VQS0
+    VQS0 --> AllValid{All Variants Valid?}
+    AllValid -->|Yes| S6
+    S5 -->|Batch| BATCH[Initial Batch Details Optional]
+    BATCH --> S6
+    S5 -->|Batch + Expiry| BEXP[Initial Batch & Expiry Details]
+    BEXP --> S6
+    S6 --> R[Review Summary]
     R --> P[Publish Product]
-    P --> K[Persist applicable Batch / Serial identity]
-    K --> L[No invented stock quantity]
-    L --> S[Product Created Successfully screen]
-    S --> VP[View Product detail]
-    S --> AA[Add Another Product Step 1 Scan]
-    S --> BL[Back to Products list]
+    P --> S[Product Created Successfully]
+    S --> VP[View Product]
+    S --> AA[Add Another Product]
+    S --> BL[Back to Products]
 ```
 
 ## Business Rules
 
-- BR-TRACK-001 to BR-TRACK-015 in [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]].
-- Step 3 identity values never auto-enable tracking toggles.
-- VARIANT identity assigns at Step 7 to an included Variant, never the parent Product.
-- BUNDLE parent cannot receive physical tracking identities.
+- Product Tracking (Step 5) is OPTIONAL. If not required, user can skip to Step 6 Review & Create.
+- Quantity tracking is the ONLY path that creates initial stock in Product Setup.
+- **SIMPLE:** Opening Quantity >= 0; zero is valid and bypasses Outlet Allocation.
+- **SIMPLE:** If Opening Quantity > 0, Outlet Allocation sum must equal Opening Stock.
+- **VARIANT:** Per-Variant Opening Quantity >= 0; zero is valid for any Variant (no Outlet Allocation for that Variant).
+- **VARIANT:** If Variant OpeningQuantity > 0, SUM(allocations for that Variant) must equal that Variant's OpeningQuantity (per-Variant exact reconciliation).
+- **VARIANT:** Product-total validation is informational only; per-Variant validation is the canonical rule.
+- **VARIANT:** Same Outlet may appear in multiple Variants (valid); duplicate Outlet within same Variant is invalid.
+- **VARIANT:** Tracking policy is product-level; mixed tracking per-Variant is not allowed.
+- **VARIANT:** Opening Stock reuses existing ProductVariants from Step 3; no new Variants created at stock time.
+- Batch tracking: Initial Batch Details are optional.
+- Batch + Expiry tracking: Both Batch Number and Expiry Date are required if details are entered.
+- VARIANT SKU/Barcode assigned at Step 3 per variant (not Step 6/7).
+- Future stock operations belong to Inventory Module, not Product Setup.
 
 ## Access Control
 
@@ -219,27 +247,26 @@ flowchart TD
 | Area | Reference |
 |---|---|
 | API group | `/api/v1/tenant-admin/products` draft, setup, publish |
-| Scan resolve | **IMPLEMENTED** `POST .../barcodes/resolve` (B4) |
-| External lookup | **IMPLEMENTED B7** `POST .../barcodes/external-lookup` (no tenant duplicate checking; zero providers → NO_MATCH) |
+| Scan resolve | `POST .../barcodes/resolve` |
+| External lookup | `POST .../barcodes/external-lookup` |
 | AUTO SKU base | `POST .../sku-candidates/generate`: selected `categoryId` → backend Category Code + atomic tenant sequence; e.g. `TSH-000125` |
-| Policy table | `product_inventory_settings` |
-| Draft identity (EXISTING) | `product_setup_initial_tracking` — CURRENT Step 3; migration `20260824095742_AddProductSetupInitialTracking`; **not** scanner-first B1 |
-| Scan context | **IMPLEMENTED IN SOURCE** `product_setup_scan_context` — migration `20260912085454_AddProductSetupScannerIdentifierContext`; local Postgres test DB applied; **production/shared apply not claimed**. Draft-bootstrap write path **IMPLEMENTED B8**; GET `/setup` hydration/remap **B9 IMPLEMENTED — PURE READ**; scanner-first composite Step 5 final SKU/barcode **IMPLEMENTED B10**; publish revalidation **IMPLEMENTED B11**; backend closure **B12**. **Steps 2–4 & 6 BACKEND IMPLEMENTED**; Step 5 VARIANT/SIMPLE+IDs **IMPLEMENTED**; **BUNDLE component graph PARTIAL** ([[../../15_IMPLEMENTATION_TRACKING/99_AUDITS/PRODUCT_SETUP_STEP2_TO_STEP6_BACKEND_REALITY_AUDIT_2026-09-13]]). Flutter Step 1 **PARTIAL / PENDING** |
-| Final identity | `product_batches`, `serial_numbers` |
+| Step 3 Config | `Tenant_Admin_Step3_Product_Type_Configuration_Specification.md` — Base Unit, Packs, SKU, Variant Matrix |
+| Step 5 Tracking | `Tenant_Admin_Add_Product_Step5_Product_Tracking_Specification.md` — Quantity, Batch, Batch+Expiry |
+| Product Tracking | `product_tracking_methods` (if exists); tracking identity stored in `product_batches`, `serial_numbers` |
+| Quantity Stock | Quantity opening stock created during Step 5 publish via inventory-module API or direct mutation (VERIFY DURING BACKEND AUDIT) |
+| Scan context | `product_setup_scan_context` — persists barcode/external lookup metadata for draft reuse |
+| Draft state | Current step tracking: `current_setup_step` (1-6 enumeration) |
 
-AUTO SKU lifecycle (approved 2026-09-14): Step 1 no-barcode flow allocates and
-displays the stable Product base. Draft bootstrap persists it in scan context.
-Step 3 SIMPLE reuses it unchanged; Step 5 VARIANT extends the same base with
-ordered stable Variant Value codes. Flutter does not compose SKUs. Category
-change before finalization requires explicit regeneration. Decision:
-[[../../13_DECISIONS_AND_CHANGES/PRODUCT_SKU_AUTO_GENERATION_CANONICAL_DECISION_2026-09-14]].
+**UOM/Pack Architecture:** Reuse existing product-specific UOM conversion tables. Step 3 SIMPLE configures product-specific pack conversions; do not globally define pack multiples.
 
 ## Edge Cases
 
-- Empty Initial Tracking Details is valid.
-- Track Inventory OFF with entered values requires confirmation then clear.
-- Expiry Tracking ON without Batch Number blocks finalization.
-- Back after confirmed clear shows normalized Step 3 values.
+- Step 5 can be skipped entirely (Product Tracking not required).
+- Quantity without Opening Stock blocks finalization.
+- Outlet Allocation not summing to Opening Stock blocks finalization.
+- Batch + Expiry with only Batch (no Expiry) blocks finalization.
+- Empty Batch Details on Batch tracking is valid (skip option available).
+- VARIANT with Step 1 barcode: Reuse for matched variant; do not re-scan.
 
 ## Out Of Scope
 
@@ -249,52 +276,51 @@ change before finalization requires explicit regeneration. Decision:
 
 ## Related Files
 
+**Primary 6-Step Authorities:**
+- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/06_Tenant_Admin_Add_Product_6_Step_Contract.md]]
+- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Step3_Product_Type_Configuration_Specification.md]]
+- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step5_Product_Tracking_Specification.md]]
+- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_SIMPLE_Quantity_Opening_Stock_Outlet_Allocation_Specification.md]] (Part A: SIMPLE Quantity; Part B: VARIANT Quantity — canonical)
+- [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_6_Step_Permission_Matrix.md]]
+
+**Supporting Specifications:**
 - [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Setup_Scan_Barcode_Specification]]
 - [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]]
-- [[../../04_MODULE_KNOWLEDGE/12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification]]
-- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]]
-- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
+- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Product_Units_Pack_Conversion_Specification.md]]
+
+**Decisions:**
+- [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_6_STEP_RESTRUCTURING_DECISION_2026-09-20.md]]
 - [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]]
-- [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP1_DECISION_2026-08-24]]
-- [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
 
-### Bundle / Kit Flow
+**Legacy (Superseded):**
+- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/05_Tenant_Admin_Add_Product_7_Step_Contract]] (SUPERSEDED)
 
-The final canonical Bundle flow completely skips Step 4 (Unit & Pack). The exact user journey is:
+### LEGACY: Bundle / Kit Flow
 
+Bundle is marked LEGACY/DEFERRED and is **not exposed** in the current 6-step Product Setup UI.
+
+**Historical reference only:**
+
+Old flow (NOT current):
 ```text
 Step 1 — Scan Barcode
-        ↓
 Step 2 — Basic Details
-        ↓
 Step 3 — Product Type & Tracking
-        ↓
-Select Bundle / Kit
-        ↓
-Bundle parent inventory tracking forced OFF
-        ↓
 Step 4 — NOT_APPLICABLE (Unit & Pack)
-        ↓
-DIRECT
-Step 5 — Product Configuration
-        ↓
-Bundle / Kit Composition (+ identifiers)
-        ↓
+Step 5 — Product Configuration (Bundle Composition)
 Step 6 — Pricing & Tax
-        ↓
 Step 7 — Review & Create
 ```
 
-**Navigation Rules**:
-- BUNDLE: Step 3 → Step 5.
-- Step 4 is never rendered. It is fully `NOT_APPLICABLE`.
-- Back navigation from Step 5 returns to Step 3 for BUNDLE products.
+Backend capability is preserved. If Bundle must re-enter the UI, a separate decision and implementation is required.
+
+**Current active product types:** SIMPLE and VARIANT only.
 
 ---
 
-## Required Canonical Rule (Step 5 Variant Configuration)
+## Required Canonical Rule (Step 3 Variant Configuration)
 
-> In Tenant Admin Add Product Step 5 Variant Configuration, clicking Add Attribute opens Attribute Name and Values inputs. After entering one or more attributes and their values, clicking Generate Variants sends the configuration to the backend. The backend validates, persists the attributes and values, generates/reconciles canonical product variants, persists those variants in the database, and returns the persisted variant result to Flutter. Flutter immediately displays the returned variants on the same Step 5 page in a Generated Variants table containing only Variant and Action columns. Generated variants must survive reload/resume and must not be frontend-only temporary records. Final SKU/Barcode assignment is completed in the Step 5 identifier section (not a separate global Barcode & SKU step).
+> In Tenant Admin Add Product Step 3 Product Type & Configuration, clicking Add Attribute opens Attribute Name and Values inputs. After entering one or more attributes and their values, clicking Generate Variants sends the configuration to the backend. The backend validates, persists the attributes and values, generates/reconciles canonical product variants, persists those variants in the database, and returns the persisted variant result to Flutter. Flutter immediately displays the returned variants on the same Step 3 page in a Generated Variants table containing only Variant and Action columns. Generated variants must survive reload/resume and must not be frontend-only temporary records. Final SKU/Barcode assignment is completed in the Step 3 identifier section (not a separate global Barcode & SKU step).
 
 ## Required Canonical Rule (Save Draft vs Auto-Save)
 

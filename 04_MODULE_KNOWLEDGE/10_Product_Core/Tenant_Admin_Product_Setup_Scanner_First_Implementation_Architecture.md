@@ -12,9 +12,26 @@ Bridge between **canonical Product Setup business/technical contracts** and **Ba
 
 **DOCUMENTATION ONLY.** Does not implement code, create/apply EF migrations, or claim scanner-first work complete.
 
-Business authority: [[05_Tenant_Admin_Add_Product_7_Step_Contract]], [[Tenant_Admin_Product_Setup_Scan_Barcode_Specification]], [[Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]], [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_TECHNICAL_CONTRACT_DECISION_2026-09-12]], [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_WRITE_STAGE_MAPPING_DECISION_2026-09-13]].
+Business authority (TARGET): [[06_Tenant_Admin_Add_Product_6_Step_Contract.md]], [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_6_Step_Permission_Matrix.md]].
 
-## 2. Canonical wizard (LOCKED — do not reopen)
+Implementation specifications: [[Tenant_Admin_Product_Setup_Scan_Barcode_Specification]], [[Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]], [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_TECHNICAL_CONTRACT_DECISION_2026-09-12]], [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_WRITE_STAGE_MAPPING_DECISION_2026-09-13]].
+
+**Legacy authority (SUPERSEDED):** [[05_Tenant_Admin_Add_Product_7_Step_Contract.md]] — retained for implementation reference only.
+
+## 2. TARGET Wizard (6-Step — LOCKED 2026-09-20)
+
+1. Scan Barcode (**PRE-DRAFT**)  
+2. Basic Details  
+3. Product Type & Configuration  
+4. Pricing & Tax  
+5. Product Tracking (Optional)  
+6. Review & Create  
+
+Authority: [[06_Tenant_Admin_Add_Product_6_Step_Contract.md]].
+
+## 2a. CURRENT IMPLEMENTATION SNAPSHOT — TO BE RECONCILED IN CHUNK 3
+
+> The following CURRENT backend wizard describes the 7-step implementation reality. Do NOT treat as target contract.
 
 1. Scan Barcode (**PRE-DRAFT**)  
 2. Basic Details  

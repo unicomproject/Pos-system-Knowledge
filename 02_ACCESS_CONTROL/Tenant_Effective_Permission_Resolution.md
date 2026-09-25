@@ -190,4 +190,6 @@ Basis: [[CANONICAL_MODULE_FEATURE_PERMISSION_CATALOG_R1]] is the authoritative C
 registry and marks the 3-tier `catalog.*` rows R1_ACTIVE; [[Permission_Code_List]] defers to
 it on conflict. Decision: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_TECHNICAL_CONTRACT_DECISION_2026-09-12]] TD-9.
 
-See [[Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
+See [[Tenant_Admin_Add_Product_6_Step_Permission_Matrix.md]] (TARGET authority).
+
+**Legacy / Historical:** [[Tenant_Admin_Add_Product_7_Step_Permission_Matrix.md]] — SUPERSEDED; retained for migration reference only.

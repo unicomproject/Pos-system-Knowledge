@@ -1,10 +1,22 @@
 <!-- title: Tenant Admin Add Product 7-Step Permission Matrix -->
-<!-- status: Active -->
+<!-- status: SUPERSEDED (2026-09-20) -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-09-11 -->
-<!-- supersedes: pre_scanner_first_step_permission_numbering -->
+<!-- superseded_by: Tenant_Admin_Add_Product_6_Step_Permission_Matrix.md -->
 
-# Tenant Admin Add Product 7-Step Permission Matrix
+# ⚠️ SUPERSEDED — DO NOT USE
+
+**SUPERSEDED 2026-09-20**
+
+This document describes the previous 7-step Product Setup permission model.
+
+**CURRENT AUTHORITY:** `Tenant_Admin_Add_Product_6_Step_Permission_Matrix.md`
+
+Do not use this document for new Backend or Flutter implementation. This is retained for historical traceability only.
+
+---
+
+# Tenant Admin Add Product 7-Step Permission Matrix (HISTORICAL)
 
 ## 1. Purpose
 

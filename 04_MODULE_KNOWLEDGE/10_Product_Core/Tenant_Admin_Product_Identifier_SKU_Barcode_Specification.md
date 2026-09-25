@@ -14,9 +14,11 @@ It replaces the former standalone global stepper authority **“Step 5 — Barco
 
 | Concern | Canonical owner |
 |---|---|
-| Scan / acquire / validate / duplicate-discover / optional external discovery | **Global Step 1 — Scan Barcode** → [[Tenant_Admin_Product_Setup_Scan_Barcode_Specification]] |
-| Final sellable SKU & barcode assignment / reconciliation | **Global Step 5 — Product Configuration** (identifier section) |
-| Final revalidation | **Global Step 7 — Review & Create** |
+| Scan / acquire / validate / duplicate-discover / optional external discovery | **Step 1 — Scan Barcode** → [[Tenant_Admin_Product_Setup_Scan_Barcode_Specification]] |
+| Final sellable SKU & barcode configuration | **Step 3 — Product Type & Configuration** (TARGET — 6-step wizard): SIMPLE reuses Step 1 Primary Barcode; VARIANT assigns SKU/Barcode per included Variant in Step 3 identifier section |
+| Final revalidation | **Step 6 — Review & Create** |
+
+> **CURRENT IMPLEMENTATION SNAPSHOT — TO BE VERIFIED / RECONCILED IN CHUNK 3:** The current backend routes final SKU/Barcode assignment through the legacy Step 5 Product Configuration processor (`ApplyCompositeStep5Identifiers`). The TARGET is Step 3 configuration context. Physical routing reconciliation happens in Chunk 3 — do NOT prematurely change backend processors based on this target ownership statement.
 
 **Actor:** Tenant Admin / Catalog Manager with `catalog.barcodes.manage` for final mutations.  
 **Persistence tables:** `product_variants.sku`, `product_barcodes` (existing).  
@@ -30,17 +32,25 @@ Legacy filename redirect: [[Tenant_Admin_Product_Barcode_SKU_Specification]].
 
 ## 2. Canonical Global Wizard Context
 
+**TARGET — 6-Step Wizard (LOCKED 2026-09-20):**
+
 1. Scan Barcode  
 2. Basic Details  
-3. Product Type & Tracking  
-4. Unit & Pack Conversion  
-5. **Product Configuration** ← this document’s final identifier UI lives here  
-6. Pricing & Tax  
-7. Review & Create  
+3. **Product Type & Configuration** ← this document's SKU/Barcode configuration lives here (TARGET)  
+4. Pricing & Tax  
+5. Product Tracking (Optional)  
+6. Review & Create  
 
-Step 5 also owns VARIANT matrix / BUNDLE composition per existing Product Configuration authorities. Identifier work is a **section** of Step 5, not a separate global step.
+Step 3 owns VARIANT matrix / SIMPLE Unit+Packs per existing Product Type & Configuration authorities, plus identifier work as a **section** of Step 3, not a separate global step.
 
-**Entry to identifier section:** Steps 1–3 complete as applicable; Step 4 Unit & Pack when required; Product Configuration structure work complete for VARIANT/BUNDLE before identifier Continue.
+**Entry to identifier section (TARGET):** Steps 1–2 complete as applicable; Product Type confirmed and type-specific configuration (units/packs for SIMPLE; attribute matrix for VARIANT) complete before identifier assignment.
+
+> **CURRENT IMPLEMENTATION SNAPSHOT — TO BE VERIFIED / RECONCILED IN CHUNK 3:**
+>
+> Current backend wizard:
+> 1. Scan Barcode → 2. Basic Details → 3. Product Type & Tracking → 4. Unit & Pack Conversion → 5. Product Configuration (+ final identifiers) → 6. Pricing & Tax → 7. Review & Create
+>
+> Legacy Step 5 also owns VARIANT matrix / BUNDLE composition per existing Product Configuration authorities. Identifier work is a **section** of legacy Step 5. **Entry to identifier section (CURRENT):** Steps 1–3 complete as applicable; Step 4 Unit & Pack when required; Product Configuration structure work complete for VARIANT/BUNDLE before identifier Continue.
 
 ---
 
@@ -50,7 +60,7 @@ Step 5 also owns VARIANT matrix / BUNDLE composition per existing Product Config
 |---|---|---|---|
 | **SIMPLE** | One default variant | `product_variants.sku` | Primary barcode on that variant |
 | **BUNDLE** | One kit parent default variant | Same as SIMPLE | Same as SIMPLE |
-| **VARIANT** | Every **included / sellable** Step 5 variant | Per-variant `product_variants.sku` | One primary barcode per variant (optional on Continue) |
+| **VARIANT** | Every **included / sellable** Variant | Per-variant `product_variants.sku` | One primary barcode per variant (optional on Continue) |
 
 `products.product_code` is Internal Code (Basic Details), **not** SKU.
 
@@ -58,25 +68,29 @@ Step 5 also owns VARIANT matrix / BUNDLE composition per existing Product Config
 
 ---
 
-## 4. Step 1 → Step 5 Identifier Reconciliation (LOCKED)
+## 4. Step 1 → Step 3 Identifier Reconciliation
+
+> **TARGET:** Identifier reconciliation between Step 1 (Scan Barcode) and Step 3 (Product Type & Configuration). The CURRENT BACKEND routes this through the legacy Step 5 Product Configuration processor — reconciliation in Chunk 3.
 
 | Structure | Rule |
 |---|---|
 | **SIMPLE** | Default sellable variant identity exists; required unique SKU; Step 1 no-barcode AUTO base becomes the final SKU unchanged; optional barcode/GTIN remains independently assigned |
 | **VARIANT** | Every included sellable variant requires a unique SKU; Step 1 AUTO base is extended server-side with each variant's ordered stable value codes; one GTIN cannot belong to multiple variants; a Step 1 scanned GTIN must be **explicitly assigned** to the correct sellable variant **or intentionally left unused** |
-| **BUNDLE** | Preserve existing SIMPLE-like parent identifier behaviour inside Step 5; no extra global step |
+| **BUNDLE** | **LEGACY / DEFERRED** — Bundle is not in the active 6-step TARGET wizard. Preserve existing SIMPLE-like parent identifier behaviour in CURRENT BACKEND; no extra global step. See LEGACY/DEFERRED BUNDLE SUPPORT section below. |
 
 ---
 
-## 5. VARIANT Identifier Journey (inside Step 5)
+## 5. VARIANT Identifier Journey (inside Step 3 Product Type & Configuration)
 
-1. User completes variant matrix + Include Variant (Product Configuration).
+> **TARGET:** Identifier assignment is a section within Step 3 Product Type & Configuration. The CURRENT BACKEND implements this inside the legacy Step 5 Product Configuration processor.
+
+1. User completes variant matrix + Include Variant (Product Type & Configuration).
 2. Identifier section loads all included variants as targets.
 3. In AUTO mode, the backend composes every included variant SKU from the one Product base plus ordered persisted Variant Value codes. In MANUAL mode, the user enters SKU per variant. Barcode remains optional and explicitly assigned.
 4. HID scanner may fill the focused barcode field; trailing Enter completes one logical scan.
 5. Save Draft may leave rows incomplete.
 6. Save & Continue requires every included variant to have non-empty SKU, uniqueness, ownership, and barcode format when barcode present.
-7. On success, wizard advances to Step 6 (Pricing & Tax).
+7. On success, wizard advances to **Step 4 (Pricing & Tax)** (TARGET). CURRENT BACKEND: advances to Step 6.
 
 **Explicit non-goals for VARIANT R1 identifier table:**
 - No silent SKU generation for every variant from one seed.
@@ -89,10 +103,10 @@ Step 5 also owns VARIANT matrix / BUNDLE composition per existing Product Config
 ## 6. VARIANT UI Contract (Table-First)
 
 ### 6.1 Header
-- Title: `SKU & Barcode — Variant Product` (section title inside Product Configuration)
+- Title: `SKU & Barcode — Variant Product` (section title inside Product Type & Configuration)
 - Subtitle: `Assign SKU and barcode to each variant.`
 - Search / Status filter / Completion summary
-- Retain Tenant Admin shell, **7-step** stepper (Scan Barcode … Review & Create), wizard footer, OneVerz tokens
+- Retain Tenant Admin shell, **6-step** stepper (Scan Barcode … Review & Create), wizard footer, OneVerz tokens
 
 ### 6.2 Table columns
 Select (UI-only) · Variant · SKU · Barcode · Status · Actions
@@ -192,7 +206,7 @@ Save Draft: barcode optional. Save & Continue: barcode optional. If present: typ
 Flutter may mirror for UX only.
 
 ### 8.5 Scanner (identifier section)
-HID keyboard wedge first. Focus field → characters → trailing Enter → one logical edit. No save-per-keystroke. Step 1 acquisition remains the primary scanner-first entry; Step 5 scanning is correction/assignment.
+HID keyboard wedge first. Focus field → characters → trailing Enter → one logical edit. No save-per-keystroke. Step 1 acquisition remains the primary scanner-first entry; identifier section scanning (TARGET: Step 3; CURRENT BACKEND: Step 5 Product Configuration) is correction/assignment.
 
 ---
 
@@ -222,7 +236,7 @@ Endpoint remains unified draft:
 }
 ```
 
-`currentSetupStep: 5` now means **Product Configuration** (including identifiers), not a standalone Barcode & SKU step.
+> **CURRENT IMPLEMENTATION SNAPSHOT:** `currentSetupStep: 5` maps to **Product Configuration** (including identifiers) in the CURRENT BACKEND processor. The TARGET 6-step wizard assigns identifier configuration to Step 3. Do not renumber this `currentSetupStep` constant until Chunk 3 backend reconciliation.
 
 Duplicate conflicts: HTTP **409** with `product.duplicate_sku` / `product.duplicate_barcode` and safe same-tenant conflict metadata only.
 
@@ -239,7 +253,7 @@ Obsolete: top-level `variantIdentifiers` as live shape.
 | Malformed / foreign variant IDs | Reject | Reject |
 | Duplicate SKU/barcode | Reject (or 409) | Reject (or 409) |
 | Invalid barcode format when present | Reject | Reject |
-| Step advance | Stay on 5 | Advance to 6 on success |
+| Step advance | Stay on 5 (CURRENT BACKEND) | Advance to Step 4 (TARGET Pricing & Tax) / Step 6 (CURRENT BACKEND Pricing & Tax) on success |
 | Concurrency | `expectedRowVersion` | same |
 
 Coverage algorithm unchanged in spirit: load authoritative included variants → reconcile assignments → require SKU coverage → bulk uniqueness → ownership → atomic persist.
@@ -275,7 +289,11 @@ In-request Ordinal checks + bulk DB queries + DB unique constraints as final rac
 
 ---
 
-## 14. SIMPLE / BUNDLE
+## LEGACY / DEFERRED BUNDLE SUPPORT
+
+> Bundle identifier support is **LEGACY / DEFERRED** in the 6-step TARGET wizard. Bundle is not an active Product Type option in the TARGET UI. The following documents CURRENT BACKEND behaviour and must be preserved for Chunk 3 reconciliation.
+
+## 14. SIMPLE / BUNDLE (CURRENT BACKEND)
 
 One SKU + optional parent/variant barcode. Same uniqueness/type/string rules. No-barcode path may prefill generated SKU candidate once.
 

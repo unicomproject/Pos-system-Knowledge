@@ -1,8 +1,9 @@
 <!-- title: Product Core Technical Contract -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-09-13 -->
+<!-- last_updated: 2026-09-24 -->
 <!-- supersedes: old_step4_bundle_step5_standalone_barcode_numbering -->
+<!-- extended: 2026-09-24 — VARIANT Quantity stock ownership & per-Variant reconciliation added -->
 
 # Product Core Technical Contract
 
@@ -12,12 +13,52 @@ Defines the technical implementation contract for `Product_Core` in the OneVerz 
 
 **Implementation ownership bridge (Chunk 3):** layer/folder/service/Flutter sequences live in [[Tenant_Admin_Product_Setup_Scanner_First_Implementation_Architecture]] — do not duplicate architecture here. API field contracts remain in this document + [[../../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]]. Write-stage numbering: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_WRITE_STAGE_MAPPING_DECISION_2026-09-13]].
 
+## TARGET CONTRACT (6-Step Wizard — LOCKED 2026-09-20)
+
+The canonical TARGET Product Setup public wizard:
+
+| Step | Name | Target API Responsibility |
+|---:|---|---|
+| 1 | Scan Barcode | Pre-draft acquisition; `POST .../barcodes/resolve`; `POST .../barcodes/external-lookup`; `POST .../sku-candidates/generate`; no product row created |
+| 2 | Basic Details | Product name, category, brand, description, images, channel visibility |
+| 3 | Product Type & Configuration | Product structure selection; SIMPLE: Unit/Packs/SKU; VARIANT: Attribute Matrix + Variant SKU/Barcode |
+| 4 | Pricing & Tax | Selling price + tax class |
+| 5 | Product Tracking | **OPTIONAL.** Quantity → Opening Stock + Outlet Allocation. Batch → Initial Batch identity. Batch + Expiry → Initial Batch + Expiry identity. Skip → no tracking. |
+| 6 | Review & Create | Full review; atomic publish via `POST .../publish` |
+
+**Target Step 5 requirements:**
+- Quantity (SIMPLE): Opening Stock (required, >= 0) + Outlet Allocation (sum = Opening Stock if > 0). Creates initial stock.
+- Quantity (VARIANT): Per-Variant Opening Stock (each >= 0) + per-Variant Outlet Allocation. Per-Variant exact reconciliation required. Product-total is informational only. Creates initial stock per Variant.
+  - Each sellable ProductVariant is an independent stock owner. (IMPLEMENTATION VERIFICATION REQUIRED for actual DTO/service names)
+  - Tracking policy is product-level. Mixed tracking per Variant is NOT supported.
+  - Opening Stock must reuse existing ProductVariants from Step 3. No new Variants at stock time.
+  - Draft stores per-Variant intent only; no inventory mutations until publish.
+  - Publish must deliver per-Variant opening stock to existing Inventory domain service. (IMPLEMENTATION VERIFICATION REQUIRED)
+  - Tenant isolation enforced on all per-Variant and per-Outlet queries.
+  - Actor-specific Outlet authorization required per existing permission architecture. (IMPLEMENTATION VERIFICATION REQUIRED)
+- Batch: Initial Batch identity only (no stock creation).
+- Batch + Expiry: Initial Batch + Expiry identity only (no stock creation).
+- Serial: LEGACY/DEFERRED — not in active 6-step UI.
+- Skip: No tracking configured. Not a tracking method.
+
+Authority: [[../../04_MODULE_KNOWLEDGE/10_Product_Core/06_Tenant_Admin_Add_Product_6_Step_Contract.md]], [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_6_Step_Permission_Matrix.md]].
+
+Detailed Quantity specification: [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_SIMPLE_Quantity_Opening_Stock_Outlet_Allocation_Specification.md]] (Part A: SIMPLE; Part B: VARIANT)
+
+---
+
+## CURRENT IMPLEMENTATION SNAPSHOT
+
+> **⚠ TO BE VERIFIED / RECONCILED IN CHUNK 3 BACKEND AUDIT**
+>
+> The following describes the CURRENT backend implementation reality. Do NOT treat this as the target business contract. Do NOT prematurely change processor constants, DTOs, physical storage, DB constraints, or route implementation based on this section.
+
 ## API Contract
 
 | Area | Contract |
 |---|---|
 | API groups | `/api/v1/tenant-admin/products`, **`/api/v1/tenant-admin/products/draft`** (canonical wizard DRAFT create), `/api/v1/tenant-admin/products/{id}/setup`, `/api/v1/tenant-admin/products/{id}/draft`, **IMPLEMENTED** `/api/v1/tenant-admin/products/barcodes/resolve` (B4), **IMPLEMENTED** `/api/v1/tenant-admin/products/barcodes/external-lookup` (B7; no tenant duplicate checking), **IMPLEMENTED** `/api/v1/tenant-admin/products/sku-candidates/generate` (B5), `/api/v1/pos/products`, `/api/v1/storefront/products` |
-| Draft API Pipeline | **Create:** `POST /api/v1/tenant-admin/products/draft` (creation-path from Step 1; lands at `current_setup_step = 2`). **Update:** single `PUT /api/v1/tenant-admin/products/{productId}/draft` supporting polymorphic step graph payloads (`currentSetupStep=2..7` for scanner-first). Step 3 carries `initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber` after Product Type is selected. Step 5 carries Product Configuration + identifier graph. `POST /api/v1/tenant-admin/products` is direct/legacy graph create — **not** wizard draft bootstrap. **Write routing:** scanner-first drafts use a centralized mapper (API step → legacy `ProductWizardStage` processor); do not globally renumber processor constants; Step 5 is SPECIAL/COMPOSITE (not `±1`). |
+| Draft API Pipeline | **CURRENT IMPLEMENTATION:** `POST /api/v1/tenant-admin/products/draft` (creation-path from Step 1; lands at `current_setup_step = 2`). **Update:** single `PUT /api/v1/tenant-admin/products/{productId}/draft` supporting polymorphic step graph payloads (`currentSetupStep=2..7` for scanner-first). **CURRENT:** Step 3 carries `initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber` after Product Type is selected. **CURRENT:** Step 5 carries Product Configuration + identifier graph. `POST /api/v1/tenant-admin/products` is direct/legacy graph create — **not** wizard draft bootstrap. **Write routing:** scanner-first drafts use a centralized mapper (API step → legacy `ProductWizardStage` processor); do not globally renumber processor constants; Step 5 is SPECIAL/COMPOSITE (not `±1`). **These currentSetupStep=2..7 values, Step 3 tracking payload, and Step 5 Product Configuration payload describe CURRENT backend implementation — TARGET is 6-step; reconciliation in Chunk 3.** |
 | Request format | Typed request DTOs (`SaveProductDraftRequest`); step-specific graphs passed via polymorphic payload structures. |
 | Response format | Typed `ProductDraftResponse` and `ProductSetupWizardDto` with full setup projections. |
 | Tenant context | Resolved server-side for tenant-owned records. |
@@ -154,16 +195,25 @@ and publish never allocate. Authority:
 
 ## Related Specifications
 
+**Current TARGET authorities (6-step):**
+- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/06_Tenant_Admin_Add_Product_6_Step_Contract.md]] — PRIMARY contract
+- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Step3_Product_Type_Configuration_Specification.md]] — Step 3 TARGET
+- [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step5_Product_Tracking_Specification.md]] — Step 5 TARGET
+- [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_6_Step_Permission_Matrix.md]] — Permission TARGET
 - [[../12_Product_Option_Variant_Configuration/Tenant_Admin_Product_Variant_Configuration_Specification]]
-- [[Tenant_Admin_Product_Type_Tracking_Specification]]
 - [[Tenant_Admin_Product_Units_Pack_Conversion_Specification]]
 - [[Tenant_Admin_Product_Setup_Scan_Barcode_Specification]]
 - [[Tenant_Admin_Product_Identifier_SKU_Barcode_Specification]]
-- [[05_Tenant_Admin_Add_Product_7_Step_Contract]]
-- [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
 - [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_STEP1_DECISION_2026-09-11]]
 - [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_WRITE_STAGE_MAPPING_DECISION_2026-09-13]]
-- [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]]
+- [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_6_STEP_RESTRUCTURING_DECISION_2026-09-20.md]]
+
+**Legacy / Historical (do NOT use as current target authority):**
+- [[Tenant_Admin_Product_Type_Tracking_Specification.md]] — SUPERSEDED
+- [[05_Tenant_Admin_Add_Product_7_Step_Contract.md]] — SUPERSEDED
+- [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification.md]] — SUPERSEDED as active tracking authority; retained for migration reference
+- [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix.md]] — SUPERSEDED; retained for migration reference
+- [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_INITIAL_TRACKING_DETAILS_STEP2_COLLECTION_DECISION_2026-09-01]] — historical decision
 
 ## Bundle Technical Contract
 
@@ -215,7 +265,7 @@ Persisted mutations must trigger exact audit event names:
 Metadata: `tenantId`, `ProductId`, `ComboDefinitionId`, `ComponentProductId`, `ComponentVariantId`, old quantity, new quantity, actor, timestamp, `rowVersion`. Unsaved drawer changes are not audited.
 
 ### NFR (Non-Functional Requirements)
-- **Security**: Strict tenant isolation, server-side permissions/entitlement, Outlet authorization, no stock/cost leakage. Never trust client available stock or tracking type; server re-resolves them. Product Setup permission authority: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
+- **Security**: Strict tenant isolation, server-side permissions/entitlement, Outlet authorization, no stock/cost leakage. Never trust client available stock or tracking type; server re-resolves them. Product Setup permission authority (TARGET): [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_6_Step_Permission_Matrix.md]]. Legacy/historical: [[../../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix.md]] (SUPERSEDED; retained for migration reference).
 - **Performance**: Server-side paginated search, debounce, request cancellation. Avoid N+1 queries; batched inventory lookups only.
 - **Reliability**: Failed API does not clear local components. Failed Save does not advance.
 - **Consistency**: Final POS sale must revalidate actual inventory transactionally.

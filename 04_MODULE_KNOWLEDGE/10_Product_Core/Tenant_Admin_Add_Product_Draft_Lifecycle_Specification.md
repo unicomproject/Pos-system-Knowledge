@@ -19,29 +19,73 @@
 | Fresh persisted draft after those transitions | **`current_setup_step = 2` (Basic Details)** — scanner-first public semantics; never persist legacy processor `1` for a fresh scanner draft |
 | Pure Step 1 pre-draft UI | No auto-save against a Product ID |
 
-## 1. Core Concept & Separation of States
-The Add Product Wizard operates on a persistent backend draft system, specifically separating two distinct states to prevent data loss while keeping the canonical Product List clean. **Draft states apply only after a Product ID exists** (post Step 1 creation-path).
+## 1. Core Concept & Persistence Lifecycle (Canonicalized 2026-09-19)
 
-### State A — IN-PROGRESS / HIDDEN (Auto-Save)
-*   **Trigger:** Automatically triggered in the background as the user types or alters fields (debounced) on Steps 2–7.
-*   **Backend Behavior:** Calls `SaveOrUpdateDraftAsync` with `wizardAction: null`.
-*   **Database Implication:** Persists the entered data and updates the wizard progress, but explicitly leaves `DraftSavedAt = null`.
-*   **Visibility:** Because `DraftSavedAt` is null, the product remains **HIDDEN** from the main Product List. 
-*   **Purpose:** Ensures the user can navigate away to other screens (e.g., Inventory, Dashboard) and return later to find all their work intact without having explicitly saved it.
+The Add Product Wizard separates three distinct persistence states to prevent data loss while maintaining clean Product semantics. **Product ID exists only after explicit user action** (post Step 1 creation-path and explicit Save Draft).
 
-### State B — DRAFT / VISIBLE (Explicit Save Draft)
-*   **Trigger:** The user explicitly clicks the physical "Save Draft" button (after a draft exists).
-*   **Backend Behavior:** Calls `SaveOrUpdateDraftAsync` with `wizardAction: 'SAVE_DRAFT'`.
-*   **Database Implication:** Explicitly sets `DraftSavedAt = DateTime.UtcNow`.
+### State A — LOCAL_UNSAVED (Client-Session Owned)
+
+*   **Trigger:** Normal wizard interaction: typing fields, navigating steps, generating variants, selecting images, entering pricing/tax.
+*   **Backend Behavior:** ZERO server writes. All state remains in client/session storage.
+*   **Database Implication:** **No Product row is created.** No backend mutation occurs.
+*   **Visibility:** Product does not appear in Product List. No Product database entry exists.
+*   **Duration:** Persists across wizard steps and module navigation (same tenant, same user, same session).
+*   **Scope:** Client/session/device-owned state keyed by tenant ID + user ID + wizard identity.
+*   **Purpose:** Allow full Product Setup completion without committing to backend until user chooses to Save Draft or Create Product.
+
+Actions within LOCAL_UNSAVED (NO server writes):
+- Entering/editing product name, category, brand, descriptions
+- Back, Continue, Skip (when eligible)
+- Generate variants (remain local with `clientCombinationKey`)
+- Entering SKU/barcode values
+- Selecting/reordering images (local preview only)
+- Entering pricing and tax values
+- Selecting channel visibility flags
+- Module navigation (Dashboard, Inventory, etc.)
+- Returning to wizard from another module
+
+### State B — EXPLICIT_DRAFT (Server-Owned DRAFT Product)
+
+*   **Trigger:** User explicitly clicks `Save Draft` button.
+*   **Backend Behavior:** `PUT /api/v1/tenant-admin/products/{id}/draft` with `wizardAction: 'SAVE_DRAFT'` (or direct POST for fresh draft). Does NOT advance `current_setup_step` automatically.
+*   **Database Implication:** Creates or updates Product row with `status = 'DRAFT'`. Sets `DraftSavedAt = DateTime.UtcNow`.
 *   **Visibility:** Because `DraftSavedAt` has a timestamp, the product becomes **VISIBLE** in the Product List with the `DRAFT` status badge.
-*   **Purpose:** Acknowledges the user's intent to keep this as an official, trackable draft.
+*   **Product ID:** Persisted DRAFT has a stable Product ID for subsequent operations.
+*   **Purpose:** User's explicit intent to keep a trackable server-side draft for resumption across devices/sessions.
+*   **Note:** Do NOT automatically advance step; do NOT auto-mark as published; do NOT create DRAFT merely because user clicked Continue/Skip.
 
-## 2. Save & Continue vs Final Create
+### State C — PUBLISHED (Final Active Product)
 
-*   **Save & Continue:** Validates the current step, persists it, and advances the `CurrentSetupStep`. It does NOT mark the product as an explicit visible Draft unless the user explicitly requested it. It sends `wizardAction: 'SAVE_AND_CONTINUE'`.
-*   **Final Review & Create:** Applies full canonical validation rules (variants, SKU/barcode identifiers, pricing, tax). Only upon passing does it finalize the product, marking `PublishedAt = DateTime.UtcNow` and changing the status to Active/Inactive.
+*   **Trigger:** User clicks `Create Product` on Review & Create step.
+*   **Backend Behavior:** `POST /api/v1/tenant-admin/products/{id}/publish` (or endpoint appropriate for final creation). Atomically validates full wizard graph and publishes product.
+*   **Database Implication:** Updates existing DRAFT Product to `status = 'ACTIVE'` (or `'INACTIVE'` per desired publish status), sets `PublishedAt = DateTime.UtcNow`.
+*   **Product Lifecycle:** Product is now final and appears in active Product List/catalog.
+*   **No Prior Draft Required:** Direct flow from LOCAL_UNSAVED → PUBLISHED is supported (atomic backend validation on all 6 steps — TARGET; current backend validates 7-step pipeline).
+*   **Purpose:** Final commitment to product creation/publication.
 
-## 2.1 `current_setup_step` Semantics (LOCKED — scanner-first)
+## 2. Continue, Skip, and Save & Continue Semantics (Canonicalized 2026-09-19)
+
+*   **Continue / Next:** Local wizard step navigation only. Does NOT call `saveAndContinue`. Does NOT persist to backend. Validates current step locally and advances wizard step. Uses existing canonical step-routing logic (e.g., Step 4 bypass for BUNDLE). All state preserved in LOCAL_UNSAVED session.
+*   **Skip:** When applicable, local wizard step navigation only. Marks step as intentionally skipped in local state. Does NOT persist to backend. Does NOT call Save Draft. Follows canonical step-routing for skipped steps. All state preserved in LOCAL_UNSAVED session.
+*   **Save Draft:** Explicit server persistence. Consumes latest LOCAL_UNSAVED snapshot and persists to EXPLICIT_DRAFT. Does NOT auto-advance wizard step.
+*   **Save & Continue (DEPRECATED SEMANTICS):** The old "Save & Continue" endpoint behavior persists in backend for backward compatibility with legacy clients. Current Product Setup must NOT invoke it. Use `Continue` (local) followed by explicit `Save Draft` (server) as separate operations.
+
+## 2.1 `current_setup_step` Semantics
+
+**TARGET (6-step wizard — LOCKED 2026-09-20):**
+
+| Value | Meaning |
+|---:|---|
+| 1 | Scan Barcode (pre-draft; persisted drafts rarely park here) |
+| 2 | Basic Details |
+| 3 | Product Type & Configuration |
+| 4 | Pricing & Tax |
+| 5 | Product Tracking (Optional) |
+| 6 | Review & Create |
+
+**CURRENT IMPLEMENTATION SNAPSHOT — TO BE RECONCILED IN CHUNK 3:**
+
+> The backend currently uses the following scanner-first step numbering (7-step). Do not prematurely renumber backend processor constants.
 
 | Value | Meaning |
 |---:|---|
@@ -53,7 +97,9 @@ The Add Product Wizard operates on a persistent backend draft system, specifical
 | 6 | Pricing & Tax |
 | 7 | Review & Create |
 
-### Legacy draft migration mapping (D11)
+### Legacy draft migration mapping (D11) — LEGACY REFERENCE
+
+> The following mapping documents how legacy (pre-scanner-first) `current_setup_step` values map to current values. This is LEGACY REFERENCE only — do not use for TARGET 6-step planning.
 
 | Old `current_setup_step` meaning | New mapping |
 |---|---|
@@ -63,7 +109,7 @@ The Add Product Wizard operates on a persistent backend draft system, specifical
 | 4 Product Configuration | 5 Product Configuration |
 | 5 Barcode & SKU | 5 Product Configuration (identifier section) |
 | 6 Pricing & Tax | 6 Pricing & Tax |
-| 7 Review & Create | 7 Review & Create |
+| 7 Review & Create | 7 Review & Create (CURRENT) / 6 Review & Create (TARGET 6-step) |
 
 **Where remapping happens (LOCKED 2026-09-12):** a **read-time compatibility layer in
 `GET /api/v1/tenant-admin/products/{id}/setup`** — **not** a destructive data migration.
@@ -102,17 +148,65 @@ Public/persisted scanner-first `current_setup_step` values **must not** be force
 
 Authority: [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_SCANNER_FIRST_WRITE_STAGE_MAPPING_DECISION_2026-09-13]].
 
-## 3. Resume & Restoration
-Whenever an In-Progress or Explicit Draft is resumed, the wizard MUST restore:
-*   The exact `CurrentSetupStep` the user was on (**after** legacy remapping when applicable).
-*   All previously entered data, including generated variants, taxes, image ordering, Initial Tracking Details on **EXISTING** `product_setup_initial_tracking` (`initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`, plus VARIANT `initialTrackingAssignedVariantId` when set), and scan context when present (schema IMPLEMENTED; population **IMPLEMENTED B8**).
-*   If Step 3 already cleared incompatible tracking values after explicit confirmation, restore the **normalized** values. Do not resurrect discarded identities.
+## 3. Resume, Recovery & Local Session Architecture (Canonicalized 2026-09-19)
+
+The wizard must support two distinct recovery scenarios:
+
+### 3.1 LOCAL_UNSAVED Session Recovery (Same Session, Same Tenant/User)
+
+When a user:
+1. Enters Product Setup data (LOCAL_UNSAVED state)
+2. Does NOT click Save Draft
+3. Navigates to another Tenant Admin module (Inventory, Dashboard, etc.)
+4. Returns to Product Setup
+
+The following restoration must occur WITHOUT creating a server Product row:
+
+*   **Flutter/Client Ownership:** Local wizard state persists via `AddProductWizardState` + product-setup local datasource/cache. Scoped by tenant ID + user ID + wizard identity to prevent leakage.
+*   **Restored Data:** All currently-entered fields, generated variants (with `clientCombinationKey`), selected images (local preview only), SKU/barcode values, pricing/tax, current step, skip state.
+*   **Storage Location:** Platform-appropriate local storage (`SharedPreferences` on Flutter; device/session scope; cleared on logout/tenant switch).
+*   **Duration:** Persists across module navigation within same session. DOES NOT persist across app restart/logout/tenant switch (those are new sessions).
+*   **Success Criterion:** User returns to wizard on exact step with exact entered data, without loss.
+
+### 3.2 EXPLICIT_DRAFT Resume (Across Devices/Sessions)
+
+When an EXPLICIT_DRAFT product is opened from Product List:
+
+1. Backend returns authoritative server DRAFT via `GET /api/v1/tenant-admin/products/{id}/setup`.
+2. Client checks for newer local unsaved overlay for same tenant/user/Product ID in current session.
+3. If newer local state exists: restore that safely on top of server DRAFT without auto-PUT.
+4. If no local overlay: restore server DRAFT as-is.
+5. Save Draft explicitly persists overlay when user chooses.
+6. Create Product may consume latest merged state directly.
+
+### 3.3 Resume & Restoration — EXPLICIT_DRAFT State
+
+Whenever an EXPLICIT_DRAFT is resumed (from server), the wizard MUST restore:
+*   The exact `CurrentSetupStep` the DRAFT was on (**after** legacy remapping when applicable).
+*   All previously persisted data from steps 1–6.
+*   Generated variants with stable `clientCombinationKey` and any `productVariantId` assignments.
+*   Initial Tracking Details from **EXISTING** `product_setup_initial_tracking` (`initialBatchNumber`, `initialExpiryDate`, `initialSerialNumber`, plus VARIANT `initialTrackingAssignedVariantId` when set).
+*   Scan context metadata when present (schema IMPLEMENTED; hydration IMPLEMENTED).
+*   If Step 3 previously cleared incompatible tracking values after user confirmation, restore the **normalized** values. Do not resurrect discarded identities.
 *   Tenant isolation is enforced strictly on all reads and writes.
 
-CURRENT: Basic Details (Step 2) draft persists on `products` master columns. Provisional Batch/Expiry/Serial live on **EXISTING** `product_setup_initial_tracking` (migration `20260824095742_AddProductSetupInitialTracking`) and are collected on Step 3. `product_setup_scan_context` **schema is IMPLEMENTED by B1** (`20260912085454_AddProductSetupScannerIdentifierContext`; local test DB verified; prod/shared apply not claimed). Actual scanner creation-path persistence is **B8 IMPLEMENTED** (`scanBootstrap` on `POST .../draft`; `ScannerFirstWizardStageMapper`; persist step 2). Setup hydration / legacy **read** remap is **B9 IMPLEMENTED** (`ScannerFirstSetupReadMapper` on `GET .../setup`; **PURE READ** — missing POS/ONLINE channel rows projected in memory only; no historical rewrite; no channel auto-provision on GET). Scanner-first composite Step 5 final identifiers are **B10 IMPLEMENTED**. **Steps 2–4 & 6 draft backends are IMPLEMENTED** (2026-09-13 reality audit); Step 5 VARIANT/SIMPLE+IDs IMPLEMENTED; **BUNDLE component graph remains PARTIAL**. B1 did **not** implement draft-bootstrap write behavior.
-
-EXISTING Initial Tracking: persist via the existing `PUT .../draft` pipeline. Do not write `product_batches` / `serial_numbers` until Step 7 Publish. See [[Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]. Scan context: [[Tenant_Admin_Product_Setup_Scan_Barcode_Specification]]. **Do not** include `product_setup_initial_tracking` in scanner-first B1.
+**CURRENT IMPLEMENTATION STATUS:**  
+Basic Details persists on `products` master columns. Batch/Expiry/Serial draft values live on **EXISTING** `product_setup_initial_tracking` (migration `20260824095742_AddProductSetupInitialTracking`). `product_setup_scan_context` **schema IMPLEMENTED B1** (migration `20260912085454_AddProductSetupScannerIdentifierContext`); setup hydration **IMPLEMENTED B9**. Steps 2–4 & 6 EXPLICIT_DRAFT backends IMPLEMENTED; Step 5 VARIANT/SIMPLE+identifiers IMPLEMENTED; **BUNDLE component graph PARTIAL**. **LOCAL_UNSAVED session recovery architecture (§3.1) requires Flutter implementation (not backend).**
 
 ## 4. Concurrency & Idempotency
-*   The system uses `ExpectedRowVersion` for optimistic concurrency. If a draft is updated in two different tabs simultaneously, the older tab will gracefully reject the save to prevent silent data corruption.
-*   Clicking "Save Draft" repeatedly does not create duplicate database rows. It idempotently updates the exact same Wizard Identity (`ProductId`).
+
+### 4.1 LOCAL_UNSAVED State
+- Concurrency is not applicable (no server writes occur).
+- Local state updates are sequential within a session.
+- Multiple Flutter rebuilds or field edits do not trigger server calls.
+
+### 4.2 EXPLICIT_DRAFT State — Save Draft Concurrency
+- The system uses `ExpectedRowVersion` for optimistic concurrency.
+- If a draft is updated by two different authenticated sessions simultaneously, the older session will gracefully reject the Save Draft request with HTTP 409 Conflict.
+- Response returns latest server `rowVersion` and updated draft state for reload.
+- Clicking "Save Draft" repeatedly does not create duplicate database rows. It idempotently updates the exact same Wizard Identity (`ProductId`).
+
+### 4.3 PUBLISHED State — Final Create
+- Atomic transaction validates full wizard graph and publishes in one operation.
+- Concurrency checks on Product row version prevent stale Create commands.
+- Failure to publish due to concurrency preserves local state and EXPLICIT_DRAFT (if prior save occurred).
