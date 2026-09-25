@@ -216,14 +216,19 @@ Platform APIs require platform JWT authentication and explicit canonical `platfo
 - [[../05_BACKEND_ARCHITECTURE/API_Standards]]
 - [[../05_BACKEND_ARCHITECTURE/Error_Response_Standards]]
 
-### Exact Permission Matrix for Bundles
-Candidate search endpoint (`GET /api/v1/tenant-admin/products/{productId}/bundle-component-candidates`) and **Step 5 Bundle/Product Configuration** endpoints have exact authorization:
+**Product Setup entitlement (LOCKED):** runtime entitlement is **`product_catalog` only**. `product_management` is the platform/module grouping label (`platform_modules.module_code`) and is **not** a runtime Product Setup entitlement check. Do not introduce dual entitlement authority. Authority: [[Feature_Entitlement_Matrix]], [[Tenant_Admin_Add_Product_6_Step_Permission_Matrix.md]], [[../00_START_HERE/Current_Source_Of_Truth]].
+
+### CURRENT / LEGACY BACKEND CAPABILITY
+
+> The following Bundle endpoint authorization facts describe **CURRENT backend implementation**. Bundle is LEGACY/DEFERRED in the active 6-step Product Setup UI. These authorization rules remain valid for the existing backend Bundle API capability until formally retired.
+
+**Product Setup Step 5 Bundle/Product Configuration endpoints (CURRENT LEGACY BACKEND):** Candidate search endpoint (`GET /api/v1/tenant-admin/products/{productId}/bundle-component-candidates`) and **CURRENT Step 5 Bundle/Product Configuration** endpoints have exact authorization:
 - `catalog.combo_components.manage` is required for modifications.
 - `catalog.products.update` (or `create`) is required depending on the draft state.
 - Cost must NOT leak without `catalog.product_cost.view`.
 - Stock must NOT leak without `inventory.stock.view`.
 
-**Product Setup entitlement (LOCKED):** runtime entitlement is **`product_catalog` only**. `product_management` is the platform/module grouping label (`platform_modules.module_code`) and is **not** a runtime Product Setup entitlement check. Do not introduce dual entitlement authority. Authority: [[Feature_Entitlement_Matrix]], [[Tenant_Admin_Add_Product_7_Step_Permission_Matrix]], [[../00_START_HERE/Current_Source_Of_Truth]].
+These endpoints are NOT part of the current 6-step TARGET user journey for Product Tracking (Step 5). See [[Tenant_Admin_Add_Product_6_Step_Permission_Matrix.md]] for TARGET authorization.
 <!-- RBAC_HARDENING_2026_08_15_START -->
 ## Historical Tenant RBAC Authorization Addendum - 2026-08-15
 

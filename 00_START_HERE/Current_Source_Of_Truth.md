@@ -275,6 +275,54 @@ Payment Method Customer card provides re-entry to edit or clear the customer.
 Second Brain is READY/CANONICALIZED; existing backend APIs are reused with deterministic exact
 normalized-phone behaviour; no database change is required.
 
+## Tenant Admin Product Setup Wizard (6-Step, Effective 2026-09-20)
+
+**UPDATED:** Product Setup restructured from 7 steps to **6 steps** (effective 2026-09-20).
+
+**Canonical Authority:**
+[[../04_MODULE_KNOWLEDGE/10_Product_Core/06_Tenant_Admin_Add_Product_6_Step_Contract.md]]
+
+The **6-step wizard** uses three-state persistence model:
+
+| State | Ownership | Trigger | Backend Write | Visibility | Purpose |
+|---|---|---|---|---|---|
+| **LOCAL_UNSAVED** | Client/Session | User enters data; navigates steps; generates variants; selects images | NO | Hidden (no Product row) | Complete Product Setup without backend commitment |
+| **EXPLICIT_DRAFT** | Server DRAFT | User clicks "Save Draft" | YES | Visible in Product List (DRAFT badge) | Trackable saved-draft for resumption across sessions |
+| **PUBLISHED** | Server ACTIVE | User clicks "Create Product" | YES | Visible in Product List / Catalog | Final published product |
+
+**KEY CANONICAL RULES (6-Step Wizard, 2026-09-20):**
+
+- **Continue/Next**: Local navigation only (no server write). Does NOT auto-advance server `current_setup_step`.
+- **Step 1 (Scan Barcode)**: Barcode acquisition only; NO Skip (use existing scanner/manual paths).
+- **Steps 2–5**: User progresses through Step 2 Basic Details → Step 3 Product Type & Configuration → Step 4 Pricing & Tax → Step 5 Product Tracking (optional).
+- **Step 5 Product Tracking**: OPTIONAL. User may Skip Step 5 entirely → proceed directly to Step 6 Review & Create.
+  - If Quantity tracking selected: **SIMPLE:** Opening Stock (>= 0; zero bypasses Outlet Allocation; positive requires Outlet Allocation totalling Opening Stock). **VARIANT:** per-Variant Opening Quantity (>= 0 each; zero Variant bypasses allocation; positive Variant requires exact per-Variant Outlet Allocation; product total is informational only). Authority: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_SIMPLE_Quantity_Opening_Stock_Outlet_Allocation_Specification.md]] (Part A: SIMPLE; Part B: VARIANT).
+  - If Batch tracking selected: Initial Batch Details are optional (user may Skip Initial Details).
+  - If Batch + Expiry tracking selected: Initial Batch Number + Expiry Date (both required if entered); user may Skip Initial Details.
+- **Step 6 (Review & Create)**: Terminal step. Atomic server-side validation of complete 6-step Product Setup graph.
+- **Save Draft**: Explicit server persistence of DRAFT state. Does NOT auto-advance wizard step.
+- **Create Product**: Final server persistence from LOCAL_UNSAVED or EXPLICIT_DRAFT + current local state. Full 6-step validation before product publish.
+- **Module Navigation**: LOCAL_UNSAVED state preserved via client/session storage (same tenant/user/session). Does NOT create server Product row.
+
+**CANONICAL AUTHORITIES:**
+
+Core specifications: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Draft_Lifecycle_Specification]], [[../04_MODULE_KNOWLEDGE/10_Product_Core/06_Tenant_Admin_Add_Product_6_Step_Contract.md]], [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Review_Create_Specification]].
+
+**Primary 6-Step Canonical References:**
+- Main Contract: [[../04_MODULE_KNOWLEDGE/10_Product_Core/06_Tenant_Admin_Add_Product_6_Step_Contract.md]]
+- Step 3 Specification: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Step3_Product_Type_Configuration_Specification.md]]
+- Step 5 Product Tracking: [[../04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step5_Product_Tracking_Specification.md]]
+- Permission Matrix: [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_6_Step_Permission_Matrix.md]]
+- Decision: [[../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_6_STEP_RESTRUCTURING_DECISION_2026-09-20.md]]
+
+**LEGACY (Do NOT use as primary authority):**
+- [[../08_FLUTTER_POS_KNOWLEDGE/Tenant_Admin_Add_Product_7_Step_Flutter_Implementation_Specification]] (CURRENT IMPLEMENTATION; not target)
+- [[../07_UI_UX_KNOWLEDGE/Tenant_Admin_Add_Product_7_Step_UI_UX_Specification]] (CURRENT IMPLEMENTATION; not target)
+- [[../05_BACKEND_ARCHITECTURE/API_ENDPOINTS]] (Product Setup section — to be updated)
+- [[../02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]] (SUPERSEDED)
+
+**IMPLEMENTATION STATUS:** Documentation canonicalized 2026-09-19. Backend/Flutter implementation PENDING.
+
 ## Highest Priority Decision
 
 ## Online Order Fulfilment / Click & Collect authority (updated 2026-09-02)

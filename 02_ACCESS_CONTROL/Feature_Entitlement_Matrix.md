@@ -101,17 +101,26 @@ Do not leave multiple runtime names for the same Product Setup check.
 | `inventory_tracking` | Runtime `feature_code` / `PlatformTenantFeatureCodes.InventoryTracking` | Exists commercially; wizard does **not** currently gate advanced toggles | Gate Batch/Expiry/Serial policy, non-empty Initial Tracking, and publish identity | Wizard policy GAP |
 | `inventory_management` | Feature matrix **group name** for stock ops | **Not** present in Unified Commerce `PlatformTenantFeatureCodes` | Docs group only. Never a Product Setup runtime check | None |
 
-Quantity Track Inventory ON/OFF remains `product_catalog`.
-Advanced tracking requires `inventory_tracking`.
+**Product Tracking policy selection** (Step 5 of the 6-step wizard) remains under the **Product Setup / `product_catalog`** capability. There is no Track Inventory ON/OFF toggle in the 6-step TARGET UI.
 
-Product Wizard permission matrix:
-[[Tenant_Admin_Add_Product_7_Step_Permission_Matrix]].
+**Tracking method entitlements (TARGET 6-step):**
+- **Quantity** (Opening Stock + Outlet Allocation): `product_catalog` capability; Outlet authorization required per allocated outlet. Whether Quantity also requires `inventory_tracking` — **VERIFY DURING CHUNK 3 BACKEND AUDIT** (unresolved; do not prematurely gate).
+- **Batch / Batch + Expiry** (advanced tracking): requires `inventory_tracking` entitlement in addition to `product_catalog`.
+- **Skip** (no tracking): `product_catalog` only; no additional entitlement.
+
+
+Product Wizard permission matrix (TARGET):
+[[Tenant_Admin_Add_Product_6_Step_Permission_Matrix.md]].
+
+**Legacy / Historical (SUPERSEDED):**
+[[Tenant_Admin_Add_Product_7_Step_Permission_Matrix.md]] — retained for migration reference only; do not use as current authority.
 
 ## Related Files
 
 - [[Access_Control_Overview]]
 - [[Permission_Code_List]]
-- [[Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]
+- [[Tenant_Admin_Add_Product_6_Step_Permission_Matrix.md]] — CURRENT TARGET authority
+- [[Tenant_Admin_Add_Product_7_Step_Permission_Matrix.md]] — SUPERSEDED; retained for migration reference
 - [[../01_RELEASE_SCOPE/Included_Features]]
 - [[../01_RELEASE_SCOPE/Excluded_Features]]
 

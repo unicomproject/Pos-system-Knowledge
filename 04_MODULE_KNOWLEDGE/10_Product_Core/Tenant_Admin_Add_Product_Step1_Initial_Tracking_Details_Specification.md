@@ -1,10 +1,25 @@
 <!-- title: Tenant Admin Add Product Initial Tracking Details Specification -->
-<!-- status: Active -->
+<!-- status: SUPERSEDED -->
+<!-- superseded_by: Tenant_Admin_Add_Product_Step5_Product_Tracking_Specification.md -->
 <!-- system: OneVerz POS MVP -->
 <!-- last_updated: 2026-09-11 -->
 <!-- supersedes: collection_step2_numbering_pre_scanner_first -->
 
+# ⚠ SUPERSEDED / LEGACY INITIAL TRACKING MODEL
+
+> **This document is SUPERSEDED as the active target Product Tracking authority.**
+>
+> **Current authority:** [[Tenant_Admin_Add_Product_Step5_Product_Tracking_Specification.md]] (Step 5: Product Tracking in the 6-step wizard).
+>
+> **This file is retained** because it may describe CURRENT backend implementation reality (`product_setup_initial_tracking` table, Step 3 collection logic) and contains legacy draft fields needed during Chunk 3 migration. Do NOT use this document to define new features or as the target product tracking contract.
+>
+> **Reconciliation required in Chunk 3.** See [[../../13_DECISIONS_AND_CHANGES/PRODUCT_SETUP_6_STEP_RESTRUCTURING_DECISION_2026-09-20.md]].
+
+---
+
 # Tenant Admin Add Product Initial Tracking Details Specification
+
+*(Content below is LEGACY/MIGRATION REFERENCE — do NOT treat as active target authority)*
 
 Filename retained as `Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification`
 for wikilink stability. **Collection UI is global Step 3 (Product Type & Tracking)**. Filename retains Step1 for wikilink stability. Remumbered 2026-09-11 (was Step 2 from 2026-09-01; Step 1 is now Scan Barcode).
@@ -24,7 +39,7 @@ and identity rules in
 
 | Layer | CURRENT | TARGET | GAP |
 |---|---|---|---|
-| Wizard length | 7 steps | Remain 7 steps | None |
+| Wizard length | 7 steps (CURRENT backend) | 6 steps (TARGET — see [[06_Tenant_Admin_Add_Product_6_Step_Contract.md]]) | Reconcile in Chunk 3 |
 | Collection UI | Step 3 after Product Type confirmed (SIMPLE / VARIANT). Hidden for BUNDLE. Not on Step 1 Scan or Step 2 Basic Details | Same ownership on Type & Tracking; global number now 3 | Docs remumber 2026-09-11 |
 | Tracking policy | Step 3 → `product_inventory_settings` | Unchanged | None |
 | Destructive clear | Step 3 continue may apply clear plan with `confirmed: true` | Explicit confirmation dialog + `confirmClearIncompatibleInitialTracking` | Flutter confirmation UX |
@@ -32,7 +47,9 @@ and identity rules in
 | Actual Serial | Inventory `serial_numbers` | Same final owner | None |
 | `products.batch_number` / `expiry_date` / `serial_number` | Do not exist | Must **not** be added as Product master identity | Do not invent these columns |
 
-## Wizard Remains Exactly 7 Steps (LOCKED 2026-09-11)
+## ⚠ LEGACY: 7-Step Wizard (SUPERSEDED as TARGET — WAS LOCKED 2026-09-11)
+
+> This 7-step layout is the CURRENT backend implementation, NOT the target. The TARGET 6-step wizard is [[06_Tenant_Admin_Add_Product_6_Step_Contract.md]].
 
 1. Scan Barcode
 2. Basic Details

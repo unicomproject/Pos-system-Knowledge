@@ -44,7 +44,7 @@ Super Admin bootstrap creates **minimum viable SIMPLE products** for operational
 | Barcode | `barcode` | `product_barcodes.barcode` | No | null | Unique per tenant if provided | same | same | Optional scan support |
 | Track Inventory | `trackInventory` | `product_inventory_settings.is_stock_tracked` | No | `true` | boolean | same | same | Controls stock behaviour |
 | Opening Stock Qty | `openingStockQuantity` | stock movement ledger | No | 0 | ≥ 0; requires outlet if > 0 | same | same + inventory | Optional initial stock |
-| Outlet | `outletId` | `inventory_balances` scope | Conditional | — | Required when opening stock > 0; must be tenant outlet | same | outlet exists | Stock location |
+| Outlet | `outletId` | `inventory_balances` scope | Conditional | — | Required when opening quantity >= 0; must be tenant outlet | same | outlet exists | Stock location |
 | Status | `status` | `products.status` | No | `ACTIVE` | `ACTIVE` or `DRAFT` only | same | same | Bootstrap default ACTIVE for immediate POS use |
 
 ## Intentionally deferred to Tenant Admin
