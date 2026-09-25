@@ -1,7 +1,7 @@
 <!-- title: Product Core Module Overview -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP Unified Commerce Scope -->
-<!-- last_updated: 2026-08-24 -->
+<!-- last_updated: 2026-09-25 -->
 
 # Product Core Module Overview
 
@@ -83,4 +83,5 @@ merchandising, attractions, and temporary retail locations.
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/03_Technical_Contract]]
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/04_Tenant_Admin_Product_List_And_Import_Contract]]
 - [[04_MODULE_KNOWLEDGE/10_Product_Core/Tenant_Admin_Add_Product_Step1_Initial_Tracking_Details_Specification]]
+- [[04_MODULE_KNOWLEDGE/10_Product_Core/Bulk_Product_Upload_Primary_Flow]] — canonical functional reference for Tenant Admin Bulk Product Upload (C41–C44, C50 boundary)
 - [[02_ACCESS_CONTROL/Tenant_Admin_Add_Product_7_Step_Permission_Matrix]]

@@ -1,9 +1,11 @@
 <!-- title: Product Import Batches And Rows Table Schemas -->
 <!-- status: Active -->
 <!-- system: OneVerz POS MVP -->
-<!-- last_updated: 2026-08-06 -->
+<!-- last_updated: 2026-09-25 -->
 
 # 15. Product Import Batches And Rows
+
+> **Note (2026-09-25):** For Tenant Admin Bulk Product Upload Primary Flow, use [[../../04_MODULE_KNOWLEDGE/10_Product_Core/Bulk_Product_Upload_Primary_Flow]] as the current canonical functional reference. That flow covers CSV and XLSX, and keeps validation state, import intent and final outcome separate. The schema below is legacy / pending reconciliation in the future DB Contract.
 
 This file defines the database schemas, foreign keys, unique constraints, and indexes for `product_import_batches` and `product_import_rows` tables, enabling tenant-isolated CSV imports.
 
