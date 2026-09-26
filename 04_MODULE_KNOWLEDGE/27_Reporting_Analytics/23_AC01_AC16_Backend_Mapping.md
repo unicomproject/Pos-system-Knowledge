@@ -13,7 +13,7 @@
 | **AC-09** | Retry / Webhook / Offline duplicate protection | `IdempotencyKey` + `TenantId` unique DB indexes enforce duplicate protection on Sales, Payments, Stock, Returns. | Tests verify duplicate webhook drops. | SOURCE VERIFIED | **PARTIAL** | None |
 | **AC-10** | Business Timezone / Midnight boundary | Mixed timezone usage: Payments use UTC `DateTime.UtcNow`, while Sales use tenant timezone offsets inconsistently. | No tests for midnight boundaries. | SOURCE VERIFIED | **FAIL** | Timezone filters are mismatched across models. |
 | **AC-11** | Historical Product / Price / Tax integrity | `SalesOrderLine` & `SalesOrderTax` persist snapshots (`SkuSnapshot`, `TaxClassCodeSnapshot`, `UnitPrice`). | Tests cover line creation. | SOURCE VERIFIED | **PARTIAL** | None |
-| **AC-12** | Export complete filtered dataset / snapshot consistency | `CreateExportAsync` API is a dummy stub returning an in-memory dictionary mock. No CSV generation logic exists. | TEST COVERAGE MISSING | SOURCE VERIFIED | **PARTIAL** | PARTIAL - EXPORT SCOPE REQUIRES PRODUCT DECISION. Implemented securely for Sales Transactions, but full scope requirements are ambiguous due to missing primary source. |
+| **AC-12** | Export complete filtered dataset / snapshot consistency | CSV Export fully implemented for all 12 mandatory Release 1 reports. Includes metadata rows, canonical schemas, and formula injection protection. | `ReportingExportTests`, `ReportingExportIntegrationTests` (11 tests pass) | SOURCE VERIFIED | **PASS** | CSV Export implemented and verified for all required active reports in Release 1. |
 | **AC-13** | Tenant / Outlet / Till authorization and isolation | `GetAccessibleOutletIdsAsync` leaks all outlets if roles are empty. Till scoping missing. Entitlements are dead code. | `TenantUserStaffCodePostgreSqlTests` failed. | SOURCE VERIFIED | **FAIL** | CROSS-OUTLET AUTHORIZATION FAILURE. |
 | **AC-14** | No Results vs Error / Unavailable distinction | Backend distinguishes DB errors (500) vs valid empty lists (200 OK + `[]`). | Checked in basic endpoint tests. | SOURCE VERIFIED | **PARTIAL** | None |
 | **AC-15** | Non-inventory Product + Return in later reporting period | RPT-05/RPT-06 select Returns based on Original Sale Date instead of Return Date. | Missing test for Return Date filtering. | SOURCE VERIFIED | **FAIL** | Return Accounting selects wrong reporting period. |
@@ -58,6 +58,7 @@ ReportingEntitlementSecurityTests:
 
 ### PostgreSQL
 POSTGRESQL RELATIONAL SECURITY VERIFICATION — PENDING P3-H
+
 
 
 

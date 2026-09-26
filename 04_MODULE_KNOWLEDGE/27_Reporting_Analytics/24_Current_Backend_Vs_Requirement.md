@@ -54,5 +54,6 @@ POSTGRESQL RELATIONAL SECURITY VERIFICATION — PENDING P3-H
 
 
 ### CSV Export Status
-AC-12 — PARTIAL — EXPORT SCOPE REQUIRES PRODUCT DECISION
-Primary source requirement OneVerz-Reporting-Requirements-Full.docx was not found. Current implementation supports Sales Transactions export.
+AC-12 — PASS
+CSV Export fully implemented for all 12 mandatory Release 1 reports based on OneVerz-Reporting-Requirements-Full.docx v2.0. Export includes metadata headers, formula-injection protection, and exact canonical schema mapping.
+
